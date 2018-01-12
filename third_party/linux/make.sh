@@ -197,6 +197,7 @@ END
 }
 
 # main
+check_args "$@"
 activate
 prepare_dirs
 for lib in $LIBS; do

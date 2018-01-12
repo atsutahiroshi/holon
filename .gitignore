@@ -1,1 +1,15 @@
+# Build directory
+/third_party/build
+
+# C/C++
+*.d
 *.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.a
+*.exe
+*.out
+*.app
+

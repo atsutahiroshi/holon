@@ -6,7 +6,7 @@ if(UNIX)
   )
   add_custom_target(
     milib_activate ALL
-    COMMAND source activate
+    COMMAND bash -c "source activate"
     DEPENDS milib_build
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/bin
   )

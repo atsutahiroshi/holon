@@ -1,5 +1,5 @@
 # holon
-Control framework for humanoid robots based on the concept of Dynamics Morphing.
+Whole-body control framework for humanoid robots based on the concept of Dyanmics Morphing.
 
 ## Dependency
 This software dependes on the following libraries. For more detail, see in the [third_party](third_party) directory.
@@ -14,4 +14,4 @@ This software dependes on the following libraries. For more detail, see in the [
   * **Hiroshi Atsuta** - *Main Developer* - [atsutahiroshi](https://github.com/atsutahiroshi)
 
 ## License
-This project is licensed under the GNU Lesser General Public License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License - see the [LICENSE](LICENSE) file for details.

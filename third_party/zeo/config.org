@@ -1,7 +1,0 @@
-# dependency
-# CURE-1.0.0-beta5
-# ZM-1.0.0a
-
-PREFIX=$(HOME)/usr
-PROJNAME=zeo
-VERSION=1.0.1a

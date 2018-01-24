@@ -1,17 +1,29 @@
-# ----------------------------------------------------------------------------
-#
-# Top-level CMake file for holon
-#
-# ----------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.2)
 
 project(holon CXX C)
 
-# holon version
-set(HOLON_VERSION_MAJOR 0)
-set(HOLON_VERSION_MINOR 1)
-set(HOLON_VERSION_PATCH 0)
-set(HOLON_VERSION "${HOLON_VERSION_MAJOR}.${HOLON_VERSION_MINOR}.${HOLON_VERSION_PATCH}")
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# build third-party modules
+set(HOLON_SOURCE_DIR ${CMAKE_SOURCE_DIR}/holon/src)
+set(HOLON_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/holon/include)
+set(HOLON_TEST_DIR ${CMAKE_SOURCE_DIR}/holon/test)
+
+set(HOLON_SOURCE_FILES
+  ${HOLON_SOURCE_DIR}/com_zmp_model.cpp
+  )
+set(HOLON_HEADER_FILES
+  ${HOLON_INCLUDE_DIR}/com_zmp_model.hpp
+  )
+set(HOLON_TEST_SOURCES
+  ${HOLON_TEST_DIR}/test_com_zmp_model.cpp
+  ${HOLON_TEST_DIR}/test_main.cpp
+  )
+
 add_subdirectory(third_party)
+
+add_library(holon ${HOLON_SOURCE_FILES})
+target_include_directories(holon PUBLIC ${HOLON_INCLUDE_DIR})
+
+add_executable(holon_test ${HOLON_TEST_SOURCES})
+target_link_libraries(holon_test PUBLIC holon Catch)

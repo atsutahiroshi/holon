@@ -35,6 +35,7 @@ set(CURE_SOURCE_FILES
   )
 add_library(cure SHARED ${CURE_SOURCE_FILES})
 target_include_directories(cure PUBLIC ${CURE_INCLUDE_DIR})
+target_link_libraries(cure m)
 
 # build app
 set(CURE_LINK "-lcure -lm")

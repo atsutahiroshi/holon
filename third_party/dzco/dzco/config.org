@@ -1,0 +1,7 @@
+# dependency
+# CURE-1.0.0-beta5
+# ZM-1.0.0-beta5
+
+PREFIX=$(HOME)/usr
+PROJNAME=dzco
+VERSION=1.0.0-beta3

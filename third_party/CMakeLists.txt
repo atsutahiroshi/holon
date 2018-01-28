@@ -5,3 +5,4 @@ target_include_directories(Catch INTERFACE ${CATCH_INCLUDE_DIR})
 
 add_subdirectory(cure)
 add_subdirectory(zm)
+add_subdirectory(zeo)

@@ -38,14 +38,26 @@ target_include_directories(cure PUBLIC ${CURE_INCLUDE_DIR})
 target_link_libraries(cure m)
 
 # build app
-set(CURE_LINK "-lcure -lm")
-add_custom_command(
-  OUTPUT cure-config
-  COMMAND sh ${CURE_APP_DIR}/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l ${CURE_LINK} -v ${CURE_VERSION} > cure-config
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  )
 if(UNIX)
-  add_custom_target(config-cure ALL SOURCES cure-config)
+  set(CURE_LINK "-lcure -lm")
+  add_custom_command(
+    OUTPUT cure-config-gen
+    COMMAND cp ${CURE_APP_DIR}/cure-config-gen ${CMAKE_BINARY_DIR}
+    )
+  add_custom_command(
+    OUTPUT cure-config
+    COMMAND sh ${CMAKE_BINARY_DIR}/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l ${CURE_LINK} -v ${CURE_VERSION} > cure-config
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+  add_custom_target(
+    make-cure-config-gen ALL
+    SOURCES cure-config-gen
+    )
+  add_custom_target(
+    make-cure-config ALL
+    DEPENDS make-cure-config-gen
+    SOURCES cure-config
+    )
 endif()
 
 # install
@@ -61,11 +73,11 @@ install(TARGETS cure
   )
 install(DIRECTORY ${CURE_INCLUDE_DIR}/ DESTINATION include)
 if(UNIX)
-  install(FILES ${CURE_APP_DIR}/cure-config-gen
+  install(FILES ${CMAKE_BINARY_DIR}/cure-config-gen
     PERMISSIONS ${PERMISSIONS_755}
     DESTINATION bin
     )
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cure-config
+  install(FILES ${CMAKE_BINARY_DIR}/cure-config
     PERMISSIONS ${PERMISSIONS_755}
     DESTINATION bin
     )

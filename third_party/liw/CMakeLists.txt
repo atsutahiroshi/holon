@@ -17,7 +17,7 @@ option(LIW_USE_RTC "Determines whether to use enhanced realtime controller (RTC)
 # get version number
 file(READ ${LIW_TOP_DIR}/config.org LIW_CONFIG_CONTENT)
 string(REGEX MATCH
-  "PREFIX=(.*)[\r\n\t ]PROJNAME=(.*)[\r\n\t ]VERSION=(.*)[\r\n\t ][\r\n\t ]#(.*)[\r\n\t ]#(.*)[\r\n\t ]#(.*)[\r\n\t ]#(.*)[\r\n\t ]"
+  "PREFIX=(.*)[\r\n\t ]PROJNAME=(.*)[\r\n\t ]VERSION=(.*)[\r\n\t ][\r\n\t ]#.*#.*#.*#.*"
   _ ${LIW_CONFIG_CONTENT})
 set(LIW_PREFIX   ${CMAKE_MATCH_1})
 set(LIW_PROJNAME ${CMAKE_MATCH_2})

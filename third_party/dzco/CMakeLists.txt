@@ -37,7 +37,7 @@ set(DZCO_SOURCE_FILES
   )
 add_library(dzco SHARED ${DZCO_SOURCE_FILES})
 target_include_directories(dzco PUBLIC ${DZCO_INCLUDE_DIR})
-target_link_libraries(dzco zm cure)
+target_link_libraries(dzco PUBLIC zm cure)
 
 # build app
 set(DZCO_APPS dz_bode dz_nyquist dz_sim)

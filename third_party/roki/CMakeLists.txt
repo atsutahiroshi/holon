@@ -51,7 +51,7 @@ set(ROKI_SOURCE_FILES
   )
 add_library(roki SHARED ${ROKI_SOURCE_FILES})
 target_include_directories(roki PUBLIC ${ROKI_INCLUDE_DIR})
-target_link_libraries(roki zeo zm cure)
+target_link_libraries(roki PUBLIC zeo zm cure)
 
 # build app
 set(ROKI_APPS

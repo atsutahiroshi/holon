@@ -67,7 +67,7 @@ set(ZEO_SOURCE_FILES
   )
 add_library(zeo SHARED ${ZEO_SOURCE_FILES})
 target_include_directories(zeo PUBLIC ${ZEO_INCLUDE_DIR})
-target_link_libraries(zeo zm cure)
+target_link_libraries(zeo PUBLIC zm cure)
 
 # build app
 set(ZEO_APPS qhull gjk terra)

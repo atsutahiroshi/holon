@@ -34,7 +34,11 @@ __BEGIN_DECLS
 int liwSleep(long int sec, long int nsec);
 
 /* CPU clock using RDTSC */
+#if ((__GNUC__ < 4) || (__GNUC__ == 4)) && !defined(__clang__)
 extern inline long long liwClock(void){
+#else
+inline long long liwClock(void){
+#endif
   unsigned long long ret;
   __asm__ volatile ( "rdtsc" : "=A" (ret) );
   return ret;

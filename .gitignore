@@ -1,6 +1,5 @@
 # Build directory
 /build
-/third_party/build
 
 # C/C++
 *.d

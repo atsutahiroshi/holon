@@ -102,7 +102,7 @@ set(ZM_SOURCE_FILES
   )
 add_library(zm SHARED ${ZM_SOURCE_FILES})
 target_include_directories(zm PUBLIC ${ZM_INCLUDE_DIR})
-target_link_libraries(zm cure)
+target_link_libraries(zm PUBLIC cure)
 
 # build app
 set(ZM_APPS deg2rad rad2deg le psolve pexp seqmod)

@@ -36,30 +36,34 @@ set(LIW_SOURCE_FILES
   ${LIW_SOURCE_DIR}/liw_lock.c
   ${LIW_SOURCE_DIR}/liw_socket.c
   )
-if(LIW_USE_LIBDL)
-  list(APPEND LIW_SOURCE_FILES ${LIW_SOURCE_DIR}/liw_dl.c)
-endif()
-if(LIW_USE_RTC)
-  list(APPEND LIW_SOURCE_FILES ${LIW_SOURCE_DIR}/liw_rtc.c)
-endif()
 add_library(liw SHARED ${LIW_SOURCE_FILES})
 target_include_directories(liw PUBLIC ${LIW_INCLUDE_DIR})
-target_link_libraries(liw cure)
+
+# specify build options
+set(LIW_LINKER_FLAGS "-lliw")   # used for generating liw-config
+if(LIW_USE_LIBDL)
+  target_sources(liw PRIVATE ${LIW_SOURCE_DIR}/liw_dl.c)
+  target_link_libraries(liw PUBLIC dl)
+  set(LIW_LINKER_FLAGS "${LIW_LINKER_FLAGS} -ldl")
+endif()
+if(LIW_USE_PTHREAD)
+  target_link_libraries(liw PUBLIC pthread)
+  set(LIW_LINKER_FLAGS "${LIW_LINKER_FLAGS} -lpthread")
+endif()
+if(LIW_USE_RT)
+  target_link_libraries(liw PUBLIC rt)
+  set(LIW_LINKER_FLAGS "${LIW_LINKER_FLAGS} -lrt")
+endif()
+if(LIW_USE_RTC)
+  target_sources(liw PRIVATE ${LIW_SOURCE_DIR}/liw_rtc.c)
+endif()
+target_link_libraries(liw PUBLIC cure)
 
 # build app
 set(LIW_APPS)
 foreach(app ${LIW_APPS})
   add_executable(${app} ${LIW_APP_DIR}/${app}.c)
   target_link_libraries(${app} liw)
-  if(LIW_USE_LIBDL)
-    target_link_libraries(${app} dl)
-  endif()
-  if(LIW_USE_PTHREAD)
-    target_link_libraries(${app} pthread)
-  endif()
-  if(LIW_USE_RT)
-    target_link_libraries(${app} rt)
-  endif()
 endforeach()
 if(UNIX)
   execute_process(
@@ -67,10 +71,10 @@ if(UNIX)
     OUTPUT_VARIABLE CURE_LINK
     OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-  set(LIW_LINK "-lliw ${CURE_LINK}")
+  set(LIW_LINKER_FLAGS "${LIW_LINKER_FLAGS} ${CURE_LINK}")
   add_custom_command(
     OUTPUT liw-config
-    COMMAND sh ${CMAKE_BINARY_DIR}/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l ${LIW_LINK} -v ${LIW_VERSION} > liw-config
+    COMMAND sh ${CMAKE_BINARY_DIR}/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l ${LIW_LINKER_FLAGS} -v ${LIW_VERSION} > liw-config
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
   add_custom_target(

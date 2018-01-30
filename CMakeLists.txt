@@ -30,6 +30,7 @@ target_compile_options(holon
   $<$<CXX_COMPILER_ID:GNU>:-pedantic -Wall -Wextra -Wshadow -Wnon-virtual-dtor>
   $<$<CXX_COMPILER_ID:MSVC>:/W4>
   )
+target_link_libraries(holon PUBLIC roki)
 
 enable_testing()
 add_executable(test_main ${HOLON_TEST_SOURCES})

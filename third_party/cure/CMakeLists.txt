@@ -34,7 +34,7 @@ set(CURE_SOURCE_FILES
   ${CURE_SOURCE_DIR}/cure_option.c
   )
 add_library(cure SHARED ${CURE_SOURCE_FILES})
-target_include_directories(cure PUBLIC ${CURE_INCLUDE_DIR})
+target_include_directories(cure SYSTEM PUBLIC ${CURE_INCLUDE_DIR})
 target_link_libraries(cure PUBLIC m)
 
 # build app

@@ -66,7 +66,7 @@ set(ZEO_SOURCE_FILES
   ${ZEO_SOURCE_DIR}/zeo_col_ph.c
   )
 add_library(zeo SHARED ${ZEO_SOURCE_FILES})
-target_include_directories(zeo PUBLIC ${ZEO_INCLUDE_DIR})
+target_include_directories(zeo SYSTEM PUBLIC ${ZEO_INCLUDE_DIR})
 target_link_libraries(zeo PUBLIC zm cure)
 
 # build app

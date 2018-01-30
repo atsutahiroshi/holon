@@ -101,7 +101,7 @@ set(ZM_SOURCE_FILES
   ${ZM_SOURCE_DIR}/zm_parse.c
   )
 add_library(zm SHARED ${ZM_SOURCE_FILES})
-target_include_directories(zm PUBLIC ${ZM_INCLUDE_DIR})
+target_include_directories(zm SYSTEM PUBLIC ${ZM_INCLUDE_DIR})
 target_link_libraries(zm PUBLIC cure)
 
 # build app

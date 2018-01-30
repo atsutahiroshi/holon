@@ -35,7 +35,7 @@ set(ROKIGL_SOURCE_FILES
   ${ROKIGL_SOURCE_DIR}/rkgl_select.c
   )
 add_library(rokigl SHARED ${ROKIGL_SOURCE_FILES})
-target_include_directories(rokigl PUBLIC ${ROKIGL_INCLUDE_DIR})
+target_include_directories(rokigl SYSTEM PUBLIC ${ROKIGL_INCLUDE_DIR})
 
 # specify build options
 set(ROKIGL_LINKER_FLAGS "-lrokigl") # used for generating rokigl-config

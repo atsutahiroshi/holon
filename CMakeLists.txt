@@ -24,6 +24,12 @@ add_subdirectory(third_party)
 
 add_library(holon ${HOLON_SOURCE_FILES})
 target_include_directories(holon PUBLIC ${HOLON_INCLUDE_DIR})
+target_compile_options(holon
+  PRIVATE
+  $<$<CXX_COMPILER_ID:Clang>:-Wall -Weverything>
+  $<$<CXX_COMPILER_ID:GNU>:-pedantic -Wall -Wextra -Wshadow -Wnon-virtual-dtor>
+  $<$<CXX_COMPILER_ID:MSVC>:/W4>
+  )
 
 enable_testing()
 add_executable(test_main ${HOLON_TEST_SOURCES})

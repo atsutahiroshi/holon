@@ -36,7 +36,7 @@ set(DZCO_SOURCE_FILES
   ${DZCO_SOURCE_DIR}/dz_ident_lag.c
   )
 add_library(dzco SHARED ${DZCO_SOURCE_FILES})
-target_include_directories(dzco PUBLIC ${DZCO_INCLUDE_DIR})
+target_include_directories(dzco SYSTEM PUBLIC ${DZCO_INCLUDE_DIR})
 target_link_libraries(dzco PUBLIC zm cure)
 
 # build app

@@ -3,26 +3,26 @@ Language:        Cpp
 BasedOnStyle:  Google
 # DisableFormat:   true
 IncludeCategories: 
+  - Regex:           '^(<|")cure/.*h'
+    Priority:        3
+  - Regex:           '^(<|")zm/.*h'
+    Priority:        4
+  - Regex:           '^(<|")zeo/.*h'
+    Priority:        5
+  - Regex:           '^(<|")roki/rk_.*h'
+    Priority:        6
+  - Regex:           '^(<|")dzco/.*h'
+    Priority:        7
+  - Regex:           '^(<|")liw/.*h'
+    Priority:        8
+  - Regex:           '^(<|")zx11/.*h'
+    Priority:        9
+  - Regex:           '^(<|")roki/rkgl_.*h'
+    Priority:        10
   - Regex:           '^<.*\.h>'
     Priority:        1
   - Regex:           '^<.*'
     Priority:        2
-  - Regex:           '^"cure/.*'
-    Priority:        3
-  - Regex:           '^"zm/.*'
-    Priority:        4
-  - Regex:           '^"zeo/.*'
-    Priority:        5
-  - Regex:           '^"roki/rk_.*'
-    Priority:        6
-  - Regex:           '^"dzco/.*'
-    Priority:        7
-  - Regex:           '^"liw/.*'
-    Priority:        8
-  - Regex:           '^"zx11/.*'
-    Priority:        9
-  - Regex:           '^"roki/rkgl_.*'
-    Priority:        10
   - Regex:           '.*'
     Priority:        11
 PointerAlignment: Right

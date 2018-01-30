@@ -17,3 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with the holon.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include <zeo/zeo_vec3d.h>
+
+namespace holon {
+
+class ComZmpModel {
+ public:
+  ComZmpModel();
+  virtual ~ComZmpModel();
+
+  zVec3D* ComputeAcc(const zVec3D* position_com, const zVec3D* position_zmp,
+                     zVec3D* acceleration);
+};
+
+}  // namespace holon

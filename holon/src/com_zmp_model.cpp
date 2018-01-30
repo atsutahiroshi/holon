@@ -17,3 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with the holon.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "holon/com_zmp_model.hpp"
+
+#include <roki/rk_g.h>
+
+namespace holon {
+
+ComZmpModel::ComZmpModel() {}
+
+ComZmpModel::~ComZmpModel() {}
+
+zVec3D* ComZmpModel::ComputeAcc(const zVec3D* position_com,
+                                const zVec3D* position_zmp,
+                                zVec3D* acceleration) {
+  zVec3DCreate(acceleration, 0, 0, -RK_G);
+  return acceleration;
+}
+
+}  // namespace holon

@@ -22,9 +22,23 @@
 
 #include "catch.hpp"
 
-namespace  {
-  TEST_CASE("Test COM-ZMP model"){
-    REQUIRE(1 == 1);
-  }
-}  // namespace
+namespace holon {
+namespace {
 
+TEST_CASE("computes acceleration based on COM-ZMP model",
+          "[corelib][humanoid]") {
+  ComZmpModel model;
+
+  zVec3D pg, pz;
+  zVec3DCreate(&pg, 0, 0, 0);
+  zVec3DCreate(&pz, 0, 0, 0);
+
+  zVec3D acc;
+  model.ComputeAcc(&pg, &pz, &acc);
+  REQUIRE(zVec3DElem(&acc, zX) == 0);
+  REQUIRE(zVec3DElem(&acc, zY) == 0);
+  REQUIRE(zVec3DElem(&acc, zZ) == -RK_G);
+}
+
+}  // namespace
+}  // namespace holon

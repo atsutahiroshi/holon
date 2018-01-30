@@ -42,7 +42,7 @@ set(ZX11_SOURCE_FILES
   ${ZX11_SOURCE_DIR}/zximage_pnm.c
   )
 add_library(zx11 SHARED ${ZX11_SOURCE_FILES})
-target_include_directories(zx11 PUBLIC ${ZX11_INCLUDE_DIR})
+target_include_directories(zx11 SYSTEM PUBLIC ${ZX11_INCLUDE_DIR})
 
 # specify build options
 set(ZX11_ADDITIONAL_SOURCE_FILES "")

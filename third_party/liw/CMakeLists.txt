@@ -37,7 +37,7 @@ set(LIW_SOURCE_FILES
   ${LIW_SOURCE_DIR}/liw_socket.c
   )
 add_library(liw SHARED ${LIW_SOURCE_FILES})
-target_include_directories(liw PUBLIC ${LIW_INCLUDE_DIR})
+target_include_directories(liw SYSTEM PUBLIC ${LIW_INCLUDE_DIR})
 
 # specify build options
 set(LIW_LINKER_FLAGS "-lliw")   # used for generating liw-config

@@ -18,7 +18,7 @@
  * along with the holon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "holon/com_zmp_model.hpp"
+#include "holon/corelib/humanoid/com_zmp_model.hpp"
 
 #include <roki/rk_g.h>
 

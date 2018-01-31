@@ -1,0 +1,4 @@
+set(HOLON_TEST_SOURCES "")
+add_subdirectory(corelib)
+add_subdirectory(modules)
+add_subdirectory(test)

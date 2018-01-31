@@ -67,12 +67,42 @@ set(ZEO_SOURCE_FILES
   )
 add_library(zeo SHARED ${ZEO_SOURCE_FILES})
 target_include_directories(zeo SYSTEM PUBLIC ${ZEO_INCLUDE_DIR})
+if(UNIX)
+  target_compile_options(zeo
+    PRIVATE
+    -ansi -Wall
+    $<$<CONFIG:Debug>:-g3 -O0>
+    $<$<CONFIG:Release>:-O3 -funroll-loops>
+    )
+elseif(MSVC)
+  target_compile_options(zeo
+    PRIVATE
+    /W4
+    $<$<CONFIG:Debug>:/Od>
+    $<$<CONFIG:Release>:/O2>
+    )
+endif()
 target_link_libraries(zeo PUBLIC zm cure)
 
 # build app
 set(ZEO_APPS qhull gjk terra)
 foreach(app ${ZEO_APPS})
   add_executable(${app} ${ZEO_APP_DIR}/${app}.c)
+  if(UNIX)
+    target_compile_options(${app}
+      PRIVATE
+      -ansi -Wall
+      $<$<CONFIG:Debug>:-g3 -O0>
+      $<$<CONFIG:Release>:-O3>
+      )
+  elseif(MSVC)
+    target_compile_options(${app}
+      PRIVATE
+      /W4
+      $<$<CONFIG:Debug>:/Od>
+      $<$<CONFIG:Release>:/O2>
+      )
+  endif()
   target_link_libraries(${app} zeo)
 endforeach()
 set(ZEO_LINKER_FLAGS "-lzeo")

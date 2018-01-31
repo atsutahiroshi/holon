@@ -36,6 +36,21 @@ set(ROKIGL_SOURCE_FILES
   )
 add_library(rokigl SHARED ${ROKIGL_SOURCE_FILES})
 target_include_directories(rokigl SYSTEM PUBLIC ${ROKIGL_INCLUDE_DIR})
+if(UNIX)
+  target_compile_options(rokigl
+    PRIVATE
+    -ansi -Wall
+    $<$<CONFIG:Debug>:-g3 -O0>
+    $<$<CONFIG:Release>:-O3 -funroll-loops>
+    )
+elseif(MSVC)
+  target_compile_options(rokigl
+    PRIVATE
+    /W4
+    $<$<CONFIG:Debug>:/Od>
+    $<$<CONFIG:Release>:/O2>
+    )
+endif()
 
 # specify build options
 set(ROKIGL_LINKER_FLAGS "-lrokigl") # used for generating rokigl-config
@@ -53,6 +68,21 @@ set(ROKIGL_APPS rk_view rk_anim rk_seq rk_pen)
 foreach(app ${ROKIGL_APPS})
   add_executable(${app} ${ROKIGL_APP_DIR}/${app}.c)
   target_compile_definitions(${app} PRIVATE __USE_GLEW)
+  if(UNIX)
+    target_compile_options(${app}
+      PRIVATE
+      -Wall
+      $<$<CONFIG:Debug>:-g3 -O0>
+      $<$<CONFIG:Release>:-O3>
+      )
+  elseif(MSVC)
+    target_compile_options(${app}
+      PRIVATE
+      /W4
+      $<$<CONFIG:Debug>:/Od>
+      $<$<CONFIG:Release>:/O2>
+      )
+  endif()
   target_link_libraries(${app} rokigl)
 endforeach()
 if(UNIX)

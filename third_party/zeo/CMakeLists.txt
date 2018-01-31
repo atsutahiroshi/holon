@@ -75,21 +75,19 @@ foreach(app ${ZEO_APPS})
   add_executable(${app} ${ZEO_APP_DIR}/${app}.c)
   target_link_libraries(${app} zeo)
 endforeach()
+set(ZEO_LINKER_FLAGS "-lzeo")
 if(UNIX)
-  execute_process(
-    COMMAND zm-config -l
-    OUTPUT_VARIABLE ZM_LINK
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-  set(ZEO_LINK "-lzeo ${ZM_LINK}")
   add_custom_command(
     OUTPUT zeo-config
-    COMMAND sh ${CMAKE_BINARY_DIR}/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l ${ZEO_LINK} -v ${ZEO_VERSION} > zeo-config
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND echo -n "${ZEO_LINKER_FLAGS} " > zeo_link
+    COMMAND sh $<TARGET_FILE_DIR:zm>/zm-config -l >> zeo_link
+    COMMAND sh $<TARGET_FILE_DIR:cure>/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l \"`cat zeo_link`\" -v ${ZEO_VERSION} > zeo-config
+    COMMAND rm -f zeo_link
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   add_custom_target(
     make-zeo-config ALL
-    DEPENDS make-cure-config-gen
+    DEPENDS make-cure-config-gen make-zm-config
     SOURCES zeo-config
     )
 endif()
@@ -110,7 +108,7 @@ install(TARGETS ${ZEO_APPS}
   RUNTIME DESTINATION bin
   )
 if(UNIX)
-  install(FILES ${CMAKE_BINARY_DIR}/zeo-config
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/zeo-config
     PERMISSIONS ${PERMISSIONS_755}
     DESTINATION bin
     )

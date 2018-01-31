@@ -56,20 +56,19 @@ foreach(app ${ROKIGL_APPS})
   target_link_libraries(${app} rokigl)
 endforeach()
 if(UNIX)
-  execute_process(
-    COMMAND roki-config -l
-    OUTPUT_VARIABLE ROKI_LINK
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-  set(ROKIGL_LINK "-lrokigl ${ROKI_LINK}")
   add_custom_command(
     OUTPUT rokigl-config
-    COMMAND sh ${CMAKE_BINARY_DIR}/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l ${ROKIGL_LINK} -v ${ROKIGL_VERSION} > rokigl-config
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND echo -n "${ROKIGL_LINKER_FLAGS} " > rokigl_link
+    COMMAND sh $<TARGET_FILE_DIR:zx11>/zx11-config -l >> rokigl_link
+    COMMAND sh $<TARGET_FILE_DIR:liw>/liw-config -l >> rokigl_link
+    COMMAND sh $<TARGET_FILE_DIR:roki>/roki-config -l >> rokigl_link
+    COMMAND sh $<TARGET_FILE_DIR:cure>/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l \"`cat rokigl_link | tr \'\\n\' \'\ \'`\" -v ${ROKIGL_VERSION} > rokigl-config
+    COMMAND rm -f rokigl_link
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   add_custom_target(
     make-rokigl-config ALL
-    DEPENDS make-cure-config-gen
+    DEPENDS make-cure-config-gen make-zx11-config make-liw-config make-roki-config
     SOURCES rokigl-config
     )
 endif()
@@ -90,7 +89,7 @@ install(TARGETS ${ROKIGL_APPS}
   RUNTIME DESTINATION bin
   )
 if(UNIX)
-  install(FILES ${CMAKE_BINARY_DIR}/rokigl-config
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/rokigl-config
     PERMISSIONS ${PERMISSIONS_755}
     DESTINATION bin
     )

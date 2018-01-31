@@ -38,6 +38,21 @@ set(LIW_SOURCE_FILES
   )
 add_library(liw SHARED ${LIW_SOURCE_FILES})
 target_include_directories(liw SYSTEM PUBLIC ${LIW_INCLUDE_DIR})
+if(UNIX)
+  target_compile_options(liw
+    PRIVATE
+    -Wall
+    $<$<CONFIG:Debug>:-g3 -O0>
+    $<$<CONFIG:Release>:-O3 -funroll-loops>
+    )
+elseif(MSVC)
+  target_compile_options(liw
+    PRIVATE
+    /W4
+    $<$<CONFIG:Debug>:/Od>
+    $<$<CONFIG:Release>:/O2>
+    )
+endif()
 
 # specify build options
 set(LIW_LINKER_FLAGS "-lliw")   # used for generating liw-config

@@ -110,21 +110,19 @@ foreach(app ${ZM_APPS})
   add_executable(${app} ${ZM_APP_DIR}/${app}.c)
   target_link_libraries(${app} zm)
 endforeach()
+set(ZM_LINKER_FLAGS "-lzm")
 if(UNIX)
-  execute_process(
-    COMMAND cure-config -l
-    OUTPUT_VARIABLE CURE_LINK
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-  set(ZM_LINK "-lzm ${CURE_LINK}")
   add_custom_command(
     OUTPUT zm-config
-    COMMAND sh ${CMAKE_BINARY_DIR}/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l ${ZM_LINK} -v ${ZM_VERSION} > zm-config
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND echo -n "${ZM_LINKER_FLAGS} " > zm_link
+    COMMAND sh $<TARGET_FILE_DIR:cure>/cure-config -l >> zm_link
+    COMMAND sh $<TARGET_FILE_DIR:cure>/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l \"`cat zm_link`\" -v ${ZM_VERSION} > zm-config
+    COMMAND rm -f zm_link
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   add_custom_target(
     make-zm-config ALL
-    DEPENDS make-cure-config-gen
+    DEPENDS make-cure-config-gen make-cure-config
     SOURCES zm-config
     )
 endif()
@@ -145,7 +143,7 @@ install(TARGETS ${ZM_APPS}
   RUNTIME DESTINATION bin
   )
 if(UNIX)
-  install(FILES ${CMAKE_BINARY_DIR}/zm-config
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/zm-config
     PERMISSIONS ${PERMISSIONS_755}
     DESTINATION bin
     )

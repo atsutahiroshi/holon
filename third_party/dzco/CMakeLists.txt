@@ -45,21 +45,19 @@ foreach(app ${DZCO_APPS})
   add_executable(${app} ${DZCO_APP_DIR}/${app}.c)
   target_link_libraries(${app} dzco)
 endforeach()
+set(DZCO_LINKER_FLAGS "-ldzco")
 if(UNIX)
-  execute_process(
-    COMMAND zm-config -l
-    OUTPUT_VARIABLE ZM_LINK
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-  set(DZCO_LINK "-ldzco ${ZM_LINK}")
   add_custom_command(
     OUTPUT dzco-config
-    COMMAND sh ${CMAKE_BINARY_DIR}/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l ${DZCO_LINK} -v ${DZCO_VERSION} > dzco-config
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND echo -n "${DZCO_LINKER_FLAGS} " > dzco_link
+    COMMAND sh $<TARGET_FILE_DIR:zm>/zm-config -l >> dzco_link
+    COMMAND sh $<TARGET_FILE_DIR:cure>/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l \"`cat dzco_link`\" -v ${DZCO_VERSION} > dzco-config
+    COMMAND rm -f dzco_link
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   add_custom_target(
     make-dzco-config ALL
-    DEPENDS make-cure-config-gen
+    DEPENDS make-cure-config-gen make-zm-config
     SOURCES dzco-config
     )
 endif()
@@ -80,7 +78,7 @@ install(TARGETS ${DZCO_APPS}
   RUNTIME DESTINATION bin
   )
 if(UNIX)
-  install(FILES ${CMAKE_BINARY_DIR}/dzco-config
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dzco-config
     PERMISSIONS ${PERMISSIONS_755}
     DESTINATION bin
     )

@@ -102,12 +102,42 @@ set(ZM_SOURCE_FILES
   )
 add_library(zm SHARED ${ZM_SOURCE_FILES})
 target_include_directories(zm SYSTEM PUBLIC ${ZM_INCLUDE_DIR})
+if(UNIX)
+  target_compile_options(zm
+    PRIVATE
+    -ansi -Wall
+    $<$<CONFIG:Debug>:-g3 -O0>
+    $<$<CONFIG:Release>:-O3 -funroll-loops>
+    )
+elseif(MSVC)
+  target_compile_options(zm
+    PRIVATE
+    /W4
+    $<$<CONFIG:Debug>:/Od>
+    $<$<CONFIG:Release>:/O2>
+    )
+endif()
 target_link_libraries(zm PUBLIC cure)
 
 # build app
 set(ZM_APPS deg2rad rad2deg le psolve pexp seqmod)
 foreach(app ${ZM_APPS})
   add_executable(${app} ${ZM_APP_DIR}/${app}.c)
+  if(UNIX)
+    target_compile_options(${app}
+      PRIVATE
+      -ansi -Wall
+      $<$<CONFIG:Debug>:-g3 -O0>
+      $<$<CONFIG:Release>:-O3>
+      )
+  elseif(MSVC)
+    target_compile_options(${app}
+      PRIVATE
+      /W4
+      $<$<CONFIG:Debug>:/Od>
+      $<$<CONFIG:Release>:/O2>
+      )
+  endif()
   target_link_libraries(${app} zm)
 endforeach()
 set(ZM_LINKER_FLAGS "-lzm")

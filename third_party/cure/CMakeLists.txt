@@ -35,6 +35,21 @@ set(CURE_SOURCE_FILES
   )
 add_library(cure SHARED ${CURE_SOURCE_FILES})
 target_include_directories(cure SYSTEM PUBLIC ${CURE_INCLUDE_DIR})
+if(UNIX)
+  target_compile_options(cure
+    PRIVATE
+    -ansi -Wall
+    $<$<CONFIG:Debug>:-g3 -O0>
+    $<$<CONFIG:Release>:-O3 -funroll-loops>
+    )
+elseif(MSVC)
+  target_compile_options(cure
+    PRIVATE
+    /W4
+    $<$<CONFIG:Debug>:/Od>
+    $<$<CONFIG:Release>:/O2>
+    )
+endif()
 target_link_libraries(cure PUBLIC m)
 
 # build app

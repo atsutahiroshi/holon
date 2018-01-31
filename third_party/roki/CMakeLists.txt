@@ -62,21 +62,19 @@ foreach(app ${ROKI_APPS})
   add_executable(${app} ${ROKI_APP_DIR}/${app}.c)
   target_link_libraries(${app} roki)
 endforeach()
+set(ROKI_LINKER_FLAGS "-lroki")
 if(UNIX)
-  execute_process(
-    COMMAND zeo-config -l
-    OUTPUT_VARIABLE ZEO_LINK
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-  set(ROKI_LINK "-lroki ${ZEO_LINK}")
   add_custom_command(
     OUTPUT roki-config
-    COMMAND sh ${CMAKE_BINARY_DIR}/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l ${ROKI_LINK} -v ${ROKI_VERSION} > roki-config
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND echo -n "${ROKI_LINKER_FLAGS} " > roki_link
+    COMMAND sh $<TARGET_FILE_DIR:zeo>/zeo-config -l >> roki_link
+    COMMAND sh $<TARGET_FILE_DIR:cure>/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l \"`cat roki_link`\" -v ${ROKI_VERSION} > roki-config
+    COMMAND rm -f roki_link
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   add_custom_target(
     make-roki-config ALL
-    DEPENDS make-cure-config-gen
+    DEPENDS make-cure-config-gen make-zeo-config
     SOURCES roki-config
     )
 endif()
@@ -97,7 +95,7 @@ install(TARGETS ${ROKI_APPS}
   RUNTIME DESTINATION bin
   )
 if(UNIX)
-  install(FILES ${CMAKE_BINARY_DIR}/roki-config
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/roki-config
     PERMISSIONS ${PERMISSIONS_755}
     DESTINATION bin
     )

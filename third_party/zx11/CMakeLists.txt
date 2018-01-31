@@ -88,6 +88,7 @@ if(ZX11_USE_PDT)
   list(APPEND ZX11_ADDITIONAL_SOURCE_FILES ${ZX11_SOURCE_DIR}/zximage_pdt.c)
   target_compile_definitions(zx11 PRIVATE __ZX11_USE_PDT)
 endif()
+set(ZX11_LINKER_FLAGS "${ZX11_LINKER_FLAGS} -lX11")
 target_sources(zx11 PRIVATE ${ZX11_ADDITIONAL_SOURCE_FILES})
 target_link_libraries(zx11 PUBLIC X11 cure)
 
@@ -98,20 +99,17 @@ foreach(app ${ZX11_APPS})
   target_link_libraries(${app} zx11)
 endforeach()
 if(UNIX)
-  execute_process(
-    COMMAND cure-config -l
-    OUTPUT_VARIABLE CURE_LINK
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-  set(ZX11_LINKER_FLAGS "${ZX11_LINKER_FLAGS} ${CURE_LINK}")
   add_custom_command(
     OUTPUT zx11-config
-    COMMAND sh ${CMAKE_BINARY_DIR}/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l ${ZX11_LINKER_FLAGS} -v ${ZX11_VERSION} > zx11-config
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND echo -n "${ZX11_LINKER_FLAGS} " > zx11_link
+    COMMAND sh $<TARGET_FILE_DIR:cure>/cure-config -l >> zx11_link
+    COMMAND sh $<TARGET_FILE_DIR:cure>/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l \"`cat zx11_link`\" -v ${ZX11_VERSION} > zx11-config
+    COMMAND rm -f zx11_link
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   add_custom_target(
     make-zx11-config ALL
-    DEPENDS make-cure-config-gen
+    DEPENDS make-cure-config-gen make-cure-config
     SOURCES zx11-config
     )
 endif()
@@ -132,7 +130,7 @@ install(TARGETS ${ZX11_APPS}
   RUNTIME DESTINATION bin
   )
 if(UNIX)
-  install(FILES ${CMAKE_BINARY_DIR}/zx11-config
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/zx11-config
     PERMISSIONS ${PERMISSIONS_755}
     DESTINATION bin
     )

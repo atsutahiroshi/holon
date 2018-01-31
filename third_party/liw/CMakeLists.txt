@@ -66,20 +66,17 @@ foreach(app ${LIW_APPS})
   target_link_libraries(${app} liw)
 endforeach()
 if(UNIX)
-  execute_process(
-    COMMAND cure-config -l
-    OUTPUT_VARIABLE CURE_LINK
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-  set(LIW_LINKER_FLAGS "${LIW_LINKER_FLAGS} ${CURE_LINK}")
   add_custom_command(
     OUTPUT liw-config
-    COMMAND sh ${CMAKE_BINARY_DIR}/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l ${LIW_LINKER_FLAGS} -v ${LIW_VERSION} > liw-config
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND echo -n "${LIW_LINKER_FLAGS} " > liw_link
+    COMMAND sh $<TARGET_FILE_DIR:cure>/cure-config -l >> liw_link
+    COMMAND sh $<TARGET_FILE_DIR:cure>/cure-config-gen -I ${CMAKE_INSTALL_PREFIX}/include -L ${CMAKE_INSTALL_PREFIX}/lib -l \"`cat liw_link`\" -v ${LIW_VERSION} > liw-config
+    COMMAND rm -f liw_link
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   add_custom_target(
     make-liw-config ALL
-    DEPENDS make-cure-config-gen
+    DEPENDS make-cure-config-gen make-cure-config
     SOURCES liw-config
     )
 endif()
@@ -100,7 +97,7 @@ install(TARGETS ${LIW_APPS}
   RUNTIME DESTINATION bin
   )
 if(UNIX)
-  install(FILES ${CMAKE_BINARY_DIR}/liw-config
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/liw-config
     PERMISSIONS ${PERMISSIONS_755}
     DESTINATION bin
     )

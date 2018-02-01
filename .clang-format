@@ -4,24 +4,24 @@ BasedOnStyle:  Google
 # DisableFormat:   true
 IncludeCategories: 
   - Regex:           '^(<|")cure/.*h'
-    Priority:        3
+    Priority:        2
   - Regex:           '^(<|")zm/.*h'
-    Priority:        4
+    Priority:        3
   - Regex:           '^(<|")zeo/.*h'
-    Priority:        5
+    Priority:        4
   - Regex:           '^(<|")roki/rk_.*h'
-    Priority:        6
+    Priority:        5
   - Regex:           '^(<|")dzco/.*h'
-    Priority:        7
+    Priority:        6
   - Regex:           '^(<|")liw/.*h'
-    Priority:        8
+    Priority:        7
   - Regex:           '^(<|")zx11/.*h'
-    Priority:        9
+    Priority:        8
   - Regex:           '^(<|")roki/rkgl_.*h'
-    Priority:        10
+    Priority:        9
   - Regex:           '^<.*\.h>'
     Priority:        1
   - Regex:           '^<.*'
-    Priority:        2
+    Priority:        10
   - Regex:           '.*'
     Priority:        11

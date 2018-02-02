@@ -22,57 +22,8 @@
 
 #include <roki/rk_g.h>
 
-#include <sstream>
-#include <string>
 #include "catch.hpp"
-
-namespace Catch {
-namespace Detail {
-
-std::string zVec3DToString(const zVec3D* v) {
-  std::ostringstream ss;
-  ss << "( ";
-  if (!v) {
-    ss << "null vector";
-  } else {
-    ss << zVec3DElem(v, zX) << ", " << zVec3DElem(v, zY) << ", "
-       << zVec3DElem(v, zZ);
-  }
-  ss << " )";
-  return ss.str();
-}
-
-}  // namespace Detail
-
-template <>
-struct StringMaker<zVec3D*> {
-  static std::string convert(zVec3D* v) {
-    return ::Catch::Detail::zVec3DToString(v);
-  }
-};
-
-class zVec3DMatcher : public MatcherBase<zVec3D*> {
-  const zVec3D* comparator_;
-
- public:
-  explicit zVec3DMatcher(const zVec3D* comparator) : comparator_(comparator) {}
-
-  bool match(zVec3D* v) const override {
-    for (std::size_t i = 0; i < 3; ++i)
-      if (!zIsTiny(zVec3DElem(comparator_, i) - zVec3DElem(v, i))) return false;
-    return true;
-  }
-  std::string describe() const override {
-    std::ostringstream ss;
-    return "Equals: " + ::Catch::Detail::zVec3DToString(comparator_);
-  }
-};
-
-// The builder function
-inline zVec3DMatcher Equals(const zVec3D* comparator) {
-  return zVec3DMatcher(comparator);
-}
-}  // namespace Catch
+#include "holon/test/util/catch/custom_matchers.hpp"
 
 namespace holon {
 namespace {

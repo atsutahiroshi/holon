@@ -83,9 +83,9 @@ TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",
           "[corelib][humanoid]") {
   ComZmpModel model;
 
-  SECTION("zeta should be computed according to the height of COM") {
+  SECTION("zeta should be computed according to the COM height") {
     struct testcase_t {
-      double height_com;
+      double com_height;
       double expected_zeta_squared;
       double expected_zeta;
     } testcases[] = {{1, G, sqrt(G)},
@@ -94,12 +94,12 @@ TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",
                      {4, G / 4, sqrt(G / 4)}};
 
     for (auto c : testcases) {
-      zVec3D pg = {0, 0, c.height_com};
+      zVec3D pg = {0, 0, c.com_height};
       CHECK(model.ComputeZetaSqr(&pg) == Approx(c.expected_zeta_squared));
       CHECK(model.ComputeZeta(&pg) == Approx(c.expected_zeta));
     }
   }
-  SECTION("return 0 when the given height of COM was 0") {
+  SECTION("return 0 when the given COM height was 0") {
     // Returning 0 when the height is 0 is due to avoiding zero-division,
     // but this is not theoritically correct.
     // This case should be handled as an exception somehow.
@@ -112,7 +112,7 @@ TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",
     CHECK(model.ComputeZeta(&pg) == 0.0);
     zEchoOn();
   }
-  SECTION("return 0 when the given height of COM was negative") {
+  SECTION("return 0 when the given COM height was negative") {
     // Return 0 when a negative valued was given as the height of COM.
     // This should be handled as an exception as well.
     // TODO(*): handle the case where a negative value is given
@@ -125,14 +125,14 @@ TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",
   }
 }
 
-TEST_CASE("compute acceleration of COM based on COM-ZMP model",
+TEST_CASE("compute the COM acceleration based on COM-ZMP model",
           "[corelib][humanoid]") {
   ComZmpModel model;
 
   SECTION("case: the COM height is assumed to be const, namely zeta is const") {
     struct testcase_t {
-      zVec3D pos_com;
-      zVec3D pos_zmp;
+      zVec3D com_pos;
+      zVec3D zmp_pos;
       zVec3D expected_acc;
     } testcases[] = {
         // cases where the COM height equals to G, namely zeta equals to 1.
@@ -166,9 +166,9 @@ TEST_CASE("compute acceleration of COM based on COM-ZMP model",
 
     for (auto c : testcases) {
       zVec3D acc;
-      model.ComputeAcceleration(&c.pos_com, &c.pos_zmp, &acc);
-      CAPTURE(&c.pos_com);
-      CAPTURE(&c.pos_zmp);
+      model.ComputeAcceleration(&c.com_pos, &c.zmp_pos, &acc);
+      CAPTURE(&c.com_pos);
+      CAPTURE(&c.zmp_pos);
       CHECK_THAT(&acc, Catch::Equals(&c.expected_acc));
     }
   }

@@ -18,6 +18,9 @@
  * along with the holon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
+#define HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
+
 #include <zeo/zeo_vec3d.h>
 
 namespace holon {
@@ -36,3 +39,5 @@ class ComZmpModel {
 };
 
 }  // namespace holon
+
+#endif  // HOLON_HUMANOID_COM_ZMP_MODEL_HPP_

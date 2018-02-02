@@ -27,8 +27,12 @@ class ComZmpModel {
   ComZmpModel();
   virtual ~ComZmpModel();
 
-  zVec3D* ComputeAcc(const zVec3D* position_com, const zVec3D* position_zmp,
-                     zVec3D* acceleration);
+  double ComputeZetaSqr(const zVec3D* position_com) const;
+  double ComputeZeta(const zVec3D* position_com) const;
+
+  zVec3D* ComputeAcceleration(const zVec3D* position_com,
+                              const zVec3D* position_zmp,
+                              zVec3D* acceleration) const;
 };
 
 }  // namespace holon

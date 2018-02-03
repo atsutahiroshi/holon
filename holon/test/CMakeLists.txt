@@ -1,5 +1,6 @@
 set(HOLON_TEST_SOURCES
   ${HOLON_TEST_SOURCES}
+  ${CMAKE_CURRENT_SOURCE_DIR}/util/fuzzer/fuzzer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/test_main.cpp
   )
 

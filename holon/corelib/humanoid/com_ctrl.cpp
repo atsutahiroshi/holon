@@ -27,10 +27,14 @@ ComCtrl::ComCtrl() {}
 ComCtrl::~ComCtrl() {}
 
 zVec3D* ComCtrl::ComputeDesiredZmpPosition(const zVec3D* ref_com_position,
-                                           zVec3D* desired_zmp_pos) const {
+                                           const zVec3D* com_position,
+                                           const zVec3D* com_velocity,
+                                           zVec3D* desired_zmp_position) const {
   (void)ref_com_position;
-  zVec3DCreate(desired_zmp_pos, 0, 0, 0);
-  return desired_zmp_pos;
+  (void)com_position;
+  (void)com_velocity;
+  zVec3DCreate(desired_zmp_position, 0, 0, 0);
+  return desired_zmp_position;
 }
 
 }  // namespace holon

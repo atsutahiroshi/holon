@@ -32,10 +32,13 @@ TEST_CASE("compute desired ZMP position from the referential COM position",
 
   SECTION("referential COM position is set as (0, 0, 1)") {
     zVec3D ref_com_pos = {0, 0, 1};
+    zVec3D com_pos = {0, 0, 1};
+    zVec3D com_vel = {0, 0, 0};
     zVec3D desired_zmp_pos;
     zVec3D expected_zmp_pos = {0, 0, 0};
 
-    ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &desired_zmp_pos);
+    ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                   &desired_zmp_pos);
     CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
   }
 }

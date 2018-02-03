@@ -31,6 +31,8 @@ class ComCtrl {
   virtual ~ComCtrl();
 
   zVec3D* ComputeDesiredZmpPosition(const zVec3D* ref_com_position,
+                                    const zVec3D* com_position,
+                                    const zVec3D* com_velocity,
                                     zVec3D* desired_zmp_position) const;
 };
 

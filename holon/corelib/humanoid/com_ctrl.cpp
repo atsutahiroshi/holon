@@ -22,9 +22,19 @@
 
 namespace holon {
 
-ComCtrl::ComCtrl() {}
+ComCtrl::ComCtrl() : q1_(1.0), q2_(1.0) {}
 
 ComCtrl::~ComCtrl() {}
+
+ComCtrl& ComCtrl::set_q1(double q1) {
+  q1_ = q1;
+  return *this;
+}
+
+ComCtrl& ComCtrl::set_q2(double q2) {
+  q2_ = q2;
+  return *this;
+}
 
 zVec3D* ComCtrl::ComputeDesiredZmpPosition(const zVec3D* ref_com_position,
                                            const zVec3D* com_position,

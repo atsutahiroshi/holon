@@ -30,10 +30,19 @@ class ComCtrl {
   ComCtrl();
   virtual ~ComCtrl();
 
+  inline double q1() const noexcept { return q1_; };
+  inline double q2() const noexcept { return q2_; };
+
+  ComCtrl& set_q1(double q1);
+  ComCtrl& set_q2(double q2);
+
   zVec3D* ComputeDesiredZmpPosition(const zVec3D* ref_com_position,
                                     const zVec3D* com_position,
                                     const zVec3D* com_velocity,
                                     zVec3D* desired_zmp_position) const;
+
+ private:
+  double q1_, q2_;
 };
 
 }  // namespace holon

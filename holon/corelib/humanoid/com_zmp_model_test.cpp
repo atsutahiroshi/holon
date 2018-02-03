@@ -20,6 +20,7 @@
 
 #include "holon/corelib/humanoid/com_zmp_model.hpp"
 
+#include <zm/zm_ieee.h>
 #include <roki/rk_g.h>
 
 #include "catch.hpp"
@@ -57,9 +58,9 @@ TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",
     // TODO(*): handle zero-division error correctly
     zVec3D pg = {0, 0, 0};
     zEchoOff();
-    CHECK_FALSE(isinf(model.ComputeZetaSqr(&pg)));
+    CHECK_FALSE(zIsInf(model.ComputeZetaSqr(&pg)));
     CHECK(model.ComputeZetaSqr(&pg) == 0.0);
-    CHECK_FALSE(isinf(model.ComputeZeta(&pg)));
+    CHECK_FALSE(zIsInf(model.ComputeZeta(&pg)));
     CHECK(model.ComputeZeta(&pg) == 0.0);
     zEchoOn();
   }
@@ -70,7 +71,7 @@ TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",
     zVec3D pg = {0, 0, -1};
     zEchoOff();
     CHECK(model.ComputeZetaSqr(&pg) == 0.0);
-    CHECK_FALSE(isnan(model.ComputeZeta(&pg)));
+    CHECK_FALSE(zIsNan(model.ComputeZeta(&pg)));
     CHECK(model.ComputeZeta(&pg) == 0.0);
     zEchoOn();
   }

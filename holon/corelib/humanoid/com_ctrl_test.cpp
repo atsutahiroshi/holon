@@ -44,9 +44,8 @@ TEST_CASE("COM controller has the poles", "[corelib][humanoid]") {
 
     SECTION("set the values of the poles") {
       for (auto i = 0; i < 3; ++i) {
-        double q1, q2;
-        q1 = fuzz.get();
-        q2 = fuzz.get();
+        double q1 = fuzz.get();
+        double q2 = fuzz.get();
         ctrl.set_q1(q1);
         ctrl.set_q2(q2);
         INFO("times: " << i);
@@ -57,9 +56,8 @@ TEST_CASE("COM controller has the poles", "[corelib][humanoid]") {
 
     SECTION("set the values of the poles with chaining methods") {
       for (auto i = 0; i < 3; ++i) {
-        double q1, q2;
-        q1 = fuzz.get();
-        q2 = fuzz.get();
+        double q1 = fuzz.get();
+        double q2 = fuzz.get();
         ctrl.set_q1(q1).set_q2(q2);
         INFO("times: " << i);
         CHECK(ctrl.q1() == q1);
@@ -70,9 +68,8 @@ TEST_CASE("COM controller has the poles", "[corelib][humanoid]") {
 
   SECTION("use constructor with paramters") {
     for (auto i = 0; i < 3; ++i) {
-      double q1, q2;
-      q1 = fuzz.get();
-      q2 = fuzz.get();
+      double q1 = fuzz.get();
+      double q2 = fuzz.get();
       ComCtrl ctrl(q1, q2);
       CHECK(ctrl.q1() == q1);
       CHECK(ctrl.q2() == q2);

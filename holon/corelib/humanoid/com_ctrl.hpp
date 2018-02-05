@@ -31,13 +31,14 @@ class ComCtrl {
 
  public:
   ComCtrl();
+  ComCtrl(double t_q1, double t_q2);
   virtual ~ComCtrl();
 
-  inline double q1() const noexcept { return q1_; };
-  inline double q2() const noexcept { return q2_; };
+  inline double q1() const noexcept { return m_q1; };
+  inline double q2() const noexcept { return m_q2; };
 
-  ComCtrl& set_q1(double new_q1);
-  ComCtrl& set_q2(double new_q2);
+  ComCtrl& set_q1(double t_q1);
+  ComCtrl& set_q2(double t_q2);
 
   double ComputeDesiredZetaSqr(const zVec3D* ref_com_position) const;
   double ComputeDesiredZeta(const zVec3D* ref_com_position) const;
@@ -48,7 +49,7 @@ class ComCtrl {
                                     zVec3D* desired_zmp_position) const;
 
  private:
-  double q1_, q2_;
+  double m_q1, m_q2;
 };
 
 }  // namespace holon

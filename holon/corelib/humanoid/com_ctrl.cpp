@@ -23,17 +23,18 @@
 
 namespace holon {
 
-ComCtrl::ComCtrl() : q1_(default_q1), q2_(default_q2) {}
+ComCtrl::ComCtrl() : m_q1(default_q1), m_q2(default_q2) {}
+ComCtrl::ComCtrl(double t_q1, double t_q2) : m_q1(t_q1), m_q2(t_q2) {}
 
 ComCtrl::~ComCtrl() {}
 
-ComCtrl& ComCtrl::set_q1(double new_q1) {
-  q1_ = new_q1;
+ComCtrl& ComCtrl::set_q1(double t_q1) {
+  m_q1 = t_q1;
   return *this;
 }
 
-ComCtrl& ComCtrl::set_q2(double new_q2) {
-  q2_ = new_q2;
+ComCtrl& ComCtrl::set_q2(double t_q2) {
+  m_q2 = t_q2;
   return *this;
 }
 

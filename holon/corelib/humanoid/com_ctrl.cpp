@@ -27,13 +27,13 @@ ComCtrl::ComCtrl() : q1_(1.0), q2_(1.0) {}
 
 ComCtrl::~ComCtrl() {}
 
-ComCtrl& ComCtrl::set_q1(double q1) {
-  q1_ = q1;
+ComCtrl& ComCtrl::set_q1(double new_q1) {
+  q1_ = new_q1;
   return *this;
 }
 
-ComCtrl& ComCtrl::set_q2(double q2) {
-  q2_ = q2;
+ComCtrl& ComCtrl::set_q2(double new_q2) {
+  q2_ = new_q2;
   return *this;
 }
 

@@ -26,6 +26,9 @@
 namespace holon {
 
 class ComCtrl {
+  const double default_q1 = 1.0;
+  const double default_q2 = 1.0;
+
  public:
   ComCtrl();
   virtual ~ComCtrl();

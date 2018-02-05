@@ -23,7 +23,7 @@
 
 namespace holon {
 
-ComCtrl::ComCtrl() : q1_(1.0), q2_(1.0) {}
+ComCtrl::ComCtrl() : q1_(default_q1), q2_(default_q2) {}
 
 ComCtrl::~ComCtrl() {}
 

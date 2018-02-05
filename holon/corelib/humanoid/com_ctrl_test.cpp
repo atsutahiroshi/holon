@@ -122,11 +122,11 @@ TEST_CASE("compute desired zeta", "[corelib][humanoid]") {
   }
 }
 
-TEST_CASE("compute desired ZMP position from the referential COM position",
+TEST_CASE("compute desired ZMP position using it as a regulator",
           "[corelib][humanoid]") {
   ComCtrl ctrl;
 
-  SECTION("referential COM position is set as (0, 0, 1)") {
+  SECTION("check only along x-axis") {
     zVec3D ref_com_pos = {0, 0, 1};
     struct testcase_t {
       zVec3D com_pos;

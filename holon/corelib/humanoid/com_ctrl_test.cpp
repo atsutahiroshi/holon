@@ -52,6 +52,18 @@ TEST_CASE("COM controller has the poles", "[corelib][humanoid]") {
       CHECK(ctrl.q2() == q2);
     }
   }
+
+  SECTION("set the values of the poles with chaining methods") {
+    for (auto i = 0; i < 3; ++i) {
+      double q1, q2;
+      q1 = fuzz.get();
+      q2 = fuzz.get();
+      ctrl.set_q1(q1).set_q2(q2);
+      INFO("times: " << i);
+      CHECK(ctrl.q1() == q1);
+      CHECK(ctrl.q2() == q2);
+    }
+  }
 }
 
 TEST_CASE("compute desired zeta", "[corelib][humanoid]") {

@@ -19,12 +19,12 @@
  */
 
 #include "holon/corelib/humanoid/com_ctrl.hpp"
-#include "holon/corelib/humanoid/com_zmp_model.hpp"
 
 namespace holon {
 
-ComCtrl::ComCtrl() : m_q1(default_q1), m_q2(default_q2) {}
-ComCtrl::ComCtrl(double t_q1, double t_q2) : m_q1(t_q1), m_q2(t_q2) {}
+ComCtrl::ComCtrl() : m_model(), m_q1(default_q1), m_q2(default_q2) {}
+ComCtrl::ComCtrl(double t_q1, double t_q2)
+    : m_model(), m_q1(t_q1), m_q2(t_q2) {}
 
 ComCtrl::~ComCtrl() {}
 

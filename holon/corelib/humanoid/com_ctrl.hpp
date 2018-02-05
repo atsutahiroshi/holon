@@ -23,6 +23,8 @@
 
 #include <zeo/zeo_vec3d.h>
 
+#include "holon/corelib/humanoid/com_zmp_model.hpp"
+
 namespace holon {
 
 class ComCtrl {
@@ -40,6 +42,8 @@ class ComCtrl {
   ComCtrl& set_q1(double t_q1);
   ComCtrl& set_q2(double t_q2);
 
+  const ComZmpModel& model() const noexcept { return m_model; };
+
   double ComputeDesiredZetaSqr(const zVec3D* ref_com_position) const;
   double ComputeDesiredZeta(const zVec3D* ref_com_position) const;
 
@@ -49,6 +53,7 @@ class ComCtrl {
                                     zVec3D* desired_zmp_position) const;
 
  private:
+  ComZmpModel m_model;
   double m_q1, m_q2;
 };
 

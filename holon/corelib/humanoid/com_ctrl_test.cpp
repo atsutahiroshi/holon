@@ -32,34 +32,48 @@ namespace {
 const double G = RK_G;
 
 TEST_CASE("COM controller has the poles", "[corelib][humanoid]") {
-  ComCtrl ctrl;
   Fuzzer fuzz;
 
-  SECTION("default values of the poles should be 1 and 1") {
-    CHECK(ctrl.q1() == 1.0);
-    CHECK(ctrl.q2() == 1.0);
-  }
+  SECTION("use constructor with no paramters") {
+    ComCtrl ctrl;
 
-  SECTION("set the values of the poles") {
-    for (auto i = 0; i < 3; ++i) {
-      double q1, q2;
-      q1 = fuzz.get();
-      q2 = fuzz.get();
-      ctrl.set_q1(q1);
-      ctrl.set_q2(q2);
-      INFO("times: " << i);
-      CHECK(ctrl.q1() == q1);
-      CHECK(ctrl.q2() == q2);
+    SECTION("default values of the poles should be 1 and 1") {
+      CHECK(ctrl.q1() == 1.0);
+      CHECK(ctrl.q2() == 1.0);
+    }
+
+    SECTION("set the values of the poles") {
+      for (auto i = 0; i < 3; ++i) {
+        double q1, q2;
+        q1 = fuzz.get();
+        q2 = fuzz.get();
+        ctrl.set_q1(q1);
+        ctrl.set_q2(q2);
+        INFO("times: " << i);
+        CHECK(ctrl.q1() == q1);
+        CHECK(ctrl.q2() == q2);
+      }
+    }
+
+    SECTION("set the values of the poles with chaining methods") {
+      for (auto i = 0; i < 3; ++i) {
+        double q1, q2;
+        q1 = fuzz.get();
+        q2 = fuzz.get();
+        ctrl.set_q1(q1).set_q2(q2);
+        INFO("times: " << i);
+        CHECK(ctrl.q1() == q1);
+        CHECK(ctrl.q2() == q2);
+      }
     }
   }
 
-  SECTION("set the values of the poles with chaining methods") {
+  SECTION("use constructor with paramters") {
     for (auto i = 0; i < 3; ++i) {
       double q1, q2;
       q1 = fuzz.get();
       q2 = fuzz.get();
-      ctrl.set_q1(q1).set_q2(q2);
-      INFO("times: " << i);
+      ComCtrl ctrl(q1, q2);
       CHECK(ctrl.q1() == q1);
       CHECK(ctrl.q2() == q2);
     }

@@ -36,6 +36,8 @@ class ComCtrl {
   ComCtrl& set_q1(double q1);
   ComCtrl& set_q2(double q2);
 
+  double ComputeDesiredZetaSqr(const zVec3D* ref_com_position) const;
+  double ComputeDesiredZeta(const zVec3D* ref_com_position) const;
   zVec3D* ComputeDesiredZmpPosition(const zVec3D* ref_com_position,
                                     const zVec3D* com_position,
                                     const zVec3D* com_velocity,

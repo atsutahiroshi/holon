@@ -19,6 +19,7 @@
  */
 
 #include "holon/corelib/humanoid/com_ctrl.hpp"
+#include "holon/corelib/humanoid/com_zmp_model.hpp"
 
 namespace holon {
 
@@ -34,6 +35,14 @@ ComCtrl& ComCtrl::set_q1(double q1) {
 ComCtrl& ComCtrl::set_q2(double q2) {
   q2_ = q2;
   return *this;
+}
+
+double ComCtrl::ComputeDesiredZetaSqr(const zVec3D* ref_com_position) const {
+  return ComZmpModel().ComputeZetaSqr(ref_com_position);
+}
+
+double ComCtrl::ComputeDesiredZeta(const zVec3D* ref_com_position) const {
+  return ComZmpModel().ComputeZeta(ref_com_position);
 }
 
 zVec3D* ComCtrl::ComputeDesiredZmpPosition(const zVec3D* ref_com_position,

@@ -20,12 +20,16 @@
 
 #include "holon/corelib/humanoid/com_ctrl.hpp"
 
+#include <roki/rk_g.h>
+
 #include "catch.hpp"
 #include "holon/test/util/catch/custom_matchers.hpp"
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
 namespace holon {
 namespace {
+
+const double G = RK_G;
 
 TEST_CASE("COM controller has the poles", "[corelib][humanoid]") {
   ComCtrl ctrl;
@@ -49,6 +53,60 @@ TEST_CASE("COM controller has the poles", "[corelib][humanoid]") {
     }
   }
 }
+
+TEST_CASE("compute desired zeta", "[corelib][humanoid]") {
+  ComCtrl ctrl;
+
+  SECTION("zeta should be computed according to the COM height") {
+    struct testcase_t {
+      double com_height;
+      double expected_zeta_squared;
+      double expected_zeta;
+    } testcases[] = {{1, G, sqrt(G)},
+                     {G, 1.0, 1.0},
+                     {2, G / 2, sqrt(G / 2)},
+                     {4, G / 4, sqrt(G / 4)}};
+
+    for (auto c : testcases) {
+      zVec3D pg = {0, 0, c.com_height};
+      CHECK(ctrl.ComputeDesiredZetaSqr(&pg) == Approx(c.expected_zeta_squared));
+      CHECK(ctrl.ComputeDesiredZeta(&pg) == Approx(c.expected_zeta));
+    }
+  }
+  SECTION("return 0 when the given COM height was 0") {
+    // Returning 0 when the height is 0 is due to avoiding zero-division,
+    // but this is not theoritically correct.
+    // This case should be handled as an exception somehow.
+    // TODO(*): handle zero-division error correctly
+    zVec3D pg = {0, 0, 0};
+    zEchoOff();
+    CHECK_FALSE(zIsInf(ctrl.ComputeDesiredZetaSqr(&pg)));
+    CHECK(ctrl.ComputeDesiredZetaSqr(&pg) == 0.0);
+    CHECK_FALSE(zIsInf(ctrl.ComputeDesiredZeta(&pg)));
+    CHECK(ctrl.ComputeDesiredZeta(&pg) == 0.0);
+    zEchoOn();
+  }
+  SECTION("return 0 when the given COM height was negative") {
+    // Return 0 when a negative valued was given as the height of COM.
+    // This should be handled as an exception as well.
+    // TODO(*): handle the case where a negative value is given
+    zVec3D pg = {0, 0, -1};
+    zEchoOff();
+    CHECK(ctrl.ComputeDesiredZetaSqr(&pg) == 0.0);
+    CHECK_FALSE(zIsNan(ctrl.ComputeDesiredZeta(&pg)));
+    CHECK(ctrl.ComputeDesiredZeta(&pg) == 0.0);
+    zEchoOn();
+  }
+}
+
+// TEST_CASE("compute gains k1 and k2 for utility", "[corelib][humanoid]") {
+//   ComCtrl ctrl;
+//   struct testcase_t {
+//     double q1, q2;
+//     double expected_k1;
+//     double expected_k2;
+//   } testcases[] = {};
+// }
 
 TEST_CASE("compute desired ZMP position from the referential COM position",
           "[corelib][humanoid]") {

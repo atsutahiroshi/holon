@@ -99,15 +99,6 @@ TEST_CASE("compute desired zeta", "[corelib][humanoid]") {
   }
 }
 
-// TEST_CASE("compute gains k1 and k2 for utility", "[corelib][humanoid]") {
-//   ComCtrl ctrl;
-//   struct testcase_t {
-//     double q1, q2;
-//     double expected_k1;
-//     double expected_k2;
-//   } testcases[] = {};
-// }
-
 TEST_CASE("compute desired ZMP position from the referential COM position",
           "[corelib][humanoid]") {
   ComCtrl ctrl;

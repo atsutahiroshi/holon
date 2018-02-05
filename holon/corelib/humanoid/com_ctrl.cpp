@@ -50,10 +50,16 @@ zVec3D* ComCtrl::ComputeDesiredZmpPosition(const zVec3D* ref_com_position,
                                            const zVec3D* com_position,
                                            const zVec3D* com_velocity,
                                            zVec3D* desired_zmp_position) const {
-  (void)ref_com_position;
-  (void)com_position;
-  (void)com_velocity;
-  zVec3DCreate(desired_zmp_position, 0, 0, 0);
+  double xd = zVec3DElem(ref_com_position, zX);
+  double x = zVec3DElem(com_position, zX);
+  double vx = zVec3DElem(com_velocity, zX);
+  double yd = zVec3DElem(ref_com_position, zY);
+  double y = zVec3DElem(com_position, zY);
+  double vy = zVec3DElem(com_velocity, zY);
+  double zeta = ComputeDesiredZeta(ref_com_position);
+  zVec3DCreate(desired_zmp_position,
+               x + (m_q1 * m_q2) * (x - xd) + (m_q1 + m_q2) * vx / zeta,
+               y + (m_q1 * m_q2) * (y - yd) + (m_q1 + m_q2) * vy / zeta, 0);
   return desired_zmp_position;
 }
 

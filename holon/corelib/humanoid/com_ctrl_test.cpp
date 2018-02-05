@@ -122,31 +122,303 @@ TEST_CASE("compute desired zeta", "[corelib][humanoid]") {
   }
 }
 
-TEST_CASE("compute desired ZMP position using it as a regulator",
+TEST_CASE("compute desired ZMP position to regulate COM at (0, 0, G)",
           "[corelib][humanoid]") {
   ComCtrl ctrl;
+  zVec3D ref_com_pos = {0, 0, G};
 
-  SECTION("check only along x-axis") {
-    zVec3D ref_com_pos = {0, 0, G};
+  SECTION("case: q1 = 1, q2 = 1, zeta = 1") {
     // fixed paramters
     REQUIRE(ctrl.model().ComputeZeta(&ref_com_pos) == Approx(1.0));
     REQUIRE(ctrl.q1() == 1.0);
     REQUIRE(ctrl.q2() == 1.0);
 
-    struct testcase_t {
-      double com_pos_x;
-      double com_vel_x;
-      double expected_zmp_pos_x;
-    } testcases[] = {{0, 0, 0}};
+    SECTION("check only along x-axis") {
+      struct testcase_t {
+        double com_pos_x;
+        double com_vel_x;
+        double expected_zmp_pos_x;
+      } testcases[] = {
+          {0, 0, 0}, {1, 0, 2}, {3, -1, 4}, {0, -2, -4}, {-2, 2, 0}};
 
-    for (auto& c : testcases) {
-      zVec3D com_pos = {c.com_pos_x, 0, zVec3DElem(&ref_com_pos, zZ)};
-      zVec3D com_vel = {c.com_vel_x, 0, 0};
-      zVec3D expected_zmp_pos = {c.expected_zmp_pos_x, 0, 0};
-      zVec3D desired_zmp_pos;
-      ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
-                                     &desired_zmp_pos);
-      CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+      for (auto& c : testcases) {
+        zVec3D com_pos = {c.com_pos_x, 0, zVec3DElem(&ref_com_pos, zZ)};
+        zVec3D com_vel = {c.com_vel_x, 0, 0};
+        zVec3D expected_zmp_pos = {c.expected_zmp_pos_x, 0, 0};
+        zVec3D desired_zmp_pos;
+        ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                       &desired_zmp_pos);
+        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+      }
+    }
+    SECTION("check only along y-axis") {
+      struct testcase_t {
+        double com_pos_y;
+        double com_vel_y;
+        double expected_zmp_pos_y;
+      } testcases[] = {
+          {0, 0, 0}, {1, 0, 2}, {3, -1, 4}, {0, -2, -4}, {-2, 2, 0}};
+
+      for (auto& c : testcases) {
+        zVec3D com_pos = {0, c.com_pos_y, zVec3DElem(&ref_com_pos, zZ)};
+        zVec3D com_vel = {0, c.com_vel_y, 0};
+        zVec3D expected_zmp_pos = {0, c.expected_zmp_pos_y, 0};
+        zVec3D desired_zmp_pos;
+        ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                       &desired_zmp_pos);
+        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+      }
+    }
+  }
+
+  SECTION("case: q1 = 1, q2 = 0.5, zeta = 1") {
+    // fixed paramters
+    REQUIRE(ctrl.model().ComputeZeta(&ref_com_pos) == Approx(1.0));
+    ctrl.set_q2(0.5);
+    REQUIRE(ctrl.q1() == 1.0);
+    REQUIRE(ctrl.q2() == 0.5);
+
+    SECTION("check only along x-axis") {
+      struct testcase_t {
+        double com_pos_x;
+        double com_vel_x;
+        double expected_zmp_pos_x;
+      } testcases[] = {
+          {0, 0, 0}, {1, 0, 1.5}, {3, -1, 3}, {0, -2, -3}, {-2, 2, 0}};
+
+      for (auto& c : testcases) {
+        zVec3D com_pos = {c.com_pos_x, 0, zVec3DElem(&ref_com_pos, zZ)};
+        zVec3D com_vel = {c.com_vel_x, 0, 0};
+        zVec3D expected_zmp_pos = {c.expected_zmp_pos_x, 0, 0};
+        zVec3D desired_zmp_pos;
+        ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                       &desired_zmp_pos);
+        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+      }
+    }
+    SECTION("check only along y-axis") {
+      struct testcase_t {
+        double com_pos_y;
+        double com_vel_y;
+        double expected_zmp_pos_y;
+      } testcases[] = {
+          {0, 0, 0}, {1, 0, 1.5}, {3, -1, 3}, {0, -2, -3}, {-2, 2, 0}};
+
+      for (auto& c : testcases) {
+        zVec3D com_pos = {0, c.com_pos_y, zVec3DElem(&ref_com_pos, zZ)};
+        zVec3D com_vel = {0, c.com_vel_y, 0};
+        zVec3D expected_zmp_pos = {0, c.expected_zmp_pos_y, 0};
+        zVec3D desired_zmp_pos;
+        ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                       &desired_zmp_pos);
+        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+      }
+    }
+  }
+  SECTION("case: q1 = 1.2, q2 = 0.8, zeta = 1") {
+    // fixed paramters
+    REQUIRE(ctrl.model().ComputeZeta(&ref_com_pos) == Approx(1.0));
+    ctrl.set_q1(1.2);
+    ctrl.set_q2(0.8);
+    REQUIRE(ctrl.q1() == 1.2);
+    REQUIRE(ctrl.q2() == 0.8);
+
+    SECTION("check only along x-axis") {
+      struct testcase_t {
+        double com_pos_x;
+        double com_vel_x;
+        double expected_zmp_pos_x;
+      } testcases[] = {
+          {0, 0, 0}, {1, 0, 1.96}, {3, -1, 3.88}, {0, -2, -4}, {-2, 2, 0.08}};
+
+      for (auto& c : testcases) {
+        zVec3D com_pos = {c.com_pos_x, 0, zVec3DElem(&ref_com_pos, zZ)};
+        zVec3D com_vel = {c.com_vel_x, 0, 0};
+        zVec3D expected_zmp_pos = {c.expected_zmp_pos_x, 0, 0};
+        zVec3D desired_zmp_pos;
+        ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                       &desired_zmp_pos);
+        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+      }
+    }
+    SECTION("check only along y-axis") {
+      struct testcase_t {
+        double com_pos_y;
+        double com_vel_y;
+        double expected_zmp_pos_y;
+      } testcases[] = {
+          {0, 0, 0}, {1, 0, 1.96}, {3, -1, 3.88}, {0, -2, -4}, {-2, 2, 0.08}};
+
+      for (auto& c : testcases) {
+        zVec3D com_pos = {0, c.com_pos_y, zVec3DElem(&ref_com_pos, zZ)};
+        zVec3D com_vel = {0, c.com_vel_y, 0};
+        zVec3D expected_zmp_pos = {0, c.expected_zmp_pos_y, 0};
+        zVec3D desired_zmp_pos;
+        ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                       &desired_zmp_pos);
+        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+      }
+    }
+  }
+}
+
+TEST_CASE("compute desired ZMP position to regulate COM when q1 = 1, q2 = 1",
+          "[corelib][humanoid]") {
+  ComCtrl ctrl;
+  REQUIRE(ctrl.q1() == 1.0);
+  REQUIRE(ctrl.q2() == 1.0);
+
+  SECTION("case: referential COM position = (1, 0.5, G)") {
+    zVec3D ref_com_pos = {1, 0.5, G};
+    REQUIRE(ctrl.model().ComputeZeta(&ref_com_pos) == Approx(1.0));
+
+    SECTION("check only along x-axis") {
+      struct testcase_t {
+        double com_pos_x;
+        double com_vel_x;
+        double expected_zmp_pos_x;
+      } testcases[] = {
+          {0, 0, -1}, {1, 0, 1}, {3, -1, 3}, {0, -2, -5}, {-2, 3, 1}};
+
+      for (auto& c : testcases) {
+        zVec3D com_pos = {c.com_pos_x, 0, zVec3DElem(&ref_com_pos, zZ)};
+        zVec3D com_vel = {c.com_vel_x, 0, 0};
+        zVec3D expected_zmp_pos = {c.expected_zmp_pos_x,
+                                   -zVec3DElem(&ref_com_pos, zY), 0};
+        zVec3D desired_zmp_pos;
+        ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                       &desired_zmp_pos);
+        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+      }
+    }
+    SECTION("check only along y-axis") {
+      struct testcase_t {
+        double com_pos_y;
+        double com_vel_y;
+        double expected_zmp_pos_y;
+      } testcases[] = {
+          {0, 0, -0.5}, {1, 0, 1.5}, {3, -1, 3.5}, {0, -2, -4.5}, {-2, 3, 1.5}};
+
+      for (auto& c : testcases) {
+        zVec3D com_pos = {0, c.com_pos_y, zVec3DElem(&ref_com_pos, zZ)};
+        zVec3D com_vel = {0, c.com_vel_y, 0};
+        zVec3D expected_zmp_pos = {-zVec3DElem(&ref_com_pos, zX),
+                                   c.expected_zmp_pos_y, 0};
+        zVec3D desired_zmp_pos;
+        ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                       &desired_zmp_pos);
+        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+      }
+    }
+  }
+}
+
+TEST_CASE("compute desired ZMP position to regulate COM when q1 = 1, q2 = 1.5",
+          "[corelib][humanoid]") {
+  ComCtrl ctrl;
+  ctrl.set_q2(1.5);
+  REQUIRE(ctrl.q1() == 1.0);
+  REQUIRE(ctrl.q2() == 1.5);
+
+  SECTION("case: referential COM position = (1, -1, G)") {
+    zVec3D ref_com_pos = {1, -1, G};
+    REQUIRE(ctrl.model().ComputeZeta(&ref_com_pos) == Approx(1.0));
+
+    SECTION("check only along x-axis") {
+      struct testcase_t {
+        double com_pos_x;
+        double com_vel_x;
+        double expected_zmp_pos_x;
+      } testcases[] = {
+          {0, 0, -1.5}, {1, 0, 1}, {3, -1, 3.5}, {0, -2, -6.5}, {-2, 3, 1}};
+
+      for (auto& c : testcases) {
+        zVec3D com_pos = {c.com_pos_x, 0, zVec3DElem(&ref_com_pos, zZ)};
+        zVec3D com_vel = {c.com_vel_x, 0, 0};
+        zVec3D expected_zmp_pos = {c.expected_zmp_pos_x,
+                                   -1.5 * zVec3DElem(&ref_com_pos, zY), 0};
+        zVec3D desired_zmp_pos;
+        ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                       &desired_zmp_pos);
+        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+      }
+    }
+    SECTION("check only along y-axis") {
+      struct testcase_t {
+        double com_pos_y;
+        double com_vel_y;
+        double expected_zmp_pos_y;
+      } testcases[] = {
+          {0, 0, 1.5}, {1, 0, 4}, {3, -1, 6.5}, {0, -2, -3.5}, {-2, 3, 4}};
+
+      for (auto& c : testcases) {
+        zVec3D com_pos = {0, c.com_pos_y, zVec3DElem(&ref_com_pos, zZ)};
+        zVec3D com_vel = {0, c.com_vel_y, 0};
+        zVec3D expected_zmp_pos = {-1.5 * zVec3DElem(&ref_com_pos, zX),
+                                   c.expected_zmp_pos_y, 0};
+        zVec3D desired_zmp_pos;
+        ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                       &desired_zmp_pos);
+        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+      }
+    }
+  }
+}
+
+TEST_CASE("compute desired ZMP position to regulate COM with q1 = 1, q2 = 1.5",
+          "[corelib][humanoid]") {
+  ComCtrl ctrl;
+  ctrl.set_q2(1.5);
+  REQUIRE(ctrl.q1() == 1.0);
+  REQUIRE(ctrl.q2() == 1.5);
+
+  SECTION("case: referential COM position = (0, 0.5, 0.5*G)") {
+    zVec3D ref_com_pos = {0, 0.5, 0.5 * G};
+    REQUIRE(ctrl.model().ComputeZeta(&ref_com_pos) == Approx(sqrt(2)));
+
+    SECTION("check only along x-axis") {
+      struct testcase_t {
+        double com_pos_x;
+        double com_vel_x;
+        double expected_zmp_pos_x;
+      } testcases[] = {{0, 0, 0},
+                       {1, 0, 2.5},
+                       {3, -2, 2.5 * (3 - sqrt(2))},
+                       {0, -1, -1.25 * sqrt(2)},
+                       {-2, 3, 2.5 * (-2 + 1.5 * sqrt(2))}};
+
+      for (auto& c : testcases) {
+        zVec3D com_pos = {c.com_pos_x, 0, zVec3DElem(&ref_com_pos, zZ)};
+        zVec3D com_vel = {c.com_vel_x, 0, 0};
+        zVec3D expected_zmp_pos = {c.expected_zmp_pos_x,
+                                   -1.5 * zVec3DElem(&ref_com_pos, zY), 0};
+        zVec3D desired_zmp_pos;
+        ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                       &desired_zmp_pos);
+        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+      }
+    }
+    SECTION("check only along y-axis") {
+      struct testcase_t {
+        double com_pos_y;
+        double com_vel_y;
+        double expected_zmp_pos_y;
+      } testcases[] = {{0, 0, -0.75},
+                       {1, 0, 1.75},
+                       {3, -2, 2.5 * (3 - sqrt(2)) - 0.75},
+                       {0, -1, -1.25 * sqrt(2) - 0.75},
+                       {-2, 3, 2.5 * (-2 + 1.5 * sqrt(2)) - 0.75}};
+
+      for (auto& c : testcases) {
+        zVec3D com_pos = {0, c.com_pos_y, zVec3DElem(&ref_com_pos, zZ)};
+        zVec3D com_vel = {0, c.com_vel_y, 0};
+        zVec3D expected_zmp_pos = {zVec3DElem(&ref_com_pos, zX),
+                                   c.expected_zmp_pos_y, 0};
+        zVec3D desired_zmp_pos;
+        ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                       &desired_zmp_pos);
+        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+      }
     }
   }
 }

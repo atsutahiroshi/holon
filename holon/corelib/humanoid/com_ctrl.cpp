@@ -22,19 +22,37 @@
 
 namespace holon {
 
-ComCtrl::ComCtrl() : m_model(), m_q1(default_q1), m_q2(default_q2) {}
-ComCtrl::ComCtrl(double t_q1, double t_q2)
-    : m_model(), m_q1(t_q1), m_q2(t_q2) {}
+class ComCtrl::impl {
+  double m_q1, m_q2;
 
-ComCtrl::~ComCtrl() {}
+ public:
+  impl() : m_q1(1), m_q2(1) {}
+  impl(double t_q1, double t_q2) : m_q1(t_q1), m_q2(t_q2) {}
+  double compute(double xd, double x, double vx, double zeta) {
+    return x + (m_q1 * m_q2) * (x - xd) + (m_q1 + m_q2) * vx / zeta;
+  }
+  inline double q1() const { return m_q1; }
+  inline double q2() const { return m_q2; }
+  void set_q1(double t_q1) { m_q1 = t_q1; }
+  void set_q2(double t_q2) { m_q2 = t_q2; }
+};
+
+ComCtrl::ComCtrl() : m_model(), m_impl(new impl()) {}
+ComCtrl::ComCtrl(double t_q1, double t_q2)
+    : m_model(), m_impl(new impl(t_q1, t_q2)) {}
+
+ComCtrl::~ComCtrl() = default;
+
+double ComCtrl::q1() const noexcept { return m_impl->q1(); }
+double ComCtrl::q2() const noexcept { return m_impl->q2(); }
 
 ComCtrl& ComCtrl::set_q1(double t_q1) {
-  m_q1 = t_q1;
+  m_impl->set_q1(t_q1);
   return *this;
 }
 
 ComCtrl& ComCtrl::set_q2(double t_q2) {
-  m_q2 = t_q2;
+  m_impl->set_q2(t_q2);
   return *this;
 }
 
@@ -44,11 +62,6 @@ double ComCtrl::ComputeDesiredZetaSqr(const zVec3D* ref_com_position) const {
 
 double ComCtrl::ComputeDesiredZeta(const zVec3D* ref_com_position) const {
   return m_model.ComputeZeta(ref_com_position);
-}
-
-double ComCtrl::ComputeDesiredZmpPositionOneAxis(double xd, double x, double vx,
-                                                 double zeta) const {
-  return x + (m_q1 * m_q2) * (x - xd) + (m_q1 + m_q2) * vx / zeta;
 }
 
 zVec3D* ComCtrl::ComputeDesiredZmpPosition(const zVec3D* ref_com_position,
@@ -62,9 +75,8 @@ zVec3D* ComCtrl::ComputeDesiredZmpPosition(const zVec3D* ref_com_position,
   double y = zVec3DElem(com_position, zY);
   double vy = zVec3DElem(com_velocity, zY);
   double zeta = ComputeDesiredZeta(ref_com_position);
-  zVec3DCreate(desired_zmp_position,
-               ComputeDesiredZmpPositionOneAxis(xd, x, vx, zeta),
-               ComputeDesiredZmpPositionOneAxis(yd, y, vy, zeta), 0);
+  zVec3DCreate(desired_zmp_position, m_impl->compute(xd, x, vx, zeta),
+               m_impl->compute(yd, y, vy, zeta), 0);
   return desired_zmp_position;
 }
 

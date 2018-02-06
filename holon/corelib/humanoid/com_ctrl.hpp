@@ -25,6 +25,8 @@
 
 #include "holon/corelib/humanoid/com_zmp_model.hpp"
 
+#include <memory>
+
 namespace holon {
 
 class ComCtrl {
@@ -36,8 +38,8 @@ class ComCtrl {
   ComCtrl(double t_q1, double t_q2);
   virtual ~ComCtrl();
 
-  inline double q1() const noexcept { return m_q1; };
-  inline double q2() const noexcept { return m_q2; };
+  double q1() const noexcept;
+  double q2() const noexcept;
 
   ComCtrl& set_q1(double t_q1);
   ComCtrl& set_q2(double t_q2);
@@ -54,10 +56,8 @@ class ComCtrl {
 
  private:
   ComZmpModel m_model;
-  double m_q1, m_q2;
-
-  double ComputeDesiredZmpPositionOneAxis(double xd, double x, double vx,
-                                          double zeta) const;
+  class impl;
+  std::unique_ptr<impl> m_impl;
 };
 
 }  // namespace holon

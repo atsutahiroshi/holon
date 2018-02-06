@@ -46,6 +46,11 @@ double ComCtrl::ComputeDesiredZeta(const zVec3D* ref_com_position) const {
   return m_model.ComputeZeta(ref_com_position);
 }
 
+double ComCtrl::ComputeDesiredZmpPositionOneAxis(double xd, double x, double vx,
+                                                 double zeta) const {
+  return x + (m_q1 * m_q2) * (x - xd) + (m_q1 + m_q2) * vx / zeta;
+}
+
 zVec3D* ComCtrl::ComputeDesiredZmpPosition(const zVec3D* ref_com_position,
                                            const zVec3D* com_position,
                                            const zVec3D* com_velocity,
@@ -58,8 +63,8 @@ zVec3D* ComCtrl::ComputeDesiredZmpPosition(const zVec3D* ref_com_position,
   double vy = zVec3DElem(com_velocity, zY);
   double zeta = ComputeDesiredZeta(ref_com_position);
   zVec3DCreate(desired_zmp_position,
-               x + (m_q1 * m_q2) * (x - xd) + (m_q1 + m_q2) * vx / zeta,
-               y + (m_q1 * m_q2) * (y - yd) + (m_q1 + m_q2) * vy / zeta, 0);
+               ComputeDesiredZmpPositionOneAxis(xd, x, vx, zeta),
+               ComputeDesiredZmpPositionOneAxis(yd, y, vy, zeta), 0);
   return desired_zmp_position;
 }
 

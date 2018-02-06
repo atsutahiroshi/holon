@@ -55,6 +55,9 @@ class ComCtrl {
  private:
   ComZmpModel m_model;
   double m_q1, m_q2;
+
+  double ComputeDesiredZmpPositionOneAxis(double xd, double x, double vx,
+                                          double zeta) const;
 };
 
 }  // namespace holon

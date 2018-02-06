@@ -40,7 +40,7 @@ class ComCtrlBenchmark : public ::hayai::Fixture {
   zVec3D com_vel;
 };
 
-BENCHMARK_F(ComCtrlBenchmark, ComputeDesiredZmpPosition, 10, 100) {
+BENCHMARK_F(ComCtrlBenchmark, ComputeDesiredZmpPosition, 100, 1000) {
   zVec3D desired_zmp_pos;
   ctrl.ComputeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
                                  &desired_zmp_pos);

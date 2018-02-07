@@ -79,19 +79,25 @@ TEST_CASE("COM-ZMP model has a mass as a parameter", "[corelib][humanoid]") {
 }
 
 TEST_CASE("COM-ZMP model has states such as COM position, ZMP position, etc.") {
-  SECTION("check if initialized with proper values with default ctor") {
-    ComZmpModel model;
-    zVec3D expected_com_pos = {0, 0, 1};
-    zVec3D expected_com_vel = {0, 0, 0};
-    zVec3D expected_com_acc = {0, 0, 0};
-    zVec3D expected_zmp_pos = {0, 0, 0};
+  ComZmpModel model;
 
+  SECTION("COM position") {
+    zVec3D expected_com_pos = {0, 0, 1};
     REQUIRE_THAT(const_cast<zVec3D*>(model.com_position()),
                  Catch::Equals(&expected_com_pos));
+  }
+  SECTION("COM velocity") {
+    zVec3D expected_com_vel = {0, 0, 0};
     REQUIRE_THAT(const_cast<zVec3D*>(model.com_velocity()),
                  Catch::Equals(&expected_com_vel));
+  }
+  SECTION("COM acceleration") {
+    zVec3D expected_com_acc = {0, 0, 0};
     REQUIRE_THAT(const_cast<zVec3D*>(model.com_acceleration()),
                  Catch::Equals(&expected_com_acc));
+  }
+  SECTION("ZMP position") {
+    zVec3D expected_zmp_pos = {0, 0, 0};
     REQUIRE_THAT(const_cast<zVec3D*>(model.zmp_position()),
                  Catch::Equals(&expected_zmp_pos));
   }

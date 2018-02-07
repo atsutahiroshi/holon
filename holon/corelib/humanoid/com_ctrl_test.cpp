@@ -151,7 +151,8 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
         zVec3D expected_zmp_pos = {0, 0, 0};
         ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
                                        &desired_zmp_pos);
-        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+        CHECK_THAT(&desired_zmp_pos,
+                   Catch::Matchers::Equals(&expected_zmp_pos));
       }
     }
     WHEN("com_pos = (1, 3, G), com_vel = (0, -1, 0)") {
@@ -163,7 +164,8 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
         zVec3D expected_zmp_pos = {2, 4, 0};
         ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
                                        &desired_zmp_pos);
-        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+        CHECK_THAT(&desired_zmp_pos,
+                   Catch::Matchers::Equals(&expected_zmp_pos));
       }
     }
     WHEN("com_pos = (0, -2, G), com_vel = (-2, 2, 0)") {
@@ -175,7 +177,8 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
         zVec3D expected_zmp_pos = {-4, 0, 0};
         ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
                                        &desired_zmp_pos);
-        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+        CHECK_THAT(&desired_zmp_pos,
+                   Catch::Matchers::Equals(&expected_zmp_pos));
       }
     }
   }
@@ -202,7 +205,8 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
         zVec3D expected_zmp_pos = {1.5, 1.96, 0};
         ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
                                        &desired_zmp_pos);
-        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+        CHECK_THAT(&desired_zmp_pos,
+                   Catch::Matchers::Equals(&expected_zmp_pos));
       }
     }
     WHEN("com_pos = (-2, 3, G), com_vel = (2, -1, 0)") {
@@ -214,7 +218,8 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
         zVec3D expected_zmp_pos = {0, 3.88, 0};
         ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
                                        &desired_zmp_pos);
-        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+        CHECK_THAT(&desired_zmp_pos,
+                   Catch::Matchers::Equals(&expected_zmp_pos));
       }
     }
   }
@@ -240,7 +245,8 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
         zVec3D expected_zmp_pos = {1, -0.5, 0};
         ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
                                        &desired_zmp_pos);
-        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+        CHECK_THAT(&desired_zmp_pos,
+                   Catch::Matchers::Equals(&expected_zmp_pos));
       }
     }
     WHEN("com_pos = (0, 3, G), com_vel = (-2, -1, 0)") {
@@ -252,7 +258,8 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
         zVec3D expected_zmp_pos = {-6.5, 3.5, 0};
         ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
                                        &desired_zmp_pos);
-        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+        CHECK_THAT(&desired_zmp_pos,
+                   Catch::Matchers::Equals(&expected_zmp_pos));
       }
     }
     WHEN("com_pos = (-2, 0, G), com_vel = (3, -2, 0)") {
@@ -264,7 +271,8 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
         zVec3D expected_zmp_pos = {1, -4.5, 0};
         ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
                                        &desired_zmp_pos);
-        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+        CHECK_THAT(&desired_zmp_pos,
+                   Catch::Matchers::Equals(&expected_zmp_pos));
       }
     }
   }
@@ -293,7 +301,8 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
         zVec3D expected_zmp_pos = {0, -0.75, 0};
         ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
                                        &desired_zmp_pos);
-        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+        CHECK_THAT(&desired_zmp_pos,
+                   Catch::Matchers::Equals(&expected_zmp_pos));
       }
     }
     WHEN("com_pos = (1, 3, G), com_vel = (0, -2, 0)") {
@@ -305,7 +314,8 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
         zVec3D expected_zmp_pos = {2.5, 2.5 * (3 - sqrt(2)) - 0.75, 0};
         ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
                                        &desired_zmp_pos);
-        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+        CHECK_THAT(&desired_zmp_pos,
+                   Catch::Matchers::Equals(&expected_zmp_pos));
       }
     }
     WHEN("com_pos = (-2, 0, G), com_vel = (3, -1, 0)") {
@@ -318,7 +328,8 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
                                    -1.25 * sqrt(2) - 0.75, 0};
         ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
                                        &desired_zmp_pos);
-        CHECK_THAT(&desired_zmp_pos, Catch::Equals(&expected_zmp_pos));
+        CHECK_THAT(&desired_zmp_pos,
+                   Catch::Matchers::Equals(&expected_zmp_pos));
       }
     }
   }

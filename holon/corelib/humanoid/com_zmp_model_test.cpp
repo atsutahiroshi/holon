@@ -84,22 +84,22 @@ TEST_CASE("COM-ZMP model has states such as COM position, ZMP position, etc.") {
   SECTION("COM position") {
     zVec3D expected_com_pos = {0, 0, 1};
     REQUIRE_THAT(const_cast<zVec3D*>(model.com_position()),
-                 Catch::Equals(&expected_com_pos));
+                 Catch::Matchers::Equals(&expected_com_pos));
   }
   SECTION("COM velocity") {
     zVec3D expected_com_vel = {0, 0, 0};
     REQUIRE_THAT(const_cast<zVec3D*>(model.com_velocity()),
-                 Catch::Equals(&expected_com_vel));
+                 Catch::Matchers::Equals(&expected_com_vel));
   }
   SECTION("COM acceleration") {
     zVec3D expected_com_acc = {0, 0, 0};
     REQUIRE_THAT(const_cast<zVec3D*>(model.com_acceleration()),
-                 Catch::Equals(&expected_com_acc));
+                 Catch::Matchers::Equals(&expected_com_acc));
   }
   SECTION("ZMP position") {
     zVec3D expected_zmp_pos = {0, 0, 0};
     REQUIRE_THAT(const_cast<zVec3D*>(model.zmp_position()),
-                 Catch::Equals(&expected_zmp_pos));
+                 Catch::Matchers::Equals(&expected_zmp_pos));
   }
 }
 
@@ -193,7 +193,7 @@ TEST_CASE("compute the COM acceleration based on COM-ZMP model",
       model.computeAcceleration(&c.com_pos, &c.zmp_pos, &acc);
       CAPTURE(&c.com_pos);
       CAPTURE(&c.zmp_pos);
-      CHECK_THAT(&acc, Catch::Equals(&c.expected_acc));
+      CHECK_THAT(&acc, Catch::Matchers::Equals(&c.expected_acc));
     }
   }
 }

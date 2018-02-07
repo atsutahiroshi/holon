@@ -30,7 +30,7 @@
 namespace Catch {
 namespace Detail {
 
-inline std::string zVec3DToString(const zVec3D* v) {
+inline std::string stringify(const zVec3D* v) {
   std::ostringstream ss;
   ss << "( ";
   if (!v) {
@@ -43,14 +43,21 @@ inline std::string zVec3DToString(const zVec3D* v) {
   return ss.str();
 }
 
+inline std::string stringify(zVec3D* v) {
+  return stringify(const_cast<const zVec3D*>(v));
+}
+
 }  // namespace Detail
 
 template <>
 struct StringMaker<zVec3D*> {
   static std::string convert(zVec3D* v) {
-    return ::Catch::Detail::zVec3DToString(v);
+    return ::Catch::Detail::stringify(v);
   }
 };
+
+namespace Matchers {
+namespace zvec3d {
 
 class zVec3DMatcher : public MatcherBase<zVec3D*> {
  public:
@@ -65,17 +72,44 @@ class zVec3DMatcher : public MatcherBase<zVec3D*> {
 
   std::string describe() const override {
     std::ostringstream ss;
-    return "Equals: " + ::Catch::Detail::zVec3DToString(comparator_);
+    return "Equals: " + ::Catch::Detail::stringify(comparator_);
   }
 
  private:
   zVec3D* comparator_;
 };
 
-inline zVec3DMatcher Equals(zVec3D* comparator) {
-  return zVec3DMatcher(comparator);
+class zVec3DNotMatcher : public MatcherBase<zVec3D*> {
+ public:
+  explicit zVec3DNotMatcher(zVec3D* comparator) : comparator_(comparator) {}
+
+  bool match(zVec3D* v) const override {
+    if (!zVec3DEqual(comparator_, v))
+      return true;
+    else
+      return false;
+  }
+
+  std::string describe() const override {
+    std::ostringstream ss;
+    return "Not Equal: " + ::Catch::Detail::stringify(comparator_);
+  }
+
+ private:
+  zVec3D* comparator_;
+};
+
+}  // namespace zvec3d
+
+inline zvec3d::zVec3DMatcher Equals(zVec3D* comparator) {
+  return zvec3d::zVec3DMatcher(comparator);
 }
 
+inline zvec3d::zVec3DNotMatcher NotEqual(zVec3D* comparator) {
+  return zvec3d::zVec3DNotMatcher(comparator);
+}
+
+}  // namespace Matchers
 }  // namespace Catch
 
 #endif  // HOLON_TEST_UTIL_CATCH_CUSTOM_MATCHERS_HPP_

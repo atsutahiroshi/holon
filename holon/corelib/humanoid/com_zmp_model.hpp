@@ -37,6 +37,13 @@ class ComZmpModel {
   inline double mass() const noexcept { return m_mass; }
   ComZmpModel& set_mass(double t_mass);
 
+  inline const zVec3D* com_position() const noexcept { return &m_com_position; }
+  inline const zVec3D* com_velocity() const noexcept { return &m_com_velocity; }
+  inline const zVec3D* com_acceleration() const noexcept {
+    return &m_com_acceleration;
+  }
+  inline const zVec3D* zmp_position() const noexcept { return &m_zmp_position; }
+
   double computeZetaSqr(const zVec3D* com_position) const;
   double computeZeta(const zVec3D* com_position) const;
 

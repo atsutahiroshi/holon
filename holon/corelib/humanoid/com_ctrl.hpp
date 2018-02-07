@@ -42,10 +42,10 @@ class ComCtrl {
 
   inline const ComZmpModel& model() const noexcept { return m_model; };
 
-  double ComputeDesiredZetaSqr(const zVec3D* ref_com_position) const;
-  double ComputeDesiredZeta(const zVec3D* ref_com_position) const;
+  double computeDesiredZetaSqr(const zVec3D* ref_com_position) const;
+  double computeDesiredZeta(const zVec3D* ref_com_position) const;
 
-  zVec3D* ComputeDesiredZmpPosition(const zVec3D* ref_com_position,
+  zVec3D* computeDesiredZmpPosition(const zVec3D* ref_com_position,
                                     const zVec3D* com_position,
                                     const zVec3D* com_velocity,
                                     zVec3D* desired_zmp_position) const;

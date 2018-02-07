@@ -47,8 +47,8 @@ TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",
 
     for (auto c : testcases) {
       zVec3D pg = {0, 0, c.com_height};
-      CHECK(model.ComputeZetaSqr(&pg) == Approx(c.expected_zeta_squared));
-      CHECK(model.ComputeZeta(&pg) == Approx(c.expected_zeta));
+      CHECK(model.computeZetaSqr(&pg) == Approx(c.expected_zeta_squared));
+      CHECK(model.computeZeta(&pg) == Approx(c.expected_zeta));
     }
   }
   SECTION("return 0 when the given COM height was 0") {
@@ -58,10 +58,10 @@ TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",
     // TODO(*): handle zero-division error correctly
     zVec3D pg = {0, 0, 0};
     zEchoOff();
-    CHECK_FALSE(zIsInf(model.ComputeZetaSqr(&pg)));
-    CHECK(model.ComputeZetaSqr(&pg) == 0.0);
-    CHECK_FALSE(zIsInf(model.ComputeZeta(&pg)));
-    CHECK(model.ComputeZeta(&pg) == 0.0);
+    CHECK_FALSE(zIsInf(model.computeZetaSqr(&pg)));
+    CHECK(model.computeZetaSqr(&pg) == 0.0);
+    CHECK_FALSE(zIsInf(model.computeZeta(&pg)));
+    CHECK(model.computeZeta(&pg) == 0.0);
     zEchoOn();
   }
   SECTION("return 0 when the given COM height was negative") {
@@ -70,9 +70,9 @@ TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",
     // TODO(*): handle the case where a negative value is given
     zVec3D pg = {0, 0, -1};
     zEchoOff();
-    CHECK(model.ComputeZetaSqr(&pg) == 0.0);
-    CHECK_FALSE(zIsNan(model.ComputeZeta(&pg)));
-    CHECK(model.ComputeZeta(&pg) == 0.0);
+    CHECK(model.computeZetaSqr(&pg) == 0.0);
+    CHECK_FALSE(zIsNan(model.computeZeta(&pg)));
+    CHECK(model.computeZeta(&pg) == 0.0);
     zEchoOn();
   }
 }
@@ -118,7 +118,7 @@ TEST_CASE("compute the COM acceleration based on COM-ZMP model",
 
     for (auto c : testcases) {
       zVec3D acc;
-      model.ComputeAcceleration(&c.com_pos, &c.zmp_pos, &acc);
+      model.computeAcceleration(&c.com_pos, &c.zmp_pos, &acc);
       CAPTURE(&c.com_pos);
       CAPTURE(&c.zmp_pos);
       CHECK_THAT(&acc, Catch::Equals(&c.expected_acc));

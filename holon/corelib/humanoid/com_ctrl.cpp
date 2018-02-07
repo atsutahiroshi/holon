@@ -26,15 +26,15 @@ ComCtrl::ComCtrl() : m_x(), m_y(), m_model() {}
 
 ComCtrl::~ComCtrl() = default;
 
-double ComCtrl::ComputeDesiredZetaSqr(const zVec3D* ref_com_position) const {
-  return m_model.ComputeZetaSqr(ref_com_position);
+double ComCtrl::computeDesiredZetaSqr(const zVec3D* ref_com_position) const {
+  return m_model.computeZetaSqr(ref_com_position);
 }
 
-double ComCtrl::ComputeDesiredZeta(const zVec3D* ref_com_position) const {
-  return m_model.ComputeZeta(ref_com_position);
+double ComCtrl::computeDesiredZeta(const zVec3D* ref_com_position) const {
+  return m_model.computeZeta(ref_com_position);
 }
 
-zVec3D* ComCtrl::ComputeDesiredZmpPosition(const zVec3D* ref_com_position,
+zVec3D* ComCtrl::computeDesiredZmpPosition(const zVec3D* ref_com_position,
                                            const zVec3D* com_position,
                                            const zVec3D* com_velocity,
                                            zVec3D* desired_zmp_position) const {
@@ -44,7 +44,7 @@ zVec3D* ComCtrl::ComputeDesiredZmpPosition(const zVec3D* ref_com_position,
   double yd = zVec3DElem(ref_com_position, zY);
   double y = zVec3DElem(com_position, zY);
   double vy = zVec3DElem(com_velocity, zY);
-  double zeta = ComputeDesiredZeta(ref_com_position);
+  double zeta = computeDesiredZeta(ref_com_position);
   zVec3DCreate(desired_zmp_position,
                m_x.computeDesiredZmpPosition(xd, x, vx, zeta),
                m_y.computeDesiredZmpPosition(yd, y, vy, zeta), 0);

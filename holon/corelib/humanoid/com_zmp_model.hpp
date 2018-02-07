@@ -30,10 +30,10 @@ class ComZmpModel {
   ComZmpModel();
   virtual ~ComZmpModel();
 
-  double ComputeZetaSqr(const zVec3D* com_position) const;
-  double ComputeZeta(const zVec3D* com_position) const;
+  double computeZetaSqr(const zVec3D* com_position) const;
+  double computeZeta(const zVec3D* com_position) const;
 
-  zVec3D* ComputeAcceleration(const zVec3D* com_position,
+  zVec3D* computeAcceleration(const zVec3D* com_position,
                               const zVec3D* zmp_position,
                               zVec3D* com_acceleration) const;
 };

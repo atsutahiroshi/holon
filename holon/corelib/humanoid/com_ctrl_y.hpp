@@ -21,6 +21,8 @@
 #ifndef HOLON_HUMANOID_COM_CTRL_Y_HPP_
 #define HOLON_HUMANOID_COM_CTRL_Y_HPP_
 
+#include <zeo/zeo_vec3d.h>
+
 namespace holon {
 
 class ComCtrlY {
@@ -40,6 +42,10 @@ class ComCtrlY {
 
   double computeDesiredZmpPosition(double yd, double y, double v,
                                    double zeta) const noexcept;
+  double computeDesiredZmpPosition(const zVec3D* ref_com_position,
+                                   const zVec3D* com_position,
+                                   const zVec3D* com_veocity, double zeta) const
+      noexcept;
 
  private:
   double m_q1;

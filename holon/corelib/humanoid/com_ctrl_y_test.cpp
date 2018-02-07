@@ -215,9 +215,47 @@ TEST_CASE("handle the case where zeta is non-positive on y-axis",
           "[corelib][humanoid]") {
   ComCtrlY ctrl;
   zEchoOff();
-  REQUIRE(ctrl.computeDesiredZmpPosition(1, 0, 0, 0) == 0);
-  REQUIRE(ctrl.computeDesiredZmpPosition(1, 0, 0, -1) == 0);
+  SECTION("call with `double` type") {
+    REQUIRE(ctrl.computeDesiredZmpPosition(1, 0, 0, 0) == 0);
+    REQUIRE(ctrl.computeDesiredZmpPosition(1, 0, 0, -1) == 0);
+  }
+  SECTION("call with `zVec3D*` type") {
+    zVec3D ref_com_pos = {1, 1, 9.8};
+    zVec3D com_pos = {0, 0, 9.8};
+    zVec3D com_vel = {0, 0, 0};
+    REQUIRE(ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                           0) == 0);
+    REQUIRE(ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                           -1) == 0);
+  }
   zEchoOn();
+}
+
+TEST_CASE("compute desired ZMP position along y-axis when vectors are given",
+          "[corelib][humanoid]") {
+  ComCtrlY ctrl;
+
+  SECTION("case: yd = -1, q1 = 1, q2 = 1.5, zeta = 1") {
+    double zeta = 1;
+    double yd = -1;
+    ctrl.set_q2(1.5);
+    REQUIRE(ctrl.q1() == 1.0);
+    REQUIRE(ctrl.q2() == 1.5);
+
+    struct testcase_t {
+      double y, vy;
+      double expected_yz;
+    } testcases[] = {
+        {0, 0, 1.5}, {1, 0, 4}, {3, -1, 6.5}, {0, -2, -3.5}, {-2, 3, 4}};
+
+    for (auto& c : testcases) {
+      zVec3D ref_com_pos = {0, yd, 1};
+      zVec3D com_pos = {0, c.y, 1};
+      zVec3D com_vel = {0, c.vy, 0};
+      CHECK(ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                           zeta) == Approx(c.expected_yz));
+    }
+  }
 }
 
 }  // namespace

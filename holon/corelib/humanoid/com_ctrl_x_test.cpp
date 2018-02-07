@@ -211,12 +211,50 @@ TEST_CASE("compute desired ZMP position along x-axis to regulate at 0",
   }
 }
 
+TEST_CASE("compute desired ZMP position along x-axis when vectors are given",
+          "[corelib][humanoid]") {
+  ComCtrlX ctrl;
+
+  SECTION("case: xd = 1, q1 = 1, q2 = 1.5, zeta = 1") {
+    double zeta = 1;
+    double xd = 1;
+    ctrl.set_q2(1.5);
+    REQUIRE(ctrl.q1() == 1.0);
+    REQUIRE(ctrl.q2() == 1.5);
+
+    struct testcase_t {
+      double x, vx;
+      double expected_xz;
+    } testcases[] = {
+        {0, 0, -1.5}, {1, 0, 1}, {3, -1, 3.5}, {0, -2, -6.5}, {-2, 3, 1}};
+
+    for (auto& c : testcases) {
+      zVec3D ref_com_pos = {xd, 0, 1};
+      zVec3D com_pos = {c.x, 0, 1};
+      zVec3D com_vel = {c.vx, 0, 0};
+      CHECK(ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                           zeta) == Approx(c.expected_xz));
+    }
+  }
+}
+
 TEST_CASE("handle the case where zeta is non-positive on x-axis",
           "[corelib][humanoid]") {
   ComCtrlX ctrl;
   zEchoOff();
-  REQUIRE(ctrl.computeDesiredZmpPosition(1, 0, 0, 0) == 0);
-  REQUIRE(ctrl.computeDesiredZmpPosition(1, 0, 0, -1) == 0);
+  SECTION("call with `double` type") {
+    REQUIRE(ctrl.computeDesiredZmpPosition(1, 0, 0, 0) == 0);
+    REQUIRE(ctrl.computeDesiredZmpPosition(1, 0, 0, -1) == 0);
+  }
+  SECTION("call with `zVec3D*` type") {
+    zVec3D ref_com_pos = {1, 1, 9.8};
+    zVec3D com_pos = {0, 0, 9.8};
+    zVec3D com_vel = {0, 0, 0};
+    REQUIRE(ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                           0) == 0);
+    REQUIRE(ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+                                           -1) == 0);
+  }
   zEchoOn();
 }
 

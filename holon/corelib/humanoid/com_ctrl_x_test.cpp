@@ -26,7 +26,7 @@
 namespace holon {
 namespace {
 
-TEST_CASE("control poles q1, q2 can be assigned", "[corelib][humanoid]") {
+TEST_CASE("control poles along x-axis can be assigned", "[corelib][humanoid]") {
   Fuzzer fuzz;
 
   SECTION("instantiate with no paramters") {
@@ -89,7 +89,7 @@ TEST_CASE("control poles q1, q2 can be assigned", "[corelib][humanoid]") {
   }
 }
 
-TEST_CASE("compute desired ZMP position to regulate at 0",
+TEST_CASE("compute desired ZMP position along x-axis to regulate at 0",
           "[corelib][humanoid]") {
   ComCtrlX ctrl;
 

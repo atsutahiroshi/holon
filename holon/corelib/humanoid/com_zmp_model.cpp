@@ -24,10 +24,17 @@
 
 namespace holon {
 
-ComZmpModel::ComZmpModel() : m_mass(default_mass) {}
-ComZmpModel::ComZmpModel(double t_mass) : m_mass(t_mass) {}
+ComZmpModel::ComZmpModel() : m_mass(default_mass) { initializeStates(); }
+ComZmpModel::ComZmpModel(double t_mass) : m_mass(t_mass) { initializeStates(); }
 
 ComZmpModel::~ComZmpModel() = default;
+
+void ComZmpModel::initializeStates() {
+  zVec3DCreate(&m_com_position, 0, 0, default_com_height);
+  zVec3DClear(&m_com_velocity);
+  zVec3DClear(&m_com_acceleration);
+  zVec3DClear(&m_zmp_position);
+}
 
 ComZmpModel& ComZmpModel::set_mass(double t_mass) {
   if (zIsTiny(t_mass) || t_mass < 0) {

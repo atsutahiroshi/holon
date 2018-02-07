@@ -27,6 +27,7 @@ namespace holon {
 
 class ComZmpModel {
   const double default_mass = 1;
+  const double default_com_height = 1;
 
  public:
   ComZmpModel();
@@ -53,6 +54,12 @@ class ComZmpModel {
 
  private:
   double m_mass;
+  zVec3D m_com_position;
+  zVec3D m_com_velocity;
+  zVec3D m_com_acceleration;
+  zVec3D m_zmp_position;
+
+  void initializeStates();
 };
 
 }  // namespace holon

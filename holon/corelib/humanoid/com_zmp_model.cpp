@@ -24,9 +24,20 @@
 
 namespace holon {
 
-ComZmpModel::ComZmpModel() {}
+ComZmpModel::ComZmpModel() : m_mass(default_mass) {}
+ComZmpModel::ComZmpModel(double t_mass) : m_mass(t_mass) {}
 
-ComZmpModel::~ComZmpModel() {}
+ComZmpModel::~ComZmpModel() = default;
+
+ComZmpModel& ComZmpModel::set_mass(double t_mass) {
+  if (zIsTiny(t_mass) || t_mass < 0) {
+    ZRUNERROR("mass must be positive value (given: %f)", t_mass);
+    m_mass = default_mass;
+  } else {
+    m_mass = t_mass;
+  }
+  return *this;
+}
 
 double ComZmpModel::computeZetaSqr(const zVec3D* com_position) const {
   if (zIsTiny(zVec3DElem(com_position, zZ)) ||

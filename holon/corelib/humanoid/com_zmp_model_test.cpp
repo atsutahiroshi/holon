@@ -25,11 +25,58 @@
 
 #include "catch.hpp"
 #include "holon/test/util/catch/custom_matchers.hpp"
+#include "holon/test/util/fuzzer/fuzzer.hpp"
 
 namespace holon {
 namespace {
 
 const double G = RK_G;
+
+TEST_CASE("COM-ZMP model has a mass as a parameter", "[corelib][humanoid]") {
+  SECTION("when instantiated with no paramters mass should be 1") {
+    ComZmpModel model;
+    CHECK(model.mass() == 1.0);
+  }
+
+  SECTION("can be instantiated by providing mass") {
+    {
+      ComZmpModel model(1.0);
+      CHECK(model.mass() == 1.0);
+    }
+    {
+      ComZmpModel model(3.0);
+      CHECK(model.mass() == 3.0);
+    }
+  }
+
+  SECTION("can provide mass after instantiation") {
+    ComZmpModel model;
+    REQUIRE(model.mass() == 1.0);
+
+    Fuzzer fuzz;
+    for (auto i = 0; i < 3; ++i) {
+      double m = fuzz.get();
+      model.set_mass(m);
+      CHECK(model.mass() == m);
+    }
+  }
+
+  SECTION("when non-positive value is given as mass it should be 1") {
+    ComZmpModel model;
+
+    zEchoOff();
+    model.set_mass(3);
+    REQUIRE(model.mass() == 3.0);
+    model.set_mass(0);
+    CHECK(model.mass() == 1.0);
+
+    model.set_mass(3);
+    REQUIRE(model.mass() == 3.0);
+    model.set_mass(-1);
+    CHECK(model.mass() == 1.0);
+    zEchoOn();
+  }
+}
 
 TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",
           "[corelib][humanoid]") {

@@ -23,26 +23,24 @@
 
 #include <zeo/zeo_vec3d.h>
 
+#include "holon/corelib/humanoid/com_ctrl_x.hpp"
+#include "holon/corelib/humanoid/com_ctrl_y.hpp"
 #include "holon/corelib/humanoid/com_zmp_model.hpp"
 
 namespace holon {
 
 class ComCtrl {
-  const double default_q1 = 1.0;
-  const double default_q2 = 1.0;
-
  public:
   ComCtrl();
-  ComCtrl(double t_q1, double t_q2);
   virtual ~ComCtrl();
 
-  inline double q1() const noexcept { return m_q1; };
-  inline double q2() const noexcept { return m_q2; };
+  inline const ComCtrlX& x() const noexcept { return m_x; }
+  inline ComCtrlX& x() noexcept { return m_x; }
 
-  ComCtrl& set_q1(double t_q1);
-  ComCtrl& set_q2(double t_q2);
+  inline const ComCtrlY& y() const noexcept { return m_y; }
+  inline ComCtrlY& y() noexcept { return m_y; }
 
-  const ComZmpModel& model() const noexcept { return m_model; };
+  inline const ComZmpModel& model() const noexcept { return m_model; };
 
   double ComputeDesiredZetaSqr(const zVec3D* ref_com_position) const;
   double ComputeDesiredZeta(const zVec3D* ref_com_position) const;
@@ -53,11 +51,9 @@ class ComCtrl {
                                     zVec3D* desired_zmp_position) const;
 
  private:
+  ComCtrlX m_x;
+  ComCtrlY m_y;
   ComZmpModel m_model;
-  double m_q1, m_q2;
-
-  double ComputeDesiredZmpPositionOneAxis(double xd, double x, double vx,
-                                          double zeta) const;
 };
 
 }  // namespace holon

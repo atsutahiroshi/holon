@@ -38,5 +38,14 @@ TEST_CASE("outputs random values", "[test][util][fuzzer]") {
   }
 }
 
+TEST_CASE("outputs same values with a specific seed", "[test][util][fuzzer]") {
+  Fuzzer fuzz1(0);
+  Fuzzer fuzz2(0);
+
+  for (auto i = 0; i < 10; ++i) {
+    REQUIRE(fuzz1.get() == fuzz2.get());
+  }
+}
+
 }  // namespace
 }  // namespace holon

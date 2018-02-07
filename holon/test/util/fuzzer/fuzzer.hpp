@@ -28,16 +28,18 @@ namespace holon {
 class Fuzzer {
  public:
   Fuzzer();
-  Fuzzer(double seed);
+  Fuzzer(const std::seed_seq& seed);
+  Fuzzer(int seed);
   virtual ~Fuzzer();
 
-  inline double get() { return mt19937_(); };
+  inline int get() { return m_engine(); };
 
  private:
-  std::random_device random_device_;
-  std::mt19937 mt19937_;
+  std::random_device m_rd;
+  std::seed_seq m_seed;
+  std::mt19937 m_engine;
 };
 
-}  // holon
+}  // namespace holon
 
 #endif  // HOLON_TEST_UTIL_FUZZER_FUZZER_HPP_

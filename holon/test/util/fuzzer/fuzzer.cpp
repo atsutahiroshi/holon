@@ -20,10 +20,18 @@
 
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
+#include <algorithm>
+#include <functional>
+
 namespace holon {
 
-Fuzzer::Fuzzer() : random_device_(), mt19937_(random_device_()) {}
-Fuzzer::Fuzzer(double seed) : random_device_(), mt19937_(seed) {}
-Fuzzer::~Fuzzer() {}
+Fuzzer::Fuzzer()
+    : m_rd(),
+      m_seed({m_rd(), m_rd(), m_rd(), m_rd(), m_rd()}),
+      m_engine(m_seed) {}
+Fuzzer::Fuzzer(const std::seed_seq& seed) : m_seed(seed), m_engine(m_seed) {}
+Fuzzer::Fuzzer(int seed) : m_seed({seed}), m_engine(m_seed) {}
 
-}  // holon
+Fuzzer::~Fuzzer() = default;
+
+}  // namespace holon

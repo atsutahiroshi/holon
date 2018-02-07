@@ -37,4 +37,9 @@ ComCtrlY& ComCtrlY::set_q2(double t_q2) {
   return *this;
 }
 
+double ComCtrlY::computeDesiredZmpPosition(double yd, double y, double v,
+                                           double zeta) const noexcept {
+  return y + (m_q1 * m_q2) * (y - yd) + (m_q1 + m_q2) * v / zeta;
+}
+
 }  // namespace holon

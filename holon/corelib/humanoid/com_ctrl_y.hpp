@@ -38,6 +38,9 @@ class ComCtrlY {
   ComCtrlY& set_q1(double t_q1);
   ComCtrlY& set_q2(double t_q2);
 
+  double computeDesiredZmpPosition(double yd, double y, double v,
+                                   double zeta) const noexcept;
+
  private:
   double m_q1;
   double m_q2;

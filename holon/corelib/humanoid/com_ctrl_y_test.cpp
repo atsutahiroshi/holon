@@ -89,5 +89,125 @@ TEST_CASE("control poles along y-axis can be assigned", "[corelib][humanoid]") {
   }
 }
 
+TEST_CASE("compute desired ZMP position along y-axis to regulate at 0",
+          "[corelib][humanoid]") {
+  ComCtrlY ctrl;
+
+  SECTION("case: yd = 0, q1 = 1, q2 = 1, zeta = 1") {
+    double zeta = 1;
+    double yd = 0;
+    REQUIRE(ctrl.q1() == 1);
+    REQUIRE(ctrl.q2() == 1);
+
+    struct testcase_t {
+      double y, vy;
+      double expected_yz;
+    } testcases[] = {{0, 0, 0}, {1, 0, 2}, {3, -1, 4}, {0, -2, -4}, {-2, 2, 0}};
+
+    for (auto& c : testcases) {
+      CHECK(ctrl.computeDesiredZmpPosition(yd, c.y, c.vy, zeta) ==
+            Approx(c.expected_yz));
+    }
+  }
+
+  SECTION("case: yd = 0, q1 = 1, q2 = 0.5, zeta = 1") {
+    double zeta = 1;
+    double yd = 0;
+    ctrl.set_q2(0.5);
+    REQUIRE(ctrl.q1() == 1);
+    REQUIRE(ctrl.q2() == 0.5);
+
+    struct testcase_t {
+      double y, vy;
+      double expected_yz;
+    } testcases[] = {
+        {0, 0, 0}, {1, 0, 1.5}, {3, -1, 3}, {0, -2, -3}, {-2, 2, 0}};
+
+    for (auto& c : testcases) {
+      CHECK(ctrl.computeDesiredZmpPosition(yd, c.y, c.vy, zeta) ==
+            Approx(c.expected_yz));
+    }
+  }
+
+  SECTION("case: yd = 0, q1 = 1.2, q2 = 0.8, zeta = 1") {
+    double zeta = 1;
+    double yd = 0;
+    ctrl.set_q1(1.2);
+    ctrl.set_q2(0.8);
+    REQUIRE(ctrl.q1() == 1.2);
+    REQUIRE(ctrl.q2() == 0.8);
+
+    struct testcase_t {
+      double y, vy;
+      double expected_yz;
+    } testcases[] = {
+        {0, 0, 0}, {1, 0, 1.96}, {3, -1, 3.88}, {0, -2, -4}, {-2, 2, 0.08}};
+
+    for (auto& c : testcases) {
+      CHECK(ctrl.computeDesiredZmpPosition(yd, c.y, c.vy, zeta) ==
+            Approx(c.expected_yz));
+    }
+  }
+
+  SECTION("case: yd = 0.5, q1 = 1, q2 = 1, zeta = 1") {
+    double zeta = 1;
+    double yd = 0.5;
+    REQUIRE(ctrl.q1() == 1.0);
+    REQUIRE(ctrl.q2() == 1.0);
+
+    struct testcase_t {
+      double y, vy;
+      double expected_yz;
+    } testcases[] = {
+        {0, 0, -0.5}, {1, 0, 1.5}, {3, -1, 3.5}, {0, -2, -4.5}, {-2, 3, 1.5}};
+
+    for (auto& c : testcases) {
+      CHECK(ctrl.computeDesiredZmpPosition(yd, c.y, c.vy, zeta) ==
+            Approx(c.expected_yz));
+    }
+  }
+
+  SECTION("case: yd = 1, q1 = 1, q2 = 1.5, zeta = 1") {
+    double zeta = 1;
+    double yd = -1;
+    ctrl.set_q2(1.5);
+    REQUIRE(ctrl.q1() == 1.0);
+    REQUIRE(ctrl.q2() == 1.5);
+
+    struct testcase_t {
+      double y, vy;
+      double expected_yz;
+    } testcases[] = {
+        {0, 0, 1.5}, {1, 0, 4}, {3, -1, 6.5}, {0, -2, -3.5}, {-2, 3, 4}};
+
+    for (auto& c : testcases) {
+      CHECK(ctrl.computeDesiredZmpPosition(yd, c.y, c.vy, zeta) ==
+            Approx(c.expected_yz));
+    }
+  }
+
+  SECTION("case: yd = 0.5, q1 = 1, q2 = 1.5, zeta = sqrt(2)") {
+    double zeta = sqrt(2);
+    double yd = 0.5;
+    ctrl.set_q2(1.5);
+    REQUIRE(ctrl.q1() == 1.0);
+    REQUIRE(ctrl.q2() == 1.5);
+
+    struct testcase_t {
+      double y, vy;
+      double expected_yz;
+    } testcases[] = {{0, 0, -0.75},
+                     {1, 0, 1.75},
+                     {3, -2, 2.5 * (3 - sqrt(2)) - 0.75},
+                     {0, -1, -1.25 * sqrt(2) - 0.75},
+                     {-2, 3, 2.5 * (-2 + 1.5 * sqrt(2)) - 0.75}};
+
+    for (auto& c : testcases) {
+      CHECK(ctrl.computeDesiredZmpPosition(yd, c.y, c.vy, zeta) ==
+            Approx(c.expected_yz));
+    }
+  }
+}
+
 }  // namespace
 }  // namespace holon

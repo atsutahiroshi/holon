@@ -20,6 +20,8 @@
 
 #include "holon/corelib/humanoid/com_ctrl_y.hpp"
 
+#include <zm/zm_misc.h>
+
 namespace holon {
 
 ComCtrlY::ComCtrlY() : m_q1(default_q1), m_q2(default_q2) {}
@@ -39,6 +41,10 @@ ComCtrlY& ComCtrlY::set_q2(double t_q2) {
 
 double ComCtrlY::computeDesiredZmpPosition(double yd, double y, double v,
                                            double zeta) const noexcept {
+  if (zIsTiny(zeta) || zeta < 0) {
+    ZRUNERROR("ZETA should be positive. (given: %f)", zeta);
+    return 0;
+  }
   return y + (m_q1 * m_q2) * (y - yd) + (m_q1 + m_q2) * v / zeta;
 }
 

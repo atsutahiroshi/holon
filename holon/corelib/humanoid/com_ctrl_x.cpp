@@ -20,6 +20,8 @@
 
 #include "holon/corelib/humanoid/com_ctrl_x.hpp"
 
+#include <zm/zm_misc.h>
+
 namespace holon {
 
 ComCtrlX::ComCtrlX() : m_q1(default_q1), m_q2(default_q2) {}
@@ -39,6 +41,10 @@ ComCtrlX& ComCtrlX::set_q2(double t_q2) {
 
 double ComCtrlX::computeDesiredZmpPosition(double xd, double x, double v,
                                            double zeta) const noexcept {
+  if (zIsTiny(zeta) || zeta < 0) {
+    ZRUNERROR("ZETA should be positive. (given: %f)", zeta);
+    return 0;
+  }
   return x + (m_q1 * m_q2) * (x - xd) + (m_q1 + m_q2) * v / zeta;
 }
 

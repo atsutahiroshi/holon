@@ -20,6 +20,8 @@
 
 #include "holon/corelib/humanoid/com_ctrl_x.hpp"
 
+#include <cure/cure_misc.h>
+
 #include "catch.hpp"
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
@@ -207,6 +209,15 @@ TEST_CASE("compute desired ZMP position along x-axis to regulate at 0",
             Approx(c.expected_xz));
     }
   }
+}
+
+TEST_CASE("handle the case where zeta is non-positive on x-axis",
+          "[corelib][humanoid]") {
+  ComCtrlX ctrl;
+  zEchoOff();
+  REQUIRE(ctrl.computeDesiredZmpPosition(1, 0, 0, 0) == 0);
+  REQUIRE(ctrl.computeDesiredZmpPosition(1, 0, 0, -1) == 0);
+  zEchoOn();
 }
 
 }  // namespace

@@ -59,4 +59,15 @@ zVec3D* ComCtrl::computeDesiredZmpPosition(const zVec3D* ref_com_pos,
   return desired_zmp_pos;
 }
 
+bool ComCtrl::update() {
+  computeDesiredZmpPosition(cmd_com_position(), model().com_position(),
+                            model().com_velocity(), &m_des_zmp_position);
+  return true;
+}
+
+bool ComCtrl::update(double t_time_step) {
+  set_time_step(t_time_step);
+  return update();
+}
+
 }  // namespace holon

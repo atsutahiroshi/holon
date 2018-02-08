@@ -64,6 +64,9 @@ class ComCtrl {
                                     const zVec3D* com_velocity,
                                     zVec3D* desired_zmp_position) const;
 
+  bool update();
+  bool update(double t_time_step);
+
  private:
   ComCtrlX m_x;
   ComCtrlY m_y;

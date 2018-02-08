@@ -371,5 +371,49 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
   }
 }
 
+TEST_CASE("check if time step is modified after update",
+          "[corelib][humanoid]") {
+  ComCtrl ctrl;
+  Fuzzer fuzz(0.0001, 0.1);
+  double dt1 = fuzz.get();
+  double dt2 = fuzz.get();
+
+  REQUIRE(ctrl.time_step() != dt1);
+  ctrl.update(dt1);
+  CHECK(ctrl.time_step() == dt1);
+  CHECK(ctrl.model().time_step() == dt1);
+  ctrl.update();
+  CHECK(ctrl.time_step() == dt1);
+  CHECK(ctrl.model().time_step() == dt1);
+
+  REQUIRE(ctrl.time_step() != dt2);
+  ctrl.update(dt2);
+  CHECK(ctrl.time_step() == dt2);
+  CHECK(ctrl.model().time_step() == dt2);
+  ctrl.update();
+  CHECK(ctrl.time_step() == dt2);
+  CHECK(ctrl.model().time_step() == dt2);
+}
+
+TEST_CASE("check if desired ZMP position is modified after update",
+          "[corelib][humanoid]") {
+  ComCtrl ctrl;
+
+  struct testcase_t {
+    zVec3D cmd_com_pos;
+  } testcases[] = {{{0, 0, 1}}, {{0.1, 0, 1}}, {{0.1, -0.1, 1}}};
+  for (auto& c : testcases) {
+    zVec3D expected_des_zmp_pos;
+    ctrl.computeDesiredZmpPosition(&c.cmd_com_pos, ctrl.model().com_position(),
+                                   ctrl.model().com_velocity(),
+                                   &expected_des_zmp_pos);
+
+    ctrl.set_cmd_com_position(&c.cmd_com_pos);
+    ctrl.update();
+    CHECK_THAT(ctrl.des_zmp_position(),
+               Catch::Matchers::Equals(&expected_des_zmp_pos));
+  }
+}
+
 }  // namespace
 }  // namespace holon

@@ -252,5 +252,51 @@ TEST_CASE("compute the COM acceleration based on COM-ZMP model",
   }
 }
 
+TEST_CASE("modify step time after calling update with double type",
+          "[corelib][humanoid]") {
+  ComZmpModel model;
+  Fuzzer fuzz(0.0001, 0.1);
+  double dt1 = fuzz.get();
+  double dt2 = fuzz.get();
+
+  REQUIRE(model.step_time() != dt1);
+  model.update(dt1);
+  CHECK(model.step_time() == dt1);
+  model.update();
+  CHECK(model.step_time() == dt1);
+
+  REQUIRE(model.step_time() != dt2);
+  model.update(dt2);
+  CHECK(model.step_time() == dt2);
+  model.update();
+  CHECK(model.step_time() == dt2);
+}
+
+TEST_CASE("test if acceleration is modified after update",
+          "[corelib][humanoid]") {
+  ComZmpModel model;
+
+  SECTION("update acceleration") {
+    struct testcase_t {
+      zVec3D com_pos;
+      zVec3D com_vel;
+      zVec3D zmp_pos;
+    } testcases[] = {{{0, 0, 1}, {0, 0, 0}, {1, 0, 0}},
+                     {{0, 0.1, 1}, {0.1, -0.1, 0}, {0.2, 0.1, 0}}};
+    for (auto& c : testcases) {
+      zVec3D expected_com_acc;
+      zVec3D computed_com_acc;
+      model.computeAcceleration(&c.com_pos, &c.zmp_pos, &expected_com_acc);
+
+      model.set_com_position(&c.com_pos);
+      model.set_com_velocity(&c.com_vel);
+      model.set_zmp_position(&c.zmp_pos);
+      model.update();
+      CHECK_THAT(model.com_acceleration(),
+                 Catch::Matchers::Equals(&expected_com_acc));
+    }
+  }
+}
+
 }  // namespace
 }  // namespace holon

@@ -66,6 +66,9 @@ class ComZmpModel {
                               const zVec3D* zmp_position,
                               zVec3D* com_acceleration) const;
 
+  bool update();
+  bool update(double t_step_time);
+
  private:
   double m_mass;
   zVec3D m_com_position;

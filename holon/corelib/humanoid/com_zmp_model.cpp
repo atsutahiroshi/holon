@@ -103,4 +103,14 @@ zVec3D* ComZmpModel::computeAcceleration(const zVec3D* t_com_position,
   return t_com_acceleration;
 }
 
+bool ComZmpModel::update() {
+  computeAcceleration(&m_com_position, &m_zmp_position, &m_com_acceleration);
+  return true;
+}
+
+bool ComZmpModel::update(double t_step_time) {
+  set_step_time(t_step_time);
+  return update();
+}
+
 }  // namespace holon

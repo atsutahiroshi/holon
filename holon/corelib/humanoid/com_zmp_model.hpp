@@ -28,6 +28,7 @@ namespace holon {
 class ComZmpModel {
   const double default_mass = 1;
   const double default_com_height = 1;
+  const double default_step_time = 0.001;
 
  public:
   ComZmpModel();
@@ -55,6 +56,9 @@ class ComZmpModel {
   inline zVec3D* zmp_position() noexcept { return &m_zmp_position; }
   ComZmpModel& set_zmp_position(const zVec3D* t_zmp_position);
 
+  inline double step_time() const noexcept { return m_step_time; }
+  ComZmpModel& set_step_time(double t_step_time);
+
   double computeZetaSqr(const zVec3D* com_position) const;
   double computeZeta(const zVec3D* com_position) const;
 
@@ -68,6 +72,7 @@ class ComZmpModel {
   zVec3D m_com_velocity;
   zVec3D m_com_acceleration;
   zVec3D m_zmp_position;
+  double m_step_time;
 
   void initializeStates();
 };

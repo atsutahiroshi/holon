@@ -24,8 +24,14 @@
 
 namespace holon {
 
-ComZmpModel::ComZmpModel() : m_mass(default_mass) { initializeStates(); }
-ComZmpModel::ComZmpModel(double t_mass) : m_mass(t_mass) { initializeStates(); }
+ComZmpModel::ComZmpModel()
+    : m_mass(default_mass), m_step_time(default_step_time) {
+  initializeStates();
+}
+ComZmpModel::ComZmpModel(double t_mass)
+    : m_mass(t_mass), m_step_time(default_step_time) {
+  initializeStates();
+}
 
 ComZmpModel::~ComZmpModel() = default;
 
@@ -58,6 +64,16 @@ ComZmpModel& ComZmpModel::set_com_velocity(const zVec3D* t_com_velocity) {
 
 ComZmpModel& ComZmpModel::set_zmp_position(const zVec3D* t_zmp_position) {
   zVec3DCopy(t_zmp_position, &m_zmp_position);
+  return *this;
+}
+
+ComZmpModel& ComZmpModel::set_step_time(double t_step_time) {
+  if (zIsTiny(t_step_time) || t_step_time < 0) {
+    ZRUNERROR("step time must be positive value (given: %f)", t_step_time);
+    m_step_time = default_step_time;
+  } else {
+    m_step_time = t_step_time;
+  }
   return *this;
 }
 

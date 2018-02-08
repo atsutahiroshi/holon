@@ -130,6 +130,33 @@ TEST_CASE("check if you can set arbitrarly states") {
   }
 }
 
+TEST_CASE("check if you can set/get step time", "[corelib][humanoid]") {
+  ComZmpModel model;
+
+  SECTION("default value is 0.001") {
+    CHECK(model.step_time() == Approx(0.001));
+  }
+  SECTION("set a value") {
+    Fuzzer fuzz(0.0001, 0.1);
+    double dt = fuzz.get();
+    model.set_step_time(dt);
+    CHECK(model.step_time() == Approx(dt));
+  }
+  SECTION("non-positive values are not allowed") {
+    zEchoOff();
+    model.set_step_time(0.1);
+    CHECK(model.step_time() != 0.001);
+    model.set_step_time(0);
+    CHECK(model.step_time() == 0.001);
+
+    model.set_step_time(0.1);
+    CHECK(model.step_time() != 0.001);
+    model.set_step_time(-0.01);
+    CHECK(model.step_time() == 0.001);
+    zEchoOn();
+  }
+}
+
 TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",
           "[corelib][humanoid]") {
   ComZmpModel model;

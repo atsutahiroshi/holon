@@ -415,5 +415,47 @@ TEST_CASE("check if desired ZMP position is modified after update",
   }
 }
 
+SCENARIO("controller can regulate COM position at a point",
+         "[corelib][humanoid]") {
+  GIVEN("command that COM position be at (0.1, -0.1, 1)") {
+    ComCtrl ctrl;
+    zVec3D cmd_com_pos = {0.1, -0.1, 1};
+    ctrl.set_cmd_com_position(&cmd_com_pos);
+
+    WHEN("at first") {
+      THEN("COM position is at (0, 0, 1)") {
+        zVec3D expected_com_pos = {0, 0, 1};
+        CHECK_THAT(const_cast<zVec3D*>(ctrl.model().com_position()),
+                   Catch::Matchers::Equals(&expected_com_pos));
+      }
+    }
+    WHEN("update until 0.1 sec") {
+      double t = 0;
+      while (t < 0.1) {
+        ctrl.update();
+        t += ctrl.time_step();
+      }
+      THEN("COM position is between (0, 0, 1) and (0.1, -0.1, 1)") {
+        CAPTURE(ctrl.model().com_position());
+        CHECK(zVec3DElem(ctrl.model().com_position(), zX) > 0.0);
+        CHECK(zVec3DElem(ctrl.model().com_position(), zX) < 0.1);
+        CHECK(zVec3DElem(ctrl.model().com_position(), zY) < 0.0);
+        CHECK(zVec3DElem(ctrl.model().com_position(), zY) > -0.1);
+      }
+    }
+    WHEN("update until 10 sec") {
+      double t = 0;
+      while (t < 10) {
+        ctrl.update();
+        t += ctrl.time_step();
+      }
+      THEN("COM lies at (0.1, -0.1, 1)") {
+        CHECK_THAT(const_cast<zVec3D*>(ctrl.model().com_position()),
+                   Catch::Matchers::Equals(&cmd_com_pos));
+      }
+    }
+  }
+}
+
 }  // namespace
 }  // namespace holon

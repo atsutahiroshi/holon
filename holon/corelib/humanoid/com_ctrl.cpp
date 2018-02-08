@@ -60,8 +60,10 @@ zVec3D* ComCtrl::computeDesiredZmpPosition(const zVec3D* ref_com_pos,
 }
 
 bool ComCtrl::update() {
-  computeDesiredZmpPosition(cmd_com_position(), model().com_position(),
-                            model().com_velocity(), &m_des_zmp_position);
+  computeDesiredZmpPosition(&m_cmd_com_position, m_model.com_position(),
+                            m_model.com_velocity(), &m_des_zmp_position);
+  m_model.set_zmp_position(&m_des_zmp_position);
+  m_model.update();
   return true;
 }
 

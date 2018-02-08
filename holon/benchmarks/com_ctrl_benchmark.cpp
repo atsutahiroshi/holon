@@ -49,7 +49,8 @@ BENCHMARK_F(ComCtrlBenchmark, SetQ1, 100, 1000) { ctrl.x().set_q1(1); }
 
 BENCHMARK_F(ComCtrlBenchmark, computeDesiredZmpPosition, 100, 1000) {
   zVec3D desired_zmp_pos;
-  ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+  double desired_zeta = ctrl.computeDesiredZeta(&ref_com_pos);
+  ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel, desired_zeta,
                                  &desired_zmp_pos);
 }
 

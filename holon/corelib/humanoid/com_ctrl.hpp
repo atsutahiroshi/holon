@@ -41,6 +41,7 @@ class ComCtrl {
   inline ComCtrlY& y() noexcept { return m_y; }
 
   inline const ComZmpModel& model() const noexcept { return m_model; }
+  inline ComZmpModel& model() noexcept { return m_model; }
 
   inline double time_step() const noexcept { return model().time_step(); }
   ComCtrl& set_time_step(double t_time_step);

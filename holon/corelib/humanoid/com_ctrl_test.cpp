@@ -466,5 +466,27 @@ SCENARIO("controller can regulate COM position at a point",
   }
 }
 
+TEST_CASE("com_ctrl: when COM height is zero, update should fail",
+          "[corelib][humanoid]") {
+  ComCtrl ctrl;
+  zVec3D p = {0, 0, 0};
+
+  ctrl.model().set_com_position(&p);
+  zEchoOff();
+  CHECK_FALSE(ctrl.update());
+  zEchoOn();
+}
+
+TEST_CASE("when commanded COM height is zero, update should fail",
+          "[corelib][humanoid]") {
+  ComCtrl ctrl;
+  zVec3D p = {0, 0, 0};
+
+  ctrl.set_cmd_com_position(&p);
+  zEchoOff();
+  CHECK_FALSE(ctrl.update());
+  zEchoOn();
+}
+
 }  // namespace
 }  // namespace holon

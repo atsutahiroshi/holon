@@ -109,7 +109,10 @@ zVec3D* ComZmpModel::computeAcceleration(const zVec3D* t_com_position,
 }
 
 bool ComZmpModel::update() {
-  computeAcceleration(&m_com_position, &m_zmp_position, &m_com_acceleration);
+  if (zIsTiny(computeZetaSqr(com_position()))) return false;
+  computeAcceleration(com_position(), zmp_position(), com_acceleration());
+  zVec3DCatDRC(com_position(), step_time(), com_velocity());
+  zVec3DCatDRC(com_velocity(), step_time(), com_acceleration());
   return true;
 }
 

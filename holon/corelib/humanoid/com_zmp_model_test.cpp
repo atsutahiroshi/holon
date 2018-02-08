@@ -321,5 +321,50 @@ TEST_CASE("test if acceleration is modified after update",
   }
 }
 
+SCENARIO("update COM position, velocity, acceleration", "[corelib][humanoid]") {
+  GIVEN("COM stays at (0, 0, 1)") {
+    ComZmpModel model;
+
+    WHEN("input ZMP position as (-1, -0.5, 0) and update") {
+      zVec3D zmp_pos = {-1, -0.5, 0};
+      model.set_zmp_position(&zmp_pos);
+      REQUIRE(model.update());
+
+      THEN("horizontal velocity should be positive") {
+        CHECK(zVec3DElem(model.com_velocity(), zX) > 0.0);
+        CHECK(zVec3DElem(model.com_velocity(), zY) > 0.0);
+      }
+      THEN("horizontal position should still be at zero") {
+        CHECK(zVec3DElem(model.com_position(), zX) == 0.0);
+        CHECK(zVec3DElem(model.com_position(), zY) == 0.0);
+      }
+
+      WHEN("and update once more") {
+        model.set_zmp_position(&zmp_pos);
+        REQUIRE(model.update());
+
+        THEN("horizontal velocity should be positive") {
+          CHECK(zVec3DElem(model.com_velocity(), zX) > 0.0);
+          CHECK(zVec3DElem(model.com_velocity(), zY) > 0.0);
+        }
+        THEN("horizontal position should move forward") {
+          CHECK(zVec3DElem(model.com_position(), zX) > 0.0);
+          CHECK(zVec3DElem(model.com_position(), zY) > 0.0);
+        }
+      }
+    }
+  }
+}
+
+TEST_CASE("when COM height is zero, update should fail") {
+  ComZmpModel model;
+  zVec3D p = {0, 0, 0};
+
+  model.set_com_position(&p);
+  zEchoOff();
+  CHECK_FALSE(model.update());
+  zEchoOn();
+}
+
 }  // namespace
 }  // namespace holon

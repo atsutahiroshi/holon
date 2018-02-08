@@ -121,6 +121,13 @@ TEST_CASE("check if you can set arbitrarly states") {
     model.set_com_velocity(&new_com_vel);
     REQUIRE_THAT(model.com_velocity(), Catch::Matchers::Equals(&new_com_vel));
   }
+  SECTION("ZMP position") {
+    zVec3D new_zmp_pos;
+    fuzz.randomize(&new_zmp_pos);
+    REQUIRE_THAT(model.zmp_position(), Catch::Matchers::NotEqual(&new_zmp_pos));
+    model.set_zmp_position(&new_zmp_pos);
+    REQUIRE_THAT(model.zmp_position(), Catch::Matchers::Equals(&new_zmp_pos));
+  }
 }
 
 TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",

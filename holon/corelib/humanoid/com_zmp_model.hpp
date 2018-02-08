@@ -53,6 +53,7 @@ class ComZmpModel {
 
   inline const zVec3D* zmp_position() const noexcept { return &m_zmp_position; }
   inline zVec3D* zmp_position() noexcept { return &m_zmp_position; }
+  ComZmpModel& set_zmp_position(const zVec3D* t_zmp_position);
 
   double computeZetaSqr(const zVec3D* com_position) const;
   double computeZeta(const zVec3D* com_position) const;

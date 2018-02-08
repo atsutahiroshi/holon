@@ -56,6 +56,11 @@ ComZmpModel& ComZmpModel::set_com_velocity(const zVec3D* t_com_velocity) {
   return *this;
 }
 
+ComZmpModel& ComZmpModel::set_zmp_position(const zVec3D* t_zmp_position) {
+  zVec3DCopy(t_zmp_position, &m_zmp_position);
+  return *this;
+}
+
 double ComZmpModel::computeZetaSqr(const zVec3D* t_com_position) const {
   if (zIsTiny(zVec3DElem(t_com_position, zZ)) ||
       zVec3DElem(t_com_position, zZ) < 0) {

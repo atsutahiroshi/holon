@@ -47,6 +47,8 @@ class ComZmpModel {
   inline zVec3D* com_velocity() noexcept { return &m_com_velocity; }
   ComZmpModel& set_com_velocity(const zVec3D* t_com_velocity);
 
+  ComZmpModel& reset_com_position(const zVec3D* t_com_position);
+
   inline const zVec3D* com_acceleration() const noexcept {
     return &m_com_acceleration;
   }

@@ -103,7 +103,7 @@ TEST_CASE("check if states in COM-ZMP model are initialized approapriately") {
   }
 }
 
-TEST_CASE("check if you can set arbitrarly states") {
+TEST_CASE("check if you can set arbitrarly states", "[corelib][humanoid]") {
   ComZmpModel model;
   Fuzzer fuzz;
 
@@ -127,6 +127,29 @@ TEST_CASE("check if you can set arbitrarly states") {
     REQUIRE_THAT(model.zmp_position(), Catch::Matchers::NotEqual(&new_zmp_pos));
     model.set_zmp_position(&new_zmp_pos);
     REQUIRE_THAT(model.zmp_position(), Catch::Matchers::Equals(&new_zmp_pos));
+  }
+}
+
+SCENARIO("reset COM position", "[corelib][humanoid]") {
+  GIVEN("initialize with random values") {
+    ComZmpModel model;
+    Fuzzer fuzz;
+    zVec3D p, v;
+
+    fuzz.randomize(&p);
+    fuzz.randomize(&v);
+    model.set_com_position(&p);
+    model.set_com_velocity(&v);
+
+    WHEN("reset COM position") {
+      fuzz.randomize(&p);
+      model.reset_com_position(&p);
+
+      THEN("COM position should be that value and velocity should be zero") {
+        CHECK_THAT(model.com_position(), Catch::Matchers::Equals(&p));
+        CHECK_THAT(model.com_velocity(), Catch::Matchers::Equals(ZVEC3DZERO));
+      }
+    }
   }
 }
 

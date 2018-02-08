@@ -62,6 +62,11 @@ ComZmpModel& ComZmpModel::set_com_velocity(const zVec3D* t_com_velocity) {
   return *this;
 }
 
+ComZmpModel& ComZmpModel::reset_com_position(const zVec3D* t_com_position) {
+  zVec3DClear(&m_com_velocity);
+  return set_com_position(t_com_position);
+}
+
 ComZmpModel& ComZmpModel::set_zmp_position(const zVec3D* t_zmp_position) {
   zVec3DCopy(t_zmp_position, &m_zmp_position);
   return *this;

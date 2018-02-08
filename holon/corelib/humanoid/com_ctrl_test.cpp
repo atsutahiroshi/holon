@@ -112,6 +112,14 @@ TEST_CASE("com_ctrl: testing of accessors/mutators", "[corelib][humanoid]") {
     REQUIRE_THAT(ctrl.cmd_com_position(),
                  Catch::Matchers::Equals(&new_cmd_com_pos));
   }
+
+  SECTION("time step") {
+    Fuzzer fuzz(0.0001, 0.1);
+    double dt = fuzz.get();
+    ctrl.set_time_step(dt);
+    CHECK(ctrl.time_step() == dt);
+    CHECK(ctrl.model().time_step() == dt);
+  }
 }
 
 TEST_CASE("compute desired zeta", "[corelib][humanoid]") {

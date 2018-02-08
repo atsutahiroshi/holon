@@ -29,6 +29,11 @@ ComCtrl::ComCtrl() : m_x(), m_y(), m_model() {
 
 ComCtrl::~ComCtrl() = default;
 
+ComCtrl& ComCtrl::set_time_step(double t_time_step) {
+  m_model.set_time_step(t_time_step);
+  return *this;
+}
+
 ComCtrl& ComCtrl::set_cmd_com_position(const zVec3D* t_cmd_com_position) {
   zVec3DCopy(t_cmd_com_position, &m_cmd_com_position);
   return *this;

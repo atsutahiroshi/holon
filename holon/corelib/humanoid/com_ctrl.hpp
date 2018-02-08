@@ -42,6 +42,9 @@ class ComCtrl {
 
   inline const ComZmpModel& model() const noexcept { return m_model; }
 
+  inline double time_step() const noexcept { return model().time_step(); }
+  ComCtrl& set_time_step(double t_time_step);
+
   inline const zVec3D* cmd_com_position() const noexcept {
     return &m_cmd_com_position;
   }

@@ -78,28 +78,48 @@ TEST_CASE("COM-ZMP model has a mass as a parameter", "[corelib][humanoid]") {
   }
 }
 
-TEST_CASE("COM-ZMP model has states such as COM position, ZMP position, etc.") {
+TEST_CASE("check if states in COM-ZMP model are initialized approapriately") {
   ComZmpModel model;
 
   SECTION("COM position") {
     zVec3D expected_com_pos = {0, 0, 1};
-    REQUIRE_THAT(const_cast<zVec3D*>(model.com_position()),
+    REQUIRE_THAT(model.com_position(),
                  Catch::Matchers::Equals(&expected_com_pos));
   }
   SECTION("COM velocity") {
     zVec3D expected_com_vel = {0, 0, 0};
-    REQUIRE_THAT(const_cast<zVec3D*>(model.com_velocity()),
+    REQUIRE_THAT(model.com_velocity(),
                  Catch::Matchers::Equals(&expected_com_vel));
   }
   SECTION("COM acceleration") {
     zVec3D expected_com_acc = {0, 0, 0};
-    REQUIRE_THAT(const_cast<zVec3D*>(model.com_acceleration()),
+    REQUIRE_THAT(model.com_acceleration(),
                  Catch::Matchers::Equals(&expected_com_acc));
   }
   SECTION("ZMP position") {
     zVec3D expected_zmp_pos = {0, 0, 0};
-    REQUIRE_THAT(const_cast<zVec3D*>(model.zmp_position()),
+    REQUIRE_THAT(model.zmp_position(),
                  Catch::Matchers::Equals(&expected_zmp_pos));
+  }
+}
+
+TEST_CASE("check if you can set arbitrarly states") {
+  ComZmpModel model;
+  Fuzzer fuzz;
+
+  SECTION("COM position") {
+    zVec3D new_com_pos;
+    fuzz.randomize(&new_com_pos);
+    REQUIRE_THAT(model.com_position(), Catch::Matchers::NotEqual(&new_com_pos));
+    model.set_com_position(&new_com_pos);
+    REQUIRE_THAT(model.com_position(), Catch::Matchers::Equals(&new_com_pos));
+  }
+  SECTION("COM velocity") {
+    zVec3D new_com_vel;
+    fuzz.randomize(&new_com_vel);
+    REQUIRE_THAT(model.com_velocity(), Catch::Matchers::NotEqual(&new_com_vel));
+    model.set_com_velocity(&new_com_vel);
+    REQUIRE_THAT(model.com_velocity(), Catch::Matchers::Equals(&new_com_vel));
   }
 }
 

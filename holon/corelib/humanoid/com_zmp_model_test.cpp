@@ -308,7 +308,6 @@ TEST_CASE("test if acceleration is modified after update",
                      {{0, 0.1, 1}, {0.1, -0.1, 0}, {0.2, 0.1, 0}}};
     for (auto& c : testcases) {
       zVec3D expected_com_acc;
-      zVec3D computed_com_acc;
       model.computeAcceleration(&c.com_pos, &c.zmp_pos, &expected_com_acc);
 
       model.set_com_position(&c.com_pos);

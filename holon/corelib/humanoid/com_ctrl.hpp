@@ -48,6 +48,11 @@ class ComCtrl {
   inline zVec3D* cmd_com_position() noexcept { return &m_cmd_com_position; }
   ComCtrl& set_cmd_com_position(const zVec3D* t_cmd_com_position);
 
+  inline const zVec3D* des_zmp_position() const noexcept {
+    return &m_des_zmp_position;
+  }
+  inline zVec3D* des_zmp_position() noexcept { return &m_des_zmp_position; }
+
   double computeDesiredZetaSqr(const zVec3D* ref_com_position) const;
   double computeDesiredZeta(const zVec3D* ref_com_position) const;
 
@@ -62,6 +67,7 @@ class ComCtrl {
   ComZmpModel m_model;
 
   zVec3D m_cmd_com_position;
+  zVec3D m_des_zmp_position;
 };
 
 }  // namespace holon

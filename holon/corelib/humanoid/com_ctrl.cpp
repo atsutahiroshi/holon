@@ -24,6 +24,7 @@ namespace holon {
 
 ComCtrl::ComCtrl() : m_x(), m_y(), m_model() {
   zVec3DCopy(model().com_position(), &m_cmd_com_position);
+  zVec3DClear(&m_des_zmp_position);
 }
 
 ComCtrl::~ComCtrl() = default;

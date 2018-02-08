@@ -94,6 +94,11 @@ TEST_CASE("com_ctrl: testing of initialization", "[corelib][humanoid]") {
     CHECK_THAT(ctrl.cmd_com_position(),
                Catch::Matchers::Equals(&expected_cmd_com_pos));
   }
+  SECTION("desired ZMP position") {
+    zVec3D expected_des_zmp_pos = {0, 0, 0};
+    CHECK_THAT(ctrl.des_zmp_position(),
+               Catch::Matchers::Equals(&expected_des_zmp_pos));
+  }
 }
 
 TEST_CASE("com_ctrl: testing of accessors/mutators", "[corelib][humanoid]") {

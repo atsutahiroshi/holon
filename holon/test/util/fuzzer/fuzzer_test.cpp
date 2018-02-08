@@ -39,11 +39,38 @@ TEST_CASE("outputs random values", "[test][util][fuzzer]") {
 }
 
 TEST_CASE("outputs same values with a specific seed", "[test][util][fuzzer]") {
-  Fuzzer fuzz1(0);
-  Fuzzer fuzz2(0);
+  Fuzzer fuzz1({0});
+  Fuzzer fuzz2({0});
 
   for (auto i = 0; i < 10; ++i) {
     REQUIRE(fuzz1.get() == fuzz2.get());
+  }
+}
+
+TEST_CASE("make uniform distribution within some range",
+          "[test][util][fuzzer]") {
+  Fuzzer fuzz(0, 10);
+
+  for (auto i = 0; i < 10; ++i) {
+    double v = fuzz.get();
+    REQUIRE(v > 0);
+    REQUIRE(v < 10);
+  }
+}
+
+TEST_CASE("make uniform distribution with a specific seed",
+          "[test][util][fuzzer]") {
+  Fuzzer fuzz1({0}, 0, 10);
+  Fuzzer fuzz2({0}, 0, 10);
+
+  for (auto i = 0; i < 10; ++i) {
+    double v1 = fuzz1.get();
+    double v2 = fuzz2.get();
+    REQUIRE(v1 == v2);
+    REQUIRE(v1 > 0);
+    REQUIRE(v1 < 10);
+    REQUIRE(v2 > 0);
+    REQUIRE(v2 < 10);
   }
 }
 

@@ -86,6 +86,29 @@ TEST_CASE("check if control poles on each axis can be assigned",
   }
 }
 
+TEST_CASE("com_ctrl: testing of initialization", "[corelib][humanoid]") {
+  ComCtrl ctrl;
+
+  SECTION("commanded COM position") {
+    zVec3D expected_cmd_com_pos = {0, 0, 1};
+    CHECK_THAT(ctrl.cmd_com_position(),
+               Catch::Matchers::Equals(&expected_cmd_com_pos));
+  }
+}
+
+TEST_CASE("com_ctrl: testing of accessors/mutators", "[corelib][humanoid]") {
+  ComCtrl ctrl;
+  Fuzzer fuzz;
+
+  SECTION("commanded COM position") {
+    zVec3D new_cmd_com_pos;
+    fuzz.randomize(&new_cmd_com_pos);
+    ctrl.set_cmd_com_position(&new_cmd_com_pos);
+    REQUIRE_THAT(ctrl.cmd_com_position(),
+                 Catch::Matchers::Equals(&new_cmd_com_pos));
+  }
+}
+
 TEST_CASE("compute desired zeta", "[corelib][humanoid]") {
   ComCtrl ctrl;
 

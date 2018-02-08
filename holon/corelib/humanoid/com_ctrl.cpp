@@ -22,9 +22,16 @@
 
 namespace holon {
 
-ComCtrl::ComCtrl() : m_x(), m_y(), m_model() {}
+ComCtrl::ComCtrl() : m_x(), m_y(), m_model() {
+  zVec3DCopy(model().com_position(), &m_cmd_com_position);
+}
 
 ComCtrl::~ComCtrl() = default;
+
+ComCtrl& ComCtrl::set_cmd_com_position(const zVec3D* t_cmd_com_position) {
+  zVec3DCopy(t_cmd_com_position, &m_cmd_com_position);
+  return *this;
+}
 
 double ComCtrl::computeDesiredZetaSqr(const zVec3D* ref_com_position) const {
   return m_model.computeZetaSqr(ref_com_position);

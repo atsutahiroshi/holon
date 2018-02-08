@@ -21,6 +21,7 @@
 #ifndef HOLON_TEST_UTIL_FUZZER_FUZZER_HPP_
 #define HOLON_TEST_UTIL_FUZZER_FUZZER_HPP_
 
+#include <zeo/zeo_vec3d.h>
 #include <random>
 
 namespace holon {
@@ -34,6 +35,8 @@ class Fuzzer {
   virtual ~Fuzzer();
 
   inline double get() { return m_distribution(m_engine); }
+
+  zVec3D* randomize(zVec3D* v);
 
  private:
   std::random_device m_rd;

@@ -157,25 +157,25 @@ TEST_CASE("check if you can set/get step time", "[corelib][humanoid]") {
   ComZmpModel model;
 
   SECTION("default value is 0.001") {
-    CHECK(model.step_time() == Approx(0.001));
+    CHECK(model.time_step() == Approx(0.001));
   }
   SECTION("set a value") {
     Fuzzer fuzz(0.0001, 0.1);
     double dt = fuzz.get();
-    model.set_step_time(dt);
-    CHECK(model.step_time() == Approx(dt));
+    model.set_time_step(dt);
+    CHECK(model.time_step() == Approx(dt));
   }
   SECTION("non-positive values are not allowed") {
     zEchoOff();
-    model.set_step_time(0.1);
-    CHECK(model.step_time() != 0.001);
-    model.set_step_time(0);
-    CHECK(model.step_time() == 0.001);
+    model.set_time_step(0.1);
+    CHECK(model.time_step() != 0.001);
+    model.set_time_step(0);
+    CHECK(model.time_step() == 0.001);
 
-    model.set_step_time(0.1);
-    CHECK(model.step_time() != 0.001);
-    model.set_step_time(-0.01);
-    CHECK(model.step_time() == 0.001);
+    model.set_time_step(0.1);
+    CHECK(model.time_step() != 0.001);
+    model.set_time_step(-0.01);
+    CHECK(model.time_step() == 0.001);
     zEchoOn();
   }
 }
@@ -282,17 +282,17 @@ TEST_CASE("modify step time after calling update with double type",
   double dt1 = fuzz.get();
   double dt2 = fuzz.get();
 
-  REQUIRE(model.step_time() != dt1);
+  REQUIRE(model.time_step() != dt1);
   model.update(dt1);
-  CHECK(model.step_time() == dt1);
+  CHECK(model.time_step() == dt1);
   model.update();
-  CHECK(model.step_time() == dt1);
+  CHECK(model.time_step() == dt1);
 
-  REQUIRE(model.step_time() != dt2);
+  REQUIRE(model.time_step() != dt2);
   model.update(dt2);
-  CHECK(model.step_time() == dt2);
+  CHECK(model.time_step() == dt2);
   model.update();
-  CHECK(model.step_time() == dt2);
+  CHECK(model.time_step() == dt2);
 }
 
 TEST_CASE("test if acceleration is modified after update",

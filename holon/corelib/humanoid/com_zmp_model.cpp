@@ -25,11 +25,11 @@
 namespace holon {
 
 ComZmpModel::ComZmpModel()
-    : m_mass(default_mass), m_step_time(default_step_time) {
+    : m_mass(default_mass), m_time_step(default_time_step) {
   initializeStates();
 }
 ComZmpModel::ComZmpModel(double t_mass)
-    : m_mass(t_mass), m_step_time(default_step_time) {
+    : m_mass(t_mass), m_time_step(default_time_step) {
   initializeStates();
 }
 
@@ -72,12 +72,12 @@ ComZmpModel& ComZmpModel::set_zmp_position(const zVec3D* t_zmp_position) {
   return *this;
 }
 
-ComZmpModel& ComZmpModel::set_step_time(double t_step_time) {
-  if (zIsTiny(t_step_time) || t_step_time < 0) {
-    ZRUNERROR("step time must be positive value (given: %f)", t_step_time);
-    m_step_time = default_step_time;
+ComZmpModel& ComZmpModel::set_time_step(double t_time_step) {
+  if (zIsTiny(t_time_step) || t_time_step < 0) {
+    ZRUNERROR("step time must be positive value (given: %f)", t_time_step);
+    m_time_step = default_time_step;
   } else {
-    m_step_time = t_step_time;
+    m_time_step = t_time_step;
   }
   return *this;
 }
@@ -111,13 +111,13 @@ zVec3D* ComZmpModel::computeAcceleration(const zVec3D* t_com_position,
 bool ComZmpModel::update() {
   if (zIsTiny(computeZetaSqr(com_position()))) return false;
   computeAcceleration(com_position(), zmp_position(), com_acceleration());
-  zVec3DCatDRC(com_position(), step_time(), com_velocity());
-  zVec3DCatDRC(com_velocity(), step_time(), com_acceleration());
+  zVec3DCatDRC(com_position(), time_step(), com_velocity());
+  zVec3DCatDRC(com_velocity(), time_step(), com_acceleration());
   return true;
 }
 
-bool ComZmpModel::update(double t_step_time) {
-  set_step_time(t_step_time);
+bool ComZmpModel::update(double t_time_step) {
+  set_time_step(t_time_step);
   return update();
 }
 

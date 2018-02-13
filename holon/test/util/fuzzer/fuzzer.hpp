@@ -27,6 +27,9 @@
 namespace holon {
 
 class Fuzzer {
+  const double default_min = -10;
+  const double default_max = 10;
+
  public:
   Fuzzer();
   Fuzzer(double t_min, double t_max);
@@ -36,7 +39,8 @@ class Fuzzer {
 
   inline double get() { return m_distribution(m_engine); }
 
-  zVec3D* randomize(zVec3D* v);
+  zVec3D* randomize(zVec3D* v);  // deprecated
+  zVec3D randomize(zVec3D& v);
 
  private:
   std::random_device m_rd;

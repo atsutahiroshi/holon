@@ -21,11 +21,14 @@
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
 #include <vector>
-
 #include "catch.hpp"
+#include "holon/test/util/catch/custom_matchers.hpp"
 
 namespace holon {
 namespace {
+
+using Catch::Matchers::Equals;
+using Catch::Matchers::VectorContains;
 
 TEST_CASE("outputs random values", "[test][util][fuzzer]") {
   std::vector<double> outdated_values;
@@ -33,7 +36,7 @@ TEST_CASE("outputs random values", "[test][util][fuzzer]") {
 
   for (auto i = 0; i < 10; ++i) {
     double n = fuzz.get();
-    REQUIRE_THAT(outdated_values, !Catch::Matchers::VectorContains(n));
+    REQUIRE_THAT(outdated_values, !VectorContains(n));
     outdated_values.push_back(n);
   }
 }
@@ -79,9 +82,9 @@ TEST_CASE("randomize elements in vector", "[test][util][fuzzer]") {
 
   for (auto i = 0; i < 10; ++i) {
     zVec3D v1, v2;
-    fuzz.randomize(&v1);
-    fuzz.randomize(&v2);
-    REQUIRE_FALSE(zVec3DEqual(&v1, &v2));
+    fuzz.randomize(v1);
+    fuzz.randomize(v2);
+    REQUIRE_THAT(v1, !Equals(v2));
   }
 }
 

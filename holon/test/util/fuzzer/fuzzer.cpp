@@ -28,7 +28,7 @@ Fuzzer::Fuzzer()
     : m_rd(),
       m_seed({m_rd(), m_rd(), m_rd(), m_rd(), m_rd()}),
       m_engine(m_seed),
-      m_distribution(0, std::numeric_limits<double>::max()) {}
+      m_distribution(default_min, default_max) {}
 
 Fuzzer::Fuzzer(double t_min, double t_max)
     : m_rd(),
@@ -39,7 +39,7 @@ Fuzzer::Fuzzer(double t_min, double t_max)
 Fuzzer::Fuzzer(const std::seed_seq& t_seed)
     : m_seed(t_seed),
       m_engine(m_seed),
-      m_distribution(0, std::numeric_limits<double>::max()) {}
+      m_distribution(default_min, default_max) {}
 
 Fuzzer::Fuzzer(const std::seed_seq& t_seed, double t_min, double t_max)
     : m_seed(t_seed), m_engine(m_seed), m_distribution(t_min, t_max) {}
@@ -48,6 +48,11 @@ Fuzzer::~Fuzzer() = default;
 
 zVec3D* Fuzzer::randomize(zVec3D* v) {
   zVec3DCreate(v, get(), get(), get());
+  return v;
+}
+
+zVec3D Fuzzer::randomize(zVec3D& v) {
+  zVec3DCreate(&v, get(), get(), get());
   return v;
 }
 

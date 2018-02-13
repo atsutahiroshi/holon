@@ -27,12 +27,15 @@
 namespace holon {
 namespace {
 
-TEST_CASE("matcher for zVec3D class", "[test][util][catch]") {
+using Catch::Matchers::Equals;
+
+TEST_CASE("matcher for zVec3D", "[test][util][catch]") {
+  zVec3D v = {0.1, 0.2, 0.3};
   zVec3D v1 = {0.1, 0.2, 0.3};
   zVec3D v2 = {0.1, 0.1, 0.1};
 
-  CHECK_THAT(&v1, Catch::Matchers::Equals(&v1));
-  CHECK_THAT(&v1, Catch::Matchers::NotEqual(&v2));
+  CHECK_THAT(v, Equals(v1));
+  CHECK_THAT(v, !Equals(v2));
 }
 
 }  // namespace

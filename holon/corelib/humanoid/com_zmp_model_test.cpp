@@ -30,6 +30,8 @@
 namespace holon {
 namespace {
 
+using Catch::Matchers::Equals;
+
 const double G = RK_G;
 
 TEST_CASE("COM-ZMP model has a mass as a parameter", "[corelib][humanoid]") {
@@ -83,23 +85,19 @@ TEST_CASE("check if states in COM-ZMP model are initialized approapriately") {
 
   SECTION("COM position") {
     zVec3D expected_com_pos = {0, 0, 1};
-    REQUIRE_THAT(model.com_position(),
-                 Catch::Matchers::Equals(&expected_com_pos));
+    REQUIRE_THAT(*model.com_position(), Equals(expected_com_pos));
   }
   SECTION("COM velocity") {
     zVec3D expected_com_vel = {0, 0, 0};
-    REQUIRE_THAT(model.com_velocity(),
-                 Catch::Matchers::Equals(&expected_com_vel));
+    REQUIRE_THAT(*model.com_velocity(), Equals(expected_com_vel));
   }
   SECTION("COM acceleration") {
     zVec3D expected_com_acc = {0, 0, 0};
-    REQUIRE_THAT(model.com_acceleration(),
-                 Catch::Matchers::Equals(&expected_com_acc));
+    REQUIRE_THAT(*model.com_acceleration(), Equals(expected_com_acc));
   }
   SECTION("ZMP position") {
     zVec3D expected_zmp_pos = {0, 0, 0};
-    REQUIRE_THAT(model.zmp_position(),
-                 Catch::Matchers::Equals(&expected_zmp_pos));
+    REQUIRE_THAT(*model.zmp_position(), Equals(expected_zmp_pos));
   }
 }
 
@@ -110,23 +108,23 @@ TEST_CASE("check if you can set arbitrarly states", "[corelib][humanoid]") {
   SECTION("COM position") {
     zVec3D new_com_pos;
     fuzz.randomize(&new_com_pos);
-    REQUIRE_THAT(model.com_position(), Catch::Matchers::NotEqual(&new_com_pos));
+    REQUIRE_THAT(*model.com_position(), !Equals(new_com_pos));
     model.set_com_position(&new_com_pos);
-    REQUIRE_THAT(model.com_position(), Catch::Matchers::Equals(&new_com_pos));
+    REQUIRE_THAT(*model.com_position(), Equals(new_com_pos));
   }
   SECTION("COM velocity") {
     zVec3D new_com_vel;
     fuzz.randomize(&new_com_vel);
-    REQUIRE_THAT(model.com_velocity(), Catch::Matchers::NotEqual(&new_com_vel));
+    REQUIRE_THAT(*model.com_velocity(), !Equals(new_com_vel));
     model.set_com_velocity(&new_com_vel);
-    REQUIRE_THAT(model.com_velocity(), Catch::Matchers::Equals(&new_com_vel));
+    REQUIRE_THAT(*model.com_velocity(), Equals(new_com_vel));
   }
   SECTION("ZMP position") {
     zVec3D new_zmp_pos;
     fuzz.randomize(&new_zmp_pos);
-    REQUIRE_THAT(model.zmp_position(), Catch::Matchers::NotEqual(&new_zmp_pos));
+    REQUIRE_THAT(*model.zmp_position(), !Equals(new_zmp_pos));
     model.set_zmp_position(&new_zmp_pos);
-    REQUIRE_THAT(model.zmp_position(), Catch::Matchers::Equals(&new_zmp_pos));
+    REQUIRE_THAT(*model.zmp_position(), Equals(new_zmp_pos));
   }
 }
 
@@ -146,8 +144,8 @@ SCENARIO("reset COM position", "[corelib][humanoid]") {
       model.reset_com_position(&p);
 
       THEN("COM position should be that value and velocity should be zero") {
-        CHECK_THAT(model.com_position(), Catch::Matchers::Equals(&p));
-        CHECK_THAT(model.com_velocity(), Catch::Matchers::Equals(ZVEC3DZERO));
+        CHECK_THAT(*model.com_position(), Equals(p));
+        CHECK_THAT(*model.com_velocity(), Equals(*ZVEC3DZERO));
       }
     }
   }
@@ -270,7 +268,7 @@ TEST_CASE("compute the COM acceleration based on COM-ZMP model",
       model.computeAcceleration(&c.com_pos, &c.zmp_pos, &acc);
       CAPTURE(&c.com_pos);
       CAPTURE(&c.zmp_pos);
-      CHECK_THAT(&acc, Catch::Matchers::Equals(&c.expected_acc));
+      CHECK_THAT(acc, Equals(c.expected_acc));
     }
   }
 }
@@ -314,8 +312,7 @@ TEST_CASE("test if acceleration is modified after update",
       model.set_com_velocity(&c.com_vel);
       model.set_zmp_position(&c.zmp_pos);
       model.update();
-      CHECK_THAT(model.com_acceleration(),
-                 Catch::Matchers::Equals(&expected_com_acc));
+      CHECK_THAT(*model.com_acceleration(), Equals(expected_com_acc));
     }
   }
 }

@@ -22,6 +22,7 @@
 
 #include <zm/zm_ieee.h>
 #include <roki/rk_g.h>
+#include <utility>
 
 #include "catch.hpp"
 #include "holon/test/util/catch/custom_matchers.hpp"
@@ -70,6 +71,57 @@ TEST_CASE("ComZmpModelData: constructor",
       zEchoOn();
     }
   }
+}
+
+TEST_CASE("ComZmpModelData: copy constructor") {
+  ComZmpModelData a;
+  a.set_mass(1.5);
+  a.set_com_position(zVec3D({{1.0, 2.0, 3.0}}));
+  ComZmpModelData b(a);
+  CHECK(b.mass() == a.mass());
+  CHECK_THAT(b.com_position(), Equals(a.com_position()));
+}
+
+TEST_CASE("ComZmpModelData: copy assignment operator") {
+  ComZmpModelData a, b;
+  a.set_mass(1.5);
+  a.set_com_position(zVec3D({{1.0, 2.0, 3.0}}));
+
+  b = a;
+  CHECK(b.mass() == a.mass());
+  CHECK_THAT(b.com_position(), Equals(a.com_position()));
+}
+
+TEST_CASE("ComZmpModelData: move constructor") {
+  double mass = 2.5;
+  zVec3D com_pos{{2.0, 3.0, 4.0}};
+  ComZmpModelData a;
+  a.set_mass(mass);
+  a.set_com_position(com_pos);
+
+  ComZmpModelData b = std::move(a);
+  CHECK(b.mass() == mass);
+  CHECK_THAT(b.com_position(), Equals(com_pos));
+
+  auto f = [](ComZmpModelData arg) { return arg; };
+  ComZmpModelData c = f(ComZmpModelData(mass));
+  CHECK(c.mass() == mass);
+}
+
+TEST_CASE("ComZmpModelData: move assignment operator") {
+  double mass = 2.5;
+  zVec3D com_pos{{2.0, 3.0, 4.0}};
+  ComZmpModelData a, b, c;
+  a.set_mass(mass);
+  a.set_com_position(com_pos);
+
+  b = std::move(a);
+  CHECK(b.mass() == mass);
+  CHECK_THAT(b.com_position(), Equals(com_pos));
+
+  auto f = [](ComZmpModelData arg) { return arg; };
+  c = f(ComZmpModelData(mass));
+  CHECK(c.mass() == mass);
 }
 
 TEST_CASE("ComZmpModelData: accessors/mutators",

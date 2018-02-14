@@ -26,14 +26,21 @@
 namespace holon {
 
 class ComZmpModelData {
-  const double default_mass = 1;
-  const zVec3D default_com_position = {{0, 0, 1}};
+  static constexpr double default_mass = 1;
+  static constexpr zVec3D default_com_position = {{0, 0, 1}};
 
  public:
   ComZmpModelData();
-  ComZmpModelData(double t_mass);
-  virtual ~ComZmpModelData() = default;
+  explicit ComZmpModelData(double t_mass);
 
+  // special member functions
+  virtual ~ComZmpModelData() = default;
+  ComZmpModelData(const ComZmpModelData&) = default;
+  ComZmpModelData(ComZmpModelData&&) = default;
+  ComZmpModelData& operator=(const ComZmpModelData&) = default;
+  ComZmpModelData& operator=(ComZmpModelData&&) = default;
+
+  // accessors
   inline double mass() const noexcept { return m_mass; }
   inline const zVec3D com_position() const noexcept { return m_com_position; }
   inline const zVec3D com_velocity() const noexcept { return m_com_velocity; }
@@ -42,6 +49,7 @@ class ComZmpModelData {
   }
   inline const zVec3D zmp_position() const noexcept { return m_zmp_position; }
 
+  // mutators
   ComZmpModelData& set_mass(double t_mass);
   ComZmpModelData& set_com_position(const zVec3D& t_com_position);
   ComZmpModelData& set_com_velocity(const zVec3D& t_com_velocity);

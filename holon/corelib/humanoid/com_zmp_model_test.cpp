@@ -34,6 +34,66 @@ using Catch::Matchers::Equals;
 
 const double G = RK_G;
 
+TEST_CASE("ComZmpModelData: constructor",
+          "[corelib][humanoid][ComZmpModelData]") {
+  double default_mass = 1;
+  zVec3D default_com_position{{0, 0, 1}};
+  zVec3D zero{{0, 0, 0}};
+
+  SECTION("default constructor (no parameters)") {
+    ComZmpModelData data;
+    CHECK(data.mass() == default_mass);
+    CHECK_THAT(data.com_position(), Equals(default_com_position));
+    CHECK_THAT(data.com_velocity(), Equals(zero));
+    CHECK_THAT(data.com_acceleration(), Equals(zero));
+    CHECK_THAT(data.zmp_position(), Equals(zero));
+  }
+
+  SECTION("with parameters") {
+    Fuzzer fuzz(0, 10);
+    for (auto i = 0; i < 10; ++i) {
+      double m = fuzz.get();
+      ComZmpModelData data(m);
+      CHECK(data.mass() == m);
+      CHECK_THAT(data.com_position(), Equals(default_com_position));
+      CHECK_THAT(data.com_velocity(), Equals(zero));
+      CHECK_THAT(data.com_acceleration(), Equals(zero));
+      CHECK_THAT(data.zmp_position(), Equals(zero));
+    }
+  }
+}
+
+TEST_CASE("ComZmpModelData: accessors/mutators",
+          "[corelib][humanoid][ComZmpModelData]") {
+  Fuzzer fuzz(0, 10);
+
+  SECTION("mass") {
+    SECTION("default mass should be 1") {
+      ComZmpModelData data;
+      CHECK(data.mass() == 1.0);
+    }
+    SECTION("can instantiate by providing mass") {
+      double mass = fuzz.get();
+      ComZmpModelData data(mass);
+      CHECK(data.mass() == mass);
+    }
+  }
+
+  SECTION("COM position") {
+    SECTION("default COM position should be (0, 0, 1)") {
+      ComZmpModelData data;
+      CHECK_THAT(data.com_position(), Equals(zVec3D({0, 0, 1})));
+    }
+  }
+
+  SECTION("COM velocity") {
+    SECTION("COM velocity should be initialized with (0, 0, 0)") {
+      ComZmpModelData data;
+      CHECK_THAT(data.com_velocity(), Equals(zVec3D({0, 0, 0})));
+    }
+  }
+}
+
 TEST_CASE("COM-ZMP model has a mass as a parameter", "[corelib][humanoid]") {
   SECTION("when instantiated with no paramters mass should be 1") {
     ComZmpModel model;
@@ -55,7 +115,7 @@ TEST_CASE("COM-ZMP model has a mass as a parameter", "[corelib][humanoid]") {
     ComZmpModel model;
     REQUIRE(model.mass() == 1.0);
 
-    Fuzzer fuzz;
+    Fuzzer fuzz(0, 10);
     for (auto i = 0; i < 3; ++i) {
       double m = fuzz.get();
       model.set_mass(m);

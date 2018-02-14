@@ -24,6 +24,20 @@
 
 namespace holon {
 
+ComZmpModelData::ComZmpModelData()
+    : m_mass(default_mass),
+      m_com_position(default_com_position),
+      m_com_velocity({{0, 0, 0}}),
+      m_com_acceleration({{0, 0, 0}}),
+      m_zmp_position({{0, 0, 0}}) {}
+
+ComZmpModelData::ComZmpModelData(double t_mass)
+    : m_mass(t_mass),
+      m_com_position(default_com_position),
+      m_com_velocity({{0, 0, 0}}),
+      m_com_acceleration({{0, 0, 0}}),
+      m_zmp_position({{0, 0, 0}}) {}
+
 ComZmpModel::ComZmpModel()
     : m_mass(default_mass), m_time_step(default_time_step) {
   initializeStates();

@@ -36,9 +36,9 @@ TEST_CASE("zvec3d::Vec3D: constructors", "[corelib][math][Vec3D]") {
 
   SECTION("default constructor should initialize with zeros") {
     Vec3D v;
-    CHECK(v.x() == 0.0);
-    CHECK(v.y() == 0.0);
-    CHECK(v.z() == 0.0);
+    CHECK(v[0] == 0.0);
+    CHECK(v[1] == 0.0);
+    CHECK(v[2] == 0.0);
   }
 
   SECTION("constructor with three arguments") {
@@ -46,9 +46,9 @@ TEST_CASE("zvec3d::Vec3D: constructors", "[corelib][math][Vec3D]") {
     double y = fuzz.get();
     double z = fuzz.get();
     Vec3D v(x, y, z);
-    CHECK(v.x() == x);
-    CHECK(v.y() == y);
-    CHECK(v.z() == z);
+    CHECK(v[0] == x);
+    CHECK(v[1] == y);
+    CHECK(v[2] == z);
   }
 }
 
@@ -57,6 +57,17 @@ TEST_CASE("zvec3d::Vec3D: copy constructor") {
   Vec3D b(a);
   CHECK_THAT(b, Equals(a));
 }
+
+TEST_CASE("zvec3d::Vec3D: copy assignment operator") { Vec3D a, b; }
+
+TEST_CASE("zvec3d::Vec3D: subscript operator") {
+  Vec3D a;
+  a[0] = 1.0;
+  a[1] = 2.0;
+  a[2] = 3.0;
+  CHECK(a[0] == 1.0);
+  CHECK(a[1] == 2.0);
+  CHECK(a[2] == 3.0);
 }
 
 }  // namespace

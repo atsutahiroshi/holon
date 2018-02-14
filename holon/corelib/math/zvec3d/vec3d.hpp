@@ -22,6 +22,7 @@
 #define HOLON_MATH_ZVEC3D_VEC3D_HPP_
 
 #include <zeo/zeo_vec3d.h>
+#include <cstddef>
 
 namespace holon {
 namespace math {
@@ -40,8 +41,12 @@ class Vec3D {
   Vec3D& operator=(const Vec3D& other) = default;
   Vec3D& operator=(Vec3D&& other) noexcept = default;
 
+  // operators
+  double& operator[](std::size_t idx) { return m_v.e[idx]; }
+  const double& operator[](std::size_t idx) const { return m_v.e[idx]; }
+
   // accessors
-  inline zVec3D* get_p() noexcept { return &m_v; }
+  inline zVec3D* get_ptr() noexcept { return &m_v; }
   inline const zVec3D get() const noexcept { return m_v; }
   inline double x() const noexcept { return zVec3DElem(&m_v, zX); }
   inline double y() const noexcept { return zVec3DElem(&m_v, zY); }

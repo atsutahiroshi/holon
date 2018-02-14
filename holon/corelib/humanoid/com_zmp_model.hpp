@@ -105,10 +105,10 @@ class ComZmpModel {
   ComZmpModel& reset(const zVec3D& t_com_position);
 
   // computing functions
-  double computeZetaSqr(const zVec3D& com_position) const;
-  double computeZeta(const zVec3D& com_position) const;
-  zVec3D computeComAcc(const zVec3D& com_position,
-                       const zVec3D& zmp_position) const;
+  double computeZetaSqr(const zVec3D& t_com_position) const;
+  double computeZeta(const zVec3D& t_com_position) const;
+  zVec3D computeComAcc(const zVec3D& t_com_position,
+                       const zVec3D& t_zmp_position) const;
 
   // update functions
   bool update();

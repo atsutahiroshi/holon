@@ -52,6 +52,11 @@ class Vec3D {
   inline double y() const noexcept { return zVec3DElem(&m_v, zY); }
   inline double z() const noexcept { return zVec3DElem(&m_v, zZ); }
 
+  // mutators
+  Vec3D& set_x(double t_x);
+  Vec3D& set_y(double t_y);
+  Vec3D& set_z(double t_z);
+
   // member functions
   inline std::size_t size() const noexcept { return 3; }
 

@@ -110,6 +110,22 @@ TEST_CASE("zvec3d::Vec3D: function size returns 3", "[corelib][math][Vec3D]") {
   CHECK(a.size() == 3);
 }
 
+TEST_CASE("zvec3d::Vec3D: accessors/mutators") {
+  SECTION("x, y, z") {
+    Vec3D a;
+    Fuzzer fuzz;
+    double x = fuzz.get();
+    double y = fuzz.get();
+    double z = fuzz.get();
+    a.set_x(x);
+    a.set_y(y);
+    a.set_z(z);
+    CHECK(a.x() == x);
+    CHECK(a.y() == y);
+    CHECK(a.z() == z);
+  }
+}
+
 }  // namespace
 }  // namespace zvec3d
 }  // namespace math

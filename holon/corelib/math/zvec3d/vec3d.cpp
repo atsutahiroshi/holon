@@ -29,6 +29,21 @@ Vec3D::Vec3D(double t_x, double t_y, double t_z) {
   zVec3DCreate(&m_v, t_x, t_y, t_z);
 }
 
+Vec3D& Vec3D::set_x(double t_x) {
+  zVec3DSetElem(&m_v, zX, t_x);
+  return *this;
+}
+
+Vec3D& Vec3D::set_y(double t_y) {
+  zVec3DSetElem(&m_v, zY, t_y);
+  return *this;
+}
+
+Vec3D& Vec3D::set_z(double t_z) {
+  zVec3DSetElem(&m_v, zZ, t_z);
+  return *this;
+}
+
 }  // namespace zvec3d
 }  // namespace math
 }  // namespace holon

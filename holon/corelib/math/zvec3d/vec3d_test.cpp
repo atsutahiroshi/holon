@@ -52,15 +52,17 @@ TEST_CASE("zvec3d::Vec3D: constructors", "[corelib][math][Vec3D]") {
   }
 }
 
-TEST_CASE("zvec3d::Vec3D: copy constructor") {
+TEST_CASE("zvec3d::Vec3D: copy constructor", "[corelib][math][Vec3D]") {
   Vec3D a(1.0, 2.0, 3.0);
   Vec3D b(a);
   CHECK_THAT(b, Equals(a));
 }
 
-TEST_CASE("zvec3d::Vec3D: copy assignment operator") { Vec3D a, b; }
+TEST_CASE("zvec3d::Vec3D: copy assignment operator", "[corelib][math][Vec3D]") {
+  Vec3D a, b;
+}
 
-TEST_CASE("zvec3d::Vec3D: subscript operator") {
+TEST_CASE("zvec3d::Vec3D: subscript operator", "[corelib][math][Vec3D]") {
   Vec3D a;
   a[0] = 1.0;
   a[1] = 2.0;

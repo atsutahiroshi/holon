@@ -108,7 +108,7 @@ TEST_CASE("com_ctrl: testing of accessors/mutators", "[corelib][humanoid]") {
 
   SECTION("commanded COM position") {
     zVec3D new_cmd_com_pos;
-    fuzz.randomize(&new_cmd_com_pos);
+    fuzz.randomize(new_cmd_com_pos);
     ctrl.set_cmd_com_position(new_cmd_com_pos);
     REQUIRE_THAT(ctrl.cmd_com_position(), Equals(new_cmd_com_pos));
   }

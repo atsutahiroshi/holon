@@ -195,7 +195,7 @@ TEST_CASE("ComZmpModelData can be reset by providing COM position",
     data.set_com_velocity(v);
 
     WHEN("reset COM position") {
-      fuzz.randomize(&p);
+      fuzz.randomize(p);
       data.reset(p);
 
       THEN("COM position should be that value and velocity should be zero") {
@@ -408,7 +408,7 @@ SCENARIO("reset COM position", "[corelib][humanoid]") {
     model.set_com_velocity(v);
 
     WHEN("reset COM position") {
-      fuzz.randomize(&p);
+      fuzz.randomize(p);
       model.reset(p);
 
       THEN("COM position should be that value and velocity should be zero") {

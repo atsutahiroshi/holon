@@ -45,8 +45,6 @@ class Fuzzer {
   Fuzzer& operator=(Fuzzer&&) = delete;
 
   inline double get() { return m_distribution(m_engine); }
-
-  zVec3D* randomize(zVec3D* v);  // deprecated
   zVec3D randomize(zVec3D& v);
 
  private:

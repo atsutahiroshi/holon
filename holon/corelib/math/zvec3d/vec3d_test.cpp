@@ -31,7 +31,7 @@ namespace {
 
 using Catch::Matchers::Equals;
 
-TEST_CASE("Vec3D: constructors", "[corelib][math][Vec3D]") {
+TEST_CASE("zvec3d::Vec3D: constructors", "[corelib][math][Vec3D]") {
   Fuzzer fuzz;
 
   SECTION("default constructor should initialize with zeros") {
@@ -52,7 +52,7 @@ TEST_CASE("Vec3D: constructors", "[corelib][math][Vec3D]") {
   }
 }
 
-TEST_CASE("Vec3D: copy constructor") {
+TEST_CASE("zvec3d::Vec3D: copy constructor") {
   Vec3D a(1.0, 2.0, 3.0);
   Vec3D b(a);
 }

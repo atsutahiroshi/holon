@@ -1,6 +1,7 @@
 set(HOLON_CORELIB_SOURCE_FILES "")
 set(HOLON_CORELIB_TEST_SOURCES "")
 
+add_subdirectory(math)
 add_subdirectory(humanoid)
 
 add_library(holon SHARED ${HOLON_CORELIB_SOURCE_FILES})

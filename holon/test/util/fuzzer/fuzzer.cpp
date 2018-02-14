@@ -44,8 +44,6 @@ Fuzzer::Fuzzer(const std::seed_seq& t_seed)
 Fuzzer::Fuzzer(const std::seed_seq& t_seed, double t_min, double t_max)
     : m_seed(t_seed), m_engine(m_seed), m_distribution(t_min, t_max) {}
 
-Fuzzer::~Fuzzer() = default;
-
 zVec3D* Fuzzer::randomize(zVec3D* v) {
   zVec3DCreate(v, get(), get(), get());
   return v;

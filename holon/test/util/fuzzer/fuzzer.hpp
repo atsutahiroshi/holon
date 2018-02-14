@@ -31,11 +31,18 @@ class Fuzzer {
   const double default_max = 10;
 
  public:
+  // constructors
   Fuzzer();
   Fuzzer(double t_min, double t_max);
   Fuzzer(const std::seed_seq& t_seed);
   Fuzzer(const std::seed_seq& t_seed, double t_min, double t_max);
-  virtual ~Fuzzer();
+
+  // special member functions
+  virtual ~Fuzzer() = default;
+  Fuzzer(const Fuzzer&) = delete;
+  Fuzzer(Fuzzer&&) = delete;
+  Fuzzer& operator=(const Fuzzer&) = delete;
+  Fuzzer& operator=(Fuzzer&&) = delete;
 
   inline double get() { return m_distribution(m_engine); }
 

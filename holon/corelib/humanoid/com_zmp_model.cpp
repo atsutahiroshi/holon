@@ -32,11 +32,47 @@ ComZmpModelData::ComZmpModelData()
       m_zmp_position({{0, 0, 0}}) {}
 
 ComZmpModelData::ComZmpModelData(double t_mass)
-    : m_mass(t_mass),
+    : m_mass(default_mass),
       m_com_position(default_com_position),
       m_com_velocity({{0, 0, 0}}),
       m_com_acceleration({{0, 0, 0}}),
-      m_zmp_position({{0, 0, 0}}) {}
+      m_zmp_position({{0, 0, 0}}) {
+  set_mass(t_mass);
+}
+
+ComZmpModelData& ComZmpModelData::set_mass(double t_mass) {
+  if (zIsTiny(t_mass) || t_mass < 0) {
+    ZRUNERROR("mass must be positive value (given: %g)", t_mass);
+    m_mass = default_mass;
+  } else {
+    m_mass = t_mass;
+  }
+  return *this;
+}
+
+ComZmpModelData& ComZmpModelData::set_com_position(
+    const zVec3D& t_com_position) {
+  zVec3DCopy(&t_com_position, &m_com_position);
+  return *this;
+}
+
+ComZmpModelData& ComZmpModelData::set_com_velocity(
+    const zVec3D& t_com_velocity) {
+  zVec3DCopy(&t_com_velocity, &m_com_velocity);
+  return *this;
+}
+
+ComZmpModelData& ComZmpModelData::set_com_acceleration(
+    const zVec3D& t_com_acceleration) {
+  zVec3DCopy(&t_com_acceleration, &m_com_acceleration);
+  return *this;
+}
+
+ComZmpModelData& ComZmpModelData::set_zmp_position(
+    const zVec3D& t_zmp_position) {
+  zVec3DCopy(&t_zmp_position, &m_zmp_position);
+  return *this;
+}
 
 ComZmpModel::ComZmpModel()
     : m_mass(default_mass), m_time_step(default_time_step) {

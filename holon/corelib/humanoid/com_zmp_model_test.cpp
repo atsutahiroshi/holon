@@ -60,6 +60,15 @@ TEST_CASE("ComZmpModelData: constructor",
       CHECK_THAT(data.com_acceleration(), Equals(zero));
       CHECK_THAT(data.zmp_position(), Equals(zero));
     }
+
+    SECTION("mass should be positive") {
+      zEchoOff();
+      ComZmpModelData data1(-1.0);
+      CHECK(data1.mass() == 1.0);
+      ComZmpModelData data2(0.0);
+      CHECK(data2.mass() == 1.0);
+      zEchoOn();
+    }
   }
 }
 
@@ -68,29 +77,56 @@ TEST_CASE("ComZmpModelData: accessors/mutators",
   Fuzzer fuzz(0, 10);
 
   SECTION("mass") {
-    SECTION("default mass should be 1") {
-      ComZmpModelData data;
+    ComZmpModelData data;
+    double mass = fuzz.get();
+    REQUIRE(data.mass() != mass);
+    data.set_mass(mass);
+    CHECK(data.mass() == mass);
+
+    SECTION("mass should be positive") {
+      zEchoOff();
+      data.set_mass(0.0);
       CHECK(data.mass() == 1.0);
-    }
-    SECTION("can instantiate by providing mass") {
-      double mass = fuzz.get();
-      ComZmpModelData data(mass);
-      CHECK(data.mass() == mass);
+      data.set_mass(-1.0);
+      CHECK(data.mass() == 1.0);
+      zEchoOn();
     }
   }
 
   SECTION("COM position") {
-    SECTION("default COM position should be (0, 0, 1)") {
-      ComZmpModelData data;
-      CHECK_THAT(data.com_position(), Equals(zVec3D({0, 0, 1})));
-    }
+    ComZmpModelData data;
+    zVec3D v;
+    fuzz.randomize(v);
+    REQUIRE_THAT(data.com_position(), !Equals(v));
+    data.set_com_position(v);
+    CHECK_THAT(data.com_position(), Equals(v));
   }
 
   SECTION("COM velocity") {
-    SECTION("COM velocity should be initialized with (0, 0, 0)") {
-      ComZmpModelData data;
-      CHECK_THAT(data.com_velocity(), Equals(zVec3D({0, 0, 0})));
-    }
+    ComZmpModelData data;
+    zVec3D v;
+    fuzz.randomize(v);
+    REQUIRE_THAT(data.com_velocity(), !Equals(v));
+    data.set_com_velocity(v);
+    CHECK_THAT(data.com_velocity(), Equals(v));
+  }
+
+  SECTION("COM acceleration") {
+    ComZmpModelData data;
+    zVec3D v;
+    fuzz.randomize(v);
+    REQUIRE_THAT(data.com_acceleration(), !Equals(v));
+    data.set_com_acceleration(v);
+    CHECK_THAT(data.com_acceleration(), Equals(v));
+  }
+
+  SECTION("ZMP position") {
+    ComZmpModelData data;
+    zVec3D v;
+    fuzz.randomize(v);
+    REQUIRE_THAT(data.zmp_position(), !Equals(v));
+    data.set_zmp_position(v);
+    CHECK_THAT(data.zmp_position(), Equals(v));
   }
 }
 

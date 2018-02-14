@@ -24,6 +24,8 @@
 #include "holon/test/util/catch/custom_matchers.hpp"
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
+#include <utility>
+
 namespace holon {
 namespace math {
 namespace zvec3d {
@@ -65,10 +67,32 @@ TEST_CASE("zvec3d::Vec3D: copy assignment operator", "[corelib][math][Vec3D]") {
   a[1] = fuzz.get();
   a[2] = fuzz.get();
   b = a;
-  for (auto i = 0; i < a.size(); ++i) {
-    INFO("i = " << i);
-    CHECK(b[i] == a[i]);
-  }
+  CHECK_THAT(b, Equals(a));
+}
+
+TEST_CASE("zvec3d::Vec3D: move constructor", "[corelib][math][Vec3D]") {
+  Vec3D a1(2, 3, 4);
+  Vec3D a2(2, 3, 4);
+
+  Vec3D b = std::move(a1);
+  CHECK_THAT(b, Equals(a1));
+
+  auto f = [](Vec3D arg) { return arg; };
+  Vec3D c = f(Vec3D(2, 3, 4));
+  CHECK_THAT(c, Equals(a2));
+}
+
+TEST_CASE("zvec3d::Vec3D: move assignment operator", "[corelib][math][Vec3D]") {
+  Vec3D a1(3, 4, 5);
+  Vec3D a2(3, 4, 5);
+  Vec3D b, c;
+
+  b = std::move(a1);
+  CHECK_THAT(b, Equals(a2));
+
+  auto f = [](Vec3D arg) { return arg; };
+  c = f(Vec3D(3, 4, 5));
+  CHECK_THAT(c, Equals(a2));
 }
 
 TEST_CASE("zvec3d::Vec3D: subscript operator", "[corelib][math][Vec3D]") {

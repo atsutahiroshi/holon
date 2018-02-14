@@ -50,11 +50,11 @@ class ComCtrlY {
   ComCtrlY& set_q2(double t_q2);
 
   // functions
-  double computeDesiredZmpPosition(double yd, double y, double v,
-                                   double zeta) const noexcept;
-  double computeDesiredZmpPosition(const zVec3D& ref_com_position,
-                                   const zVec3D& com_position,
-                                   const zVec3D& com_veocity, double zeta) const
+  double computeDesZmpPos(double t_yd, double t_y, double t_v,
+                          double t_zeta) const noexcept;
+  double computeDesZmpPos(const zVec3D& t_ref_com_position,
+                          const zVec3D& t_com_position,
+                          const zVec3D& t_com_veocity, double t_zeta) const
       noexcept;
 
  private:

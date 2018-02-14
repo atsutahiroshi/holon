@@ -47,11 +47,11 @@ BENCHMARK_F(ComCtrlBenchmark, GetQ1, 100, 1000) {
 
 BENCHMARK_F(ComCtrlBenchmark, SetQ1, 100, 1000) { ctrl.x().set_q1(1); }
 
-BENCHMARK_F(ComCtrlBenchmark, computeDesiredZmpPosition, 100, 1000) {
-  zVec3D desired_zmp_pos;
-  double desired_zeta = ctrl.computeDesiredZeta(ref_com_pos);
-  desired_zmp_pos = ctrl.computeDesiredZmpPosition(ref_com_pos, com_pos,
-                                                   com_vel, desired_zeta);
+BENCHMARK_F(ComCtrlBenchmark, computeDesZmpPos, 100, 1000) {
+  double desired_zeta = ctrl.computeDesZeta(ref_com_pos);
+  zVec3D desired_zmp_pos =
+      ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
+  (void)desired_zmp_pos;
 }
 
 }  // namespace

@@ -61,15 +61,15 @@ class ComCtrl {
   ComCtrl& set_time_step(double t_time_step);
   ComCtrl& set_cmd_com_position(const zVec3D& t_cmd_com_position);
 
-  // functions
-  double computeDesiredZetaSqr(const zVec3D& ref_com_position) const;
-  double computeDesiredZeta(const zVec3D& ref_com_position) const;
+  // computing functions
+  double computeDesZetaSqr(const zVec3D& t_ref_com_position) const;
+  double computeDesZeta(const zVec3D& t_ref_com_position) const;
+  zVec3D computeDesZmpPos(const zVec3D& t_ref_com_position,
+                          const zVec3D& t_com_position,
+                          const zVec3D& t_com_velocity,
+                          double t_desired_zeta) const;
 
-  zVec3D computeDesiredZmpPosition(const zVec3D& ref_com_position,
-                                   const zVec3D& com_position,
-                                   const zVec3D& com_velocity,
-                                   double desired_zeta) const;
-
+  // update functions
   bool update();
   bool update(double t_time_step);
 

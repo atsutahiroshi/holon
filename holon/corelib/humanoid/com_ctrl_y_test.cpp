@@ -107,7 +107,7 @@ TEST_CASE("compute desired ZMP position along y-axis to regulate at 0",
     } testcases[] = {{0, 0, 0}, {1, 0, 2}, {3, -1, 4}, {0, -2, -4}, {-2, 2, 0}};
 
     for (auto& c : testcases) {
-      CHECK(ctrl.computeDesiredZmpPosition(yd, c.y, c.vy, zeta) ==
+      CHECK(ctrl.computeDesZmpPos(yd, c.y, c.vy, zeta) ==
             Approx(c.expected_yz));
     }
   }
@@ -126,7 +126,7 @@ TEST_CASE("compute desired ZMP position along y-axis to regulate at 0",
         {0, 0, 0}, {1, 0, 1.5}, {3, -1, 3}, {0, -2, -3}, {-2, 2, 0}};
 
     for (auto& c : testcases) {
-      CHECK(ctrl.computeDesiredZmpPosition(yd, c.y, c.vy, zeta) ==
+      CHECK(ctrl.computeDesZmpPos(yd, c.y, c.vy, zeta) ==
             Approx(c.expected_yz));
     }
   }
@@ -146,7 +146,7 @@ TEST_CASE("compute desired ZMP position along y-axis to regulate at 0",
         {0, 0, 0}, {1, 0, 1.96}, {3, -1, 3.88}, {0, -2, -4}, {-2, 2, 0.08}};
 
     for (auto& c : testcases) {
-      CHECK(ctrl.computeDesiredZmpPosition(yd, c.y, c.vy, zeta) ==
+      CHECK(ctrl.computeDesZmpPos(yd, c.y, c.vy, zeta) ==
             Approx(c.expected_yz));
     }
   }
@@ -164,7 +164,7 @@ TEST_CASE("compute desired ZMP position along y-axis to regulate at 0",
         {0, 0, -0.5}, {1, 0, 1.5}, {3, -1, 3.5}, {0, -2, -4.5}, {-2, 3, 1.5}};
 
     for (auto& c : testcases) {
-      CHECK(ctrl.computeDesiredZmpPosition(yd, c.y, c.vy, zeta) ==
+      CHECK(ctrl.computeDesZmpPos(yd, c.y, c.vy, zeta) ==
             Approx(c.expected_yz));
     }
   }
@@ -183,7 +183,7 @@ TEST_CASE("compute desired ZMP position along y-axis to regulate at 0",
         {0, 0, 1.5}, {1, 0, 4}, {3, -1, 6.5}, {0, -2, -3.5}, {-2, 3, 4}};
 
     for (auto& c : testcases) {
-      CHECK(ctrl.computeDesiredZmpPosition(yd, c.y, c.vy, zeta) ==
+      CHECK(ctrl.computeDesZmpPos(yd, c.y, c.vy, zeta) ==
             Approx(c.expected_yz));
     }
   }
@@ -205,7 +205,7 @@ TEST_CASE("compute desired ZMP position along y-axis to regulate at 0",
                      {-2, 3, 2.5 * (-2 + 1.5 * sqrt(2)) - 0.75}};
 
     for (auto& c : testcases) {
-      CHECK(ctrl.computeDesiredZmpPosition(yd, c.y, c.vy, zeta) ==
+      CHECK(ctrl.computeDesZmpPos(yd, c.y, c.vy, zeta) ==
             Approx(c.expected_yz));
     }
   }
@@ -216,17 +216,15 @@ TEST_CASE("handle the case where zeta is non-positive on y-axis",
   ComCtrlY ctrl;
   zEchoOff();
   SECTION("call with `double` type") {
-    REQUIRE(ctrl.computeDesiredZmpPosition(1, 0, 0, 0) == 0);
-    REQUIRE(ctrl.computeDesiredZmpPosition(1, 0, 0, -1) == 0);
+    REQUIRE(ctrl.computeDesZmpPos(1, 0, 0, 0) == 0);
+    REQUIRE(ctrl.computeDesZmpPos(1, 0, 0, -1) == 0);
   }
   SECTION("call with `zVec3D*` type") {
     zVec3D ref_com_pos = {1, 1, 9.8};
     zVec3D com_pos = {0, 0, 9.8};
     zVec3D com_vel = {0, 0, 0};
-    REQUIRE(ctrl.computeDesiredZmpPosition(ref_com_pos, com_pos, com_vel, 0) ==
-            0);
-    REQUIRE(ctrl.computeDesiredZmpPosition(ref_com_pos, com_pos, com_vel, -1) ==
-            0);
+    REQUIRE(ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, 0) == 0);
+    REQUIRE(ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, -1) == 0);
   }
   zEchoOn();
 }
@@ -252,8 +250,8 @@ TEST_CASE("compute desired ZMP position along y-axis when vectors are given",
       zVec3D ref_com_pos = {0, yd, 1};
       zVec3D com_pos = {0, c.y, 1};
       zVec3D com_vel = {0, c.vy, 0};
-      CHECK(ctrl.computeDesiredZmpPosition(ref_com_pos, com_pos, com_vel,
-                                           zeta) == Approx(c.expected_yz));
+      CHECK(ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, zeta) ==
+            Approx(c.expected_yz));
     }
   }
 }

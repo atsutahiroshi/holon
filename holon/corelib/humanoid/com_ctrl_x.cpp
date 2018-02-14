@@ -37,22 +37,22 @@ ComCtrlX& ComCtrlX::set_q2(double t_q2) {
   return *this;
 }
 
-double ComCtrlX::computeDesiredZmpPosition(double xd, double x, double v,
-                                           double zeta) const noexcept {
-  if (zIsTiny(zeta) || zeta < 0) {
-    ZRUNERROR("ZETA should be positive. (given: %f)", zeta);
+double ComCtrlX::computeDesZmpPos(double t_xd, double t_x, double t_v,
+                                  double t_zeta) const noexcept {
+  if (zIsTiny(t_zeta) || t_zeta < 0) {
+    ZRUNERROR("ZETA should be positive. (given: %f)", t_zeta);
     return 0;
   }
-  return x + (m_q1 * m_q2) * (x - xd) + (m_q1 + m_q2) * v / zeta;
+  return t_x + (m_q1 * m_q2) * (t_x - t_xd) + (m_q1 + m_q2) * t_v / t_zeta;
 }
 
-double ComCtrlX::computeDesiredZmpPosition(const zVec3D& ref_com_position,
-                                           const zVec3D& com_position,
-                                           const zVec3D& com_veocity,
-                                           double zeta) const noexcept {
-  return computeDesiredZmpPosition(zVec3DElem(&ref_com_position, zX),
-                                   zVec3DElem(&com_position, zX),
-                                   zVec3DElem(&com_veocity, zX), zeta);
+double ComCtrlX::computeDesZmpPos(const zVec3D& t_ref_com_position,
+                                  const zVec3D& t_com_position,
+                                  const zVec3D& t_com_veocity,
+                                  double t_zeta) const noexcept {
+  return computeDesZmpPos(zVec3DElem(&t_ref_com_position, zX),
+                          zVec3DElem(&t_com_position, zX),
+                          zVec3DElem(&t_com_veocity, zX), t_zeta);
 }
 
 }  // namespace holon

@@ -52,6 +52,9 @@ class Vec3D {
   inline double y() const noexcept { return zVec3DElem(&m_v, zY); }
   inline double z() const noexcept { return zVec3DElem(&m_v, zZ); }
 
+  // member functions
+  inline std::size_t size() const noexcept { return 3; }
+
  private:
   zVec3D m_v;
 };

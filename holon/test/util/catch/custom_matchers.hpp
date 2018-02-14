@@ -101,7 +101,7 @@ class EqualsMatcher : public MatcherBase<Vec3D> {
   explicit EqualsMatcher(const Vec3D& comparator) : m_comparator(comparator) {}
 
   bool match(const Vec3D& v) const override {
-    for (auto i = 0; i < 3; ++i) {
+    for (auto i = 0; i < v.size(); ++i) {
       if (m_comparator[i] != v[i]) {
         return false;
       }

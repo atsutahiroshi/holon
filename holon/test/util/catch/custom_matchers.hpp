@@ -101,12 +101,12 @@ class EqualsMatcher : public MatcherBase<Vec3D> {
   explicit EqualsMatcher(const Vec3D& comparator) : m_comparator(comparator) {}
 
   bool match(const Vec3D& v) const override {
-    if (m_comparator.x() != v.x() || m_comparator.y() != v.y() ||
-        m_comparator.z() != v.z()) {
-      return false;
-    } else {
-      return true;
+    for (auto i = 0; i < 3; ++i) {
+      if (m_comparator[i] != v[i]) {
+        return false;
+      }
     }
+    return true;
   }
   std::string describe() const override {
     return "Equals: " + ::Catch::Detail::stringify(m_comparator);

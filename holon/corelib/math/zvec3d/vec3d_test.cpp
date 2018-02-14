@@ -59,7 +59,16 @@ TEST_CASE("zvec3d::Vec3D: copy constructor", "[corelib][math][Vec3D]") {
 }
 
 TEST_CASE("zvec3d::Vec3D: copy assignment operator", "[corelib][math][Vec3D]") {
+  Fuzzer fuzz;
   Vec3D a, b;
+  a[0] = fuzz.get();
+  a[1] = fuzz.get();
+  a[2] = fuzz.get();
+  b = a;
+  for (auto i = 0; i < a.size(); ++i) {
+    INFO("i = " << i);
+    CHECK(b[i] == a[i]);
+  }
 }
 
 TEST_CASE("zvec3d::Vec3D: subscript operator", "[corelib][math][Vec3D]") {

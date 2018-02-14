@@ -141,23 +141,23 @@ double ComZmpModel::computeZeta(const zVec3D& t_com_position) const {
   return sqrt(computeZetaSqr(t_com_position));
 }
 
-zVec3D ComZmpModel::computeAcceleration(const zVec3D& t_com_position,
-                                        const zVec3D& t_zmp_position) const {
+zVec3D ComZmpModel::computeComAcc(const zVec3D& t_com_position,
+                                  const zVec3D& t_zmp_position) const {
   zVec3D g = {{0, 0, RK_G}};
-  zVec3D com_acceleration;
+  zVec3D com_acc;
   // TODO(*): remove const_cast when own math library is implemented
   zVec3DSub(const_cast<zVec3D*>(&t_com_position),
-            const_cast<zVec3D*>(&t_zmp_position), &com_acceleration);
-  zVec3DMulDRC(&com_acceleration, computeZetaSqr(t_com_position));
-  zVec3DSubDRC(&com_acceleration, &g);
-  return com_acceleration;
+            const_cast<zVec3D*>(&t_zmp_position), &com_acc);
+  zVec3DMulDRC(&com_acc, computeZetaSqr(t_com_position));
+  zVec3DSubDRC(&com_acc, &g);
+  return com_acc;
 }
 
 bool ComZmpModel::update() {
   if (zIsTiny(computeZetaSqr(com_position()))) return false;
   zVec3D pos = com_position();
   zVec3D vel = com_velocity();
-  zVec3D acc = computeAcceleration(com_position(), zmp_position());
+  zVec3D acc = computeComAcc(com_position(), zmp_position());
   zVec3DCatDRC(&pos, time_step(), &vel);
   zVec3DCatDRC(&vel, time_step(), &acc);
   m_data.set_com_position(pos);

@@ -22,6 +22,7 @@
 #define HOLON_TEST_UTIL_CATCH_CUSTOM_MATCHERS_HPP_
 
 #include <zeo/zeo_vec3d.h>
+#include "holon/corelib/math/zvec3d/vec3d.hpp"
 
 #include <sstream>
 #include <string>
@@ -39,6 +40,14 @@ inline std::string stringify(const zVec3D& v) {
   return ss.str();
 }
 
+inline std::string stringfy(const holon::math::zvec3d::Vec3D& v) {
+  std::ostringstream ss;
+  ss << "( ";
+  ss << v.x() << ", " << v.y() << ", " << v.z();
+  ss << " )";
+  return ss.str();
+}
+
 }  // namespace Detail
 
 template <>
@@ -48,15 +57,24 @@ struct StringMaker<zVec3D> {
   }
 };
 
+template <>
+struct StringMaker<holon::math::zvec3d::Vec3D> {
+  static std::string convert(const holon::math::zvec3d::Vec3D& v) {
+    return ::Catch::Detail::stringify(v.get());
+    // return ::Catch::Detail::stringify(v);
+  }
+};
+
 namespace Matchers {
 namespace zvec3d {
 
 class EqualsMatcher : public MatcherBase<zVec3D> {
  public:
-  explicit EqualsMatcher(const zVec3D& comparator) : comparator_(comparator) {}
+  explicit EqualsMatcher(const zVec3D& comparator) : m_comparator(comparator) {}
 
   bool match(const zVec3D& v) const override {
-    if (zVec3DEqual(const_cast<zVec3D*>(&comparator_), const_cast<zVec3D*>(&v)))
+    if (zVec3DEqual(const_cast<zVec3D*>(&m_comparator),
+                    const_cast<zVec3D*>(&v)))
       return true;
     else
       return false;
@@ -64,17 +82,50 @@ class EqualsMatcher : public MatcherBase<zVec3D> {
 
   std::string describe() const override {
     std::ostringstream ss;
-    return "Equals: " + ::Catch::Detail::stringify(comparator_);
+    return "Equals: " + ::Catch::Detail::stringify(m_comparator);
   }
 
  private:
-  const zVec3D& comparator_;
+  const zVec3D& m_comparator;
 };
 
 }  // namespace zvec3d
 
+namespace vec3d {
+namespace zvec3d {
+
+using holon::math::zvec3d::Vec3D;
+
+class EqualsMatcher : public MatcherBase<Vec3D> {
+ public:
+  explicit EqualsMatcher(const Vec3D& comparator) : m_comparator(comparator) {}
+
+  bool match(const Vec3D& v) const override {
+    if (m_comparator.x() != v.x() || m_comparator.y() != v.y() ||
+        m_comparator.z() != v.z()) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+  std::string describe() const override {
+    return "Equals: " + ::Catch::Detail::stringify(m_comparator);
+  }
+
+ private:
+  const Vec3D& m_comparator;
+};
+
+}  // namespace zvec3d
+}  // namespace vec3d
+
 inline zvec3d::EqualsMatcher Equals(const zVec3D& comparator) {
   return zvec3d::EqualsMatcher(comparator);
+}
+
+inline vec3d::zvec3d::EqualsMatcher Equals(
+    const holon::math::zvec3d::Vec3D& comparator) {
+  return vec3d::zvec3d::EqualsMatcher(comparator);
 }
 
 }  // namespace Matchers

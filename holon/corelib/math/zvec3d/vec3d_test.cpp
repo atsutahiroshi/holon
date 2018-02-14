@@ -55,6 +55,8 @@ TEST_CASE("zvec3d::Vec3D: constructors", "[corelib][math][Vec3D]") {
 TEST_CASE("zvec3d::Vec3D: copy constructor") {
   Vec3D a(1.0, 2.0, 3.0);
   Vec3D b(a);
+  CHECK_THAT(b, Equals(a));
+}
 }
 
 }  // namespace

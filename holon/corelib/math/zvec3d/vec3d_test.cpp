@@ -105,11 +105,6 @@ TEST_CASE("zvec3d::Vec3D: subscript operator", "[corelib][math][Vec3D]") {
   CHECK(a[2] == 3.0);
 }
 
-TEST_CASE("zvec3d::Vec3D: function size returns 3", "[corelib][math][Vec3D]") {
-  Vec3D a;
-  CHECK(a.size() == 3);
-}
-
 TEST_CASE("zvec3d::Vec3D: accessors/mutators") {
   SECTION("x, y, z") {
     Vec3D a;
@@ -124,6 +119,11 @@ TEST_CASE("zvec3d::Vec3D: accessors/mutators") {
     CHECK(a.y() == y);
     CHECK(a.z() == z);
   }
+}
+
+TEST_CASE("zvec3d::Vec3D: function size returns 3", "[corelib][math][Vec3D]") {
+  Vec3D a;
+  CHECK(a.size() == 3);
 }
 
 }  // namespace

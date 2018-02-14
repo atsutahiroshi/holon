@@ -30,16 +30,26 @@ class ComCtrlY {
   const double default_q2 = 1.0;
 
  public:
+  // constructors
   ComCtrlY();
   ComCtrlY(double t_q1, double t_q2);
-  virtual ~ComCtrlY();
 
+  // special member functions
+  virtual ~ComCtrlY() = default;
+  ComCtrlY(const ComCtrlY&) = delete;
+  ComCtrlY(ComCtrlY&&) = delete;
+  ComCtrlY& operator=(const ComCtrlY&) = delete;
+  ComCtrlY& operator=(ComCtrlY&&) = delete;
+
+  // accessors
   inline double q1() const noexcept { return m_q1; }
   inline double q2() const noexcept { return m_q2; }
 
+  // mutators
   ComCtrlY& set_q1(double t_q1);
   ComCtrlY& set_q2(double t_q2);
 
+  // functions
   double computeDesiredZmpPosition(double yd, double y, double v,
                                    double zeta) const noexcept;
   double computeDesiredZmpPosition(const zVec3D& ref_com_position,

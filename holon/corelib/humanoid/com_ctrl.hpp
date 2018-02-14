@@ -31,32 +31,37 @@ namespace holon {
 
 class ComCtrl {
  public:
+  // constructors
   ComCtrl();
-  virtual ~ComCtrl();
 
+  // special member functions
+  virtual ~ComCtrl() = default;
+  ComCtrl(const ComCtrl&) = delete;
+  ComCtrl(ComCtrl&&) = delete;
+  ComCtrl& operator=(const ComCtrl&) = delete;
+  ComCtrl& operator=(ComCtrl&&) = delete;
+
+  // accessors
   inline const ComCtrlX& x() const noexcept { return m_x; }
   inline ComCtrlX& x() noexcept { return m_x; }
-
   inline const ComCtrlY& y() const noexcept { return m_y; }
   inline ComCtrlY& y() noexcept { return m_y; }
-
   inline const ComZmpModel& model() const noexcept { return m_model; }
   inline ComZmpModel& model() noexcept { return m_model; }
-
   inline double time_step() const noexcept { return model().time_step(); }
-  ComCtrl& set_time_step(double t_time_step);
-
   inline const zVec3D cmd_com_position() const noexcept {
     return m_cmd_com_position;
   }
-  ComCtrl& set_cmd_com_position(const zVec3D& t_cmd_com_position);
-
   inline const zVec3D des_zmp_position() const noexcept {
     return m_des_zmp_position;
   }
-
   inline double des_zeta() const noexcept { return m_des_zeta; }
 
+  // mutators
+  ComCtrl& set_time_step(double t_time_step);
+  ComCtrl& set_cmd_com_position(const zVec3D& t_cmd_com_position);
+
+  // functions
   double computeDesiredZetaSqr(const zVec3D& ref_com_position) const;
   double computeDesiredZeta(const zVec3D& ref_com_position) const;
 

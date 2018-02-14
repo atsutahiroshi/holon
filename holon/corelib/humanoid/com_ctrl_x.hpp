@@ -30,16 +30,26 @@ class ComCtrlX {
   const double default_q2 = 1.0;
 
  public:
+  // constructors
   ComCtrlX();
   ComCtrlX(double t_q1, double t_q2);
-  virtual ~ComCtrlX();
 
+  // special member functions
+  virtual ~ComCtrlX() = default;
+  ComCtrlX(const ComCtrlX&) = delete;
+  ComCtrlX(ComCtrlX&&) = delete;
+  ComCtrlX& operator=(const ComCtrlX&) = delete;
+  ComCtrlX& operator=(ComCtrlX&&) = delete;
+
+  // accessors
   inline double q1() const noexcept { return m_q1; }
   inline double q2() const noexcept { return m_q2; }
 
+  // mutators
   ComCtrlX& set_q1(double t_q1);
   ComCtrlX& set_q2(double t_q2);
 
+  // functions
   double computeDesiredZmpPosition(double xd, double x, double v,
                                    double zeta) const noexcept;
   double computeDesiredZmpPosition(const zVec3D& ref_com_position,

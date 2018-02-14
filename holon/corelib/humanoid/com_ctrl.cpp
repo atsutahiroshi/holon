@@ -31,8 +31,6 @@ ComCtrl::ComCtrl()
   m_des_zeta = computeDesiredZeta(model().com_position());
 }
 
-ComCtrl::~ComCtrl() = default;
-
 ComCtrl& ComCtrl::set_time_step(double t_time_step) {
   m_model.set_time_step(t_time_step);
   return *this;

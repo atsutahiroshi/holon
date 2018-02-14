@@ -27,8 +27,6 @@ namespace holon {
 ComCtrlX::ComCtrlX() : m_q1(default_q1), m_q2(default_q2) {}
 ComCtrlX::ComCtrlX(double t_q1, double t_q2) : m_q1(t_q1), m_q2(t_q2) {}
 
-ComCtrlX::~ComCtrlX() = default;
-
 ComCtrlX& ComCtrlX::set_q1(double t_q1) {
   m_q1 = t_q1;
   return *this;

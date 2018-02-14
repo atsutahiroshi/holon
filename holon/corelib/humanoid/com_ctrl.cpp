@@ -22,9 +22,12 @@
 
 namespace holon {
 
-ComCtrl::ComCtrl() : m_x(), m_y(), m_model() {
-  zVec3DCopy(model().com_position(), &m_cmd_com_position);
-  zVec3DClear(&m_des_zmp_position);
+ComCtrl::ComCtrl()
+    : m_x(),
+      m_y(),
+      m_model(),
+      m_cmd_com_position(model().com_position()),
+      m_des_zmp_position(*ZVEC3DZERO) {
   m_des_zeta = computeDesiredZeta(model().com_position());
 }
 
@@ -35,25 +38,25 @@ ComCtrl& ComCtrl::set_time_step(double t_time_step) {
   return *this;
 }
 
-ComCtrl& ComCtrl::set_cmd_com_position(const zVec3D* t_cmd_com_position) {
-  zVec3DCopy(t_cmd_com_position, &m_cmd_com_position);
+ComCtrl& ComCtrl::set_cmd_com_position(const zVec3D& t_cmd_com_position) {
+  zVec3DCopy(&t_cmd_com_position, &m_cmd_com_position);
   return *this;
 }
 
-double ComCtrl::computeDesiredZetaSqr(const zVec3D* ref_com_position) const {
+double ComCtrl::computeDesiredZetaSqr(const zVec3D& ref_com_position) const {
   return m_model.computeZetaSqr(ref_com_position);
 }
 
-double ComCtrl::computeDesiredZeta(const zVec3D* ref_com_position) const {
+double ComCtrl::computeDesiredZeta(const zVec3D& ref_com_position) const {
   return m_model.computeZeta(ref_com_position);
 }
 
-zVec3D* ComCtrl::computeDesiredZmpPosition(const zVec3D* ref_com_pos,
-                                           const zVec3D* com_pos,
-                                           const zVec3D* com_vel,
-                                           double desired_zeta,
-                                           zVec3D* desired_zmp_pos) const {
-  zVec3DCreate(desired_zmp_pos,
+zVec3D ComCtrl::computeDesiredZmpPosition(const zVec3D& ref_com_pos,
+                                          const zVec3D& com_pos,
+                                          const zVec3D& com_vel,
+                                          double desired_zeta) const {
+  zVec3D desired_zmp_pos;
+  zVec3DCreate(&desired_zmp_pos,
                m_x.computeDesiredZmpPosition(ref_com_pos, com_pos, com_vel,
                                              desired_zeta),
                m_y.computeDesiredZmpPosition(ref_com_pos, com_pos, com_vel,
@@ -63,12 +66,12 @@ zVec3D* ComCtrl::computeDesiredZmpPosition(const zVec3D* ref_com_pos,
 }
 
 bool ComCtrl::update() {
-  m_des_zeta = computeDesiredZeta(&m_cmd_com_position);
+  m_des_zeta = computeDesiredZeta(m_cmd_com_position);
   if (zIsTiny(m_des_zeta)) return false;
-  computeDesiredZmpPosition(&m_cmd_com_position, m_model.com_position(),
-                            m_model.com_velocity(), m_des_zeta,
-                            &m_des_zmp_position);
-  m_model.set_zmp_position(&m_des_zmp_position);
+  m_des_zmp_position =
+      computeDesiredZmpPosition(m_cmd_com_position, m_model.com_position(),
+                                m_model.com_velocity(), m_des_zeta);
+  m_model.set_zmp_position(m_des_zmp_position);
   return m_model.update();
 }
 

@@ -30,20 +30,19 @@ int main() {
   zVec3D cmd_com_pos = {{0, 0, 1}};
   double t = 0;
 
-  ctrl.model().reset_com_position(&initial_com_pos);
+  ctrl.model().reset(initial_com_pos);
   while (t < T) {
-    ctrl.set_cmd_com_position(&cmd_com_pos);
+    ctrl.set_cmd_com_position(cmd_com_pos);
     ctrl.update(DT);
+    zVec3D pos = ctrl.model().com_position();
+    zVec3D vel = ctrl.model().com_velocity();
+    zVec3D zmp = ctrl.model().zmp_position();
     std::cout << t << " ";
-    std::cout << zVec3DElem(ctrl.model().com_position(), zX) << " "
-              << zVec3DElem(ctrl.model().com_position(), zY) << " "
-              << zVec3DElem(ctrl.model().com_position(), zZ) << " "
-              << zVec3DElem(ctrl.model().com_velocity(), zX) << " "
-              << zVec3DElem(ctrl.model().com_velocity(), zY) << " "
-              << zVec3DElem(ctrl.model().com_velocity(), zZ) << " "
-              << zVec3DElem(ctrl.des_zmp_position(), zX) << " "
-              << zVec3DElem(ctrl.des_zmp_position(), zY) << " "
-              << zVec3DElem(ctrl.des_zmp_position(), zZ) << " "
+    std::cout << zVec3DElem(&pos, zX) << " " << zVec3DElem(&pos, zY) << " "
+              << zVec3DElem(&pos, zZ) << " " << zVec3DElem(&vel, zX) << " "
+              << zVec3DElem(&vel, zY) << " " << zVec3DElem(&vel, zZ) << " "
+              << zVec3DElem(&zmp, zX) << " " << zVec3DElem(&zmp, zY) << " "
+              << zVec3DElem(&zmp, zZ) << " "
               << "\n";
     t += ctrl.time_step();
   }

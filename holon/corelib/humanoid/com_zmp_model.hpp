@@ -66,60 +66,56 @@ class ComZmpModelData {
 };
 
 class ComZmpModel {
-  const double default_mass = 1;
-  const double default_com_height = 1;
-  const double default_time_step = 0.001;
+  static constexpr double default_time_step = 0.001;
 
  public:
   ComZmpModel();
   ComZmpModel(double t_mass);
 
-  virtual ~ComZmpModel();
+  // special member functions
+  virtual ~ComZmpModel() = default;
+  ComZmpModel(const ComZmpModel&) = delete;
+  ComZmpModel(ComZmpModel&&) = delete;
+  ComZmpModel& operator=(const ComZmpModel&) = delete;
+  ComZmpModel& operator=(ComZmpModel&&) = delete;
 
-  inline double mass() const noexcept { return m_mass; }
-  ComZmpModel& set_mass(double t_mass);
-
-  inline const zVec3D* com_position() const noexcept { return &m_com_position; }
-  inline zVec3D* com_position() noexcept { return &m_com_position; }
-  ComZmpModel& set_com_position(const zVec3D* t_com_position);
-
-  inline const zVec3D* com_velocity() const noexcept { return &m_com_velocity; }
-  inline zVec3D* com_velocity() noexcept { return &m_com_velocity; }
-  ComZmpModel& set_com_velocity(const zVec3D* t_com_velocity);
-
-  ComZmpModel& reset_com_position(const zVec3D* t_com_position);
-
-  inline const zVec3D* com_acceleration() const noexcept {
-    return &m_com_acceleration;
+  // accessors
+  inline double mass() const noexcept { return m_data.mass(); }
+  inline const zVec3D com_position() const noexcept {
+    return m_data.com_position();
   }
-  inline zVec3D* com_acceleration() noexcept { return &m_com_acceleration; }
-
-  inline const zVec3D* zmp_position() const noexcept { return &m_zmp_position; }
-  inline zVec3D* zmp_position() noexcept { return &m_zmp_position; }
-  ComZmpModel& set_zmp_position(const zVec3D* t_zmp_position);
-
+  inline const zVec3D com_velocity() const noexcept {
+    return m_data.com_velocity();
+  }
+  inline const zVec3D com_acceleration() const noexcept {
+    return m_data.com_acceleration();
+  }
+  inline const zVec3D zmp_position() const noexcept {
+    return m_data.zmp_position();
+  }
   inline double time_step() const noexcept { return m_time_step; }
+
+  // mutators
+  ComZmpModel& set_mass(double t_mass);
+  ComZmpModel& set_com_position(const zVec3D& t_com_position);
+  ComZmpModel& set_com_velocity(const zVec3D& t_com_velocity);
+  ComZmpModel& set_com_acceleration(const zVec3D& t_com_acceleration);
+  ComZmpModel& set_zmp_position(const zVec3D& t_zmp_position);
   ComZmpModel& set_time_step(double t_time_step);
+  ComZmpModel& reset(const zVec3D& t_com_position);
 
-  double computeZetaSqr(const zVec3D* com_position) const;
-  double computeZeta(const zVec3D* com_position) const;
+  double computeZetaSqr(const zVec3D& com_position) const;
+  double computeZeta(const zVec3D& com_position) const;
 
-  zVec3D* computeAcceleration(const zVec3D* com_position,
-                              const zVec3D* zmp_position,
-                              zVec3D* com_acceleration) const;
+  zVec3D computeAcceleration(const zVec3D& com_position,
+                             const zVec3D& zmp_position) const;
 
   bool update();
   bool update(double t_time_step);
 
  private:
-  double m_mass;
-  zVec3D m_com_position;
-  zVec3D m_com_velocity;
-  zVec3D m_com_acceleration;
-  zVec3D m_zmp_position;
+  ComZmpModelData m_data;
   double m_time_step;
-
-  void initializeStates();
 };
 
 }  // namespace holon

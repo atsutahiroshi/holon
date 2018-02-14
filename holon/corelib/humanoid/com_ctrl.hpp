@@ -46,27 +46,24 @@ class ComCtrl {
   inline double time_step() const noexcept { return model().time_step(); }
   ComCtrl& set_time_step(double t_time_step);
 
-  inline const zVec3D* cmd_com_position() const noexcept {
-    return &m_cmd_com_position;
+  inline const zVec3D cmd_com_position() const noexcept {
+    return m_cmd_com_position;
   }
-  inline zVec3D* cmd_com_position() noexcept { return &m_cmd_com_position; }
-  ComCtrl& set_cmd_com_position(const zVec3D* t_cmd_com_position);
+  ComCtrl& set_cmd_com_position(const zVec3D& t_cmd_com_position);
 
-  inline const zVec3D* des_zmp_position() const noexcept {
-    return &m_des_zmp_position;
+  inline const zVec3D des_zmp_position() const noexcept {
+    return m_des_zmp_position;
   }
-  inline zVec3D* des_zmp_position() noexcept { return &m_des_zmp_position; }
 
   inline double des_zeta() const noexcept { return m_des_zeta; }
 
-  double computeDesiredZetaSqr(const zVec3D* ref_com_position) const;
-  double computeDesiredZeta(const zVec3D* ref_com_position) const;
+  double computeDesiredZetaSqr(const zVec3D& ref_com_position) const;
+  double computeDesiredZeta(const zVec3D& ref_com_position) const;
 
-  zVec3D* computeDesiredZmpPosition(const zVec3D* ref_com_position,
-                                    const zVec3D* com_position,
-                                    const zVec3D* com_velocity,
-                                    double desired_zeta,
-                                    zVec3D* desired_zmp_position) const;
+  zVec3D computeDesiredZmpPosition(const zVec3D& ref_com_position,
+                                   const zVec3D& com_position,
+                                   const zVec3D& com_velocity,
+                                   double desired_zeta) const;
 
   bool update();
   bool update(double t_time_step);

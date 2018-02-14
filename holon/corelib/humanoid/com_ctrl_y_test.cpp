@@ -223,10 +223,10 @@ TEST_CASE("handle the case where zeta is non-positive on y-axis",
     zVec3D ref_com_pos = {1, 1, 9.8};
     zVec3D com_pos = {0, 0, 9.8};
     zVec3D com_vel = {0, 0, 0};
-    REQUIRE(ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
-                                           0) == 0);
-    REQUIRE(ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
-                                           -1) == 0);
+    REQUIRE(ctrl.computeDesiredZmpPosition(ref_com_pos, com_pos, com_vel, 0) ==
+            0);
+    REQUIRE(ctrl.computeDesiredZmpPosition(ref_com_pos, com_pos, com_vel, -1) ==
+            0);
   }
   zEchoOn();
 }
@@ -252,7 +252,7 @@ TEST_CASE("compute desired ZMP position along y-axis when vectors are given",
       zVec3D ref_com_pos = {0, yd, 1};
       zVec3D com_pos = {0, c.y, 1};
       zVec3D com_vel = {0, c.vy, 0};
-      CHECK(ctrl.computeDesiredZmpPosition(&ref_com_pos, &com_pos, &com_vel,
+      CHECK(ctrl.computeDesiredZmpPosition(ref_com_pos, com_pos, com_vel,
                                            zeta) == Approx(c.expected_yz));
     }
   }

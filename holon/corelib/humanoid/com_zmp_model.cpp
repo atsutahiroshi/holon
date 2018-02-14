@@ -21,6 +21,7 @@
 #include "holon/corelib/humanoid/com_zmp_model.hpp"
 
 #include <roki/rk_g.h>
+#include <utility>
 
 namespace holon {
 
@@ -74,51 +75,40 @@ ComZmpModelData& ComZmpModelData::set_zmp_position(
   return *this;
 }
 
-ComZmpModel::ComZmpModel()
-    : m_mass(default_mass), m_time_step(default_time_step) {
-  initializeStates();
+ComZmpModelData& ComZmpModelData::reset(const zVec3D& t_com_position) {
+  set_com_position(t_com_position);
+  set_com_velocity(zVec3D({{0, 0, 0}}));
+  return *this;
 }
+
+ComZmpModel::ComZmpModel() : m_data(), m_time_step(default_time_step) {}
+
 ComZmpModel::ComZmpModel(double t_mass)
-    : m_mass(t_mass), m_time_step(default_time_step) {
-  initializeStates();
-}
-
-ComZmpModel::~ComZmpModel() = default;
-
-void ComZmpModel::initializeStates() {
-  zVec3DCreate(&m_com_position, 0, 0, default_com_height);
-  zVec3DClear(&m_com_velocity);
-  zVec3DClear(&m_com_acceleration);
-  zVec3DClear(&m_zmp_position);
-}
+    : m_data(t_mass), m_time_step(default_time_step) {}
 
 ComZmpModel& ComZmpModel::set_mass(double t_mass) {
-  if (zIsTiny(t_mass) || t_mass < 0) {
-    ZRUNERROR("mass must be positive value (given: %f)", t_mass);
-    m_mass = default_mass;
-  } else {
-    m_mass = t_mass;
-  }
+  m_data.set_mass(t_mass);
   return *this;
 }
 
-ComZmpModel& ComZmpModel::set_com_position(const zVec3D* t_com_position) {
-  zVec3DCopy(t_com_position, &m_com_position);
+ComZmpModel& ComZmpModel::set_com_position(const zVec3D& t_com_position) {
+  m_data.set_com_position(t_com_position);
   return *this;
 }
 
-ComZmpModel& ComZmpModel::set_com_velocity(const zVec3D* t_com_velocity) {
-  zVec3DCopy(t_com_velocity, &m_com_velocity);
+ComZmpModel& ComZmpModel::set_com_velocity(const zVec3D& t_com_velocity) {
+  m_data.set_com_velocity(t_com_velocity);
   return *this;
 }
 
-ComZmpModel& ComZmpModel::reset_com_position(const zVec3D* t_com_position) {
-  zVec3DClear(&m_com_velocity);
-  return set_com_position(t_com_position);
+ComZmpModel& ComZmpModel::set_com_acceleration(
+    const zVec3D& t_com_acceleration) {
+  m_data.set_com_acceleration(t_com_acceleration);
+  return *this;
 }
 
-ComZmpModel& ComZmpModel::set_zmp_position(const zVec3D* t_zmp_position) {
-  zVec3DCopy(t_zmp_position, &m_zmp_position);
+ComZmpModel& ComZmpModel::set_zmp_position(const zVec3D& t_zmp_position) {
+  m_data.set_zmp_position(t_zmp_position);
   return *this;
 }
 
@@ -132,37 +122,47 @@ ComZmpModel& ComZmpModel::set_time_step(double t_time_step) {
   return *this;
 }
 
-double ComZmpModel::computeZetaSqr(const zVec3D* t_com_position) const {
-  if (zIsTiny(zVec3DElem(t_com_position, zZ)) ||
-      zVec3DElem(t_com_position, zZ) < 0) {
-    ZRUNERROR("The COM height must be positive. (given: %f)",
-              zVec3DElem(t_com_position, zZ));
-    return 0.0;
-  }
-  return RK_G / zVec3DElem(t_com_position, zZ);
+ComZmpModel& ComZmpModel::reset(const zVec3D& t_com_position) {
+  m_data.reset(t_com_position);
+  return *this;
 }
 
-double ComZmpModel::computeZeta(const zVec3D* t_com_position) const {
+double ComZmpModel::computeZetaSqr(const zVec3D& t_com_position) const {
+  if (zIsTiny(zVec3DElem(&t_com_position, zZ)) ||
+      zVec3DElem(&t_com_position, zZ) < 0) {
+    ZRUNERROR("The COM height must be positive. (given: %f)",
+              zVec3DElem(&t_com_position, zZ));
+    return 0.0;
+  }
+  return RK_G / zVec3DElem(&t_com_position, zZ);
+}
+
+double ComZmpModel::computeZeta(const zVec3D& t_com_position) const {
   return sqrt(computeZetaSqr(t_com_position));
 }
 
-zVec3D* ComZmpModel::computeAcceleration(const zVec3D* t_com_position,
-                                         const zVec3D* t_zmp_position,
-                                         zVec3D* t_com_acceleration) const {
+zVec3D ComZmpModel::computeAcceleration(const zVec3D& t_com_position,
+                                        const zVec3D& t_zmp_position) const {
   zVec3D g = {{0, 0, RK_G}};
+  zVec3D com_acceleration;
   // TODO(*): remove const_cast when own math library is implemented
-  zVec3DSub(const_cast<zVec3D*>(t_com_position),
-            const_cast<zVec3D*>(t_zmp_position), t_com_acceleration);
-  zVec3DMulDRC(t_com_acceleration, computeZetaSqr(t_com_position));
-  zVec3DSubDRC(t_com_acceleration, &g);
-  return t_com_acceleration;
+  zVec3DSub(const_cast<zVec3D*>(&t_com_position),
+            const_cast<zVec3D*>(&t_zmp_position), &com_acceleration);
+  zVec3DMulDRC(&com_acceleration, computeZetaSqr(t_com_position));
+  zVec3DSubDRC(&com_acceleration, &g);
+  return com_acceleration;
 }
 
 bool ComZmpModel::update() {
   if (zIsTiny(computeZetaSqr(com_position()))) return false;
-  computeAcceleration(com_position(), zmp_position(), com_acceleration());
-  zVec3DCatDRC(com_position(), time_step(), com_velocity());
-  zVec3DCatDRC(com_velocity(), time_step(), com_acceleration());
+  zVec3D pos = com_position();
+  zVec3D vel = com_velocity();
+  zVec3D acc = computeAcceleration(com_position(), zmp_position());
+  zVec3DCatDRC(&pos, time_step(), &vel);
+  zVec3DCatDRC(&vel, time_step(), &acc);
+  m_data.set_com_position(pos);
+  m_data.set_com_velocity(vel);
+  m_data.set_com_acceleration(acc);
   return true;
 }
 

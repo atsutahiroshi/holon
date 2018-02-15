@@ -21,7 +21,7 @@
 #include "holon/corelib/math/zvec3dwrap/vec3d.hpp"
 
 namespace holon {
-namespace zvec3d {
+namespace zVec3DWrap {
 
 Vec3D::Vec3D() { zVec3DClear(&m_v); }
 Vec3D::Vec3D(double t_x, double t_y, double t_z) {

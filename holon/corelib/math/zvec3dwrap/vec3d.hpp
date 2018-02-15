@@ -25,7 +25,7 @@
 #include <cstddef>
 
 namespace holon {
-namespace zvec3d {
+namespace zVec3DWrap {
 
 class Vec3D {
  public:

@@ -40,9 +40,9 @@ TEST_CASE("matchers for zVec3D", "[test][util][catch]") {
 namespace {
 
 TEST_CASE("matchers for zvec3d::Vec3D", "[test][util][catch]") {
-  zvec3d::Vec3D v(0.1, 0.2, 0.3);
-  zvec3d::Vec3D v1(0.1, 0.2, 0.3);
-  zvec3d::Vec3D v2(0.1, 0.1, 0.1);
+  Vec3D v(0.1, 0.2, 0.3);
+  Vec3D v1(0.1, 0.2, 0.3);
+  Vec3D v2(0.1, 0.1, 0.1);
 
   CHECK_THAT(v, Equals(v1));
   CHECK_THAT(v, !Equals(v2));

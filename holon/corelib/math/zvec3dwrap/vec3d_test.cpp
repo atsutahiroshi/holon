@@ -26,7 +26,7 @@
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
 namespace holon {
-namespace zvec3d {
+namespace zVec3DWrap {
 namespace {
 
 using Catch::Matchers::Equals;

@@ -98,11 +98,12 @@ using holon::math::zvec3d::Vec3D;
 
 class EqualsMatcher : public MatcherBase<Vec3D> {
  public:
-  explicit EqualsMatcher(const Vec3D& comparator) : m_comparator(comparator) {}
-
+  explicit EqualsMatcher(const Vec3D& comparator)
+      : m_comparator(comparator),
+        m_epsilon(std::numeric_limits<float>::epsilon() * 100) {}
   bool match(const Vec3D& v) const override {
-    for (auto i = 0; i < v.size(); ++i) {
-      if (m_comparator[i] != v[i]) {
+    for (std::size_t i = 0; i < v.size(); ++i) {
+      if (std::fabs(m_comparator[i] - v[i]) > m_epsilon) {
         return false;
       }
     }
@@ -114,6 +115,7 @@ class EqualsMatcher : public MatcherBase<Vec3D> {
 
  private:
   const Vec3D& m_comparator;
+  double m_epsilon;
 };
 
 }  // namespace zvec3d

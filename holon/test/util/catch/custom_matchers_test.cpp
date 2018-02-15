@@ -47,6 +47,9 @@ TEST_CASE("matchers for zvec3d::Vec3D", "[test][util][catch]") {
 
   CHECK_THAT(v, Equals(v1));
   CHECK_THAT(v, !Equals(v2));
+
+  v1 = {0.1, 0.2, (0.1 + 0.2)};
+  CHECK_THAT(v, Equals(v1));
 }
 
 }  // namespace

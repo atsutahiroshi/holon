@@ -5,7 +5,7 @@ set(HOLON_CORELIB_MATH_TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/vec3d_test.cpp
   )
 
-add_subdirectory(zvec3d)
+add_subdirectory(zvec3dwrap)
 
 set(HOLON_CORELIB_SOURCE_FILES
   ${HOLON_CORELIB_SOURCE_FILES}

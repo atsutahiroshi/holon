@@ -18,7 +18,7 @@
  * along with the holon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "holon/corelib/math/zvec3d/vec3d.hpp"
+#include "holon/corelib/math/zvec3dwrap/vec3d.hpp"
 
 #include <utility>
 #include "catch.hpp"

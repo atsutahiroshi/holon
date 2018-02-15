@@ -21,7 +21,7 @@
 #ifndef HOLON_MATH_VEC3D_HPP_
 #define HOLON_MATH_VEC3D_HPP_
 
-#include "holon/corelib/math/zvec3d/vec3d.hpp"
+#include "holon/corelib/math/zvec3dwrap/vec3d.hpp"
 
 namespace holon {
 

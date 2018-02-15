@@ -18,20 +18,13 @@
  * along with the holon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef HOLON_MATH_VEC3D_HPP_
-#define HOLON_MATH_VEC3D_HPP_
-
-#include "holon/corelib/math/zvec3d/vec3d.hpp"
+#include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
 
-using zvec3d::Vec3D;
-
-extern const Vec3D kVec3DZero;
-extern const Vec3D kVec3DX;
-extern const Vec3D kVec3DY;
-extern const Vec3D kVec3DZ;
+const Vec3D kVec3DZero = {0, 0, 0};
+const Vec3D kVec3DX = {1, 0, 0};
+const Vec3D kVec3DY = {0, 1, 0};
+const Vec3D kVec3DZ = {0, 0, 1};
 
 }  // namespace holon
-
-#endif  // HOLON_MATH_VEC3D_HPP_

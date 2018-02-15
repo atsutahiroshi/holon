@@ -18,20 +18,20 @@
  * along with the holon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef HOLON_MATH_VEC3D_HPP_
-#define HOLON_MATH_VEC3D_HPP_
-
-#include "holon/corelib/math/zvec3d/vec3d.hpp"
+#include "holon/corelib/math/vec3d.hpp"
+#include "holon/test/util/catch/custom_matchers.hpp"
 
 namespace holon {
+namespace {
 
-using zvec3d::Vec3D;
+using Catch::Matchers::Equals;
 
-extern const Vec3D kVec3DZero;
-extern const Vec3D kVec3DX;
-extern const Vec3D kVec3DY;
-extern const Vec3D kVec3DZ;
+TEST_CASE("Vec3D: check constants") {
+  CHECK_THAT(kVec3DZero, Equals(Vec3D(0, 0, 0)));
+  CHECK_THAT(kVec3DX, Equals(Vec3D(1, 0, 0)));
+  CHECK_THAT(kVec3DY, Equals(Vec3D(0, 1, 0)));
+  CHECK_THAT(kVec3DZ, Equals(Vec3D(0, 0, 1)));
+}
 
+}  // namespace
 }  // namespace holon
-
-#endif  // HOLON_MATH_VEC3D_HPP_

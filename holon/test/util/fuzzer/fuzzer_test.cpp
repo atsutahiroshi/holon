@@ -77,11 +77,22 @@ TEST_CASE("make uniform distribution with a specific seed",
   }
 }
 
-TEST_CASE("randomize elements in vector", "[test][util][fuzzer]") {
+TEST_CASE("randomize elements in zVec3D", "[test][util][fuzzer]") {
   Fuzzer fuzz;
 
   for (auto i = 0; i < 10; ++i) {
     zVec3D v1, v2;
+    fuzz.randomize(v1);
+    fuzz.randomize(v2);
+    REQUIRE_THAT(v1, !Equals(v2));
+  }
+}
+
+TEST_CASE("randomize elements in Vec3D", "[test][util][fuzzer]") {
+  Fuzzer fuzz;
+
+  for (auto i = 0; i < 10; ++i) {
+    math::Vec3D v1, v2;
     fuzz.randomize(v1);
     fuzz.randomize(v2);
     REQUIRE_THAT(v1, !Equals(v2));

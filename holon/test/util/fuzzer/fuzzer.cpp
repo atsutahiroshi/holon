@@ -49,4 +49,9 @@ zVec3D Fuzzer::randomize(zVec3D& v) {
   return v;
 }
 
+math::Vec3D Fuzzer::randomize(math::Vec3D& v) {
+  for (auto i = 0; i < v.size(); ++i) v[i] = get();
+  return v;
+}
+
 }  // namespace holon

@@ -23,6 +23,7 @@
 
 #include <zeo/zeo_vec3d.h>
 #include <random>
+#include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
 
@@ -46,6 +47,7 @@ class Fuzzer {
 
   inline double get() { return m_distribution(m_engine); }
   zVec3D randomize(zVec3D& v);
+  math::Vec3D randomize(math::Vec3D& v);
 
  private:
   std::random_device m_rd;

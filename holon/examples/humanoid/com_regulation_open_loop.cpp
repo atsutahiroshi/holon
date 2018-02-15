@@ -26,23 +26,21 @@ const double DT = 0.01;
 
 int main() {
   holon::ComCtrl ctrl;
-  zVec3D initial_com_pos = {{0.1, -0.1, 1}};
-  zVec3D cmd_com_pos = {{0, 0, 1}};
+  holon::Vec3D initial_com_pos = {0.1, -0.1, 1};
+  holon::Vec3D cmd_com_pos = {0, 0, 1};
   double t = 0;
 
   ctrl.model().reset(initial_com_pos);
   while (t < T) {
     ctrl.set_cmd_com_position(cmd_com_pos);
     ctrl.update(DT);
-    zVec3D pos = ctrl.model().com_position();
-    zVec3D vel = ctrl.model().com_velocity();
-    zVec3D zmp = ctrl.model().zmp_position();
+    holon::Vec3D pos = ctrl.model().com_position();
+    holon::Vec3D vel = ctrl.model().com_velocity();
+    holon::Vec3D zmp = ctrl.model().zmp_position();
     std::cout << t << " ";
-    std::cout << zVec3DElem(&pos, zX) << " " << zVec3DElem(&pos, zY) << " "
-              << zVec3DElem(&pos, zZ) << " " << zVec3DElem(&vel, zX) << " "
-              << zVec3DElem(&vel, zY) << " " << zVec3DElem(&vel, zZ) << " "
-              << zVec3DElem(&zmp, zX) << " " << zVec3DElem(&zmp, zY) << " "
-              << zVec3DElem(&zmp, zZ) << " "
+    std::cout << pos.x() << " " << pos.y() << " " << pos.z() << " " << vel.x()
+              << " " << vel.y() << " " << vel.z() << " " << zmp.x() << " "
+              << zmp.y() << " " << zmp.z() << " "
               << "\n";
     t += ctrl.time_step();
   }

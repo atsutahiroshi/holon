@@ -21,11 +21,10 @@
 #ifndef HOLON_HUMANOID_COM_CTRL_HPP_
 #define HOLON_HUMANOID_COM_CTRL_HPP_
 
-#include <zeo/zeo_vec3d.h>
-
 #include "holon/corelib/humanoid/com_ctrl_x.hpp"
 #include "holon/corelib/humanoid/com_ctrl_y.hpp"
 #include "holon/corelib/humanoid/com_zmp_model.hpp"
+#include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
 
@@ -49,25 +48,25 @@ class ComCtrl {
   inline const ComZmpModel& model() const noexcept { return m_model; }
   inline ComZmpModel& model() noexcept { return m_model; }
   inline double time_step() const noexcept { return model().time_step(); }
-  inline const zVec3D cmd_com_position() const noexcept {
+  inline const Vec3D cmd_com_position() const noexcept {
     return m_cmd_com_position;
   }
-  inline const zVec3D des_zmp_position() const noexcept {
+  inline const Vec3D des_zmp_position() const noexcept {
     return m_des_zmp_position;
   }
   inline double des_zeta() const noexcept { return m_des_zeta; }
 
   // mutators
   ComCtrl& set_time_step(double t_time_step);
-  ComCtrl& set_cmd_com_position(const zVec3D& t_cmd_com_position);
+  ComCtrl& set_cmd_com_position(const Vec3D& t_cmd_com_position);
 
   // computing functions
-  double computeDesZetaSqr(const zVec3D& t_ref_com_position) const;
-  double computeDesZeta(const zVec3D& t_ref_com_position) const;
-  zVec3D computeDesZmpPos(const zVec3D& t_ref_com_position,
-                          const zVec3D& t_com_position,
-                          const zVec3D& t_com_velocity,
-                          double t_desired_zeta) const;
+  double computeDesZetaSqr(const Vec3D& t_ref_com_position) const;
+  double computeDesZeta(const Vec3D& t_ref_com_position) const;
+  Vec3D computeDesZmpPos(const Vec3D& t_ref_com_position,
+                         const Vec3D& t_com_position,
+                         const Vec3D& t_com_velocity,
+                         double t_desired_zeta) const;
 
   // update functions
   bool update();
@@ -78,8 +77,8 @@ class ComCtrl {
   ComCtrlY m_y;
   ComZmpModel m_model;
 
-  zVec3D m_cmd_com_position;
-  zVec3D m_des_zmp_position;
+  Vec3D m_cmd_com_position;
+  Vec3D m_des_zmp_position;
   double m_des_zeta;
 };
 

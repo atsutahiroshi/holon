@@ -27,7 +27,7 @@ ComCtrl::ComCtrl()
       m_y(),
       m_model(),
       m_cmd_com_position(model().com_position()),
-      m_des_zmp_position(*ZVEC3DZERO) {
+      m_des_zmp_position(0, 0, 0) {
   m_des_zeta = computeDesZeta(model().com_position());
 }
 
@@ -36,29 +36,28 @@ ComCtrl& ComCtrl::set_time_step(double t_time_step) {
   return *this;
 }
 
-ComCtrl& ComCtrl::set_cmd_com_position(const zVec3D& t_cmd_com_position) {
-  zVec3DCopy(&t_cmd_com_position, &m_cmd_com_position);
+ComCtrl& ComCtrl::set_cmd_com_position(const Vec3D& t_cmd_com_position) {
+  m_cmd_com_position = t_cmd_com_position;
   return *this;
 }
 
-double ComCtrl::computeDesZetaSqr(const zVec3D& t_ref_com_position) const {
+double ComCtrl::computeDesZetaSqr(const Vec3D& t_ref_com_position) const {
   return m_model.computeZetaSqr(t_ref_com_position);
 }
 
-double ComCtrl::computeDesZeta(const zVec3D& t_ref_com_position) const {
+double ComCtrl::computeDesZeta(const Vec3D& t_ref_com_position) const {
   return m_model.computeZeta(t_ref_com_position);
 }
 
-zVec3D ComCtrl::computeDesZmpPos(const zVec3D& t_ref_com_pos,
-                                 const zVec3D& t_com_pos,
-                                 const zVec3D& t_com_vel,
-                                 double t_desired_zeta) const {
-  zVec3D desired_zmp_pos;
-  zVec3DCreate(
-      &desired_zmp_pos,
-      m_x.computeDesZmpPos(t_ref_com_pos, t_com_pos, t_com_vel, t_desired_zeta),
-      m_y.computeDesZmpPos(t_ref_com_pos, t_com_pos, t_com_vel, t_desired_zeta),
-      0);
+Vec3D ComCtrl::computeDesZmpPos(const Vec3D& t_ref_com_pos,
+                                const Vec3D& t_com_pos, const Vec3D& t_com_vel,
+                                double t_desired_zeta) const {
+  Vec3D desired_zmp_pos;
+  desired_zmp_pos.set_x(m_x.computeDesZmpPos(t_ref_com_pos, t_com_pos,
+                                             t_com_vel, t_desired_zeta));
+  desired_zmp_pos.set_y(m_y.computeDesZmpPos(t_ref_com_pos, t_com_pos,
+                                             t_com_vel, t_desired_zeta));
+  desired_zmp_pos.set_z(0);
   return desired_zmp_pos;
 }
 

@@ -21,7 +21,7 @@
 #ifndef HOLON_HUMANOID_COM_CTRL_Y_HPP_
 #define HOLON_HUMANOID_COM_CTRL_Y_HPP_
 
-#include <zeo/zeo_vec3d.h>
+#include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
 
@@ -52,9 +52,9 @@ class ComCtrlY {
   // functions
   double computeDesZmpPos(double t_yd, double t_y, double t_v,
                           double t_zeta) const noexcept;
-  double computeDesZmpPos(const zVec3D& t_ref_com_position,
-                          const zVec3D& t_com_position,
-                          const zVec3D& t_com_veocity, double t_zeta) const
+  double computeDesZmpPos(const Vec3D& t_ref_com_position,
+                          const Vec3D& t_com_position,
+                          const Vec3D& t_com_veocity, double t_zeta) const
       noexcept;
 
  private:

@@ -92,11 +92,11 @@ TEST_CASE("com_ctrl: testing of initialization", "[corelib][humanoid]") {
   ComCtrl ctrl;
 
   SECTION("commanded COM position") {
-    zVec3D expected_cmd_com_pos = {0, 0, 1};
+    Vec3D expected_cmd_com_pos = {0, 0, 1};
     CHECK_THAT(ctrl.cmd_com_position(), Equals(expected_cmd_com_pos));
   }
   SECTION("desired ZMP position") {
-    zVec3D expected_des_zmp_pos = {0, 0, 0};
+    Vec3D expected_des_zmp_pos = {0, 0, 0};
     CHECK_THAT(ctrl.des_zmp_position(), Equals(expected_des_zmp_pos));
   }
   SECTION("desired value of zeta") { CHECK(ctrl.des_zeta() == sqrt(G)); }
@@ -107,7 +107,7 @@ TEST_CASE("com_ctrl: testing of accessors/mutators", "[corelib][humanoid]") {
   Fuzzer fuzz;
 
   SECTION("commanded COM position") {
-    zVec3D new_cmd_com_pos;
+    Vec3D new_cmd_com_pos;
     fuzz.randomize(new_cmd_com_pos);
     ctrl.set_cmd_com_position(new_cmd_com_pos);
     REQUIRE_THAT(ctrl.cmd_com_position(), Equals(new_cmd_com_pos));
@@ -136,7 +136,7 @@ TEST_CASE("compute desired zeta", "[corelib][humanoid]") {
                      {4, G / 4, sqrt(G / 4)}};
 
     for (auto c : testcases) {
-      zVec3D pg = {0, 0, c.com_height};
+      Vec3D pg = {0, 0, c.com_height};
       CHECK(ctrl.computeDesZetaSqr(pg) == Approx(c.expected_zeta_squared));
       CHECK(ctrl.computeDesZeta(pg) == Approx(c.expected_zeta));
     }
@@ -146,7 +146,7 @@ TEST_CASE("compute desired zeta", "[corelib][humanoid]") {
     // but this is not theoritically correct.
     // This case should be handled as an exception somehow.
     // TODO(*): handle zero-division error correctly
-    zVec3D pg = {0, 0, 0};
+    Vec3D pg = {0, 0, 0};
     zEchoOff();
     CHECK_FALSE(zIsInf(ctrl.computeDesZetaSqr(pg)));
     CHECK(ctrl.computeDesZetaSqr(pg) == 0.0);
@@ -158,7 +158,7 @@ TEST_CASE("compute desired zeta", "[corelib][humanoid]") {
     // Return 0 when a negative valued was given as the height of COM.
     // This should be handled as an exception as well.
     // TODO(*): handle the case where a negative value is given
-    zVec3D pg = {0, 0, -1};
+    Vec3D pg = {0, 0, -1};
     zEchoOff();
     CHECK(ctrl.computeDesZetaSqr(pg) == 0.0);
     CHECK_FALSE(zIsNan(ctrl.computeDesZeta(pg)));
@@ -170,7 +170,7 @@ TEST_CASE("compute desired zeta", "[corelib][humanoid]") {
 SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
   GIVEN("qx1 = 1.0, qx2 = 1.0, qy1 = 1.0, qy2 = 1.0, ref_com_pos = (0, 0, G)") {
     ComCtrl ctrl;
-    zVec3D ref_com_pos = {0, 0, G};
+    Vec3D ref_com_pos = {0, 0, G};
     double desired_zeta = ctrl.computeDesZeta(ref_com_pos);
 
     REQUIRE(desired_zeta == Approx(1.0));
@@ -180,35 +180,35 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
     REQUIRE(ctrl.y().q2() == 1);
 
     WHEN("com_pos = (0, 0, G), com_vel = (0, 0, 0)") {
-      zVec3D com_pos = {0, 0, G};
-      zVec3D com_vel = {0, 0, 0};
+      Vec3D com_pos = {0, 0, G};
+      Vec3D com_vel = {0, 0, 0};
 
       THEN("desire_zmp_pos = (0, 0, 0)") {
-        // zVec3D desired_zmp_pos;
-        zVec3D expected_zmp_pos = {0, 0, 0};
-        zVec3D desired_zmp_pos =
+        // Vec3D desired_zmp_pos;
+        Vec3D expected_zmp_pos = {0, 0, 0};
+        Vec3D desired_zmp_pos =
             ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
         CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
       }
     }
     WHEN("com_pos = (1, 3, G), com_vel = (0, -1, 0)") {
-      zVec3D com_pos = {1, 3, G};
-      zVec3D com_vel = {0, -1, 0};
+      Vec3D com_pos = {1, 3, G};
+      Vec3D com_vel = {0, -1, 0};
 
       THEN("desire_zmp_pos = (2, 4, 0)") {
-        zVec3D expected_zmp_pos = {2, 4, 0};
-        zVec3D desired_zmp_pos =
+        Vec3D expected_zmp_pos = {2, 4, 0};
+        Vec3D desired_zmp_pos =
             ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
         CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
       }
     }
     WHEN("com_pos = (0, -2, G), com_vel = (-2, 2, 0)") {
-      zVec3D com_pos = {0, -2, G};
-      zVec3D com_vel = {-2, 2, 0};
+      Vec3D com_pos = {0, -2, G};
+      Vec3D com_vel = {-2, 2, 0};
 
       THEN("desire_zmp_pos = (-4, 0, 0)") {
-        zVec3D expected_zmp_pos = {-4, 0, 0};
-        zVec3D desired_zmp_pos =
+        Vec3D expected_zmp_pos = {-4, 0, 0};
+        Vec3D desired_zmp_pos =
             ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
         CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
       }
@@ -217,7 +217,7 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
 
   GIVEN("qx1 = 1, qx2 = 0.5, qy1 = 1.2, qy2 = 0.8, ref_com_pos = (0, 0, G)") {
     ComCtrl ctrl;
-    zVec3D ref_com_pos = {0, 0, G};
+    Vec3D ref_com_pos = {0, 0, G};
     double desired_zeta = ctrl.computeDesZeta(ref_com_pos);
 
     ctrl.x().set_q1(1.0).set_q2(0.5);
@@ -230,23 +230,23 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
     REQUIRE(ctrl.y().q2() == 0.8);
 
     WHEN("com_pos = (1, 1, G), com_vel = (0, 0, 0)") {
-      zVec3D com_pos = {1, 1, G};
-      zVec3D com_vel = {0, 0, 0};
+      Vec3D com_pos = {1, 1, G};
+      Vec3D com_vel = {0, 0, 0};
 
       THEN("desire_zmp_pos = (1.5, 1.96, 0)") {
-        zVec3D expected_zmp_pos = {1.5, 1.96, 0};
-        zVec3D desired_zmp_pos =
+        Vec3D expected_zmp_pos = {1.5, 1.96, 0};
+        Vec3D desired_zmp_pos =
             ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
         CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
       }
     }
     WHEN("com_pos = (-2, 3, G), com_vel = (2, -1, 0)") {
-      zVec3D com_pos = {-2, 3, G};
-      zVec3D com_vel = {2, -1, 0};
+      Vec3D com_pos = {-2, 3, G};
+      Vec3D com_vel = {2, -1, 0};
 
       THEN("desire_zmp_pos = (0, 3.88, 0)") {
-        zVec3D expected_zmp_pos = {0, 3.88, 0};
-        zVec3D desired_zmp_pos =
+        Vec3D expected_zmp_pos = {0, 3.88, 0};
+        Vec3D desired_zmp_pos =
             ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
         CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
       }
@@ -255,7 +255,7 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
   GIVEN(
       "qx1 = 1.0, qx2 = 1.5, qy1 = 1.0, qy2 = 1.0, ref_com_pos = (1, 0.5, G)") {
     ComCtrl ctrl;
-    zVec3D ref_com_pos = {1, 0.5, G};
+    Vec3D ref_com_pos = {1, 0.5, G};
     double desired_zeta = ctrl.computeDesZeta(ref_com_pos);
 
     ctrl.x().set_q2(1.5);
@@ -267,34 +267,34 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
     REQUIRE(ctrl.y().q2() == 1);
 
     WHEN("com_pos = (1, 0, G), com_vel = (0, 0, 0)") {
-      zVec3D com_pos = {1, 0, G};
-      zVec3D com_vel = {0, 0, 0};
+      Vec3D com_pos = {1, 0, G};
+      Vec3D com_vel = {0, 0, 0};
 
       THEN("desire_zmp_pos = (1, -0.5, 0)") {
-        zVec3D expected_zmp_pos = {1, -0.5, 0};
-        zVec3D desired_zmp_pos =
+        Vec3D expected_zmp_pos = {1, -0.5, 0};
+        Vec3D desired_zmp_pos =
             ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
         CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
       }
     }
     WHEN("com_pos = (0, 3, G), com_vel = (-2, -1, 0)") {
-      zVec3D com_pos = {0, 3, G};
-      zVec3D com_vel = {-2, -1, 0};
+      Vec3D com_pos = {0, 3, G};
+      Vec3D com_vel = {-2, -1, 0};
 
       THEN("desire_zmp_pos = (-6.5, 3.5, 0)") {
-        zVec3D expected_zmp_pos = {-6.5, 3.5, 0};
-        zVec3D desired_zmp_pos =
+        Vec3D expected_zmp_pos = {-6.5, 3.5, 0};
+        Vec3D desired_zmp_pos =
             ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
         CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
       }
     }
     WHEN("com_pos = (-2, 0, G), com_vel = (3, -2, 0)") {
-      zVec3D com_pos = {-2, 0, G};
-      zVec3D com_vel = {3, -2, 0};
+      Vec3D com_pos = {-2, 0, G};
+      Vec3D com_vel = {3, -2, 0};
 
       THEN("desire_zmp_pos = (1, -4.5, 0)") {
-        zVec3D expected_zmp_pos = {1, -4.5, 0};
-        zVec3D desired_zmp_pos =
+        Vec3D expected_zmp_pos = {1, -4.5, 0};
+        Vec3D desired_zmp_pos =
             ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
         CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
       }
@@ -305,7 +305,7 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
       "qx1 = 1.0, qx2 = 1.5, qy1 = 1.0, qy2 = 1.5, "
       "ref_com_pos = (0, 0.5, 0.5*G)") {
     ComCtrl ctrl;
-    zVec3D ref_com_pos = {0, 0.5, 0.5 * G};
+    Vec3D ref_com_pos = {0, 0.5, 0.5 * G};
     double desired_zeta = ctrl.computeDesZeta(ref_com_pos);
 
     ctrl.x().set_q2(1.5);
@@ -318,35 +318,35 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
     REQUIRE(ctrl.y().q2() == 1.5);
 
     WHEN("com_pos = (0, 0, G), com_vel = (0, 0, 0)") {
-      zVec3D com_pos = {0, 0, G};
-      zVec3D com_vel = {0, 0, 0};
+      Vec3D com_pos = {0, 0, G};
+      Vec3D com_vel = {0, 0, 0};
 
       THEN("desire_zmp_pos = (0, -0.75, 0)") {
-        zVec3D expected_zmp_pos = {0, -0.75, 0};
-        zVec3D desired_zmp_pos =
+        Vec3D expected_zmp_pos = {0, -0.75, 0};
+        Vec3D desired_zmp_pos =
             ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
         CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
       }
     }
     WHEN("com_pos = (1, 3, G), com_vel = (0, -2, 0)") {
-      zVec3D com_pos = {1, 3, G};
-      zVec3D com_vel = {0, -2, 0};
+      Vec3D com_pos = {1, 3, G};
+      Vec3D com_vel = {0, -2, 0};
 
       THEN("desire_zmp_pos = (2.5, 2.5*(3-sqrt(2))-0.75, 0)") {
-        zVec3D expected_zmp_pos = {2.5, 2.5 * (3 - sqrt(2)) - 0.75, 0};
-        zVec3D desired_zmp_pos =
+        Vec3D expected_zmp_pos = {2.5, 2.5 * (3 - sqrt(2)) - 0.75, 0};
+        Vec3D desired_zmp_pos =
             ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
         CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
       }
     }
     WHEN("com_pos = (-2, 0, G), com_vel = (3, -1, 0)") {
-      zVec3D com_pos = {-2, 0, G};
-      zVec3D com_vel = {3, -1, 0};
+      Vec3D com_pos = {-2, 0, G};
+      Vec3D com_vel = {3, -1, 0};
 
       THEN("desire_zmp_pos = (2.5*(-2+1.5*sqrt(2)), -1.25*sqrt(2)-0.75, 0)") {
-        zVec3D expected_zmp_pos = {2.5 * (-2 + 1.5 * sqrt(2)),
-                                   -1.25 * sqrt(2) - 0.75, 0};
-        zVec3D desired_zmp_pos =
+        Vec3D expected_zmp_pos = {2.5 * (-2 + 1.5 * sqrt(2)),
+                                  -1.25 * sqrt(2) - 0.75, 0};
+        Vec3D desired_zmp_pos =
             ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
         CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
       }
@@ -383,10 +383,10 @@ TEST_CASE("check if desired ZMP position is modified after update",
   ComCtrl ctrl;
 
   struct testcase_t {
-    zVec3D cmd_com_pos;
+    Vec3D cmd_com_pos;
   } testcases[] = {{{0, 0, 1}}, {{0.1, 0, 1}}, {{0.1, -0.1, 1}}};
   for (auto& c : testcases) {
-    zVec3D expected_des_zmp_pos;
+    Vec3D expected_des_zmp_pos;
     double expected_des_zeta;
 
     expected_des_zeta = ctrl.computeDesZeta(c.cmd_com_pos);
@@ -405,12 +405,12 @@ SCENARIO("controller can regulate COM position at a point",
          "[corelib][humanoid]") {
   GIVEN("command that COM position be at (0.1, -0.1, 1)") {
     ComCtrl ctrl;
-    zVec3D cmd_com_pos = {0.1, -0.1, 1};
+    Vec3D cmd_com_pos = {0.1, -0.1, 1};
     ctrl.set_cmd_com_position(cmd_com_pos);
 
     WHEN("at first") {
       THEN("COM position is at (0, 0, 1)") {
-        zVec3D expected_com_pos = {0, 0, 1};
+        Vec3D expected_com_pos = {0, 0, 1};
         CHECK_THAT(ctrl.model().com_position(), Equals(expected_com_pos));
       }
     }
@@ -421,12 +421,12 @@ SCENARIO("controller can regulate COM position at a point",
         t += ctrl.time_step();
       }
       THEN("COM position is between (0, 0, 1) and (0.1, -0.1, 1)") {
-        zVec3D pos = ctrl.model().com_position();
+        Vec3D pos = ctrl.model().com_position();
         CAPTURE(pos);
-        CHECK(zVec3DElem(&pos, zX) > 0.0);
-        CHECK(zVec3DElem(&pos, zX) < 0.1);
-        CHECK(zVec3DElem(&pos, zY) < 0.0);
-        CHECK(zVec3DElem(&pos, zY) > -0.1);
+        CHECK(pos.x() > 0.0);
+        CHECK(pos.x() < 0.1);
+        CHECK(pos.y() < 0.0);
+        CHECK(pos.y() > -0.1);
       }
     }
     WHEN("update until 10 sec") {
@@ -445,7 +445,7 @@ SCENARIO("controller can regulate COM position at a point",
 TEST_CASE("com_ctrl: when COM height is zero, update should fail",
           "[corelib][humanoid]") {
   ComCtrl ctrl;
-  zVec3D p = {0, 0, 0};
+  Vec3D p = {0, 0, 0};
 
   ctrl.model().set_com_position(p);
   zEchoOff();
@@ -456,7 +456,7 @@ TEST_CASE("com_ctrl: when COM height is zero, update should fail",
 TEST_CASE("when commanded COM height is zero, update should fail",
           "[corelib][humanoid]") {
   ComCtrl ctrl;
-  zVec3D p = {0, 0, 0};
+  Vec3D p = {0, 0, 0};
 
   ctrl.set_cmd_com_position(p);
   zEchoOff();

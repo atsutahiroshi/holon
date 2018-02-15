@@ -28,16 +28,16 @@ namespace {
 class ComCtrlBenchmark : public ::hayai::Fixture {
  public:
   virtual void SetUp() {
-    zVec3DCreate(&ref_com_pos, 0, 0, 1);
-    zVec3DCreate(&com_pos, 0, 0, 1);
-    zVec3DCreate(&com_vel, 0, 0, 0);
+    ref_com_pos = {0, 0, 1};
+    com_pos = {0, 0, 1};
+    com_vel = {0, 0, 0};
   }
   virtual void TearDown() {}
 
   ComCtrl ctrl;
-  zVec3D ref_com_pos;
-  zVec3D com_pos;
-  zVec3D com_vel;
+  Vec3D ref_com_pos;
+  Vec3D com_pos;
+  Vec3D com_vel;
 };
 
 BENCHMARK_F(ComCtrlBenchmark, GetQ1, 100, 1000) {
@@ -49,7 +49,7 @@ BENCHMARK_F(ComCtrlBenchmark, SetQ1, 100, 1000) { ctrl.x().set_q1(1); }
 
 BENCHMARK_F(ComCtrlBenchmark, computeDesZmpPos, 100, 1000) {
   double desired_zeta = ctrl.computeDesZeta(ref_com_pos);
-  zVec3D desired_zmp_pos =
+  Vec3D desired_zmp_pos =
       ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
   (void)desired_zmp_pos;
 }

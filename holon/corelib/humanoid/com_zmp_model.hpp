@@ -21,13 +21,13 @@
 #ifndef HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
 #define HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
 
-#include <zeo/zeo_vec3d.h>
+#include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
 
 class ComZmpModelData {
-  static constexpr double default_mass = 1;
-  static constexpr zVec3D default_com_position = {{0, 0, 1}};
+  static const double default_mass;
+  static const Vec3D default_com_position;
 
  public:
   ComZmpModelData();
@@ -42,27 +42,27 @@ class ComZmpModelData {
 
   // accessors
   inline double mass() const noexcept { return m_mass; }
-  inline const zVec3D com_position() const noexcept { return m_com_position; }
-  inline const zVec3D com_velocity() const noexcept { return m_com_velocity; }
-  inline const zVec3D com_acceleration() const noexcept {
+  inline const Vec3D com_position() const noexcept { return m_com_position; }
+  inline const Vec3D com_velocity() const noexcept { return m_com_velocity; }
+  inline const Vec3D com_acceleration() const noexcept {
     return m_com_acceleration;
   }
-  inline const zVec3D zmp_position() const noexcept { return m_zmp_position; }
+  inline const Vec3D zmp_position() const noexcept { return m_zmp_position; }
 
   // mutators
   ComZmpModelData& set_mass(double t_mass);
-  ComZmpModelData& set_com_position(const zVec3D& t_com_position);
-  ComZmpModelData& set_com_velocity(const zVec3D& t_com_velocity);
-  ComZmpModelData& set_com_acceleration(const zVec3D& t_com_acceleration);
-  ComZmpModelData& set_zmp_position(const zVec3D& t_zmp_position);
-  ComZmpModelData& reset(const zVec3D& t_com_position);
+  ComZmpModelData& set_com_position(const Vec3D& t_com_position);
+  ComZmpModelData& set_com_velocity(const Vec3D& t_com_velocity);
+  ComZmpModelData& set_com_acceleration(const Vec3D& t_com_acceleration);
+  ComZmpModelData& set_zmp_position(const Vec3D& t_zmp_position);
+  ComZmpModelData& reset(const Vec3D& t_com_position);
 
  private:
   double m_mass;
-  zVec3D m_com_position;
-  zVec3D m_com_velocity;
-  zVec3D m_com_acceleration;
-  zVec3D m_zmp_position;
+  Vec3D m_com_position;
+  Vec3D m_com_velocity;
+  Vec3D m_com_acceleration;
+  Vec3D m_zmp_position;
 };
 
 class ComZmpModel {
@@ -81,34 +81,34 @@ class ComZmpModel {
 
   // accessors
   inline double mass() const noexcept { return m_data.mass(); }
-  inline const zVec3D com_position() const noexcept {
+  inline const Vec3D com_position() const noexcept {
     return m_data.com_position();
   }
-  inline const zVec3D com_velocity() const noexcept {
+  inline const Vec3D com_velocity() const noexcept {
     return m_data.com_velocity();
   }
-  inline const zVec3D com_acceleration() const noexcept {
+  inline const Vec3D com_acceleration() const noexcept {
     return m_data.com_acceleration();
   }
-  inline const zVec3D zmp_position() const noexcept {
+  inline const Vec3D zmp_position() const noexcept {
     return m_data.zmp_position();
   }
   inline double time_step() const noexcept { return m_time_step; }
 
   // mutators
   ComZmpModel& set_mass(double t_mass);
-  ComZmpModel& set_com_position(const zVec3D& t_com_position);
-  ComZmpModel& set_com_velocity(const zVec3D& t_com_velocity);
-  ComZmpModel& set_com_acceleration(const zVec3D& t_com_acceleration);
-  ComZmpModel& set_zmp_position(const zVec3D& t_zmp_position);
+  ComZmpModel& set_com_position(const Vec3D& t_com_position);
+  ComZmpModel& set_com_velocity(const Vec3D& t_com_velocity);
+  ComZmpModel& set_com_acceleration(const Vec3D& t_com_acceleration);
+  ComZmpModel& set_zmp_position(const Vec3D& t_zmp_position);
   ComZmpModel& set_time_step(double t_time_step);
-  ComZmpModel& reset(const zVec3D& t_com_position);
+  ComZmpModel& reset(const Vec3D& t_com_position);
 
   // computing functions
-  double computeZetaSqr(const zVec3D& t_com_position) const;
-  double computeZeta(const zVec3D& t_com_position) const;
-  zVec3D computeComAcc(const zVec3D& t_com_position,
-                       const zVec3D& t_zmp_position) const;
+  double computeZetaSqr(const Vec3D& t_com_position) const;
+  double computeZeta(const Vec3D& t_com_position) const;
+  Vec3D computeComAcc(const Vec3D& t_com_position,
+                      const Vec3D& t_zmp_position) const;
 
   // update functions
   bool update();

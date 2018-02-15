@@ -46,13 +46,12 @@ double ComCtrlY::computeDesZmpPos(double t_yd, double t_y, double t_v,
   return t_y + (m_q1 * m_q2) * (t_y - t_yd) + (m_q1 + m_q2) * t_v / t_zeta;
 }
 
-double ComCtrlY::computeDesZmpPos(const zVec3D& t_ref_com_position,
-                                  const zVec3D& t_com_position,
-                                  const zVec3D& t_com_veocity,
+double ComCtrlY::computeDesZmpPos(const Vec3D& t_ref_com_position,
+                                  const Vec3D& t_com_position,
+                                  const Vec3D& t_com_veocity,
                                   double t_zeta) const noexcept {
-  return computeDesZmpPos(zVec3DElem(&t_ref_com_position, zY),
-                          zVec3DElem(&t_com_position, zY),
-                          zVec3DElem(&t_com_veocity, zY), t_zeta);
+  return computeDesZmpPos(t_ref_com_position.y(), t_com_position.y(),
+                          t_com_veocity.y(), t_zeta);
 }
 
 }  // namespace holon

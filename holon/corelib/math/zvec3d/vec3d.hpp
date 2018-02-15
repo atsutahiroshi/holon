@@ -36,10 +36,10 @@ class Vec3D {
 
   // special member functions
   virtual ~Vec3D() noexcept = default;
-  Vec3D(const Vec3D& other) = default;
-  Vec3D(Vec3D&& other) noexcept = default;
-  Vec3D& operator=(const Vec3D& other) = default;
-  Vec3D& operator=(Vec3D&& other) noexcept = default;
+  Vec3D(const Vec3D&) = default;
+  Vec3D(Vec3D&&) noexcept = default;
+  Vec3D& operator=(const Vec3D&) = default;
+  Vec3D& operator=(Vec3D&&) noexcept = default;
 
   // operators
   double& operator[](std::size_t idx) { return m_v.e[idx]; }

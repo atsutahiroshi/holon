@@ -146,7 +146,7 @@ TEST_CASE("zVec3DWrap::Vec3D: clone the object which has opposite values",
   CHECK(b[2] == -a[2]);
 }
 
-TEST_CASE("zVec3DWrap::Vec3D: clear the elements") {
+TEST_CASE("zVec3DWrap::Vec3D: clear the elements", "[corelib][math][Vec3D]") {
   Vec3D a;
   Fuzzer fuzz;
   fuzz.randomize(a);

@@ -20,6 +20,9 @@
 
 #include "holon/corelib/math/zvec3dwrap/vec3d.hpp"
 
+#include <iomanip>
+#include <sstream>
+#include <string>
 #include <utility>
 #include "catch.hpp"
 #include "holon/test/util/catch/custom_matchers.hpp"
@@ -151,7 +154,67 @@ TEST_CASE("zVec3DWrap::Vec3D: clear the elements", "[corelib][math][Vec3D]") {
   Fuzzer fuzz;
   fuzz.randomize(a);
   a.clear();
-  CHECK_THAT(a, Equals(Vec3D(0, 0, 0)));
+  CHECK_THAT(a, Equals(kVec3DZero));
+}
+
+TEST_CASE("zVecDWrap::Vec3D: make string") {
+  SECTION("case1") {
+    Vec3D a(1, 2, 3);
+    CHECK_THAT(a.str(), Equals(std::string("( 1, 2, 3 )")));
+  }
+  SECTION("case2") {
+    Vec3D a(0.1, 0.2, 0.3);
+    CHECK_THAT(a.str(), Equals(std::string("( 0.1, 0.2, 0.3 )")));
+  }
+}
+
+TEST_CASE("zVecDWrap::Vec3D: make string for data") {
+  SECTION("case1") {
+    Vec3D a(1, 2, 3);
+    std::string s("1.0000000000e+00 2.0000000000e+00 3.0000000000e+00");
+    CHECK_THAT(a.data(), Equals(s));
+  }
+  SECTION("case2") {
+    Vec3D a(0.1, 0.2, 0.3);
+    std::string s("1.0000000000e-01 2.0000000000e-01 3.0000000000e-01");
+    CHECK_THAT(a.data(), Equals(s));
+  }
+  SECTION("case3") {
+    Vec3D a(10, 20, 30);
+    std::string s("1.0000000000e+01, 2.0000000000e+01, 3.0000000000e+01");
+    CHECK_THAT(a.data(", "), Equals(s));
+  }
+  SECTION("case4") {
+    Vec3D a(0.1, 0.2, 0.3);
+    std::string s("1.0000e-01 2.0000e-01 3.0000e-01");
+    CHECK_THAT(a.data(4), Equals(s));
+  }
+  SECTION("case5") {
+    Vec3D a(0.1, 0.2, 0.3);
+    std::string s("1.00e-01,2.00e-01,3.00e-01");
+    CHECK_THAT(a.data(",", 2), Equals(s));
+  }
+}
+
+TEST_CASE("zVecDWrap::Vec3D: insertion to stream") {
+  SECTION("case1") {
+    Vec3D a(1, 2, 3);
+    std::stringstream ss;
+    ss << a;
+    CHECK_THAT(ss.str(), Equals(std::string("( 1, 2, 3 )")));
+  }
+  SECTION("case2") {
+    Vec3D a(0.1, 0.2, 0.3);
+    std::stringstream ss;
+    ss << a;
+    CHECK_THAT(ss.str(), Equals(std::string("( 0.1, 0.2, 0.3 )")));
+  }
+  SECTION("case3") {
+    Vec3D a(0.1, 0.2, 0.3);
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(4) << a;
+    CHECK_THAT(ss.str(), Equals(std::string("( 0.1000, 0.2000, 0.3000 )")));
+  }
 }
 
 TEST_CASE("zVec3DWrap::Vec3D: unary plus operator", "[corelib][math][Vec3D]") {

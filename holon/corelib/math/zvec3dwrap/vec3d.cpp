@@ -20,6 +20,10 @@
 
 #include "holon/corelib/math/zvec3dwrap/vec3d.hpp"
 
+#include <iomanip>
+#include <sstream>
+#include <string>
+
 namespace holon {
 namespace zVec3DWrap {
 
@@ -44,6 +48,21 @@ Vec3D& Vec3D::set_z(double t_z) {
 }
 
 Vec3D Vec3D::opposite() const { return Vec3D(-m_v.e[0], -m_v.e[1], -m_v.e[2]); }
+
+std::string Vec3D::str() const {
+  std::stringstream ss;
+  ss << "( ";
+  ss << x() << ", " << y() << ", " << z();
+  ss << " )";
+  return ss.str();
+}
+
+std::string Vec3D::data(const std::string& delim, int precision) const {
+  std::stringstream ss;
+  ss << std::scientific << std::setprecision(precision);
+  ss << x() << delim << y() << delim << z();
+  return ss.str();
+}
 
 Vec3D Vec3D::add(const Vec3D& rhs) const {
   return Vec3D(m_v.e[0] + rhs[0], m_v.e[1] + rhs[1], m_v.e[2] + rhs[2]);
@@ -74,5 +93,12 @@ Vec3D Vec3D::div(double rhs) const {
   return mul(rhs);
 }
 
-}  // namespace zvec3d
+std::ostream& operator<<(std::ostream& os, const Vec3D& v) {
+  os << "( ";
+  os << v[0] << ", " << v[1] << ", " << v[2];
+  os << " )";
+  return os;
+}
+
+}  // namespace zVec3DWrap
 }  // namespace holon

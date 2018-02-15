@@ -23,6 +23,8 @@
 
 #include <zeo/zeo_vec3d.h>
 #include <cstddef>
+#include <iostream>
+#include <string>
 
 namespace holon {
 namespace zVec3DWrap {
@@ -62,6 +64,11 @@ class Vec3D {
   Vec3D opposite() const;
   inline void clear() { zVec3DClear(&m_v); }
 
+  // functions to make string
+  std::string str() const;
+  std::string data(const std::string& delim = " ", int precision = 10) const;
+  inline std::string data(int precision) const { return data(" ", precision); }
+
   // arithmetic member functions
   Vec3D add(const Vec3D& rhs) const;
   Vec3D add(double rhs) const;
@@ -90,6 +97,9 @@ class Vec3D {
 inline Vec3D operator+(double lhs, const Vec3D& rhs) { return rhs.add(lhs); }
 inline Vec3D operator-(double lhs, const Vec3D& rhs) { return -rhs.sub(lhs); }
 inline Vec3D operator*(double lhs, const Vec3D& rhs) { return rhs.mul(lhs); }
+
+// stream insertion
+std::ostream& operator<<(std::ostream& os, const Vec3D& v);
 
 }  // namespace zvec3d
 }  // namespace holon

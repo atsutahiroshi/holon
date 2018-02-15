@@ -31,7 +31,7 @@ namespace {
 
 using Catch::Matchers::Equals;
 
-TEST_CASE("zvec3d::Vec3D: constructors", "[corelib][math][Vec3D]") {
+TEST_CASE("zVec3DWrap::Vec3D: constructors", "[corelib][math][Vec3D]") {
   Fuzzer fuzz;
 
   SECTION("default constructor should initialize with zeros") {
@@ -52,13 +52,14 @@ TEST_CASE("zvec3d::Vec3D: constructors", "[corelib][math][Vec3D]") {
   }
 }
 
-TEST_CASE("zvec3d::Vec3D: copy constructor", "[corelib][math][Vec3D]") {
+TEST_CASE("zVec3DWrap::Vec3D: copy constructor", "[corelib][math][Vec3D]") {
   Vec3D a(1.0, 2.0, 3.0);
   Vec3D b(a);
   CHECK_THAT(b, Equals(a));
 }
 
-TEST_CASE("zvec3d::Vec3D: copy assignment operator", "[corelib][math][Vec3D]") {
+TEST_CASE("zVec3DWrap::Vec3D: copy assignment operator",
+          "[corelib][math][Vec3D]") {
   Fuzzer fuzz;
   Vec3D a, b;
   a[0] = fuzz.get();
@@ -68,7 +69,7 @@ TEST_CASE("zvec3d::Vec3D: copy assignment operator", "[corelib][math][Vec3D]") {
   CHECK_THAT(b, Equals(a));
 }
 
-TEST_CASE("zvec3d::Vec3D: move constructor", "[corelib][math][Vec3D]") {
+TEST_CASE("zVec3DWrap::Vec3D: move constructor", "[corelib][math][Vec3D]") {
   Vec3D a1(2, 3, 4);
   Vec3D a2(2, 3, 4);
 
@@ -80,7 +81,8 @@ TEST_CASE("zvec3d::Vec3D: move constructor", "[corelib][math][Vec3D]") {
   CHECK_THAT(c, Equals(a2));
 }
 
-TEST_CASE("zvec3d::Vec3D: move assignment operator", "[corelib][math][Vec3D]") {
+TEST_CASE("zVec3DWrap::Vec3D: move assignment operator",
+          "[corelib][math][Vec3D]") {
   Vec3D a1(3, 4, 5);
   Vec3D a2(3, 4, 5);
   Vec3D b, c;
@@ -93,7 +95,7 @@ TEST_CASE("zvec3d::Vec3D: move assignment operator", "[corelib][math][Vec3D]") {
   CHECK_THAT(c, Equals(a2));
 }
 
-TEST_CASE("zvec3d::Vec3D: subscript operator", "[corelib][math][Vec3D]") {
+TEST_CASE("zVec3DWrap::Vec3D: subscript operator", "[corelib][math][Vec3D]") {
   Vec3D a;
   a[0] = 1.0;
   a[1] = 2.0;
@@ -103,7 +105,7 @@ TEST_CASE("zvec3d::Vec3D: subscript operator", "[corelib][math][Vec3D]") {
   CHECK(a[2] == 3.0);
 }
 
-TEST_CASE("zvec3d::Vec3D: accessors/mutators", "[corelib][math][Vec3D]") {
+TEST_CASE("zVec3DWrap::Vec3D: accessors/mutators", "[corelib][math][Vec3D]") {
   SECTION("x, y, z") {
     Vec3D a;
     Fuzzer fuzz;
@@ -119,12 +121,13 @@ TEST_CASE("zvec3d::Vec3D: accessors/mutators", "[corelib][math][Vec3D]") {
   }
 }
 
-TEST_CASE("zvec3d::Vec3D: function size returns 3", "[corelib][math][Vec3D]") {
+TEST_CASE("zVec3DWrap::Vec3D: function size returns 3",
+          "[corelib][math][Vec3D]") {
   Vec3D a;
   CHECK(a.size() == 3);
 }
 
-TEST_CASE("vec3d::Vec3D: clone the object", "[corelib][math][Vec3D]") {
+TEST_CASE("zVec3DWrap::Vec3D: clone the object", "[corelib][math][Vec3D]") {
   Vec3D a, b;
   Fuzzer fuzz;
   fuzz.randomize(a);
@@ -132,7 +135,7 @@ TEST_CASE("vec3d::Vec3D: clone the object", "[corelib][math][Vec3D]") {
   CHECK_THAT(b, Equals(a));
 }
 
-TEST_CASE("vec3d::Vec3D: clone the object which has opposite values",
+TEST_CASE("zVec3DWrap::Vec3D: clone the object which has opposite values",
           "[corelib][math][Vec3D]") {
   Vec3D a, b;
   Fuzzer fuzz;
@@ -143,7 +146,7 @@ TEST_CASE("vec3d::Vec3D: clone the object which has opposite values",
   CHECK(b[2] == -a[2]);
 }
 
-TEST_CASE("vec3d::Vec3D: clear the elements") {
+TEST_CASE("zVec3DWrap::Vec3D: clear the elements") {
   Vec3D a;
   Fuzzer fuzz;
   fuzz.randomize(a);
@@ -151,7 +154,7 @@ TEST_CASE("vec3d::Vec3D: clear the elements") {
   CHECK_THAT(a, Equals(Vec3D(0, 0, 0)));
 }
 
-TEST_CASE("zvec3d::Vec3D: unary plus operator", "[corelib][math][Vec3D]") {
+TEST_CASE("zVec3DWrap::Vec3D: unary plus operator", "[corelib][math][Vec3D]") {
   Vec3D a, b;
   Fuzzer fuzz;
   fuzz.randomize(a);
@@ -159,7 +162,7 @@ TEST_CASE("zvec3d::Vec3D: unary plus operator", "[corelib][math][Vec3D]") {
   CHECK_THAT(b, Equals(a));
 }
 
-TEST_CASE("zvec3d::Vec3D: unary minus operator", "[corelib][math][Vec3D]") {
+TEST_CASE("zVec3DWrap::Vec3D: unary minus operator", "[corelib][math][Vec3D]") {
   Vec3D a, b;
   Fuzzer fuzz;
   fuzz.randomize(a);
@@ -169,7 +172,7 @@ TEST_CASE("zvec3d::Vec3D: unary minus operator", "[corelib][math][Vec3D]") {
   CHECK(b[2] == -a[2]);
 }
 
-TEST_CASE("zvec3d::Vec3D: addition", "[corelib][math][Vec3D]") {
+TEST_CASE("zVec3DWrap::Vec3D: addition", "[corelib][math][Vec3D]") {
   SECTION("add Vec3D object by calling member function") {
     Vec3D a = {1, 2, 3};
     Vec3D b = {4, 5, 6};
@@ -242,7 +245,7 @@ TEST_CASE("zvec3d::Vec3D: addition", "[corelib][math][Vec3D]") {
   }
 }
 
-TEST_CASE("zvec3d::Vec3D: subtraction", "[corelib][math][Vec3D]") {
+TEST_CASE("zVec3DWrap::Vec3D: subtraction", "[corelib][math][Vec3D]") {
   SECTION("subtract Vec3D object by calling member function") {
     Vec3D a = {1, 2, 3};
     Vec3D b = {4, 5, 6};
@@ -315,7 +318,7 @@ TEST_CASE("zvec3d::Vec3D: subtraction", "[corelib][math][Vec3D]") {
   }
 }
 
-TEST_CASE("zvec3d::Vec3D: multiplication", "[corelib][math][Vec3D]") {
+TEST_CASE("zVec3DWrap::Vec3D: multiplication", "[corelib][math][Vec3D]") {
   SECTION("multiply scalar by calling member function") {
     Vec3D a = {1, 2, 3};
     double k = 4;
@@ -350,7 +353,7 @@ TEST_CASE("zvec3d::Vec3D: multiplication", "[corelib][math][Vec3D]") {
   }
 }
 
-TEST_CASE("zvec3d::Vec3D: division", "[corelib][math][Vec3D]") {
+TEST_CASE("zVec3DWrap::Vec3D: division", "[corelib][math][Vec3D]") {
   SECTION("div scalar by calling member function") {
     Vec3D a = {10, 20, 30};
     double k = 4;

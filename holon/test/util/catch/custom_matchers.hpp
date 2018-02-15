@@ -66,7 +66,7 @@ struct StringMaker<holon::Vec3D> {
 };
 
 namespace Matchers {
-namespace zvec3d {
+namespace Vector_zVec3D {
 
 class EqualsMatcher : public MatcherBase<zVec3D> {
  public:
@@ -89,10 +89,9 @@ class EqualsMatcher : public MatcherBase<zVec3D> {
   const zVec3D& m_comparator;
 };
 
-}  // namespace zvec3d
+}  // namespace Vector_zVec3D
 
-namespace vec3d {
-namespace zvec3d {
+namespace Vector_Vec3D {
 
 using holon::Vec3D;
 
@@ -118,15 +117,14 @@ class EqualsMatcher : public MatcherBase<Vec3D> {
   double m_epsilon;
 };
 
-}  // namespace zvec3d
-}  // namespace vec3d
+}  // namespace Vector_Vec3D
 
-inline zvec3d::EqualsMatcher Equals(const zVec3D& comparator) {
-  return zvec3d::EqualsMatcher(comparator);
+inline Vector_zVec3D::EqualsMatcher Equals(const zVec3D& comparator) {
+  return Vector_zVec3D::EqualsMatcher(comparator);
 }
 
-inline vec3d::zvec3d::EqualsMatcher Equals(const holon::Vec3D& comparator) {
-  return vec3d::zvec3d::EqualsMatcher(comparator);
+inline Vector_Vec3D::EqualsMatcher Equals(const holon::Vec3D& comparator) {
+  return Vector_Vec3D::EqualsMatcher(comparator);
 }
 
 }  // namespace Matchers

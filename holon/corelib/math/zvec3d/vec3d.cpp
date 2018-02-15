@@ -21,7 +21,6 @@
 #include "holon/corelib/math/zvec3d/vec3d.hpp"
 
 namespace holon {
-namespace math {
 namespace zvec3d {
 
 Vec3D::Vec3D() { zVec3DClear(&m_v); }
@@ -76,5 +75,4 @@ Vec3D Vec3D::div(double rhs) const {
 }
 
 }  // namespace zvec3d
-}  // namespace math
 }  // namespace holon

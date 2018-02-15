@@ -20,14 +20,12 @@
 
 #include "holon/corelib/math/zvec3d/vec3d.hpp"
 
+#include <utility>
 #include "catch.hpp"
 #include "holon/test/util/catch/custom_matchers.hpp"
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
-#include <utility>
-
 namespace holon {
-namespace math {
 namespace zvec3d {
 namespace {
 
@@ -379,5 +377,4 @@ TEST_CASE("zvec3d::Vec3D: division", "[corelib][math][Vec3D]") {
 
 }  // namespace
 }  // namespace zvec3d
-}  // namespace math
 }  // namespace holon

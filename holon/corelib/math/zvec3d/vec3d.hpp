@@ -25,7 +25,6 @@
 #include <cstddef>
 
 namespace holon {
-namespace math {
 namespace zvec3d {
 
 class Vec3D {
@@ -92,7 +91,6 @@ inline Vec3D operator-(double lhs, const Vec3D& rhs) { return -rhs.sub(lhs); }
 inline Vec3D operator*(double lhs, const Vec3D& rhs) { return rhs.mul(lhs); }
 
 }  // namespace zvec3d
-}  // namespace math
 }  // namespace holon
 
 #endif  // HOLON_MATH_ZVEC3D_VEC3D_HPP_

@@ -24,11 +24,9 @@
 #include "holon/corelib/math/zvec3d/vec3d.hpp"
 
 namespace holon {
-namespace math {
 
 using zvec3d::Vec3D;
 
-}  // namespace math
 }  // namespace holon
 
 #endif  // HOLON_MATH_VEC3D_HPP_

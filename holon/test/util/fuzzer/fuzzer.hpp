@@ -47,7 +47,7 @@ class Fuzzer {
 
   inline double get() { return m_distribution(m_engine); }
   zVec3D randomize(zVec3D& v);
-  math::Vec3D randomize(math::Vec3D& v);
+  Vec3D randomize(Vec3D& v);
 
  private:
   std::random_device m_rd;

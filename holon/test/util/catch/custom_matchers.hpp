@@ -40,7 +40,7 @@ inline std::string stringify(const zVec3D& v) {
   return ss.str();
 }
 
-inline std::string stringfy(const holon::math::zvec3d::Vec3D& v) {
+inline std::string stringfy(const holon::zvec3d::Vec3D& v) {
   std::ostringstream ss;
   ss << "( ";
   ss << v.x() << ", " << v.y() << ", " << v.z();
@@ -58,8 +58,8 @@ struct StringMaker<zVec3D> {
 };
 
 template <>
-struct StringMaker<holon::math::zvec3d::Vec3D> {
-  static std::string convert(const holon::math::zvec3d::Vec3D& v) {
+struct StringMaker<holon::zvec3d::Vec3D> {
+  static std::string convert(const holon::zvec3d::Vec3D& v) {
     return ::Catch::Detail::stringify(v.get());
     // return ::Catch::Detail::stringify(v);
   }
@@ -94,7 +94,7 @@ class EqualsMatcher : public MatcherBase<zVec3D> {
 namespace vec3d {
 namespace zvec3d {
 
-using holon::math::zvec3d::Vec3D;
+using holon::zvec3d::Vec3D;
 
 class EqualsMatcher : public MatcherBase<Vec3D> {
  public:
@@ -126,7 +126,7 @@ inline zvec3d::EqualsMatcher Equals(const zVec3D& comparator) {
 }
 
 inline vec3d::zvec3d::EqualsMatcher Equals(
-    const holon::math::zvec3d::Vec3D& comparator) {
+    const holon::zvec3d::Vec3D& comparator) {
   return vec3d::zvec3d::EqualsMatcher(comparator);
 }
 

@@ -37,7 +37,6 @@ TEST_CASE("matchers for zVec3D", "[test][util][catch]") {
 
 }  // namespace
 
-namespace math {
 namespace {
 
 TEST_CASE("matchers for zvec3d::Vec3D", "[test][util][catch]") {
@@ -53,6 +52,5 @@ TEST_CASE("matchers for zvec3d::Vec3D", "[test][util][catch]") {
 }
 
 }  // namespace
-}  // namespace math
 
 }  // namespace holon

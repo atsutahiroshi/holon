@@ -92,7 +92,7 @@ TEST_CASE("randomize elements in Vec3D", "[test][util][fuzzer]") {
   Fuzzer fuzz;
 
   for (auto i = 0; i < 10; ++i) {
-    math::Vec3D v1, v2;
+    Vec3D v1, v2;
     fuzz.randomize(v1);
     fuzz.randomize(v2);
     REQUIRE_THAT(v1, !Equals(v2));

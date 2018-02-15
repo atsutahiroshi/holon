@@ -143,6 +143,14 @@ TEST_CASE("vec3d::Vec3D: clone the object which has opposite values",
   CHECK(b[2] == -a[2]);
 }
 
+TEST_CASE("vec3d::Vec3D: clear the elements") {
+  Vec3D a;
+  Fuzzer fuzz;
+  fuzz.randomize(a);
+  a.clear();
+  CHECK_THAT(a, Equals(Vec3D(0, 0, 0)));
+}
+
 TEST_CASE("zvec3d::Vec3D: unary plus operator", "[corelib][math][Vec3D]") {
   Vec3D a, b;
   Fuzzer fuzz;

@@ -60,6 +60,7 @@ class Vec3D {
   inline std::size_t size() const noexcept { return 3; }
   inline Vec3D clone() const { return Vec3D(*this); }
   Vec3D opposite() const;
+  inline void clear() { zVec3DClear(&m_v); }
 
   // arithmetic member functions
   Vec3D add(const Vec3D& rhs) const;

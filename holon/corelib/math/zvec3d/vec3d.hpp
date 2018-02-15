@@ -59,10 +59,37 @@ class Vec3D {
 
   // member functions
   inline std::size_t size() const noexcept { return 3; }
+  inline Vec3D clone() const { return Vec3D(*this); }
+  Vec3D opposite() const;
+
+  // arithmetic member functions
+  Vec3D add(const Vec3D& rhs) const;
+  Vec3D add(double rhs) const;
+  Vec3D sub(const Vec3D& rhs) const;
+  Vec3D sub(double rhs) const;
+  Vec3D mul(double rhs) const;
+  Vec3D div(double rhs) const;
+
+  // arithmetic unary operators
+  inline Vec3D operator+() const { return clone(); }
+  inline Vec3D operator-() const { return opposite(); }
+
+  // arithmetic binary operators
+  inline Vec3D operator+(const Vec3D& rhs) const { return add(rhs); }
+  inline Vec3D operator+(double rhs) const { return add(rhs); }
+  inline Vec3D operator-(const Vec3D& rhs) const { return sub(rhs); }
+  inline Vec3D operator-(double rhs) const { return sub(rhs); }
+  inline Vec3D operator*(double rhs) const { return mul(rhs); }
+  inline Vec3D operator/(double rhs) const { return div(rhs); }
 
  private:
   zVec3D m_v;
 };
+
+// non-member arithmetic operators
+inline Vec3D operator+(double lhs, const Vec3D& rhs) { return rhs.add(lhs); }
+inline Vec3D operator-(double lhs, const Vec3D& rhs) { return -rhs.sub(lhs); }
+inline Vec3D operator*(double lhs, const Vec3D& rhs) { return rhs.mul(lhs); }
 
 }  // namespace zvec3d
 }  // namespace math

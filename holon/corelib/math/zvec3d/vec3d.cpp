@@ -44,6 +44,37 @@ Vec3D& Vec3D::set_z(double t_z) {
   return *this;
 }
 
+Vec3D Vec3D::opposite() const { return Vec3D(-m_v.e[0], -m_v.e[1], -m_v.e[2]); }
+
+Vec3D Vec3D::add(const Vec3D& rhs) const {
+  return Vec3D(m_v.e[0] + rhs[0], m_v.e[1] + rhs[1], m_v.e[2] + rhs[2]);
+}
+
+Vec3D Vec3D::add(double rhs) const {
+  return Vec3D(m_v.e[0] + rhs, m_v.e[1] + rhs, m_v.e[2] + rhs);
+}
+
+Vec3D Vec3D::sub(const Vec3D& rhs) const {
+  return Vec3D(m_v.e[0] - rhs[0], m_v.e[1] - rhs[1], m_v.e[2] - rhs[2]);
+}
+
+Vec3D Vec3D::sub(double rhs) const {
+  return Vec3D(m_v.e[0] - rhs, m_v.e[1] - rhs, m_v.e[2] - rhs);
+}
+
+Vec3D Vec3D::mul(double rhs) const {
+  return Vec3D(m_v.e[0] * rhs, m_v.e[1] * rhs, m_v.e[2] * rhs);
+}
+
+Vec3D Vec3D::div(double rhs) const {
+  if (rhs == 0) {
+    ZRUNWARN("cannot divide by zero value");
+    return *this;
+  }
+  rhs = 1.0 / rhs;
+  return mul(rhs);
+}
+
 }  // namespace zvec3d
 }  // namespace math
 }  // namespace holon

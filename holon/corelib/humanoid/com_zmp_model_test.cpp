@@ -39,15 +39,14 @@ TEST_CASE("ComZmpModelData: constructor",
           "[corelib][humanoid][ComZmpModelData]") {
   double default_mass = 1;
   Vec3D default_com_position = {0, 0, 1};
-  Vec3D zero = {0, 0, 0};
 
   SECTION("default constructor (no parameters)") {
     ComZmpModelData data;
     CHECK(data.mass() == default_mass);
     CHECK_THAT(data.com_position(), Equals(default_com_position));
-    CHECK_THAT(data.com_velocity(), Equals(zero));
-    CHECK_THAT(data.com_acceleration(), Equals(zero));
-    CHECK_THAT(data.zmp_position(), Equals(zero));
+    CHECK_THAT(data.com_velocity(), Equals(kVec3DZero));
+    CHECK_THAT(data.com_acceleration(), Equals(kVec3DZero));
+    CHECK_THAT(data.zmp_position(), Equals(kVec3DZero));
   }
 
   SECTION("with parameters") {
@@ -57,9 +56,9 @@ TEST_CASE("ComZmpModelData: constructor",
       ComZmpModelData data(m);
       CHECK(data.mass() == m);
       CHECK_THAT(data.com_position(), Equals(default_com_position));
-      CHECK_THAT(data.com_velocity(), Equals(zero));
-      CHECK_THAT(data.com_acceleration(), Equals(zero));
-      CHECK_THAT(data.zmp_position(), Equals(zero));
+      CHECK_THAT(data.com_velocity(), Equals(kVec3DZero));
+      CHECK_THAT(data.com_acceleration(), Equals(kVec3DZero));
+      CHECK_THAT(data.zmp_position(), Equals(kVec3DZero));
     }
 
     SECTION("mass should be positive") {
@@ -200,7 +199,7 @@ TEST_CASE("ComZmpModelData can be reset by providing COM position",
 
       THEN("COM position should be that value and velocity should be zero") {
         CHECK_THAT(data.com_position(), Equals(p));
-        CHECK_THAT(data.com_velocity(), Equals(Vec3D(0, 0, 0)));
+        CHECK_THAT(data.com_velocity(), Equals(kVec3DZero));
       }
     }
   }
@@ -210,15 +209,14 @@ TEST_CASE("ComZmpModelData can be reset by providing COM position",
 TEST_CASE("ComZmpModel: constructor", "[corelib][humanoid][ComZmpModel]") {
   double default_mass = 1;
   Vec3D default_com_position = {0, 0, 1};
-  Vec3D zero = {0, 0, 0};
 
   SECTION("default constructor (no parameters)") {
     ComZmpModel model;
     CHECK(model.mass() == default_mass);
     CHECK_THAT(model.com_position(), Equals(default_com_position));
-    CHECK_THAT(model.com_velocity(), Equals(zero));
-    CHECK_THAT(model.com_acceleration(), Equals(zero));
-    CHECK_THAT(model.zmp_position(), Equals(zero));
+    CHECK_THAT(model.com_velocity(), Equals(kVec3DZero));
+    CHECK_THAT(model.com_acceleration(), Equals(kVec3DZero));
+    CHECK_THAT(model.zmp_position(), Equals(kVec3DZero));
   }
 
   SECTION("with parameters") {
@@ -228,9 +226,9 @@ TEST_CASE("ComZmpModel: constructor", "[corelib][humanoid][ComZmpModel]") {
       ComZmpModel model(m);
       CHECK(model.mass() == m);
       CHECK_THAT(model.com_position(), Equals(default_com_position));
-      CHECK_THAT(model.com_velocity(), Equals(zero));
-      CHECK_THAT(model.com_acceleration(), Equals(zero));
-      CHECK_THAT(model.zmp_position(), Equals(zero));
+      CHECK_THAT(model.com_velocity(), Equals(kVec3DZero));
+      CHECK_THAT(model.com_acceleration(), Equals(kVec3DZero));
+      CHECK_THAT(model.zmp_position(), Equals(kVec3DZero));
     }
 
     SECTION("mass should be positive") {
@@ -413,7 +411,7 @@ SCENARIO("reset COM position", "[corelib][humanoid]") {
 
       THEN("COM position should be that value and velocity should be zero") {
         CHECK_THAT(model.com_position(), Equals(p));
-        CHECK_THAT(model.com_velocity(), Equals(Vec3D(0, 0, 0)));
+        CHECK_THAT(model.com_velocity(), Equals(kVec3DZero));
       }
     }
   }

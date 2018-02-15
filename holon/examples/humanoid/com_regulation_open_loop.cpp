@@ -34,14 +34,10 @@ int main() {
   while (t < T) {
     ctrl.set_cmd_com_position(cmd_com_pos);
     ctrl.update(DT);
-    holon::Vec3D pos = ctrl.model().com_position();
-    holon::Vec3D vel = ctrl.model().com_velocity();
-    holon::Vec3D zmp = ctrl.model().zmp_position();
     std::cout << t << " ";
-    std::cout << pos.x() << " " << pos.y() << " " << pos.z() << " " << vel.x()
-              << " " << vel.y() << " " << vel.z() << " " << zmp.x() << " "
-              << zmp.y() << " " << zmp.z() << " "
-              << "\n";
+    std::cout << ctrl.model().com_position().data() << " ";
+    std::cout << ctrl.model().com_velocity().data() << " ";
+    std::cout << ctrl.model().zmp_position().data() << "\n";
     t += ctrl.time_step();
   }
   return 0;

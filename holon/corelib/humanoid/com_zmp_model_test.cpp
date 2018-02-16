@@ -48,6 +48,7 @@ TEST_CASE("ComZmpModelData: constructor",
     CHECK_THAT(data.com_velocity(), Equals(kVec3DZero));
     CHECK_THAT(data.com_acceleration(), Equals(kVec3DZero));
     CHECK_THAT(data.zmp_position(), Equals(kVec3DZero));
+    CHECK_THAT(data.reaction_force(), Equals(Vec3D(0, 0, G)));
     CHECK_THAT(data.external_force(), Equals(kVec3DZero));
   }
 
@@ -62,6 +63,7 @@ TEST_CASE("ComZmpModelData: constructor",
       CHECK_THAT(data.com_velocity(), Equals(kVec3DZero));
       CHECK_THAT(data.com_acceleration(), Equals(kVec3DZero));
       CHECK_THAT(data.zmp_position(), Equals(kVec3DZero));
+      CHECK_THAT(data.reaction_force(), Equals(Vec3D(0, 0, m * G)));
       CHECK_THAT(data.external_force(), Equals(kVec3DZero));
     }
 
@@ -184,6 +186,15 @@ TEST_CASE("ComZmpModelData: accessors/mutators",
     CHECK_THAT(data.zmp_position(), Equals(v));
   }
 
+  SECTION("Reaction force") {
+    ComZmpModelData data;
+    Vec3D v;
+    fuzz.randomize(v);
+    REQUIRE_THAT(data.reaction_force(), !Equals(v));
+    data.set_reaction_force(v);
+    CHECK_THAT(data.reaction_force(), Equals(v));
+  }
+
   SECTION("External force") {
     ComZmpModelData data;
     Vec3D v;
@@ -231,6 +242,7 @@ TEST_CASE("ComZmpModel: constructor", "[corelib][humanoid][ComZmpModel]") {
     CHECK_THAT(model.com_velocity(), Equals(kVec3DZero));
     CHECK_THAT(model.com_acceleration(), Equals(kVec3DZero));
     CHECK_THAT(model.zmp_position(), Equals(kVec3DZero));
+    CHECK_THAT(model.reaction_force(), Equals(Vec3D(0, 0, G)));
     CHECK_THAT(model.external_force(), Equals(kVec3DZero));
   }
 
@@ -245,6 +257,7 @@ TEST_CASE("ComZmpModel: constructor", "[corelib][humanoid][ComZmpModel]") {
       CHECK_THAT(model.com_velocity(), Equals(kVec3DZero));
       CHECK_THAT(model.com_acceleration(), Equals(kVec3DZero));
       CHECK_THAT(model.zmp_position(), Equals(kVec3DZero));
+      CHECK_THAT(model.reaction_force(), Equals(Vec3D(0, 0, m * G)));
       CHECK_THAT(model.external_force(), Equals(kVec3DZero));
     }
 
@@ -316,7 +329,16 @@ TEST_CASE("ComZmpModel: accessors/mutators",
     CHECK_THAT(model.zmp_position(), Equals(v));
   }
 
-  SECTION("ZMP position") {
+  SECTION("Reaction force") {
+    ComZmpModel model;
+    Vec3D v;
+    fuzz.randomize(v);
+    REQUIRE_THAT(model.reaction_force(), !Equals(v));
+    model.set_reaction_force(v);
+    CHECK_THAT(model.reaction_force(), Equals(v));
+  }
+
+  SECTION("External force") {
     ComZmpModel model;
     Vec3D v;
     fuzz.randomize(v);

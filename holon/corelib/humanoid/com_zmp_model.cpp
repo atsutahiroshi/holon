@@ -34,7 +34,9 @@ ComZmpModelData::ComZmpModelData()
       m_com_position(default_com_position),
       m_com_velocity(kVec3DZero),
       m_com_acceleration(kVec3DZero),
-      m_zmp_position(kVec3DZero) {}
+      m_zmp_position(kVec3DZero),
+      m_reaction_force(0, 0, default_mass * RK_G),
+      m_external_force(kVec3DZero) {}
 
 ComZmpModelData::ComZmpModelData(double t_mass)
     : m_mass(default_mass),
@@ -42,8 +44,11 @@ ComZmpModelData::ComZmpModelData(double t_mass)
       m_com_position(default_com_position),
       m_com_velocity(kVec3DZero),
       m_com_acceleration(kVec3DZero),
-      m_zmp_position(kVec3DZero) {
+      m_zmp_position(kVec3DZero),
+      m_reaction_force(0, 0, default_mass * RK_G),
+      m_external_force(kVec3DZero) {
   set_mass(t_mass);
+  m_reaction_force.set_z(m_mass * RK_G);
 }
 
 ComZmpModelData& ComZmpModelData::set_mass(double t_mass) {
@@ -77,6 +82,12 @@ ComZmpModelData& ComZmpModelData::set_com_acceleration(
 ComZmpModelData& ComZmpModelData::set_zmp_position(
     const Vec3D& t_zmp_position) {
   m_zmp_position = t_zmp_position;
+  return *this;
+}
+
+ComZmpModelData& ComZmpModelData::set_reaction_force(
+    const Vec3D& t_reaction_force) {
+  m_reaction_force = t_reaction_force;
   return *this;
 }
 
@@ -120,6 +131,11 @@ ComZmpModel& ComZmpModel::set_com_acceleration(
 
 ComZmpModel& ComZmpModel::set_zmp_position(const Vec3D& t_zmp_position) {
   m_data.set_zmp_position(t_zmp_position);
+  return *this;
+}
+
+ComZmpModel& ComZmpModel::set_reaction_force(const Vec3D& t_reaction_force) {
+  m_data.set_reaction_force(t_reaction_force);
   return *this;
 }
 

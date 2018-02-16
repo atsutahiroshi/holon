@@ -49,6 +49,9 @@ class ComZmpModelData {
     return m_com_acceleration;
   }
   inline const Vec3D zmp_position() const noexcept { return m_zmp_position; }
+  inline const Vec3D reaction_force() const noexcept {
+    return m_reaction_force;
+  }
   inline const Vec3D external_force() const noexcept {
     return m_external_force;
   }
@@ -59,6 +62,7 @@ class ComZmpModelData {
   ComZmpModelData& set_com_velocity(const Vec3D& t_com_velocity);
   ComZmpModelData& set_com_acceleration(const Vec3D& t_com_acceleration);
   ComZmpModelData& set_zmp_position(const Vec3D& t_zmp_position);
+  ComZmpModelData& set_reaction_force(const Vec3D& t_reaction_force);
   ComZmpModelData& set_external_force(const Vec3D& t_external_force);
   ComZmpModelData& reset(const Vec3D& t_com_position);
 
@@ -69,6 +73,7 @@ class ComZmpModelData {
   Vec3D m_com_velocity;
   Vec3D m_com_acceleration;
   Vec3D m_zmp_position;
+  Vec3D m_reaction_force;
   Vec3D m_external_force;
 };
 
@@ -101,6 +106,9 @@ class ComZmpModel {
   inline const Vec3D zmp_position() const noexcept {
     return m_data.zmp_position();
   }
+  inline const Vec3D reaction_force() const noexcept {
+    return m_data.reaction_force();
+  }
   inline const Vec3D external_force() const noexcept {
     return m_data.external_force();
   }
@@ -112,6 +120,7 @@ class ComZmpModel {
   ComZmpModel& set_com_velocity(const Vec3D& t_com_velocity);
   ComZmpModel& set_com_acceleration(const Vec3D& t_com_acceleration);
   ComZmpModel& set_zmp_position(const Vec3D& t_zmp_position);
+  ComZmpModel& set_reaction_force(const Vec3D& t_reaction_force);
   ComZmpModel& set_external_force(const Vec3D& t_external_force);
   ComZmpModel& set_time_step(double t_time_step);
   ComZmpModel& reset(const Vec3D& t_com_position);

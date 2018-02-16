@@ -96,6 +96,10 @@ class Vec3D {
   Vec3D mul(double rhs) const;
   Vec3D div(double rhs) const;
 
+  // inner / outer product
+  double dot(const Vec3D& rhs) const;
+  Vec3D cross(const Vec3D& rhs) const;
+
   // arithmetic unary operators
   inline Vec3D operator+() const { return clone(); }
   inline Vec3D operator-() const { return opposite(); }

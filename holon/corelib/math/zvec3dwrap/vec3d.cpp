@@ -111,6 +111,20 @@ Vec3D Vec3D::div(double rhs) const {
   return mul(rhs);
 }
 
+double Vec3D::dot(const Vec3D& rhs) const {
+  double retval = 0;
+  for (std::size_t i = 0; i < size(); ++i) retval += (*this)[i] * rhs[i];
+  return retval;
+}
+
+Vec3D Vec3D::cross(const Vec3D& rhs) const {
+  double x_, y_, z_;
+  x_ = this->y() * rhs.z() - this->z() * rhs.y();
+  y_ = this->z() * rhs.x() - this->x() * rhs.z();
+  z_ = this->x() * rhs.y() - this->y() * rhs.x();
+  return Vec3D(x_, y_, z_);
+}
+
 Vec3D::iterator Vec3D::begin() {
   return Vec3DIterator<double>(const_cast<double*>(m_v.e));
 }

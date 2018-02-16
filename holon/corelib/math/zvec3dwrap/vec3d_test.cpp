@@ -501,6 +501,41 @@ TEST_CASE("zVec3DWrap::Vec3D: division", "[corelib][math][Vec3D]") {
   }
 }
 
+TEST_CASE("zVec3DWrap::Vec3D: inner product", "[corelib][math][Vec3D]") {
+  struct testcase_t {
+    Vec3D a, b;
+    double expect;
+  } testcases[] = {
+      {{1, 1, 1}, {1, 2, 3}, 6},
+      {{2, 1, 3}, {5, 9, 4}, 31},
+      {{1.1, 2.3, 3.5}, {10, 10, 10}, 69},
+  };
+
+  for (const auto& c : testcases) {
+    CHECK(c.a.dot(c.b) == c.expect);
+  }
+}
+
+TEST_CASE("zVec3DWrap::Vec3D: outer product", "[corelib][math][Vec3D]") {
+  struct testcase_t {
+    Vec3D a, b;
+    Vec3D expect;
+  } testcases[] = {
+      {{1, 2, 3}, {0, 0, 0}, {0, 0, 0}},
+      {{1, 2, 3}, {1, 2, 3}, {0, 0, 0}},
+      {{1, 2, 3}, {4, 8, 12}, {0, 0, 0}},
+      {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}},
+      {{1, 1, 1}, {0, 1, 0}, {-1, 0, 1}},
+      {{1, 2, 3}, {4, 5, 6}, {-3, 6, -3}},
+      {{4, 5, 6}, {1, 2, 3}, {3, -6, 3}},
+      {{1.5, 2.3, 3.6}, {10, 10, 10}, {-13, 21, -8}},
+  };
+
+  for (const auto& c : testcases) {
+    CHECK_THAT(c.a.cross(c.b), Equals(c.expect));
+  }
+}
+
 TEST_CASE("zVec3DWrap::Vec3D: loop with iterator", "[corelib][math][Vec3D]") {
   Vec3D a = {10, 20, 30};
   int cnt = 0;

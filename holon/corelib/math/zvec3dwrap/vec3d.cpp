@@ -93,6 +93,37 @@ Vec3D Vec3D::div(double rhs) const {
   return mul(rhs);
 }
 
+Vec3DIterator Vec3D::begin() const {
+  return Vec3DIterator(const_cast<double*>(m_v.e));
+}
+
+Vec3DIterator Vec3D::end() const {
+  return Vec3DIterator(const_cast<double*>(m_v.e + size()));
+}
+
+Vec3DIterator::Vec3DIterator(double* ptr) : m_ptr(ptr) {}
+
+double& Vec3DIterator::operator*() const { return *m_ptr; }
+
+Vec3DIterator& Vec3DIterator::operator++() {
+  ++m_ptr;
+  return *this;
+}
+
+Vec3DIterator Vec3DIterator::operator++(int) {
+  Vec3DIterator tmp = *this;
+  ++m_ptr;
+  return tmp;
+}
+
+bool Vec3DIterator::operator==(const Vec3DIterator& rhs) {
+  return m_ptr == rhs.m_ptr;
+}
+
+bool Vec3DIterator::operator!=(const Vec3DIterator& rhs) {
+  return !(*this == rhs);
+}
+
 std::ostream& operator<<(std::ostream& os, const Vec3D& v) {
   os << "( ";
   os << v[0] << ", " << v[1] << ", " << v[2];

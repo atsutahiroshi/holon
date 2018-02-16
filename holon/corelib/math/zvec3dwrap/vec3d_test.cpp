@@ -449,6 +449,48 @@ TEST_CASE("zVec3DWrap::Vec3D: division", "[corelib][math][Vec3D]") {
   }
 }
 
+TEST_CASE("zVec3DWrap::Vec3D: range-based loop", "[corelib][math][Vec3D]") {
+  SECTION("check value") {
+    Vec3D a = {1, 2, 3};
+    int cnt = 0;
+    for (auto&& e : a) {
+      CHECK(e == ++cnt);
+    }
+    CHECK(cnt == 3);
+  }
+
+  SECTION("modify value") {
+    Vec3D a = {1, 2, 3};
+    int cnt = 0;
+    for (auto&& e : a) {
+      e = e + 3;
+      CHECK(e == ++cnt + 3);
+    }
+    CHECK(cnt == 3);
+  }
+}
+
+TEST_CASE("zVec3DWrap::Vec3D: loop with iterator", "[corelib][math][Vec3D]") {
+  SECTION("check value") {
+    Vec3D a = {10, 20, 30};
+    int cnt = 0;
+    for (auto it = a.begin(); it != a.end(); ++it) {
+      CHECK(*it == 10.0 * ++cnt);
+    }
+    CHECK(cnt == 3);
+  }
+
+  SECTION("modify value") {
+    Vec3D a = {10, 20, 30};
+    int cnt = 0;
+    for (auto it = a.begin(); it != a.end(); ++it) {
+      *it = *it + 10;
+      CHECK(*it == 10.0 * ++cnt + 10);
+    }
+    CHECK(cnt == 3);
+  }
+}
+
 }  // namespace
-}  // namespace zvec3d
+}  // namespace zVec3DWrap
 }  // namespace holon

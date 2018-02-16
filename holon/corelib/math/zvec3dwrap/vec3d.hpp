@@ -24,10 +24,13 @@
 #include <zeo/zeo_vec3d.h>
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <string>
 
 namespace holon {
 namespace zVec3DWrap {
+
+class Vec3DIterator;
 
 class Vec3D {
  public:
@@ -89,8 +92,41 @@ class Vec3D {
   inline Vec3D operator*(double rhs) const { return mul(rhs); }
   inline Vec3D operator/(double rhs) const { return div(rhs); }
 
+  // member functions for iteration
+  Vec3DIterator begin() const;
+  Vec3DIterator end() const;
+
  private:
   zVec3D m_v;
+};
+
+// iterator for Vec3D
+class Vec3DIterator {
+ public:
+  // iterator traits
+  using iterator_category = std::forward_iterator_tag;
+  using value_type = double;
+  using difference_type = std::ptrdiff_t;
+  using pointer = double*;
+  using reference = double&;
+
+  // default constructible
+  Vec3DIterator() = default;
+  explicit Vec3DIterator(double* ptr);
+
+  // dereferenceable
+  double& operator*() const;
+
+  // pre- and post-incrementable
+  Vec3DIterator& operator++();
+  Vec3DIterator operator++(int);
+
+  // equality / inequality
+  bool operator==(const Vec3DIterator& rhs);
+  bool operator!=(const Vec3DIterator& rhs);
+
+ private:
+  double* m_ptr{nullptr};
 };
 
 // non-member arithmetic operators

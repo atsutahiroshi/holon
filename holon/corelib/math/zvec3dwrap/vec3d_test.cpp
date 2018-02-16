@@ -136,6 +136,11 @@ TEST_CASE("zVec3DWrap::Vec3D: clone the object", "[corelib][math][Vec3D]") {
   fuzz.randomize(a);
   b = a.clone();
   CHECK_THAT(b, Equals(a));
+
+  fuzz.randomize(a);
+  REQUIRE_THAT(b, !Equals(a));
+  b = +a;
+  CHECK_THAT(b, Equals(a));
 }
 
 TEST_CASE("zVec3DWrap::Vec3D: clone the object which has opposite values",
@@ -144,6 +149,15 @@ TEST_CASE("zVec3DWrap::Vec3D: clone the object which has opposite values",
   Fuzzer fuzz;
   fuzz.randomize(a);
   b = a.opposite();
+  CHECK(b[0] == -a[0]);
+  CHECK(b[1] == -a[1]);
+  CHECK(b[2] == -a[2]);
+
+  fuzz.randomize(a);
+  REQUIRE(b[0] != -a[0]);
+  REQUIRE(b[1] != -a[1]);
+  REQUIRE(b[2] != -a[2]);
+  b = -a;
   CHECK(b[0] == -a[0]);
   CHECK(b[1] == -a[1]);
   CHECK(b[2] == -a[2]);

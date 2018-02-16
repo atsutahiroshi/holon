@@ -1,5 +1,6 @@
 set(HOLON_BENCHMARK_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/com_ctrl_benchmark.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/vec3d_computation_benchmark.cpp
   )
 
 cmake_policy(PUSH)

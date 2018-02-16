@@ -47,6 +47,7 @@ TEST_CASE("ComZmpModelData: constructor",
     CHECK_THAT(data.com_velocity(), Equals(kVec3DZero));
     CHECK_THAT(data.com_acceleration(), Equals(kVec3DZero));
     CHECK_THAT(data.zmp_position(), Equals(kVec3DZero));
+    CHECK_THAT(data.external_force(), Equals(kVec3DZero));
   }
 
   SECTION("with parameters") {
@@ -59,6 +60,7 @@ TEST_CASE("ComZmpModelData: constructor",
       CHECK_THAT(data.com_velocity(), Equals(kVec3DZero));
       CHECK_THAT(data.com_acceleration(), Equals(kVec3DZero));
       CHECK_THAT(data.zmp_position(), Equals(kVec3DZero));
+      CHECK_THAT(data.external_force(), Equals(kVec3DZero));
     }
 
     SECTION("mass should be positive") {
@@ -179,6 +181,15 @@ TEST_CASE("ComZmpModelData: accessors/mutators",
     data.set_zmp_position(v);
     CHECK_THAT(data.zmp_position(), Equals(v));
   }
+
+  SECTION("External force") {
+    ComZmpModelData data;
+    Vec3D v;
+    fuzz.randomize(v);
+    REQUIRE_THAT(data.external_force(), !Equals(v));
+    data.set_external_force(v);
+    CHECK_THAT(data.external_force(), Equals(v));
+  }
 }
 
 TEST_CASE("ComZmpModelData can be reset by providing COM position",
@@ -217,6 +228,7 @@ TEST_CASE("ComZmpModel: constructor", "[corelib][humanoid][ComZmpModel]") {
     CHECK_THAT(model.com_velocity(), Equals(kVec3DZero));
     CHECK_THAT(model.com_acceleration(), Equals(kVec3DZero));
     CHECK_THAT(model.zmp_position(), Equals(kVec3DZero));
+    CHECK_THAT(model.external_force(), Equals(kVec3DZero));
   }
 
   SECTION("with parameters") {
@@ -229,6 +241,7 @@ TEST_CASE("ComZmpModel: constructor", "[corelib][humanoid][ComZmpModel]") {
       CHECK_THAT(model.com_velocity(), Equals(kVec3DZero));
       CHECK_THAT(model.com_acceleration(), Equals(kVec3DZero));
       CHECK_THAT(model.zmp_position(), Equals(kVec3DZero));
+      CHECK_THAT(model.external_force(), Equals(kVec3DZero));
     }
 
     SECTION("mass should be positive") {
@@ -298,6 +311,15 @@ TEST_CASE("ComZmpModel: accessors/mutators",
     model.set_zmp_position(v);
     CHECK_THAT(model.zmp_position(), Equals(v));
   }
+
+  SECTION("ZMP position") {
+    ComZmpModel model;
+    Vec3D v;
+    fuzz.randomize(v);
+    REQUIRE_THAT(model.external_force(), !Equals(v));
+    model.set_external_force(v);
+    CHECK_THAT(model.external_force(), Equals(v));
+  }
 }
 
 TEST_CASE("COM-ZMP model has a mass as a parameter", "[corelib][humanoid]") {
@@ -364,6 +386,10 @@ TEST_CASE("check if states in COM-ZMP model are initialized approapriately") {
   SECTION("ZMP position") {
     Vec3D expected_zmp_pos = {0, 0, 0};
     REQUIRE_THAT(model.zmp_position(), Equals(expected_zmp_pos));
+  }
+  SECTION("ZMP position") {
+    Vec3D expected_ext_force = {0, 0, 0};
+    REQUIRE_THAT(model.external_force(), Equals(expected_ext_force));
   }
 }
 

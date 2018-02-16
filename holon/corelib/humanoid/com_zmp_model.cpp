@@ -78,6 +78,12 @@ ComZmpModelData& ComZmpModelData::set_zmp_position(
   return *this;
 }
 
+ComZmpModelData& ComZmpModelData::set_external_force(
+    const Vec3D& t_external_force) {
+  m_external_force = t_external_force;
+  return *this;
+}
+
 ComZmpModelData& ComZmpModelData::reset(const Vec3D& t_com_position) {
   m_com_position = t_com_position;
   m_com_velocity.clear();
@@ -115,6 +121,11 @@ ComZmpModel& ComZmpModel::set_zmp_position(const Vec3D& t_zmp_position) {
   return *this;
 }
 
+ComZmpModel& ComZmpModel::set_external_force(const Vec3D& t_external_force) {
+  m_data.set_external_force(t_external_force);
+  return *this;
+}
+
 ComZmpModel& ComZmpModel::set_time_step(double t_time_step) {
   if (zIsTiny(t_time_step) || t_time_step < 0) {
     ZRUNERROR("step time must be positive value (given: %f)", t_time_step);
@@ -137,13 +148,6 @@ double ComZmpModel::computeSqrZeta(const Vec3D& t_com_position) const {
     return 0.0;
   }
   return RK_G / t_com_position.z();
-  // if (zIsTiny(Vec3DElem(&t_com_position, zZ)) ||
-  //     Vec3DElem(&t_com_position, zZ) < 0) {
-  //   ZRUNERROR("The COM height must be positive. (given: %f)",
-  //             Vec3DElem(&t_com_position, zZ));
-  //   return 0.0;
-  // }
-  // return RK_G / Vec3DElem(&t_com_position, zZ);
 }
 
 double ComZmpModel::computeZeta(const Vec3D& t_com_position) const {

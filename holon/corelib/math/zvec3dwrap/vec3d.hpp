@@ -30,6 +30,7 @@
 namespace holon {
 namespace zVec3DWrap {
 
+template <typename T>
 class Vec3DIterator;
 
 class Vec3D {
@@ -92,41 +93,55 @@ class Vec3D {
   inline Vec3D operator*(double rhs) const { return mul(rhs); }
   inline Vec3D operator/(double rhs) const { return div(rhs); }
 
-  // member functions for iteration
-  Vec3DIterator begin() const;
-  Vec3DIterator end() const;
+  // iterators
+  using iterator = Vec3DIterator<double>;
+  using const_iterator = Vec3DIterator<const double>;
+  iterator begin();
+  iterator end();
+  const_iterator begin() const;
+  const_iterator end() const;
+  const_iterator cbegin() const;
+  const_iterator cend() const;
 
  private:
   zVec3D m_v;
 };
 
 // iterator for Vec3D
+template <typename T>
 class Vec3DIterator {
  public:
   // iterator traits
   using iterator_category = std::forward_iterator_tag;
-  using value_type = double;
+  using value_type = T;
   using difference_type = std::ptrdiff_t;
-  using pointer = double*;
-  using reference = double&;
+  using pointer = T*;
+  using reference = T&;
 
   // default constructible
   Vec3DIterator() = default;
-  explicit Vec3DIterator(double* ptr);
+  explicit Vec3DIterator(pointer ptr) : m_ptr(ptr) {}
 
   // dereferenceable
-  double& operator*() const;
+  reference operator*() const { return *m_ptr; }
 
   // pre- and post-incrementable
-  Vec3DIterator& operator++();
-  Vec3DIterator operator++(int);
+  Vec3DIterator& operator++() {
+    ++m_ptr;
+    return *this;
+  }
+  Vec3DIterator operator++(int) {
+    Vec3DIterator tmp = *this;
+    ++m_ptr;
+    return tmp;
+  }
 
   // equality / inequality
-  bool operator==(const Vec3DIterator& rhs);
-  bool operator!=(const Vec3DIterator& rhs);
+  bool operator==(const Vec3DIterator& rhs) { return m_ptr == rhs.m_ptr; }
+  bool operator!=(const Vec3DIterator& rhs) { return !(*this == rhs); }
 
  private:
-  double* m_ptr{nullptr};
+  pointer m_ptr{nullptr};
 };
 
 // non-member arithmetic operators

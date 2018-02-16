@@ -93,35 +93,28 @@ Vec3D Vec3D::div(double rhs) const {
   return mul(rhs);
 }
 
-Vec3DIterator Vec3D::begin() const {
-  return Vec3DIterator(const_cast<double*>(m_v.e));
+Vec3D::iterator Vec3D::begin() {
+  return Vec3DIterator<double>(const_cast<double*>(m_v.e));
 }
 
-Vec3DIterator Vec3D::end() const {
-  return Vec3DIterator(const_cast<double*>(m_v.e + size()));
+Vec3D::iterator Vec3D::end() {
+  return Vec3DIterator<double>(const_cast<double*>(m_v.e + size()));
 }
 
-Vec3DIterator::Vec3DIterator(double* ptr) : m_ptr(ptr) {}
-
-double& Vec3DIterator::operator*() const { return *m_ptr; }
-
-Vec3DIterator& Vec3DIterator::operator++() {
-  ++m_ptr;
-  return *this;
+Vec3D::const_iterator Vec3D::begin() const {
+  return Vec3DIterator<const double>(const_cast<double*>(m_v.e));
 }
 
-Vec3DIterator Vec3DIterator::operator++(int) {
-  Vec3DIterator tmp = *this;
-  ++m_ptr;
-  return tmp;
+Vec3D::const_iterator Vec3D::end() const {
+  return Vec3DIterator<const double>(const_cast<double*>(m_v.e + size()));
 }
 
-bool Vec3DIterator::operator==(const Vec3DIterator& rhs) {
-  return m_ptr == rhs.m_ptr;
+Vec3D::const_iterator Vec3D::cbegin() const {
+  return Vec3DIterator<const double>(const_cast<double*>(m_v.e));
 }
 
-bool Vec3DIterator::operator!=(const Vec3DIterator& rhs) {
-  return !(*this == rhs);
+Vec3D::const_iterator Vec3D::cend() const {
+  return Vec3DIterator<const double>(const_cast<double*>(m_v.e + size()));
 }
 
 std::ostream& operator<<(std::ostream& os, const Vec3D& v) {

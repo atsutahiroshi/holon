@@ -70,18 +70,18 @@ class Vec3D {
   inline void clear() { zVec3DClear(&m_v); }
 
   // functions to investigate equality
-  bool match(const Vec3D& other);
-  bool equal(const Vec3D& other);
+  bool match(const Vec3D& rhs) const;
+  bool equal(const Vec3D& rhs) const;
 
   // check if it is tiny
-  bool istiny(double tol = zTOL);
+  bool istiny(double tol = zTOL) const;
 
 // TODO(*): remove this when <math.h> is completely eliminated
 #if defined(isnan)
 #undef isnan
 #endif
   // check if it includes NaN or Inf component
-  bool isnan();
+  bool isnan() const;
 
   // functions to make string
   std::string str() const;

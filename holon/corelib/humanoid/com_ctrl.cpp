@@ -42,7 +42,7 @@ ComCtrl& ComCtrl::set_cmd_com_position(const Vec3D& t_cmd_com_position) {
 }
 
 double ComCtrl::computeDesZetaSqr(const Vec3D& t_ref_com_position) const {
-  return m_model.computeZetaSqr(t_ref_com_position);
+  return m_model.computeSqrZeta(t_ref_com_position);
 }
 
 double ComCtrl::computeDesZeta(const Vec3D& t_ref_com_position) const {

@@ -130,7 +130,7 @@ ComZmpModel& ComZmpModel::reset(const Vec3D& t_com_position) {
   return *this;
 }
 
-double ComZmpModel::computeZetaSqr(const Vec3D& t_com_position) const {
+double ComZmpModel::computeSqrZeta(const Vec3D& t_com_position) const {
   if (t_com_position.z() == 0.0 || t_com_position.z() < 0.0) {
     ZRUNERROR("The COM height must be positive. (given: %g)",
               t_com_position.z());
@@ -147,25 +147,25 @@ double ComZmpModel::computeZetaSqr(const Vec3D& t_com_position) const {
 }
 
 double ComZmpModel::computeZeta(const Vec3D& t_com_position) const {
-  return sqrt(computeZetaSqr(t_com_position));
+  return sqrt(computeSqrZeta(t_com_position));
 }
 
 Vec3D ComZmpModel::computeComAcc(const Vec3D& t_com_position,
                                  const Vec3D& t_zmp_position) const {
   Vec3D g = {0, 0, RK_G};
-  double zeta2 = computeZetaSqr(t_com_position);
+  double zeta2 = computeSqrZeta(t_com_position);
   Vec3D com_acc;
   // TODO(*): remove const_cast when own math library is implemented
   com_acc = zeta2 * (t_com_position - t_zmp_position) - g;
   // Vec3DSub(const_cast<Vec3D*>(&t_com_position),
   //          const_cast<Vec3D*>(&t_zmp_position), &com_acc);
-  // Vec3DMulDRC(&com_acc, computeZetaSqr(t_com_position));
+  // Vec3DMulDRC(&com_acc, computeSqrZeta(t_com_position));
   // Vec3DSubDRC(&com_acc, &g);
   return com_acc;
 }
 
 bool ComZmpModel::update() {
-  if (zIsTiny(computeZetaSqr(com_position()))) return false;
+  if (zIsTiny(computeSqrZeta(com_position()))) return false;
   Vec3D acc = computeComAcc(com_position(), zmp_position());
   Vec3D pos = com_position() + time_step() * com_velocity();
   Vec3D vel = com_velocity() + time_step() * acc;

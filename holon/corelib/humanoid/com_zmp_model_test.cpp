@@ -460,7 +460,7 @@ TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",
 
     for (auto c : testcases) {
       Vec3D pg = {0, 0, c.com_height};
-      CHECK(model.computeZetaSqr(pg) == Approx(c.expected_zeta_squared));
+      CHECK(model.computeSqrZeta(pg) == Approx(c.expected_zeta_squared));
       CHECK(model.computeZeta(pg) == Approx(c.expected_zeta));
     }
   }
@@ -471,8 +471,8 @@ TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",
     // TODO(*): handle zero-division error correctly
     Vec3D pg = {0, 0, 0};
     zEchoOff();
-    CHECK_FALSE(zIsInf(model.computeZetaSqr(pg)));
-    CHECK(model.computeZetaSqr(pg) == 0.0);
+    CHECK_FALSE(zIsInf(model.computeSqrZeta(pg)));
+    CHECK(model.computeSqrZeta(pg) == 0.0);
     CHECK_FALSE(zIsInf(model.computeZeta(pg)));
     CHECK(model.computeZeta(pg) == 0.0);
     zEchoOn();
@@ -483,7 +483,7 @@ TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",
     // TODO(*): handle the case where a negative value is given
     Vec3D pg = {0, 0, -1};
     zEchoOff();
-    CHECK(model.computeZetaSqr(pg) == 0.0);
+    CHECK(model.computeSqrZeta(pg) == 0.0);
     CHECK_FALSE(zIsNan(model.computeZeta(pg)));
     CHECK(model.computeZeta(pg) == 0.0);
     zEchoOn();

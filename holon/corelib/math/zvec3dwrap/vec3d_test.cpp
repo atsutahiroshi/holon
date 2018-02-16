@@ -174,6 +174,12 @@ TEST_CASE("zVec3DWrap::Vec3D: investigate equality", "[corelib][math][Vec3D]") {
     CHECK(v.equal(b));
     CHECK_FALSE(v.equal(c));
   }
+
+  SECTION("check equal operator") {
+    CHECK(v == a);
+    CHECK(v == b);
+    CHECK(v != c);
+  }
 }
 
 TEST_CASE("zVecDWrap::Vec3D: check if Vec3D is tiny") {

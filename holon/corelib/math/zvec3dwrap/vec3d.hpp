@@ -108,6 +108,10 @@ class Vec3D {
   inline Vec3D operator*(double rhs) const { return mul(rhs); }
   inline Vec3D operator/(double rhs) const { return div(rhs); }
 
+  // relational operators
+  inline bool operator==(const Vec3D& rhs) const { return equal(rhs); }
+  inline bool operator!=(const Vec3D& rhs) const { return !(*this == rhs); }
+
   // iterators
   using iterator = Vec3DIterator<double>;
   using const_iterator = Vec3DIterator<const double>;

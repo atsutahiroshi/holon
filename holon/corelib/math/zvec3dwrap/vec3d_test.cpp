@@ -543,6 +543,17 @@ TEST_CASE("zVec3DWrap::Vec3D: range-based loop", "[corelib][math][Vec3D]") {
   }
 }
 
+TEST_CASE("zVecDWrap::Vec3D: calculate v1 added v2 multiplied by k") {
+  Vec3D v1 = {1, 2, 3};
+  Vec3D v2 = {4, 5, 6};
+  double k = 7;
+  CHECK_THAT(cat(v1, k, v2), Equals(Vec3D(29, 37, 45)));
+  v1 = {.1, .2, .3};
+  v2 = {.4, .5, .6};
+  k = .7;
+  CHECK_THAT(cat(v1, k, v2), Equals(Vec3D(0.38, 0.55, 0.72)));
+}
+
 }  // namespace
 }  // namespace zVec3DWrap
 }  // namespace holon

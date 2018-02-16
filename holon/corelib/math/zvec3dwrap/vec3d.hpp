@@ -168,6 +168,11 @@ inline Vec3D operator+(double lhs, const Vec3D& rhs) { return rhs.add(lhs); }
 inline Vec3D operator-(double lhs, const Vec3D& rhs) { return -rhs.sub(lhs); }
 inline Vec3D operator*(double lhs, const Vec3D& rhs) { return rhs.mul(lhs); }
 
+// non-member arithmetic functions
+inline Vec3D cat(const Vec3D& v1, double k, const Vec3D& v2) {
+  return v1 + k * v2;
+}
+
 // stream insertion
 std::ostream& operator<<(std::ostream& os, const Vec3D& v);
 

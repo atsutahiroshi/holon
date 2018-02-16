@@ -368,31 +368,6 @@ TEST_CASE("COM-ZMP model has a mass as a parameter", "[corelib][humanoid]") {
   }
 }
 
-TEST_CASE("check if states in COM-ZMP model are initialized approapriately") {
-  ComZmpModel model;
-
-  SECTION("COM position") {
-    Vec3D expected_com_pos = {0, 0, 1};
-    REQUIRE_THAT(model.com_position(), Equals(expected_com_pos));
-  }
-  SECTION("COM velocity") {
-    Vec3D expected_com_vel = {0, 0, 0};
-    REQUIRE_THAT(model.com_velocity(), Equals(expected_com_vel));
-  }
-  SECTION("COM acceleration") {
-    Vec3D expected_com_acc = {0, 0, 0};
-    REQUIRE_THAT(model.com_acceleration(), Equals(expected_com_acc));
-  }
-  SECTION("ZMP position") {
-    Vec3D expected_zmp_pos = {0, 0, 0};
-    REQUIRE_THAT(model.zmp_position(), Equals(expected_zmp_pos));
-  }
-  SECTION("ZMP position") {
-    Vec3D expected_ext_force = {0, 0, 0};
-    REQUIRE_THAT(model.external_force(), Equals(expected_ext_force));
-  }
-}
-
 TEST_CASE("check if you can set arbitrarly states", "[corelib][humanoid]") {
   ComZmpModel model;
   Fuzzer fuzz;

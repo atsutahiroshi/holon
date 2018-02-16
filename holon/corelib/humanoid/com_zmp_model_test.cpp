@@ -43,6 +43,7 @@ TEST_CASE("ComZmpModelData: constructor",
   SECTION("default constructor (no parameters)") {
     ComZmpModelData data;
     CHECK(data.mass() == default_mass);
+    CHECK_THAT(data.nu(), Equals(kVec3DZ));
     CHECK_THAT(data.com_position(), Equals(default_com_position));
     CHECK_THAT(data.com_velocity(), Equals(kVec3DZero));
     CHECK_THAT(data.com_acceleration(), Equals(kVec3DZero));
@@ -56,6 +57,7 @@ TEST_CASE("ComZmpModelData: constructor",
       double m = fuzz.get();
       ComZmpModelData data(m);
       CHECK(data.mass() == m);
+      CHECK_THAT(data.nu(), Equals(kVec3DZ));
       CHECK_THAT(data.com_position(), Equals(default_com_position));
       CHECK_THAT(data.com_velocity(), Equals(kVec3DZero));
       CHECK_THAT(data.com_acceleration(), Equals(kVec3DZero));
@@ -224,6 +226,7 @@ TEST_CASE("ComZmpModel: constructor", "[corelib][humanoid][ComZmpModel]") {
   SECTION("default constructor (no parameters)") {
     ComZmpModel model;
     CHECK(model.mass() == default_mass);
+    CHECK_THAT(model.nu(), Equals(kVec3DZ));
     CHECK_THAT(model.com_position(), Equals(default_com_position));
     CHECK_THAT(model.com_velocity(), Equals(kVec3DZero));
     CHECK_THAT(model.com_acceleration(), Equals(kVec3DZero));
@@ -237,6 +240,7 @@ TEST_CASE("ComZmpModel: constructor", "[corelib][humanoid][ComZmpModel]") {
       double m = fuzz.get();
       ComZmpModel model(m);
       CHECK(model.mass() == m);
+      CHECK_THAT(model.nu(), Equals(kVec3DZ));
       CHECK_THAT(model.com_position(), Equals(default_com_position));
       CHECK_THAT(model.com_velocity(), Equals(kVec3DZero));
       CHECK_THAT(model.com_acceleration(), Equals(kVec3DZero));

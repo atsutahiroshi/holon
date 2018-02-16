@@ -42,6 +42,7 @@ class ComZmpModelData {
 
   // accessors
   inline double mass() const noexcept { return m_mass; }
+  inline const Vec3D nu() const noexcept { return m_nu; }
   inline const Vec3D com_position() const noexcept { return m_com_position; }
   inline const Vec3D com_velocity() const noexcept { return m_com_velocity; }
   inline const Vec3D com_acceleration() const noexcept {
@@ -63,6 +64,7 @@ class ComZmpModelData {
 
  private:
   double m_mass;
+  Vec3D m_nu;
   Vec3D m_com_position;
   Vec3D m_com_velocity;
   Vec3D m_com_acceleration;
@@ -86,6 +88,7 @@ class ComZmpModel {
 
   // accessors
   inline double mass() const noexcept { return m_data.mass(); }
+  inline const Vec3D nu() const noexcept { return m_data.nu(); }
   inline const Vec3D com_position() const noexcept {
     return m_data.com_position();
   }

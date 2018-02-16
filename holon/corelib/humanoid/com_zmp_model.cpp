@@ -30,6 +30,7 @@ const Vec3D ComZmpModelData::default_com_position = {0.0, 0.0, 1.0};
 
 ComZmpModelData::ComZmpModelData()
     : m_mass(default_mass),
+      m_nu(kVec3DZ),
       m_com_position(default_com_position),
       m_com_velocity(0, 0, 0),
       m_com_acceleration(0, 0, 0),
@@ -37,6 +38,7 @@ ComZmpModelData::ComZmpModelData()
 
 ComZmpModelData::ComZmpModelData(double t_mass)
     : m_mass(default_mass),
+      m_nu(kVec3DZ),
       m_com_position(default_com_position),
       m_com_velocity(0, 0, 0),
       m_com_acceleration(0, 0, 0),

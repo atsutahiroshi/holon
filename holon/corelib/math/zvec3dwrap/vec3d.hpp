@@ -52,6 +52,7 @@ class Vec3D {
 
   // accessors
   inline zVec3D* get_ptr() noexcept { return &m_v; }
+  inline const zVec3D* get_ptr() const noexcept { return &m_v; }
   inline const zVec3D get() const noexcept { return m_v; }
   inline double x() const noexcept { return zVec3DElem(&m_v, zX); }
   inline double y() const noexcept { return zVec3DElem(&m_v, zY); }
@@ -67,6 +68,20 @@ class Vec3D {
   inline Vec3D clone() const { return Vec3D(*this); }
   Vec3D opposite() const;
   inline void clear() { zVec3DClear(&m_v); }
+
+  // functions to investigate equality
+  bool match(const Vec3D& other);
+  bool equal(const Vec3D& other);
+
+  // check if it is tiny
+  bool istiny(double tol = zTOL);
+
+// TODO(*): remove this when <math.h> is completely eliminated
+#if defined(isnan)
+#undef isnan
+#endif
+  // check if it includes NaN or Inf component
+  bool isnan();
 
   // functions to make string
   std::string str() const;

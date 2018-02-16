@@ -49,6 +49,18 @@ Vec3D& Vec3D::set_z(double t_z) {
 
 Vec3D Vec3D::opposite() const { return Vec3D(-m_v.e[0], -m_v.e[1], -m_v.e[2]); }
 
+bool Vec3D::match(const Vec3D& other) {
+  return zVec3DMatch(get_ptr(), const_cast<zVec3D*>(other.get_ptr()));
+}
+
+bool Vec3D::equal(const Vec3D& other) {
+  return zVec3DEqual(get_ptr(), const_cast<zVec3D*>(other.get_ptr()));
+}
+
+bool Vec3D::istiny(double tol) { return zVec3DIsTol(get_ptr(), tol); }
+
+bool Vec3D::isnan() { return zVec3DIsNan(get_ptr()); }
+
 std::string Vec3D::str() const {
   std::stringstream ss;
   ss << "( ";

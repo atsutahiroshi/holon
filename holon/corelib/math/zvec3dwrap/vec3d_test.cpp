@@ -157,6 +157,38 @@ TEST_CASE("zVec3DWrap::Vec3D: clear the elements", "[corelib][math][Vec3D]") {
   CHECK_THAT(a, Equals(kVec3DZero));
 }
 
+TEST_CASE("zVec3DWrap::Vec3D: investigate equality", "[corelib][math][Vec3D]") {
+  Vec3D v = {0.0, 0.1, 0.2};
+  Vec3D a = {0.0, 0.1, 0.2};                    // exactly the same as `v`
+  Vec3D b = {0.0, 0.1, 1 / sqrt(5) / sqrt(5)};  // almost the same as `v`
+  Vec3D c = {0.0, 1.0, 2.0};                    // totally different from `v`
+
+  SECTION("check if they match each other") {
+    CHECK(v.match(a));
+    CHECK_FALSE(v.match(b));
+    CHECK_FALSE(v.match(c));
+  }
+
+  SECTION("check if they are equivalent") {
+    CHECK(v.equal(a));
+    CHECK(v.equal(b));
+    CHECK_FALSE(v.equal(c));
+  }
+}
+
+TEST_CASE("zVecDWrap::Vec3D: check if Vec3D is tiny") {
+  Vec3D v = {1.0e-20, 1.0e-20, 1.0e-20};
+  CHECK(v.istiny());
+  CHECK_FALSE(v.istiny(1.0e-21));
+}
+
+TEST_CASE("zVecDWrap::Vec3D: check if Vec3D includes NaN") {
+  Vec3D v = {0, 0, NAN};
+  CHECK(v.isnan());
+  Vec3D w = {0, 0, INFINITY};
+  CHECK(v.isnan());
+}
+
 TEST_CASE("zVecDWrap::Vec3D: make string") {
   SECTION("case1") {
     Vec3D a(1, 2, 3);

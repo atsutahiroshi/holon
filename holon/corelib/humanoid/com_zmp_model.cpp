@@ -32,17 +32,17 @@ ComZmpModelData::ComZmpModelData()
     : m_mass(default_mass),
       m_nu(kVec3DZ),
       m_com_position(default_com_position),
-      m_com_velocity(0, 0, 0),
-      m_com_acceleration(0, 0, 0),
-      m_zmp_position(0, 0, 0) {}
+      m_com_velocity(kVec3DZero),
+      m_com_acceleration(kVec3DZero),
+      m_zmp_position(kVec3DZero) {}
 
 ComZmpModelData::ComZmpModelData(double t_mass)
     : m_mass(default_mass),
       m_nu(kVec3DZ),
       m_com_position(default_com_position),
-      m_com_velocity(0, 0, 0),
-      m_com_acceleration(0, 0, 0),
-      m_zmp_position(0, 0, 0) {
+      m_com_velocity(kVec3DZero),
+      m_com_acceleration(kVec3DZero),
+      m_zmp_position(kVec3DZero) {
   set_mass(t_mass);
 }
 

@@ -471,7 +471,7 @@ TEST_CASE("check if you can set/get step time", "[corelib][humanoid]") {
   }
 }
 
-TEST_CASE("compute zeta squared in equation of motion based on COM-ZMP model",
+TEST_CASE("compute squared zeta in equation of motion based on COM-ZMP model",
           "[corelib][humanoid]") {
   ComZmpModel model;
 

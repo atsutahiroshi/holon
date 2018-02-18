@@ -142,6 +142,20 @@ class ComZmpModel {
  private:
   ComZmpModelData m_data;
   double m_time_step;
+
+  bool isTimeStepValid(double t_time_step) const;
+  bool isMassValid(double t_mass) const;
+  bool isComZmpDiffValid(double t_com_position_z,
+                         double t_zmp_position_z) const;
+  bool isComZmpDiffValid(const Vec3D& t_com_position,
+                         const Vec3D& t_zmp_position,
+                         const Vec3D& t_nu = kVec3DZ) const;
+  bool isReactionForceValid(double t_reaction_force_z) const;
+  bool isReactionForceValid(const Vec3D& t_reaction_force,
+                            const Vec3D& t_nu = kVec3DZ) const;
+  bool isComAccelerationValid(double t_com_acceleration_z) const;
+  bool isComAccelerationValid(const Vec3D& t_com_acceleration,
+                              const Vec3D& t_nu = kVec3DZ) const;
 };
 
 }  // namespace holon

@@ -145,8 +145,7 @@ ComZmpModel& ComZmpModel::set_external_force(const Vec3D& t_external_force) {
 }
 
 ComZmpModel& ComZmpModel::set_time_step(double t_time_step) {
-  if (zIsTiny(t_time_step) || t_time_step < 0) {
-    ZRUNERROR("step time must be positive value (given: %f)", t_time_step);
+  if (!isTimeStepValid(t_time_step)) {
     m_time_step = default_time_step;
   } else {
     m_time_step = t_time_step;
@@ -162,37 +161,26 @@ ComZmpModel& ComZmpModel::reset(const Vec3D& t_com_position) {
 double ComZmpModel::computeSqrZeta(double t_com_position_z,
                                    double t_zmp_position_z,
                                    double t_com_acceleration_z) const {
+  if (!isComZmpDiffValid(t_com_position_z, t_zmp_position_z) ||
+      !isComAccelerationValid(t_com_acceleration_z)) {
+    return 0.0;
+  }
   double numer = t_com_acceleration_z + RK_G;
   double denom = t_com_position_z - t_zmp_position_z;
-  if (zIsTiny(denom) || denom < 0.0) {
-    ZRUNWARN("The COM must be above ZMP.");
-    return 0.0;
-  }
-  if (numer < 0.0) {
-    ZRUNWARN("The COM acceleration must be greater than -G");
-    return 0.0;
-  }
   return numer / denom;
 }
 
 double ComZmpModel::computeSqrZeta(double t_com_position_z,
                                    double t_zmp_position_z,
-                                   double t_reation_force_z,
+                                   double t_reaction_force_z,
                                    double t_mass) const {
-  double denom = t_com_position_z - t_zmp_position_z;
-  if (zIsTiny(denom) || denom < 0.0) {
-    ZRUNWARN("The COM must be above ZMP.");
+  if (!isMassValid(t_mass) ||
+      !isComZmpDiffValid(t_com_position_z, t_zmp_position_z) ||
+      !isReactionForceValid(t_reaction_force_z)) {
     return 0.0;
   }
-  if (t_reation_force_z < 0.0) {
-    ZRUNWARN("The reaction force must be positive.");
-    return 0.0;
-  }
-  if (t_mass < 0.0) {
-    ZRUNWARN("The mass must be positive.");
-    return 0.0;
-  }
-  return t_reation_force_z / (denom * t_mass);
+  double denom = (t_com_position_z - t_zmp_position_z) * t_mass;
+  return t_reaction_force_z / denom;
 }
 
 double ComZmpModel::computeSqrZeta(const Vec3D& t_com_position) const {
@@ -236,6 +224,91 @@ bool ComZmpModel::update() {
 bool ComZmpModel::update(double t_time_step) {
   set_time_step(t_time_step);
   return update();
+}
+
+bool ComZmpModel::isTimeStepValid(double t_time_step) const {
+  if (zIsTiny(t_time_step) || t_time_step < 0) {
+    ZRUNWARN("Time step must be positive (given: %g)", t_time_step);
+    return false;
+  }
+  return true;
+}
+
+bool ComZmpModel::isMassValid(double t_mass) const {
+  if (t_mass < 0.0) {
+    ZRUNWARN("The mass must be positive. (given mass = %g)", t_mass);
+    return false;
+  }
+  return true;
+}
+
+bool ComZmpModel::isComZmpDiffValid(double t_com_position_z,
+                                    double t_zmp_position_z) const {
+  double diff = t_com_position_z - t_zmp_position_z;
+  if (zIsTiny(diff) || diff < 0.0) {
+    ZRUNWARN("The COM must be above the terrain. (given z = %g, zz = %g)",
+             t_com_position_z, t_zmp_position_z);
+    return false;
+  }
+  return true;
+}
+
+bool ComZmpModel::isComZmpDiffValid(const Vec3D& t_com_position,
+                                    const Vec3D& t_zmp_position,
+                                    const Vec3D& t_nu) const {
+  double com_side = t_nu.dot(t_com_position - t_zmp_position);
+  if (zIsTiny(com_side) || com_side < 0.0) {
+    ZRUNWARN(
+        "The must be above the terrain. "
+        "(COM: %s, ZMP: %s, nu: %s)",
+        t_com_position.str().c_str(), t_zmp_position.str().c_str(),
+        t_nu.str().c_str());
+    return false;
+  }
+  return true;
+}
+
+bool ComZmpModel::isReactionForceValid(double t_reaction_force_z) const {
+  if (t_reaction_force_z < 0.0) {
+    ZRUNWARN("The reaction force must be positive. (given %g)",
+             t_reaction_force_z);
+    return false;
+  }
+  return true;
+}
+
+bool ComZmpModel::isReactionForceValid(const Vec3D& t_reaction_force,
+                                       const Vec3D& t_nu) const {
+  double react_force = t_nu.dot(t_reaction_force);
+  if (react_force < 0.0) {
+    ZRUNWARN(
+        "The reaction force must be positive. "
+        "(force: %s, nu: %s)",
+        t_reaction_force.str().c_str(), t_nu.str().c_str());
+    return false;
+  }
+  return true;
+}
+
+bool ComZmpModel::isComAccelerationValid(double t_com_acceleration_z) const {
+  if ((t_com_acceleration_z + RK_G) < 0.0) {
+    ZRUNWARN("The COM acceleration must be greater than -G. (given %g)",
+             t_com_acceleration_z);
+    return false;
+  }
+  return true;
+}
+
+bool ComZmpModel::isComAccelerationValid(const Vec3D& t_com_acceleration,
+                                         const Vec3D& t_nu) const {
+  Vec3D G(0, 0, RK_G);
+  double acc = t_nu.dot(t_com_acceleration + G);
+  if (acc < 0.0) {
+    ZRUNWARN("Cannot produce pulling force (COM acc: %s, nu: %s)",
+             t_com_acceleration.str().c_str(), t_nu.str().c_str());
+    return false;
+  }
+  return true;
 }
 
 }  // namespace holon

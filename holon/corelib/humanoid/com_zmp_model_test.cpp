@@ -471,6 +471,183 @@ TEST_CASE("check if you can set/get step time", "[corelib][humanoid]") {
   }
 }
 
+TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double)",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+
+  SECTION("various COM height, ZMP height and COM acc fixed to 0") {
+    double zz = 0;
+    double az = 0;
+    struct testcaset_t {
+      double z;
+      double expected_sqr_zeta;
+    } testcases[] = {{1, G}, {G, 1.0}, {2, G / 2}, {4, G / 4}};
+    for (const auto& c : testcases) {
+      INFO("z=" << c.z << ", zz=" << zz << ", az=" << az);
+      CHECK(model.computeSqrZeta(c.z, zz, az) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("various ZMP height, COM height = 2 and COM acc = 0") {
+    double z = 2;
+    double az = 0;
+    struct testcaset_t {
+      double zz;
+      double expected_sqr_zeta;
+    } testcases[] = {
+        {1, G}, {1.5, 2.0 * G}, {0.5, 2.0 * G / 3.0}, {-0.5, 2.0 * G / 5.0}};
+    for (const auto& c : testcases) {
+      INFO("z=" << z << ", zz=" << c.zz << ", az=" << az);
+      CHECK(model.computeSqrZeta(z, c.zz, az) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("various COM acceleration, COM height = 1.5 and ZMP height = 0.5") {
+    double z = 1.5;
+    double zz = 0.5;
+    struct testcaset_t {
+      double az;
+      double expected_sqr_zeta;
+    } testcases[] = {
+        {1, 1.0 + G}, {1.5, 1.5 + G}, {-1, -1.0 + G}, {G, 2.0 * G}};
+    for (const auto& c : testcases) {
+      INFO("z=" << z << ", zz=" << zz << ", az=" << c.az);
+      CHECK(model.computeSqrZeta(z, zz, c.az) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("return 0 when (z - zz) <= 0") {
+    double az = 0;
+    struct testcase_t {
+      double z;
+      double zz;
+      double expected_sqr_zeta;
+    } testcases[] = {{1, 1, 0}, {1, 2, 0}};
+    for (const auto& c : testcases) {
+      INFO("z=" << c.z << ", zz=" << c.zz << ", az=" << az);
+      CHECK(model.computeSqrZeta(c.z, c.zz, az) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("return 0 when (az + g) <= 0") {
+    double z = 1;
+    double zz = 0;
+    struct testcase_t {
+      double az;
+      double expected_sqr_zeta;
+    } testcases[] = {{-2.0 * G, 0}};
+    for (const auto& c : testcases) {
+      INFO("z=" << z << ", zz=" << zz << ", az=" << c.az);
+      CHECK(model.computeSqrZeta(z, zz, c.az) == c.expected_sqr_zeta);
+    }
+  }
+}
+
+TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double,double)",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+
+  SECTION("various COM height, fixed ZMP = 0, Fz = G, m = 1") {
+    double zz = 0;
+    double fz = G;
+    double m = 1;
+    struct testcaset_t {
+      double z;
+      double expected_sqr_zeta;
+    } testcases[] = {{1, G}, {G, 1.0}, {2, G / 2}, {4, G / 4}};
+    for (const auto& c : testcases) {
+      INFO("z=" << c.z << ", zz=" << zz << ", fz=" << fz << ", m=" << m);
+      CHECK(model.computeSqrZeta(c.z, zz, fz, m) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("various ZMP height, fixed COM = 2, Fz = G, m = 1") {
+    double z = 2;
+    double fz = G;
+    double m = 1;
+    struct testcaset_t {
+      double zz;
+      double expected_sqr_zeta;
+    } testcases[] = {
+        {1, G}, {1.5, 2.0 * G}, {0.5, 2.0 * G / 3.0}, {-0.5, 2.0 * G / 5.0}};
+    for (const auto& c : testcases) {
+      INFO("z=" << z << ", zz=" << c.zz << ", fz=" << fz << ", m=" << m);
+      CHECK(model.computeSqrZeta(z, c.zz, fz, m) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("various Fz, fixed COM = 2, ZMP = 1, m = 1") {
+    double z = 2;
+    double zz = 1;
+    double m = 1;
+    struct testcaset_t {
+      double fz;
+      double expected_sqr_zeta;
+    } testcases[] = {{1, 1}, {1.5, 1.5}, {0.5, 0.5}, {G, G}};
+    for (const auto& c : testcases) {
+      INFO("z=" << z << ", zz=" << zz << ", fz=" << c.fz << ", m=" << m);
+      CHECK(model.computeSqrZeta(z, zz, c.fz, m) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("various mass, fixed COM = 2, ZMP = 1, Fz = 2") {
+    double z = 2;
+    double zz = 1;
+    double fz = 2;
+    struct testcaset_t {
+      double m;
+      double expected_sqr_zeta;
+    } testcases[] = {{1, 2}, {2, 1}, {0.5, 4}, {1.5, 4.0 / 3}};
+    for (const auto& c : testcases) {
+      INFO("z=" << z << ", zz=" << zz << ", fz=" << fz << ", m=" << c.m);
+      CHECK(model.computeSqrZeta(z, zz, fz, c.m) ==
+            Approx(c.expected_sqr_zeta));
+    }
+  }
+
+  SECTION("return 0 when (z - zz) <= 0") {
+    double fz = 1;
+    double m = 1;
+    struct testcase_t {
+      double z;
+      double zz;
+      double expected_sqr_zeta;
+    } testcases[] = {{1, 1, 0}, {1, 2, 0}};
+    for (const auto& c : testcases) {
+      INFO("z=" << c.z << ", zz=" << c.zz << ", fz=" << fz << ", m=" << m);
+      CHECK(model.computeSqrZeta(c.z, c.zz, fz, m) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("return 0 when fz < 0") {
+    double z = 2;
+    double zz = 1;
+    double m = 1;
+    struct testcase_t {
+      double fz;
+      double expected_sqr_zeta;
+    } testcases[] = {{-1, 0}};
+    for (const auto& c : testcases) {
+      INFO("z=" << z << ", zz=" << zz << ", fz=" << c.fz << ", m=" << m);
+      CHECK(model.computeSqrZeta(z, zz, c.fz, m) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("return 0 when mass < 0") {
+    double z = 2;
+    double zz = 1;
+    double fz = 1;
+    struct testcase_t {
+      double m;
+      double expected_sqr_zeta;
+    } testcases[] = {{-1, 0}};
+    for (const auto& c : testcases) {
+      INFO("z=" << z << ", zz=" << zz << ", fz=" << fz << ", m=" << c.m);
+      CHECK(model.computeSqrZeta(z, zz, fz, c.m) == c.expected_sqr_zeta);
+    }
+  }
+}
+
 TEST_CASE("compute squared zeta in equation of motion based on COM-ZMP model",
           "[corelib][humanoid]") {
   ComZmpModel model;

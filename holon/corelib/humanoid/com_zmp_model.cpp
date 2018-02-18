@@ -159,6 +159,42 @@ ComZmpModel& ComZmpModel::reset(const Vec3D& t_com_position) {
   return *this;
 }
 
+double ComZmpModel::computeSqrZeta(double t_com_position_z,
+                                   double t_zmp_position_z,
+                                   double t_com_acceleration_z) const {
+  double numer = t_com_acceleration_z + RK_G;
+  double denom = t_com_position_z - t_zmp_position_z;
+  if (zIsTiny(denom) || denom < 0.0) {
+    ZRUNWARN("The COM must be above ZMP.");
+    return 0.0;
+  }
+  if (numer < 0.0) {
+    ZRUNWARN("The COM acceleration must be greater than -G");
+    return 0.0;
+  }
+  return numer / denom;
+}
+
+double ComZmpModel::computeSqrZeta(double t_com_position_z,
+                                   double t_zmp_position_z,
+                                   double t_reation_force_z,
+                                   double t_mass) const {
+  double denom = t_com_position_z - t_zmp_position_z;
+  if (zIsTiny(denom) || denom < 0.0) {
+    ZRUNWARN("The COM must be above ZMP.");
+    return 0.0;
+  }
+  if (t_reation_force_z < 0.0) {
+    ZRUNWARN("The reaction force must be positive.");
+    return 0.0;
+  }
+  if (t_mass < 0.0) {
+    ZRUNWARN("The mass must be positive.");
+    return 0.0;
+  }
+  return t_reation_force_z / (denom * t_mass);
+}
+
 double ComZmpModel::computeSqrZeta(const Vec3D& t_com_position) const {
   if (t_com_position.z() == 0.0 || t_com_position.z() < 0.0) {
     ZRUNERROR("The COM height must be positive. (given: %g)",

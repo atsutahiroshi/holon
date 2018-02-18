@@ -125,7 +125,11 @@ class ComZmpModel {
   ComZmpModel& set_time_step(double t_time_step);
   ComZmpModel& reset(const Vec3D& t_com_position);
 
-  // computing functions
+  // functions to compute squared zeta
+  double computeSqrZeta(double t_com_position_z, double t_zmp_position_z,
+                        double t_com_acceleration_z) const;
+  double computeSqrZeta(double t_com_position_z, double t_zmp_position_z,
+                        double t_reation_force_z, double t_mass) const;
   double computeSqrZeta(const Vec3D& t_com_position) const;
   double computeZeta(const Vec3D& t_com_position) const;
   Vec3D computeComAcc(const Vec3D& t_com_position,

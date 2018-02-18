@@ -523,10 +523,12 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double)",
       double zz;
       double expected_sqr_zeta;
     } testcases[] = {{1, 1, 0}, {1, 2, 0}};
+    zEchoOff();
     for (const auto& c : testcases) {
       INFO("z=" << c.z << ", zz=" << c.zz << ", az=" << az);
       CHECK(model.computeSqrZeta(c.z, c.zz, az) == c.expected_sqr_zeta);
     }
+    zEchoOn();
   }
 
   SECTION("return 0 when (az + g) <= 0") {
@@ -536,10 +538,12 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double)",
       double az;
       double expected_sqr_zeta;
     } testcases[] = {{-2.0 * G, 0}};
+    zEchoOff();
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << zz << ", az=" << c.az);
       CHECK(model.computeSqrZeta(z, zz, c.az) == c.expected_sqr_zeta);
     }
+    zEchoOn();
   }
 }
 
@@ -613,10 +617,12 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double,double)",
       double zz;
       double expected_sqr_zeta;
     } testcases[] = {{1, 1, 0}, {1, 2, 0}};
+    zEchoOff();
     for (const auto& c : testcases) {
       INFO("z=" << c.z << ", zz=" << c.zz << ", fz=" << fz << ", m=" << m);
       CHECK(model.computeSqrZeta(c.z, c.zz, fz, m) == c.expected_sqr_zeta);
     }
+    zEchoOn();
   }
 
   SECTION("return 0 when fz < 0") {
@@ -627,10 +633,12 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double,double)",
       double fz;
       double expected_sqr_zeta;
     } testcases[] = {{-1, 0}};
+    zEchoOff();
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << zz << ", fz=" << c.fz << ", m=" << m);
       CHECK(model.computeSqrZeta(z, zz, c.fz, m) == c.expected_sqr_zeta);
     }
+    zEchoOn();
   }
 
   SECTION("return 0 when mass < 0") {
@@ -641,10 +649,12 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double,double)",
       double m;
       double expected_sqr_zeta;
     } testcases[] = {{-1, 0}};
+    zEchoOff();
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << zz << ", fz=" << fz << ", m=" << c.m);
       CHECK(model.computeSqrZeta(z, zz, fz, c.m) == c.expected_sqr_zeta);
     }
+    zEchoOn();
   }
 }
 

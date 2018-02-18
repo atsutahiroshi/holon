@@ -214,6 +214,36 @@ double ComZmpModel::computeSqrZeta(const Vec3D& t_com_position,
   return numer / denom;
 }
 
+double ComZmpModel::computeZeta(double t_com_position_z,
+                                double t_zmp_position_z,
+                                double t_com_acceleration_z) const {
+  return sqrt(
+      computeSqrZeta(t_com_position_z, t_zmp_position_z, t_com_acceleration_z));
+}
+
+double ComZmpModel::computeZeta(double t_com_position_z,
+                                double t_zmp_position_z,
+                                double t_reation_force_z, double t_mass) const {
+  return sqrt(computeSqrZeta(t_com_position_z, t_zmp_position_z,
+                             t_reation_force_z, t_mass));
+}
+
+double ComZmpModel::computeZeta(const Vec3D& t_com_position,
+                                const Vec3D& t_zmp_position,
+                                const Vec3D& t_com_acceleration,
+                                const Vec3D& t_nu) const {
+  return sqrt(
+      computeSqrZeta(t_com_position, t_zmp_position, t_com_acceleration, t_nu));
+}
+
+double ComZmpModel::computeZeta(const Vec3D& t_com_position,
+                                const Vec3D& t_zmp_position,
+                                const Vec3D& t_reaction_force, double t_mass,
+                                const Vec3D& t_nu) const {
+  return sqrt(computeSqrZeta(t_com_position, t_zmp_position, t_reaction_force,
+                             t_mass, t_nu));
+}
+
 double ComZmpModel::computeSqrZeta(const Vec3D& t_com_position) const {
   // double numer = nu().dot(reaction_force());
   // double denom = nu().dot(com_position()) * mass();

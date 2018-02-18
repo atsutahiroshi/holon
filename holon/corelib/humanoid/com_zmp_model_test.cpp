@@ -485,6 +485,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double)",
     for (const auto& c : testcases) {
       INFO("z=" << c.z << ", zz=" << zz << ", az=" << az);
       CHECK(model.computeSqrZeta(c.z, zz, az) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(c.z, zz, az) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -499,6 +500,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double)",
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << c.zz << ", az=" << az);
       CHECK(model.computeSqrZeta(z, c.zz, az) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(z, c.zz, az) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -513,6 +515,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double)",
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << zz << ", az=" << c.az);
       CHECK(model.computeSqrZeta(z, zz, c.az) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(z, zz, c.az) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -527,6 +530,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double)",
     for (const auto& c : testcases) {
       INFO("z=" << c.z << ", zz=" << c.zz << ", az=" << az);
       CHECK(model.computeSqrZeta(c.z, c.zz, az) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(c.z, c.zz, az) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -542,6 +546,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double)",
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << zz << ", az=" << c.az);
       CHECK(model.computeSqrZeta(z, zz, c.az) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(z, zz, c.az) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -562,6 +567,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double,double)",
     for (const auto& c : testcases) {
       INFO("z=" << c.z << ", zz=" << zz << ", fz=" << fz << ", m=" << m);
       CHECK(model.computeSqrZeta(c.z, zz, fz, m) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(c.z, zz, fz, m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -577,6 +583,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double,double)",
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << c.zz << ", fz=" << fz << ", m=" << m);
       CHECK(model.computeSqrZeta(z, c.zz, fz, m) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(z, c.zz, fz, m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -591,6 +598,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double,double)",
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << zz << ", fz=" << c.fz << ", m=" << m);
       CHECK(model.computeSqrZeta(z, zz, c.fz, m) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(z, zz, c.fz, m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -606,6 +614,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double,double)",
       INFO("z=" << z << ", zz=" << zz << ", fz=" << fz << ", m=" << c.m);
       CHECK(model.computeSqrZeta(z, zz, fz, c.m) ==
             Approx(c.expected_sqr_zeta));
+      CHECK(model.computeZeta(z, zz, fz, c.m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -621,6 +630,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double,double)",
     for (const auto& c : testcases) {
       INFO("z=" << c.z << ", zz=" << c.zz << ", fz=" << fz << ", m=" << m);
       CHECK(model.computeSqrZeta(c.z, c.zz, fz, m) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(c.z, c.zz, fz, m) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -637,6 +647,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double,double)",
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << zz << ", fz=" << c.fz << ", m=" << m);
       CHECK(model.computeSqrZeta(z, zz, c.fz, m) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(z, zz, c.fz, m) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -653,6 +664,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double,double)",
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << zz << ", fz=" << fz << ", m=" << c.m);
       CHECK(model.computeSqrZeta(z, zz, fz, c.m) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(z, zz, fz, c.m) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -675,6 +687,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(const Vec3D&,const Vec3D&,const Vec3D&)",
       Vec3D ddp{1, 0, az};
       INFO("z=" << c.z << ", zz=" << zz << ", az=" << az);
       CHECK(model.computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(p, pz, ddp) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -692,6 +705,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(const Vec3D&,const Vec3D&,const Vec3D&)",
       Vec3D ddp{1, 2, az};
       INFO("z=" << z << ", zz=" << c.zz << ", az=" << az);
       CHECK(model.computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(p, pz, ddp) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -709,6 +723,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(const Vec3D&,const Vec3D&,const Vec3D&)",
       Vec3D ddp{1, 0.1, c.az};
       INFO("z=" << z << ", zz=" << zz << ", az=" << c.az);
       CHECK(model.computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(p, pz, ddp) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -726,6 +741,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(const Vec3D&,const Vec3D&,const Vec3D&)",
       Vec3D ddp{0, 0, az};
       INFO("z=" << c.z << ", zz=" << c.zz << ", az=" << az);
       CHECK(model.computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(p, pz, ddp) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -744,6 +760,7 @@ TEST_CASE("ComZmpModel::computeSqrZeta(const Vec3D&,const Vec3D&,const Vec3D&)",
       Vec3D ddp{0, 0, c.az};
       INFO("z=" << z << ", zz=" << zz << ", az=" << c.az);
       CHECK(model.computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(p, pz, ddp) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -769,6 +786,7 @@ TEST_CASE(
       Vec3D f{1, 0, fz};
       INFO("z=" << c.z << ", zz=" << zz << ", fz=" << fz << ", m=" << m);
       CHECK(model.computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(p, pz, f, m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -787,6 +805,7 @@ TEST_CASE(
       Vec3D f{0, 2, fz};
       INFO("z=" << z << ", zz=" << c.zz << ", fz=" << fz << ", m=" << m);
       CHECK(model.computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(p, pz, f, m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -804,6 +823,7 @@ TEST_CASE(
       Vec3D f{-0.1, 0, c.fz};
       INFO("z=" << z << ", zz=" << zz << ", fz=" << c.fz << ", m=" << m);
       CHECK(model.computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(p, pz, f, m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -821,6 +841,7 @@ TEST_CASE(
       Vec3D f{0, -1, fz};
       INFO("z=" << z << ", zz=" << zz << ", fz=" << fz << ", m=" << c.m);
       CHECK(model.computeSqrZeta(p, pz, f, c.m) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(p, pz, f, c.m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -839,6 +860,7 @@ TEST_CASE(
       Vec3D f{0, 0, fz};
       INFO("z=" << c.z << ", zz=" << c.zz << ", fz=" << fz << ", m=" << m);
       CHECK(model.computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(p, pz, f, m) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -858,6 +880,7 @@ TEST_CASE(
       Vec3D f{0, 0, c.fz};
       INFO("z=" << z << ", zz=" << zz << ", fz=" << c.fz << ", m=" << m);
       CHECK(model.computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(p, pz, f, m) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -877,6 +900,7 @@ TEST_CASE(
       Vec3D f{0, 0, fz};
       INFO("z=" << z << ", zz=" << zz << ", fz=" << fz << ", m=" << c.m);
       CHECK(model.computeSqrZeta(p, pz, f, c.m) == c.expected_sqr_zeta);
+      CHECK(model.computeZeta(p, pz, f, c.m) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }

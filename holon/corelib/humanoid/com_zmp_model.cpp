@@ -28,6 +28,10 @@ namespace holon {
 const double ComZmpModelData::default_mass = 1.0;
 const Vec3D ComZmpModelData::default_com_position = {0.0, 0.0, 1.0};
 
+namespace {
+const Vec3D kG = {0, 0, RK_G};
+}  //
+
 ComZmpModelData::ComZmpModelData()
     : m_mass(default_mass),
       m_nu(kVec3DZ),
@@ -183,13 +187,43 @@ double ComZmpModel::computeSqrZeta(double t_com_position_z,
   return t_reaction_force_z / denom;
 }
 
+double ComZmpModel::computeSqrZeta(const Vec3D& t_com_position,
+                                   const Vec3D& t_zmp_position,
+                                   const Vec3D& t_com_acceleration,
+                                   const Vec3D& t_nu) const {
+  if (!isComZmpDiffValid(t_com_position, t_zmp_position) ||
+      !isComAccelerationValid(t_com_acceleration)) {
+    return 0.0;
+  }
+  double numer = t_nu.dot(t_com_acceleration + kG);
+  double denom = t_nu.dot(t_com_position - t_zmp_position);
+  return numer / denom;
+}
+
+double ComZmpModel::computeSqrZeta(const Vec3D& t_com_position,
+                                   const Vec3D& t_zmp_position,
+                                   const Vec3D& t_reaction_force, double t_mass,
+                                   const Vec3D& t_nu) const {
+  if (!isMassValid(t_mass) ||
+      !isComZmpDiffValid(t_com_position, t_zmp_position) ||
+      !isReactionForceValid(t_reaction_force)) {
+    return 0.0;
+  }
+  double numer = t_nu.dot(t_reaction_force);
+  double denom = t_nu.dot(t_com_position - t_zmp_position) * t_mass;
+  return numer / denom;
+}
+
 double ComZmpModel::computeSqrZeta(const Vec3D& t_com_position) const {
+  // double numer = nu().dot(reaction_force());
+  // double denom = nu().dot(com_position()) * mass();
   if (t_com_position.z() == 0.0 || t_com_position.z() < 0.0) {
     ZRUNERROR("The COM height must be positive. (given: %g)",
               t_com_position.z());
     return 0.0;
   }
   return RK_G / t_com_position.z();
+  // return numer / denom;
 }
 
 double ComZmpModel::computeZeta(const Vec3D& t_com_position) const {
@@ -198,11 +232,10 @@ double ComZmpModel::computeZeta(const Vec3D& t_com_position) const {
 
 Vec3D ComZmpModel::computeComAcc(const Vec3D& t_com_position,
                                  const Vec3D& t_zmp_position) const {
-  Vec3D g = {0, 0, RK_G};
   double zeta2 = computeSqrZeta(t_com_position);
   Vec3D com_acc;
   // TODO(*): remove const_cast when own math library is implemented
-  com_acc = zeta2 * (t_com_position - t_zmp_position) - g;
+  com_acc = zeta2 * (t_com_position - t_zmp_position) - kG;
   // Vec3DSub(const_cast<Vec3D*>(&t_com_position),
   //          const_cast<Vec3D*>(&t_zmp_position), &com_acc);
   // Vec3DMulDRC(&com_acc, computeSqrZeta(t_com_position));
@@ -301,8 +334,7 @@ bool ComZmpModel::isComAccelerationValid(double t_com_acceleration_z) const {
 
 bool ComZmpModel::isComAccelerationValid(const Vec3D& t_com_acceleration,
                                          const Vec3D& t_nu) const {
-  Vec3D G(0, 0, RK_G);
-  double acc = t_nu.dot(t_com_acceleration + G);
+  double acc = t_nu.dot(t_com_acceleration + kG);
   if (acc < 0.0) {
     ZRUNWARN("Cannot produce pulling force (COM acc: %s, nu: %s)",
              t_com_acceleration.str().c_str(), t_nu.str().c_str());

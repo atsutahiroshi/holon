@@ -658,6 +658,230 @@ TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double,double)",
   }
 }
 
+TEST_CASE("ComZmpModel::computeSqrZeta(const Vec3D&,const Vec3D&,const Vec3D&)",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+
+  SECTION("various COM height, ZMP height and COM acc fixed to 0") {
+    double zz = 0;
+    double az = 0;
+    struct testcaset_t {
+      double z;
+      double expected_sqr_zeta;
+    } testcases[] = {{1, G}, {G, 1.0}, {2, G / 2}, {4, G / 4}};
+    for (const auto& c : testcases) {
+      Vec3D p{1, 2, c.z};
+      Vec3D pz{0, 1, zz};
+      Vec3D ddp{1, 0, az};
+      INFO("z=" << c.z << ", zz=" << zz << ", az=" << az);
+      CHECK(model.computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("various ZMP height, COM height = 2 and COM acc = 0") {
+    double z = 2;
+    double az = 0;
+    struct testcaset_t {
+      double zz;
+      double expected_sqr_zeta;
+    } testcases[] = {
+        {1, G}, {1.5, 2.0 * G}, {0.5, 2.0 * G / 3.0}, {-0.5, 2.0 * G / 5.0}};
+    for (const auto& c : testcases) {
+      Vec3D p{1, 0, z};
+      Vec3D pz{1, 1, c.zz};
+      Vec3D ddp{1, 2, az};
+      INFO("z=" << z << ", zz=" << c.zz << ", az=" << az);
+      CHECK(model.computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("various COM acceleration, COM height = 1.5 and ZMP height = 0.5") {
+    double z = 1.5;
+    double zz = 0.5;
+    struct testcaset_t {
+      double az;
+      double expected_sqr_zeta;
+    } testcases[] = {
+        {1, 1.0 + G}, {1.5, 1.5 + G}, {-1, -1.0 + G}, {G, 2.0 * G}};
+    for (const auto& c : testcases) {
+      Vec3D p{1, 0.1, z};
+      Vec3D pz{0, 0.1, zz};
+      Vec3D ddp{1, 0.1, c.az};
+      INFO("z=" << z << ", zz=" << zz << ", az=" << c.az);
+      CHECK(model.computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("return 0 when (z - zz) <= 0") {
+    double az = 0;
+    struct testcase_t {
+      double z;
+      double zz;
+      double expected_sqr_zeta;
+    } testcases[] = {{1, 1, 0}, {1, 2, 0}};
+    zEchoOff();
+    for (const auto& c : testcases) {
+      Vec3D p{0, 0, c.z};
+      Vec3D pz{0, 0, c.zz};
+      Vec3D ddp{0, 0, az};
+      INFO("z=" << c.z << ", zz=" << c.zz << ", az=" << az);
+      CHECK(model.computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
+    }
+    zEchoOn();
+  }
+
+  SECTION("return 0 when (az + g) <= 0") {
+    double z = 1;
+    double zz = 0;
+    struct testcase_t {
+      double az;
+      double expected_sqr_zeta;
+    } testcases[] = {{-2.0 * G, 0}};
+    zEchoOff();
+    for (const auto& c : testcases) {
+      Vec3D p{0, 0, z};
+      Vec3D pz{0, 0, zz};
+      Vec3D ddp{0, 0, c.az};
+      INFO("z=" << z << ", zz=" << zz << ", az=" << c.az);
+      CHECK(model.computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
+    }
+    zEchoOn();
+  }
+}
+
+TEST_CASE(
+    "ComZmpModel::computeSqrZeta(const Vec3D&,const Vec3D&,const Vec3D&,const "
+    "Vec3D&)",
+    "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+
+  SECTION("various COM height, fixed ZMP = 0, Fz = G, m = 1") {
+    double zz = 0;
+    double fz = G;
+    double m = 1;
+    struct testcaset_t {
+      double z;
+      double expected_sqr_zeta;
+    } testcases[] = {{1, G}, {G, 1.0}, {2, G / 2}, {4, G / 4}};
+    for (const auto& c : testcases) {
+      Vec3D p{1, 2, c.z};
+      Vec3D pz{0, 1, zz};
+      Vec3D f{1, 0, fz};
+      INFO("z=" << c.z << ", zz=" << zz << ", fz=" << fz << ", m=" << m);
+      CHECK(model.computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("various ZMP height, fixed COM = 2, Fz = G, m = 1") {
+    double z = 2;
+    double fz = G;
+    double m = 1;
+    struct testcaset_t {
+      double zz;
+      double expected_sqr_zeta;
+    } testcases[] = {
+        {1, G}, {1.5, 2.0 * G}, {0.5, 2.0 * G / 3.0}, {-0.5, 2.0 * G / 5.0}};
+    for (const auto& c : testcases) {
+      Vec3D p{0, 1, z};
+      Vec3D pz{1, 1, c.zz};
+      Vec3D f{0, 2, fz};
+      INFO("z=" << z << ", zz=" << c.zz << ", fz=" << fz << ", m=" << m);
+      CHECK(model.computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("various Fz, fixed COM = 2, ZMP = 1, m = 1") {
+    double z = 2;
+    double zz = 1;
+    double m = 1;
+    struct testcaset_t {
+      double fz;
+      double expected_sqr_zeta;
+    } testcases[] = {{1, 1}, {1.5, 1.5}, {0.5, 0.5}, {G, G}};
+    for (const auto& c : testcases) {
+      Vec3D p{-1, 0, z};
+      Vec3D pz{0.1, 0, zz};
+      Vec3D f{-0.1, 0, c.fz};
+      INFO("z=" << z << ", zz=" << zz << ", fz=" << c.fz << ", m=" << m);
+      CHECK(model.computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("various mass, fixed COM = 2, ZMP = 1, Fz = 2") {
+    double z = 2;
+    double zz = 1;
+    double fz = 2;
+    struct testcaset_t {
+      double m;
+      double expected_sqr_zeta;
+    } testcases[] = {{1, 2}, {2, 1}, {0.5, 4}, {1.5, 4.0 / 3}};
+    for (const auto& c : testcases) {
+      Vec3D p{1, -1, z};
+      Vec3D pz{-1, 1, zz};
+      Vec3D f{0, -1, fz};
+      INFO("z=" << z << ", zz=" << zz << ", fz=" << fz << ", m=" << c.m);
+      CHECK(model.computeSqrZeta(p, pz, f, c.m) == c.expected_sqr_zeta);
+    }
+  }
+
+  SECTION("return 0 when (z - zz) <= 0") {
+    double fz = 1;
+    double m = 1;
+    struct testcase_t {
+      double z;
+      double zz;
+      double expected_sqr_zeta;
+    } testcases[] = {{1, 1, 0}, {1, 2, 0}};
+    zEchoOff();
+    for (const auto& c : testcases) {
+      Vec3D p{0, 0, c.z};
+      Vec3D pz{0, 0, c.zz};
+      Vec3D f{0, 0, fz};
+      INFO("z=" << c.z << ", zz=" << c.zz << ", fz=" << fz << ", m=" << m);
+      CHECK(model.computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
+    }
+    zEchoOn();
+  }
+
+  SECTION("return 0 when fz < 0") {
+    double z = 2;
+    double zz = 1;
+    double m = 1;
+    struct testcase_t {
+      double fz;
+      double expected_sqr_zeta;
+    } testcases[] = {{-1, 0}};
+    zEchoOff();
+    for (const auto& c : testcases) {
+      Vec3D p{0, 0, z};
+      Vec3D pz{0, 0, zz};
+      Vec3D f{0, 0, c.fz};
+      INFO("z=" << z << ", zz=" << zz << ", fz=" << c.fz << ", m=" << m);
+      CHECK(model.computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
+    }
+    zEchoOn();
+  }
+
+  SECTION("return 0 when mass < 0") {
+    double z = 2;
+    double zz = 1;
+    double fz = 1;
+    struct testcase_t {
+      double m;
+      double expected_sqr_zeta;
+    } testcases[] = {{-1, 0}};
+    zEchoOff();
+    for (const auto& c : testcases) {
+      Vec3D p{0, 0, z};
+      Vec3D pz{0, 0, zz};
+      Vec3D f{0, 0, fz};
+      INFO("z=" << z << ", zz=" << zz << ", fz=" << fz << ", m=" << c.m);
+      CHECK(model.computeSqrZeta(p, pz, f, c.m) == c.expected_sqr_zeta);
+    }
+    zEchoOn();
+  }
+}
+
 TEST_CASE("compute squared zeta in equation of motion based on COM-ZMP model",
           "[corelib][humanoid]") {
   ComZmpModel model;

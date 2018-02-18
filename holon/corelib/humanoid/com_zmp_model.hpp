@@ -130,6 +130,15 @@ class ComZmpModel {
                         double t_com_acceleration_z) const;
   double computeSqrZeta(double t_com_position_z, double t_zmp_position_z,
                         double t_reation_force_z, double t_mass) const;
+  double computeSqrZeta(const Vec3D& t_com_position,
+                        const Vec3D& t_zmp_position,
+                        const Vec3D& t_com_acceleration,
+                        const Vec3D& t_nu = kVec3DZ) const;
+  double computeSqrZeta(const Vec3D& t_com_position,
+                        const Vec3D& t_zmp_position,
+                        const Vec3D& t_reaction_force, double t_mass,
+                        const Vec3D& t_nu = kVec3DZ) const;
+
   double computeSqrZeta(const Vec3D& t_com_position) const;
   double computeZeta(const Vec3D& t_com_position) const;
   Vec3D computeComAcc(const Vec3D& t_com_position,

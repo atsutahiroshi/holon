@@ -22,6 +22,7 @@
 #define HOLON_TEST_UTIL_CATCH_CUSTOM_MATCHERS_HPP_
 
 #include <zeo/zeo_vec3d.h>
+#include "holon/corelib/common/optional.hpp"
 #include "holon/corelib/math/vec3d.hpp"
 
 #include <sstream>
@@ -62,6 +63,16 @@ struct StringMaker<holon::Vec3D> {
   static std::string convert(const holon::Vec3D& v) {
     return ::Catch::Detail::stringify(v.get());
     // return ::Catch::Detail::stringify(v);
+  }
+};
+
+template <>
+struct StringMaker<holon::optional<holon::Vec3D>> {
+  static std::string convert(const holon::optional<holon::Vec3D>& v) {
+    if (v.has_value())
+      return ::Catch::Detail::stringify(v.value().get());
+    else
+      return std::string("( null vector )");
   }
 };
 

@@ -60,6 +60,7 @@ class ComCtrl {
   typedef ComCtrlInputs Inputs;
   typedef ComCtrlOutputs Outputs;
   typedef ComZmpModelData States;
+  typedef ComZmpModel Model;
 
   // constructors
   ComCtrl();
@@ -72,12 +73,15 @@ class ComCtrl {
   ComCtrl& operator=(ComCtrl&&) = delete;
 
   // accessors
-  inline const ComCtrlX& x() const noexcept { return m_x; }
   inline ComCtrlX& x() noexcept { return m_x; }
-  inline const ComCtrlY& y() const noexcept { return m_y; }
   inline ComCtrlY& y() noexcept { return m_y; }
-  inline const ComZmpModel& model() const noexcept { return m_model; }
-  inline ComZmpModel& model() noexcept { return m_model; }
+  inline Model& model() noexcept { return m_model; }
+  inline Inputs& inputs() noexcept { return m_inputs; }
+  // const accessors
+  inline const ComCtrlX& x() const noexcept { return m_x; }
+  inline const ComCtrlY& y() const noexcept { return m_y; }
+  inline const Model& model() const noexcept { return m_model; }
+  inline const Inputs& inputs() const noexcept { return m_inputs; }
   inline const Outputs& outputs() const noexcept { return m_outputs; }
   inline double time_step() const noexcept { return model().time_step(); }
 
@@ -100,7 +104,7 @@ class ComCtrl {
  private:
   ComCtrlX m_x;
   ComCtrlY m_y;
-  ComZmpModel m_model;
+  Model m_model;
 
   UserCommands m_user_cmds;
   Inputs m_inputs;

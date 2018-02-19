@@ -26,13 +26,14 @@ const double DT = 0.01;
 
 int main() {
   holon::ComCtrl ctrl;
+  auto cmd = ctrl.getUserCommands();
   holon::Vec3D initial_com_pos = {0.1, -0.1, 1};
   holon::Vec3D cmd_com_pos = {0, 0, 1};
   double t = 0;
 
   ctrl.model().reset(initial_com_pos);
   while (t < T) {
-    ctrl.set_cmd_com_position(cmd_com_pos);
+    cmd->com_position = cmd_com_pos;
     ctrl.update(DT);
     std::cout << t << " ";
     std::cout << ctrl.model().com_position().data() << " ";

@@ -33,145 +33,29 @@ using Catch::Matchers::Equals;
 
 const double G = RK_G;
 
-TEST_CASE("check if control poles on each axis can be assigned",
-          "[corelib][humanoid]") {
-  Fuzzer fuzz;
-
-  SECTION("control poles along x-axis") {
-    ComCtrl ctrl;
-
-    SECTION("set the values of the poles") {
-      for (auto i = 0; i < 3; ++i) {
-        double q1 = fuzz.get();
-        double q2 = fuzz.get();
-        ctrl.x().set_q1(q1);
-        ctrl.x().set_q2(q2);
-        CHECK(ctrl.x().q1() == q1);
-        CHECK(ctrl.x().q2() == q2);
-      }
-    }
-
-    SECTION("set the values of the poles with chaining methods") {
-      for (auto i = 0; i < 3; ++i) {
-        double q1 = fuzz.get();
-        double q2 = fuzz.get();
-        ctrl.x().set_q1(q1).set_q2(q2);
-        CHECK(ctrl.x().q1() == q1);
-        CHECK(ctrl.x().q2() == q2);
-      }
-    }
-  }
-
-  SECTION("control poles along y-axis") {
-    ComCtrl ctrl;
-
-    SECTION("set the values of the poles") {
-      for (auto i = 0; i < 3; ++i) {
-        double q1 = fuzz.get();
-        double q2 = fuzz.get();
-        ctrl.y().set_q1(q1);
-        ctrl.y().set_q2(q2);
-        CHECK(ctrl.y().q1() == q1);
-        CHECK(ctrl.y().q2() == q2);
-      }
-    }
-
-    SECTION("set the values of the poles with chaining methods") {
-      for (auto i = 0; i < 3; ++i) {
-        double q1 = fuzz.get();
-        double q2 = fuzz.get();
-        ctrl.y().set_q1(q1).set_q2(q2);
-        CHECK(ctrl.y().q1() == q1);
-        CHECK(ctrl.y().q2() == q2);
-      }
-    }
-  }
-}
-
-TEST_CASE("com_ctrl: testing of initialization", "[corelib][humanoid]") {
+TEST_CASE("ComCtrl::getUserCommands() provides shared pointer to user commands",
+          "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
 
-  SECTION("commanded COM position") {
-    Vec3D expected_cmd_com_pos = {0, 0, 1};
-    CHECK_THAT(ctrl.cmd_com_position(), Equals(expected_cmd_com_pos));
-  }
-  SECTION("desired ZMP position") {
-    Vec3D expected_des_zmp_pos = {0, 0, 0};
-    CHECK_THAT(ctrl.des_zmp_position(), Equals(expected_des_zmp_pos));
-  }
-  SECTION("desired value of zeta") { CHECK(ctrl.des_zeta() == sqrt(G)); }
-}
+  auto cmd = ctrl.getUserCommands();
+  CHECK(cmd->com_position == nullopt);
+  CHECK(cmd->com_position != kVec3DZero);
+  CHECK_FALSE(cmd->com_position);
+  CHECK_FALSE(cmd->com_position.has_value());
+  CHECK_THROWS_AS(cmd->com_position.value(), bad_optional_access);
+  CHECK(cmd->com_position.value_or(kVec3DZero) == kVec3DZero);
 
-TEST_CASE("com_ctrl: testing of accessors/mutators", "[corelib][humanoid]") {
-  ComCtrl ctrl;
-  Fuzzer fuzz;
-
-  SECTION("commanded COM position") {
-    Vec3D new_cmd_com_pos;
-    fuzz.randomize(new_cmd_com_pos);
-    ctrl.set_cmd_com_position(new_cmd_com_pos);
-    REQUIRE_THAT(ctrl.cmd_com_position(), Equals(new_cmd_com_pos));
-  }
-
-  SECTION("time step") {
-    Fuzzer fuzz(0.0001, 0.1);
-    double dt = fuzz.get();
-    ctrl.set_time_step(dt);
-    CHECK(ctrl.time_step() == dt);
-    CHECK(ctrl.model().time_step() == dt);
-  }
-}
-
-TEST_CASE("compute desired zeta", "[corelib][humanoid]") {
-  ComCtrl ctrl;
-
-  SECTION("zeta should be computed according to the COM height") {
-    struct testcase_t {
-      double com_height;
-      double expected_zeta_squared;
-      double expected_zeta;
-    } testcases[] = {{1, G, sqrt(G)},
-                     {G, 1.0, 1.0},
-                     {2, G / 2, sqrt(G / 2)},
-                     {4, G / 4, sqrt(G / 4)}};
-
-    for (auto c : testcases) {
-      Vec3D pg = {0, 0, c.com_height};
-      CHECK(ctrl.computeDesZetaSqr(pg) == Approx(c.expected_zeta_squared));
-      CHECK(ctrl.computeDesZeta(pg) == Approx(c.expected_zeta));
-    }
-  }
-  SECTION("return 0 when the given COM height was 0") {
-    // Returning 0 when the height is 0 is due to avoiding zero-division,
-    // but this is not theoritically correct.
-    // This case should be handled as an exception somehow.
-    // TODO(*): handle zero-division error correctly
-    Vec3D pg = {0, 0, 0};
-    zEchoOff();
-    CHECK_FALSE(zIsInf(ctrl.computeDesZetaSqr(pg)));
-    CHECK(ctrl.computeDesZetaSqr(pg) == 0.0);
-    CHECK_FALSE(zIsInf(ctrl.computeDesZeta(pg)));
-    CHECK(ctrl.computeDesZeta(pg) == 0.0);
-    zEchoOn();
-  }
-  SECTION("return 0 when the given COM height was negative") {
-    // Return 0 when a negative valued was given as the height of COM.
-    // This should be handled as an exception as well.
-    // TODO(*): handle the case where a negative value is given
-    Vec3D pg = {0, 0, -1};
-    zEchoOff();
-    CHECK(ctrl.computeDesZetaSqr(pg) == 0.0);
-    CHECK_FALSE(zIsNan(ctrl.computeDesZeta(pg)));
-    CHECK(ctrl.computeDesZeta(pg) == 0.0);
-    zEchoOn();
-  }
+  cmd->com_position = Vec3D(0, 0, 0.42);
+  CHECK(cmd->com_position == Vec3D(0, 0, 0.42));
+  CHECK(cmd->com_position.value() == Vec3D(0, 0, 0.42));
+  CHECK(cmd->com_position.value_or(kVec3DZero) == Vec3D(0, 0, 0.42));
 }
 
 SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
   GIVEN("qx1 = 1.0, qx2 = 1.0, qy1 = 1.0, qy2 = 1.0, ref_com_pos = (0, 0, G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {0, 0, G};
-    double desired_zeta = ctrl.computeDesZeta(ref_com_pos);
+    double desired_zeta = ctrl.model().computeZeta(ref_com_pos);
 
     REQUIRE(desired_zeta == Approx(1.0));
     REQUIRE(ctrl.x().q1() == 1);
@@ -218,7 +102,7 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
   GIVEN("qx1 = 1, qx2 = 0.5, qy1 = 1.2, qy2 = 0.8, ref_com_pos = (0, 0, G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {0, 0, G};
-    double desired_zeta = ctrl.computeDesZeta(ref_com_pos);
+    double desired_zeta = ctrl.model().computeZeta(ref_com_pos);
 
     ctrl.x().set_q1(1.0).set_q2(0.5);
     ctrl.y().set_q1(1.2).set_q2(0.8);
@@ -256,7 +140,7 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
       "qx1 = 1.0, qx2 = 1.5, qy1 = 1.0, qy2 = 1.0, ref_com_pos = (1, 0.5, G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {1, 0.5, G};
-    double desired_zeta = ctrl.computeDesZeta(ref_com_pos);
+    double desired_zeta = ctrl.model().computeZeta(ref_com_pos);
 
     ctrl.x().set_q2(1.5);
 
@@ -306,7 +190,7 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
       "ref_com_pos = (0, 0.5, 0.5*G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {0, 0.5, 0.5 * G};
-    double desired_zeta = ctrl.computeDesZeta(ref_com_pos);
+    double desired_zeta = ctrl.model().computeZeta(ref_com_pos);
 
     ctrl.x().set_q2(1.5);
     ctrl.y().set_q2(1.5);
@@ -381,6 +265,7 @@ TEST_CASE("check if time step is modified after update",
 TEST_CASE("check if desired ZMP position is modified after update",
           "[corelib][humanoid]") {
   ComCtrl ctrl;
+  auto cmd = ctrl.getUserCommands();
 
   struct testcase_t {
     Vec3D cmd_com_pos;
@@ -389,15 +274,15 @@ TEST_CASE("check if desired ZMP position is modified after update",
     Vec3D expected_des_zmp_pos;
     double expected_des_zeta;
 
-    expected_des_zeta = ctrl.computeDesZeta(c.cmd_com_pos);
+    expected_des_zeta = ctrl.model().computeZeta(c.cmd_com_pos);
     expected_des_zmp_pos =
         ctrl.computeDesZmpPos(c.cmd_com_pos, ctrl.model().com_position(),
                               ctrl.model().com_velocity(), expected_des_zeta);
 
-    ctrl.set_cmd_com_position(c.cmd_com_pos);
+    cmd->com_position = c.cmd_com_pos;
     ctrl.update();
-    CHECK(ctrl.des_zeta() == expected_des_zeta);
-    CHECK_THAT(ctrl.des_zmp_position(), Equals(expected_des_zmp_pos));
+    CHECK(ctrl.outputs().zeta == expected_des_zeta);
+    CHECK_THAT(ctrl.outputs().zmp_position, Equals(expected_des_zmp_pos));
   }
 }
 
@@ -406,7 +291,7 @@ SCENARIO("controller can regulate COM position at a point",
   GIVEN("command that COM position be at (0.1, -0.1, 1)") {
     ComCtrl ctrl;
     Vec3D cmd_com_pos = {0.1, -0.1, 1};
-    ctrl.set_cmd_com_position(cmd_com_pos);
+    ctrl.getUserCommands()->com_position = cmd_com_pos;
 
     WHEN("at first") {
       THEN("COM position is at (0, 0, 1)") {
@@ -458,7 +343,7 @@ TEST_CASE("when commanded COM height is zero, update should fail",
   ComCtrl ctrl;
   Vec3D p = {0, 0, 0};
 
-  ctrl.set_cmd_com_position(p);
+  ctrl.getUserCommands()->com_position = p;
   zEchoOff();
   CHECK_FALSE(ctrl.update());
   zEchoOn();

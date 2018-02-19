@@ -21,6 +21,8 @@
 #ifndef HOLON_HUMANOID_COM_CTRL_HPP_
 #define HOLON_HUMANOID_COM_CTRL_HPP_
 
+#include <memory>
+#include "holon/corelib/common/optional.hpp"
 #include "holon/corelib/humanoid/com_ctrl_x.hpp"
 #include "holon/corelib/humanoid/com_ctrl_y.hpp"
 #include "holon/corelib/humanoid/com_zmp_model.hpp"
@@ -28,8 +30,37 @@
 
 namespace holon {
 
+struct ComCtrlCommands {
+  optional<Vec3D> com_position;
+  optional<Vec3D> com_velocity;
+  optional<double> qx1, qx2;
+  optional<double> qy1, qy2;
+  optional<double> qz1, qz2;
+};
+
+struct ComCtrlInputs {
+  Vec3D com_position;
+  Vec3D com_velocity;
+  double qx1, qx2;
+  double qy1, qy2;
+  double qz1, qz2;
+};
+
+struct ComCtrlOutputs {
+  Vec3D com_position;
+  Vec3D com_velocity;
+  Vec3D com_acceleration;
+  Vec3D zmp_position;
+  double zeta;
+};
+
 class ComCtrl {
  public:
+  typedef std::shared_ptr<ComCtrlCommands> UserCommands;
+  typedef ComCtrlInputs Inputs;
+  typedef ComCtrlOutputs Outputs;
+  typedef ComZmpModelData States;
+
   // constructors
   ComCtrl();
 
@@ -47,22 +78,16 @@ class ComCtrl {
   inline ComCtrlY& y() noexcept { return m_y; }
   inline const ComZmpModel& model() const noexcept { return m_model; }
   inline ComZmpModel& model() noexcept { return m_model; }
+  inline const Outputs& outputs() const noexcept { return m_outputs; }
   inline double time_step() const noexcept { return model().time_step(); }
-  inline const Vec3D cmd_com_position() const noexcept {
-    return m_cmd_com_position;
-  }
-  inline const Vec3D des_zmp_position() const noexcept {
-    return m_des_zmp_position;
-  }
-  inline double des_zeta() const noexcept { return m_des_zeta; }
 
   // mutators
   ComCtrl& set_time_step(double t_time_step);
-  ComCtrl& set_cmd_com_position(const Vec3D& t_cmd_com_position);
+
+  //
+  inline UserCommands getUserCommands() const noexcept { return m_user_cmds; }
 
   // computing functions
-  double computeDesZetaSqr(const Vec3D& t_ref_com_position) const;
-  double computeDesZeta(const Vec3D& t_ref_com_position) const;
   Vec3D computeDesZmpPos(const Vec3D& t_ref_com_position,
                          const Vec3D& t_com_position,
                          const Vec3D& t_com_velocity,
@@ -77,9 +102,12 @@ class ComCtrl {
   ComCtrlY m_y;
   ComZmpModel m_model;
 
-  Vec3D m_cmd_com_position;
-  Vec3D m_des_zmp_position;
-  double m_des_zeta;
+  UserCommands m_user_cmds;
+  Inputs m_inputs;
+  Outputs m_outputs;
+  // States m_states;
+
+  void remapUserCommandsToInputs();
 };
 
 }  // namespace holon

@@ -20,15 +20,12 @@
 
 #include "holon/corelib/humanoid/com_ctrl.hpp"
 
+#include <memory>
+
 namespace holon {
 
-ComCtrl::ComCtrl()
-    : m_x(),
-      m_y(),
-      m_model(),
-      m_cmd_com_position(model().com_position()),
-      m_des_zmp_position(0, 0, 0) {
-  m_des_zeta = computeDesZeta(model().com_position());
+ComCtrl::ComCtrl() : m_x(), m_y(), m_model() {
+  m_user_cmds = std::make_shared<ComCtrlCommands>();
 }
 
 ComCtrl& ComCtrl::set_time_step(double t_time_step) {
@@ -36,38 +33,32 @@ ComCtrl& ComCtrl::set_time_step(double t_time_step) {
   return *this;
 }
 
-ComCtrl& ComCtrl::set_cmd_com_position(const Vec3D& t_cmd_com_position) {
-  m_cmd_com_position = t_cmd_com_position;
-  return *this;
-}
-
-double ComCtrl::computeDesZetaSqr(const Vec3D& t_ref_com_position) const {
-  return m_model.computeSqrZeta(t_ref_com_position);
-}
-
-double ComCtrl::computeDesZeta(const Vec3D& t_ref_com_position) const {
-  return m_model.computeZeta(t_ref_com_position);
-}
-
 Vec3D ComCtrl::computeDesZmpPos(const Vec3D& t_ref_com_pos,
                                 const Vec3D& t_com_pos, const Vec3D& t_com_vel,
                                 double t_desired_zeta) const {
-  Vec3D desired_zmp_pos;
-  desired_zmp_pos.set_x(m_x.computeDesZmpPos(t_ref_com_pos, t_com_pos,
-                                             t_com_vel, t_desired_zeta));
-  desired_zmp_pos.set_y(m_y.computeDesZmpPos(t_ref_com_pos, t_com_pos,
-                                             t_com_vel, t_desired_zeta));
-  desired_zmp_pos.set_z(0);
-  return desired_zmp_pos;
+  double xz =
+      m_x.computeDesZmpPos(t_ref_com_pos, t_com_pos, t_com_vel, t_desired_zeta);
+  double yz =
+      m_y.computeDesZmpPos(t_ref_com_pos, t_com_pos, t_com_vel, t_desired_zeta);
+  double zz = 0;
+  return Vec3D(xz, yz, zz);
+}
+
+void ComCtrl::remapUserCommandsToInputs() {
+  Vec3D default_com_pos(0, 0, m_model.com_position().z());
+  m_inputs.com_position = m_user_cmds->com_position.value_or(default_com_pos);
 }
 
 bool ComCtrl::update() {
-  m_des_zeta = computeDesZeta(m_cmd_com_position);
-  if (zIsTiny(m_des_zeta)) return false;
-  m_des_zmp_position =
-      computeDesZmpPos(m_cmd_com_position, m_model.com_position(),
-                       m_model.com_velocity(), m_des_zeta);
-  m_model.set_zmp_position(m_des_zmp_position);
+  remapUserCommandsToInputs();
+  m_outputs.zeta =
+      m_model.computeZeta(m_inputs.com_position, kVec3DZero, kVec3DZero);
+  if (zIsTiny(m_outputs.zeta)) return false;
+
+  m_outputs.zmp_position =
+      computeDesZmpPos(m_inputs.com_position, m_model.com_position(),
+                       m_model.com_velocity(), m_outputs.zeta);
+  m_model.set_zmp_position(m_outputs.zmp_position);
   return m_model.update();
 }
 

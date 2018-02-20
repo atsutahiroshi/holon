@@ -700,7 +700,8 @@ TEST_CASE("compute the COM acceleration based on COM-ZMP model",
     };
 
     for (auto c : testcases) {
-      Vec3D acc = model.computeComAcc(c.com_pos, c.zmp_pos);
+      Vec3D acc = model.computeComAcc(c.com_pos, c.zmp_pos,
+                                      model.data()->reaction_force);
       CAPTURE(&c.com_pos);
       CAPTURE(&c.zmp_pos);
       CHECK_THAT(acc, Equals(c.expected_acc));
@@ -740,7 +741,8 @@ TEST_CASE("test if acceleration is modified after update",
     } testcases[] = {{{0, 0, 1}, {0, 0, 0}, {1, 0, 0}},
                      {{0, 0.1, 1}, {0.1, -0.1, 0}, {0.2, 0.1, 0}}};
     for (auto& c : testcases) {
-      Vec3D expected_com_acc = model.computeComAcc(c.com_pos, c.zmp_pos);
+      Vec3D expected_com_acc = model.computeComAcc(
+          c.com_pos, c.zmp_pos, model.data()->reaction_force);
 
       model.data()->com_position = c.com_pos;
       model.data()->com_velocity = c.com_vel;

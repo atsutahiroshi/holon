@@ -168,19 +168,6 @@ double ComZmpModel::computeZeta(const Vec3D& t_com_position,
 }
 
 Vec3D ComZmpModel::computeComAcc(const Vec3D& t_com_position,
-                                 const Vec3D& t_zmp_position) const {
-  double zeta2 = computeSqrZeta(t_com_position, t_zmp_position, kVec3DZero);
-  Vec3D com_acc;
-  // TODO(*): remove const_cast when own math library is implemented
-  com_acc = zeta2 * (t_com_position - t_zmp_position) - kG;
-  // Vec3DSub(const_cast<Vec3D*>(&t_com_position),
-  //          const_cast<Vec3D*>(&t_zmp_position), &com_acc);
-  // Vec3DMulDRC(&com_acc, computeSqrZeta(t_com_position));
-  // Vec3DSubDRC(&com_acc, &g);
-  return com_acc;
-}
-
-Vec3D ComZmpModel::computeComAcc(const Vec3D& t_com_position,
                                  const Vec3D& t_zmp_position,
                                  const Vec3D& t_reaction_force) const {
   double zeta2 = computeSqrZeta(t_com_position, t_zmp_position,

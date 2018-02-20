@@ -33,7 +33,7 @@ using Catch::Matchers::Equals;
 
 const double G = RK_G;
 
-TEST_CASE("ComCtrl::getUserCommands() provides shared pointer to user commands",
+TEST_CASE("ComCtrl::getUserCommands() provides a pointer to user commands",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
 

@@ -79,13 +79,28 @@ Vec3D ComCtrl::computeDesZmpPos(const Vec3D& t_ref_com_pos,
 }
 
 void ComCtrl::remapUserCommandsToInputs() {
-  Vec3D default_com_pos(0, 0, m_model.data().com_position.z());
-  m_inputs_ptr->com_position = cmds().com_position.value_or(default_com_pos);
+  m_inputs_ptr->com_position =
+      cmds().com_position.value_or(m_initial_com_position);
+  m_inputs_ptr->com_velocity = cmds().com_velocity.value_or(kVec3DZero);
+  m_inputs_ptr->qx1 = cmds().qx1.value_or(ComCtrlX::default_q1);
+  m_inputs_ptr->qx2 = cmds().qx2.value_or(ComCtrlX::default_q2);
+  m_inputs_ptr->qy1 = cmds().qy1.value_or(ComCtrlY::default_q1);
+  m_inputs_ptr->qy2 = cmds().qy2.value_or(ComCtrlY::default_q2);
+}
+
+void ComCtrl::updateCtrlParam() {
+  x().set_q1(inputs().qx1);
+  x().set_q2(inputs().qx2);
+  y().set_q1(inputs().qy1);
+  y().set_q2(inputs().qy2);
 }
 
 bool ComCtrl::update() {
   // remap commanded values given by user to referential values for controller
   remapUserCommandsToInputs();
+
+  // update control parameters
+  updateCtrlParam();
 
   // compute desired reaction force along z-axis
   m_outputs_ptr->reaction_force = computeDesReactForce();

@@ -24,6 +24,9 @@
 
 namespace holon {
 
+const double ComCtrlY::default_q1 = 1.0;
+const double ComCtrlY::default_q2 = 1.0;
+
 ComCtrlY::ComCtrlY() : m_q1(default_q1), m_q2(default_q2) {}
 ComCtrlY::ComCtrlY(double t_q1, double t_q2) : m_q1(t_q1), m_q2(t_q2) {}
 

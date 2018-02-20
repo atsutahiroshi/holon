@@ -128,6 +128,7 @@ class ComCtrl {
   UserCommandsPtr m_user_cmds_ptr;
   Vec3D m_initial_com_position;
 
+  void updateCtrlParam();
   void remapUserCommandsToInputs();
 };
 

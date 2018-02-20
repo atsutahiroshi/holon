@@ -26,8 +26,9 @@
 namespace holon {
 
 class ComCtrlY {
-  const double default_q1 = 1.0;
-  const double default_q2 = 1.0;
+ public:
+  static const double default_q1;
+  static const double default_q2;
 
  public:
   // constructors

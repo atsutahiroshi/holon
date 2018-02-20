@@ -349,13 +349,132 @@ TEST_CASE("check if desired ZMP position is modified after update",
 TEST_CASE("ComCtrl::update() updates control paramters",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
+  Vec3D p0 = {0.1, -0.1, 1.5};
+  ctrl.reset(p0);
   auto cmd = ctrl.getUserCommands();
 
   SECTION("COM position") {
-    Vec3D v = {1.2, -1.2, 1.5};
-    cmd->com_position = v;
-    ctrl.update();
-    CHECK(ctrl.inputs().com_position == v);
+    SECTION("default") {
+      ctrl.update();
+      CHECK(ctrl.inputs().com_position == p0);
+    }
+    SECTION("set user command") {
+      Vec3D v = {1.2, -1.2, 1.5};
+      cmd->com_position = v;
+      ctrl.update();
+      CHECK(ctrl.inputs().com_position == v);
+    }
+    SECTION("clear") {
+      cmd->clear();
+      ctrl.update();
+      CHECK(ctrl.inputs().com_position == p0);
+    }
+  }
+
+  SECTION("COM velocity") {
+    SECTION("default") {
+      ctrl.update();
+      CHECK(ctrl.inputs().com_velocity == kVec3DZero);
+    }
+    SECTION("set user command") {
+      Vec3D v = {1.2, -1.2, 1.5};
+      cmd->com_velocity = v;
+      ctrl.update();
+      CHECK(ctrl.inputs().com_velocity == v);
+    }
+    SECTION("clear") {
+      cmd->clear();
+      ctrl.update();
+      CHECK(ctrl.inputs().com_velocity == kVec3DZero);
+    }
+  }
+
+  SECTION("qx1 and qx2") {
+    SECTION("default") {
+      ctrl.update();
+      CHECK(ctrl.inputs().qx1 == 1.0);
+      CHECK(ctrl.inputs().qx2 == 1.0);
+      CHECK(ctrl.x().q1() == 1.0);
+      CHECK(ctrl.x().q2() == 1.0);
+    }
+    SECTION("set user command") {
+      cmd->qx1 = 0.8;
+      cmd->qx2 = 0.5;
+      ctrl.update();
+      CHECK(ctrl.inputs().qx1 == 0.8);
+      CHECK(ctrl.inputs().qx2 == 0.5);
+      CHECK(ctrl.x().q1() == 0.8);
+      CHECK(ctrl.x().q2() == 0.5);
+    }
+    SECTION("clear") {
+      cmd->clear();
+      ctrl.update();
+      CHECK(ctrl.inputs().qx1 == 1.0);
+      CHECK(ctrl.inputs().qx2 == 1.0);
+      CHECK(ctrl.x().q1() == 1.0);
+      CHECK(ctrl.x().q2() == 1.0);
+    }
+  }
+
+  SECTION("qy1 and qy2") {
+    SECTION("default") {
+      ctrl.update();
+      CHECK(ctrl.inputs().qy1 == 1.0);
+      CHECK(ctrl.inputs().qy2 == 1.0);
+      CHECK(ctrl.y().q1() == 1.0);
+      CHECK(ctrl.y().q2() == 1.0);
+    }
+    SECTION("set user command") {
+      cmd->qy1 = 0.8;
+      cmd->qy2 = 0.5;
+      ctrl.update();
+      CHECK(ctrl.inputs().qy1 == 0.8);
+      CHECK(ctrl.inputs().qy2 == 0.5);
+      CHECK(ctrl.y().q1() == 0.8);
+      CHECK(ctrl.y().q2() == 0.5);
+    }
+    SECTION("clear") {
+      cmd->clear();
+      ctrl.update();
+      CHECK(ctrl.inputs().qy1 == 1.0);
+      CHECK(ctrl.inputs().qy2 == 1.0);
+      CHECK(ctrl.y().q1() == 1.0);
+      CHECK(ctrl.y().q2() == 1.0);
+    }
+  }
+
+#if 0
+  SECTION("qz1 and qz2") {
+    SECTION("default") {
+      ctrl.update();
+      CHECK(ctrl.inputs().qz1 == 1.0);
+      CHECK(ctrl.inputs().qz2 == 1.0);
+      CHECK(ctrl.z().q1() == 1.0);
+      CHECK(ctrl.z().q2() == 1.0);
+    }
+    SECTION("set user command") {
+      cmd->qz1 = 0.8;
+      cmd->qz2 = 0.5;
+      ctrl.update();
+      CHECK(ctrl.inputs().qz1 == 0.8);
+      CHECK(ctrl.inputs().qz2 == 0.5);
+      CHECK(ctrl.z().q1() == 0.8);
+      CHECK(ctrl.z().q2() == 0.5);
+    }
+    SECTION("clear") {
+      cmd->clear();
+      ctrl.update();
+      CHECK(ctrl.inputs().qz1 == 1.0);
+      CHECK(ctrl.inputs().qz2 == 1.0);
+      CHECK(ctrl.z().q1() == 1.0);
+      CHECK(ctrl.z().q2() == 1.0);
+    }
+  }
+#endif
+  SECTION("New variable") {
+    SECTION("default") {}
+    SECTION("set user command") {}
+    SECTION("clear") {}
   }
 }
 

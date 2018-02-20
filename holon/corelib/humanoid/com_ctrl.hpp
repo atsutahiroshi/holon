@@ -37,6 +37,8 @@ struct ComCtrlCommands {
   optional<double> qx1, qx2;
   optional<double> qy1, qy2;
   optional<double> qz1, qz2;
+
+  void clear();
 };
 
 struct ComCtrlInputs {

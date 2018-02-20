@@ -25,6 +25,17 @@
 
 namespace holon {
 
+void ComCtrlCommands::clear() {
+  com_position = nullopt;
+  com_velocity = nullopt;
+  qx1 = nullopt;
+  qx2 = nullopt;
+  qy1 = nullopt;
+  qy2 = nullopt;
+  qz1 = nullopt;
+  qz2 = nullopt;
+}
+
 ComCtrl::ComCtrl()
     : m_x(),
       m_y(),

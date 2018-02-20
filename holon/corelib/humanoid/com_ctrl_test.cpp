@@ -33,6 +33,34 @@ using Catch::Matchers::Equals;
 
 const double G = RK_G;
 
+TEST_CASE("ComCtrlCommands::clear() should clear all the values") {
+  Fuzzer fuzz;
+  ComCtrlCommands cmd;
+
+  // randomize all
+  cmd.com_position = fuzz.get<Vec3D>();
+  cmd.com_velocity = fuzz.get<Vec3D>();
+  cmd.qx1 = fuzz.get();
+  cmd.qx2 = fuzz.get();
+  cmd.qy1 = fuzz.get();
+  cmd.qy2 = fuzz.get();
+  cmd.qz1 = fuzz.get();
+  cmd.qz2 = fuzz.get();
+
+  // clear
+  cmd.clear();
+
+  // check
+  CHECK(cmd.com_position == nullopt);
+  CHECK(cmd.com_velocity == nullopt);
+  CHECK(cmd.qx1 == nullopt);
+  CHECK(cmd.qx2 == nullopt);
+  CHECK(cmd.qy1 == nullopt);
+  CHECK(cmd.qy2 == nullopt);
+  CHECK(cmd.qz1 == nullopt);
+  CHECK(cmd.qz2 == nullopt);
+}
+
 TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
   SECTION("check if member pointers are preserved") {

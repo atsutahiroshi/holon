@@ -67,12 +67,19 @@ struct StringMaker<holon::Vec3D> {
 };
 
 template <>
-struct StringMaker<holon::optional<holon::Vec3D>> {
-  static std::string convert(const holon::optional<holon::Vec3D>& v) {
+struct StringMaker<holon::nullopt_t> {
+  static std::string convert(const holon::nullopt_t&) {
+    return std::string("nullopt");
+  }
+};
+
+template <typename T>
+struct StringMaker<holon::optional<T>> {
+  static std::string convert(const holon::optional<T>& v) {
     if (v.has_value())
-      return ::Catch::Detail::stringify(v.value().get());
+      return ::Catch::Detail::stringify(v.value());
     else
-      return std::string("( null vector )");
+      return std::string("nullopt");
   }
 };
 

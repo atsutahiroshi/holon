@@ -84,6 +84,9 @@ class ComCtrl {
   inline Model& model() noexcept { return m_model; }
   inline States& states() noexcept { return *m_states_ptr; }
   // const accessors
+  inline const Vec3D& initial_com_position() const noexcept {
+    return m_initial_com_position;
+  }
   inline const ComCtrlX& x() const noexcept { return m_x; }
   inline const ComCtrlY& y() const noexcept { return m_y; }
   inline const Model& model() const noexcept { return m_model; }
@@ -95,6 +98,7 @@ class ComCtrl {
 
   // mutators
   ComCtrl& set_time_step(double t_time_step);
+  ComCtrl& reset(const Vec3D& t_com_position);
 
   //
   inline UserCommandsPtr getUserCommands() const noexcept {
@@ -119,6 +123,7 @@ class ComCtrl {
   InputsPtr m_inputs_ptr;
   OutputsPtr m_outputs_ptr;
   UserCommandsPtr m_user_cmds_ptr;
+  Vec3D m_initial_com_position;
 
   void remapUserCommandsToInputs();
 };

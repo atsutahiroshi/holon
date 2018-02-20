@@ -35,11 +35,17 @@ const double G = RK_G;
 
 TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
-  REQUIRE(&ctrl.states());
-  REQUIRE(&ctrl.inputs());
-  REQUIRE(&ctrl.outputs());
-  REQUIRE(&ctrl.cmds());
-  REQUIRE(ctrl.model().data().get() == &ctrl.states());
+  SECTION("check if member pointers are preserved") {
+    REQUIRE(&ctrl.states());
+    REQUIRE(&ctrl.inputs());
+    REQUIRE(&ctrl.outputs());
+    REQUIRE(&ctrl.cmds());
+    REQUIRE(ctrl.model().data().get() == &ctrl.states());
+  }
+
+  SECTION("check if initial COM position be initialized") {
+    CHECK_THAT(ctrl.initial_com_position(), Equals(ctrl.states().com_position));
+  }
 }
 
 TEST_CASE("ComCtrl::getUserCommands() provides a pointer to user commands",
@@ -58,6 +64,17 @@ TEST_CASE("ComCtrl::getUserCommands() provides a pointer to user commands",
   CHECK(cmd->com_position == Vec3D(0, 0, 0.42));
   CHECK(cmd->com_position.value() == Vec3D(0, 0, 0.42));
   CHECK(cmd->com_position.value_or(kVec3DZero) == Vec3D(0, 0, 0.42));
+}
+
+TEST_CASE("ComCtrl::reset(const Vec3D&) should reset initial COM position") {
+  ComCtrl ctrl;
+  Vec3D supposed_pi = {0, 0, 1.5};
+  REQUIRE_THAT(ctrl.initial_com_position(), !Equals(supposed_pi));
+
+  ctrl.reset(supposed_pi);
+  CHECK_THAT(ctrl.initial_com_position(), Equals(supposed_pi));
+  CHECK_THAT(ctrl.states().com_position, Equals(supposed_pi));
+  CHECK_THAT(ctrl.states().com_velocity, Equals(kVec3DZero));
 }
 
 SCENARIO("ComCtrl: compute desired ZMP position",
@@ -146,7 +163,8 @@ SCENARIO("ComCtrl: compute desired ZMP position",
     }
   }
   GIVEN(
-      "qx1 = 1.0, qx2 = 1.5, qy1 = 1.0, qy2 = 1.0, ref_com_pos = (1, 0.5, G)") {
+      "qx1 = 1.0, qx2 = 1.5, qy1 = 1.0, qy2 = 1.0, ref_com_pos = (1, 0.5, "
+      "G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {1, 0.5, G};
     double desired_zeta = ctrl.model().computeZeta(ref_com_pos);

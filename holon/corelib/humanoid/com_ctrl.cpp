@@ -31,10 +31,17 @@ ComCtrl::ComCtrl()
       m_states_ptr(m_model.data()),
       m_inputs_ptr(std::make_shared<ComCtrlInputs>()),
       m_outputs_ptr(std::make_shared<ComCtrlOutputs>()),
-      m_user_cmds_ptr(std::make_shared<ComCtrlCommands>()) {}
+      m_user_cmds_ptr(std::make_shared<ComCtrlCommands>()),
+      m_initial_com_position(m_states_ptr->com_position) {}
 
 ComCtrl& ComCtrl::set_time_step(double t_time_step) {
   m_model.set_time_step(t_time_step);
+  return *this;
+}
+
+ComCtrl& ComCtrl::reset(const Vec3D& t_com_position) {
+  m_initial_com_position = t_com_position;
+  m_model.reset(m_initial_com_position);
   return *this;
 }
 

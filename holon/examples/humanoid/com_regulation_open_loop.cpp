@@ -36,9 +36,9 @@ int main() {
     cmd->com_position = cmd_com_pos;
     ctrl.update(DT);
     std::cout << t << " ";
-    std::cout << ctrl.model().com_position().data() << " ";
-    std::cout << ctrl.model().com_velocity().data() << " ";
-    std::cout << ctrl.model().zmp_position().data() << "\n";
+    std::cout << ctrl.model().data()->com_position.data() << " ";
+    std::cout << ctrl.model().data()->com_velocity.data() << " ";
+    std::cout << ctrl.model().data()->zmp_position.data() << "\n";
     t += ctrl.time_step();
   }
   return 0;

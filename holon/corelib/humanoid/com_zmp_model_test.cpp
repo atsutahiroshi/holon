@@ -22,6 +22,7 @@
 
 #include <zm/zm_ieee.h>
 #include <roki/rk_g.h>
+#include <memory>
 #include <utility>
 
 #include "catch.hpp"
@@ -42,14 +43,14 @@ TEST_CASE("ComZmpModelData: constructor",
 
   SECTION("default constructor (no parameters)") {
     ComZmpModelData data;
-    CHECK(data.mass() == default_mass);
-    CHECK_THAT(data.nu(), Equals(kVec3DZ));
-    CHECK_THAT(data.com_position(), Equals(default_com_position));
-    CHECK_THAT(data.com_velocity(), Equals(kVec3DZero));
-    CHECK_THAT(data.com_acceleration(), Equals(kVec3DZero));
-    CHECK_THAT(data.zmp_position(), Equals(kVec3DZero));
-    CHECK_THAT(data.reaction_force(), Equals(Vec3D(0, 0, G)));
-    CHECK_THAT(data.external_force(), Equals(kVec3DZero));
+    CHECK(data.mass == default_mass);
+    CHECK_THAT(data.nu, Equals(kVec3DZ));
+    CHECK_THAT(data.com_position, Equals(default_com_position));
+    CHECK_THAT(data.com_velocity, Equals(kVec3DZero));
+    CHECK_THAT(data.com_acceleration, Equals(kVec3DZero));
+    CHECK_THAT(data.zmp_position, Equals(kVec3DZero));
+    CHECK_THAT(data.reaction_force, Equals(Vec3D(0, 0, G)));
+    CHECK_THAT(data.external_force, Equals(kVec3DZero));
   }
 
   SECTION("with parameters") {
@@ -57,367 +58,101 @@ TEST_CASE("ComZmpModelData: constructor",
     for (auto i = 0; i < 10; ++i) {
       double m = fuzz.get();
       ComZmpModelData data(m);
-      CHECK(data.mass() == m);
-      CHECK_THAT(data.nu(), Equals(kVec3DZ));
-      CHECK_THAT(data.com_position(), Equals(default_com_position));
-      CHECK_THAT(data.com_velocity(), Equals(kVec3DZero));
-      CHECK_THAT(data.com_acceleration(), Equals(kVec3DZero));
-      CHECK_THAT(data.zmp_position(), Equals(kVec3DZero));
-      CHECK_THAT(data.reaction_force(), Equals(Vec3D(0, 0, m * G)));
-      CHECK_THAT(data.external_force(), Equals(kVec3DZero));
-    }
-
-    SECTION("mass should be positive") {
-      zEchoOff();
-      ComZmpModelData data1(-1.0);
-      CHECK(data1.mass() == 1.0);
-      ComZmpModelData data2(0.0);
-      CHECK(data2.mass() == 1.0);
-      zEchoOn();
+      CHECK(data.mass == m);
+      CHECK_THAT(data.nu, Equals(kVec3DZ));
+      CHECK_THAT(data.com_position, Equals(default_com_position));
+      CHECK_THAT(data.com_velocity, Equals(kVec3DZero));
+      CHECK_THAT(data.com_acceleration, Equals(kVec3DZero));
+      CHECK_THAT(data.zmp_position, Equals(kVec3DZero));
+      CHECK_THAT(data.reaction_force, Equals(Vec3D(0, 0, m * G)));
+      CHECK_THAT(data.external_force, Equals(kVec3DZero));
     }
   }
 }
 
 TEST_CASE("ComZmpModelData: copy constructor") {
   ComZmpModelData a;
-  a.set_mass(1.5);
-  a.set_com_position(Vec3D(1.0, 2.0, 3.0));
+  a.mass = 1.5;
+  a.com_position = Vec3D(1.0, 2.0, 3.0);
   ComZmpModelData b(a);
-  CHECK(b.mass() == a.mass());
-  CHECK_THAT(b.com_position(), Equals(a.com_position()));
+  CHECK(b.mass == a.mass);
+  CHECK_THAT(b.com_position, Equals(a.com_position));
 }
 
 TEST_CASE("ComZmpModelData: copy assignment operator") {
   ComZmpModelData a, b;
-  a.set_mass(1.5);
-  a.set_com_position(Vec3D(1.0, 2.0, 3.0));
+  a.mass = 1.5;
+  a.com_position = Vec3D(1.0, 2.0, 3.0);
 
   b = a;
-  CHECK(b.mass() == a.mass());
-  CHECK_THAT(b.com_position(), Equals(a.com_position()));
+  CHECK(b.mass == a.mass);
+  CHECK_THAT(b.com_position, Equals(a.com_position));
 }
 
 TEST_CASE("ComZmpModelData: move constructor") {
   double mass = 2.5;
   Vec3D com_pos = {2.0, 3.0, 4.0};
   ComZmpModelData a;
-  a.set_mass(mass);
-  a.set_com_position(com_pos);
+  a.mass = mass;
+  a.com_position = com_pos;
 
   ComZmpModelData b = std::move(a);
-  CHECK(b.mass() == mass);
-  CHECK_THAT(b.com_position(), Equals(com_pos));
+  CHECK(b.mass == mass);
+  CHECK_THAT(b.com_position, Equals(com_pos));
 
   auto f = [](ComZmpModelData arg) { return arg; };
   ComZmpModelData c = f(ComZmpModelData(mass));
-  CHECK(c.mass() == mass);
+  CHECK(c.mass == mass);
 }
 
 TEST_CASE("ComZmpModelData: move assignment operator") {
   double mass = 2.5;
   Vec3D com_pos = {2.0, 3.0, 4.0};
   ComZmpModelData a, b, c;
-  a.set_mass(mass);
-  a.set_com_position(com_pos);
+  a.mass = mass;
+  a.com_position = com_pos;
 
   b = std::move(a);
-  CHECK(b.mass() == mass);
-  CHECK_THAT(b.com_position(), Equals(com_pos));
+  CHECK(b.mass == mass);
+  CHECK_THAT(b.com_position, Equals(com_pos));
 
   auto f = [](ComZmpModelData arg) { return arg; };
   c = f(ComZmpModelData(mass));
-  CHECK(c.mass() == mass);
-}
-
-TEST_CASE("ComZmpModelData: accessors/mutators",
-          "[corelib][humanoid][ComZmpModelData]") {
-  Fuzzer fuzz(0, 10);
-
-  SECTION("mass") {
-    ComZmpModelData data;
-    double mass = fuzz.get();
-    REQUIRE(data.mass() != mass);
-    data.set_mass(mass);
-    CHECK(data.mass() == mass);
-
-    SECTION("mass should be positive") {
-      zEchoOff();
-      data.set_mass(0.0);
-      CHECK(data.mass() == 1.0);
-      data.set_mass(-1.0);
-      CHECK(data.mass() == 1.0);
-      zEchoOn();
-    }
-  }
-
-  SECTION("COM position") {
-    ComZmpModelData data;
-    Vec3D v;
-    fuzz.randomize(v);
-    REQUIRE_THAT(data.com_position(), !Equals(v));
-    data.set_com_position(v);
-    CHECK_THAT(data.com_position(), Equals(v));
-  }
-
-  SECTION("COM velocity") {
-    ComZmpModelData data;
-    Vec3D v;
-    fuzz.randomize(v);
-    REQUIRE_THAT(data.com_velocity(), !Equals(v));
-    data.set_com_velocity(v);
-    CHECK_THAT(data.com_velocity(), Equals(v));
-  }
-
-  SECTION("COM acceleration") {
-    ComZmpModelData data;
-    Vec3D v;
-    fuzz.randomize(v);
-    REQUIRE_THAT(data.com_acceleration(), !Equals(v));
-    data.set_com_acceleration(v);
-    CHECK_THAT(data.com_acceleration(), Equals(v));
-  }
-
-  SECTION("ZMP position") {
-    ComZmpModelData data;
-    Vec3D v;
-    fuzz.randomize(v);
-    REQUIRE_THAT(data.zmp_position(), !Equals(v));
-    data.set_zmp_position(v);
-    CHECK_THAT(data.zmp_position(), Equals(v));
-  }
-
-  SECTION("Reaction force") {
-    ComZmpModelData data;
-    Vec3D v;
-    fuzz.randomize(v);
-    REQUIRE_THAT(data.reaction_force(), !Equals(v));
-    data.set_reaction_force(v);
-    CHECK_THAT(data.reaction_force(), Equals(v));
-  }
-
-  SECTION("External force") {
-    ComZmpModelData data;
-    Vec3D v;
-    fuzz.randomize(v);
-    REQUIRE_THAT(data.external_force(), !Equals(v));
-    data.set_external_force(v);
-    CHECK_THAT(data.external_force(), Equals(v));
-  }
-}
-
-TEST_CASE("ComZmpModelData can be reset by providing COM position",
-          "[corelib][humanoid][ComZmpModelData]") {
-  GIVEN("initialize with random values") {
-    ComZmpModelData data;
-    Fuzzer fuzz;
-    Vec3D p, v;
-
-    fuzz.randomize(p);
-    fuzz.randomize(v);
-    data.set_com_position(p);
-    data.set_com_velocity(v);
-
-    WHEN("reset COM position") {
-      fuzz.randomize(p);
-      data.reset(p);
-
-      THEN("COM position should be that value and velocity should be zero") {
-        CHECK_THAT(data.com_position(), Equals(p));
-        CHECK_THAT(data.com_velocity(), Equals(kVec3DZero));
-      }
-    }
-  }
+  CHECK(c.mass == mass);
 }
 
 // ComZmpModel class
-TEST_CASE("ComZmpModel: constructor", "[corelib][humanoid][ComZmpModel]") {
+TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
   double default_mass = 1;
   Vec3D default_com_position = {0, 0, 1};
 
   SECTION("default constructor (no parameters)") {
     ComZmpModel model;
-    CHECK(model.mass() == default_mass);
-    CHECK_THAT(model.nu(), Equals(kVec3DZ));
-    CHECK_THAT(model.com_position(), Equals(default_com_position));
-    CHECK_THAT(model.com_velocity(), Equals(kVec3DZero));
-    CHECK_THAT(model.com_acceleration(), Equals(kVec3DZero));
-    CHECK_THAT(model.zmp_position(), Equals(kVec3DZero));
-    CHECK_THAT(model.reaction_force(), Equals(Vec3D(0, 0, G)));
-    CHECK_THAT(model.external_force(), Equals(kVec3DZero));
+    CHECK(model.data()->mass == default_mass);
   }
 
-  SECTION("with parameters") {
+  SECTION("ComZmpModel(double t_mass)") {
     Fuzzer fuzz(0, 10);
     for (auto i = 0; i < 10; ++i) {
       double m = fuzz.get();
       ComZmpModel model(m);
-      CHECK(model.mass() == m);
-      CHECK_THAT(model.nu(), Equals(kVec3DZ));
-      CHECK_THAT(model.com_position(), Equals(default_com_position));
-      CHECK_THAT(model.com_velocity(), Equals(kVec3DZero));
-      CHECK_THAT(model.com_acceleration(), Equals(kVec3DZero));
-      CHECK_THAT(model.zmp_position(), Equals(kVec3DZero));
-      CHECK_THAT(model.reaction_force(), Equals(Vec3D(0, 0, m * G)));
-      CHECK_THAT(model.external_force(), Equals(kVec3DZero));
+      CHECK(model.data()->mass == m);
     }
 
     SECTION("mass should be positive") {
       zEchoOff();
       ComZmpModel model1(-1.0);
-      CHECK(model1.mass() == 1.0);
+      CHECK(model1.data()->mass == 1.0);
       ComZmpModel model2(0.0);
-      CHECK(model2.mass() == 1.0);
-      zEchoOn();
-    }
-  }
-}
-
-TEST_CASE("ComZmpModel: accessors/mutators",
-          "[corelib][humanoid][ComZmpModel]") {
-  Fuzzer fuzz(0, 10);
-
-  SECTION("mass") {
-    ComZmpModel model;
-    double mass = fuzz.get();
-    REQUIRE(model.mass() != mass);
-    model.set_mass(mass);
-    CHECK(model.mass() == mass);
-
-    SECTION("mass should be positive") {
-      zEchoOff();
-      model.set_mass(0.0);
-      CHECK(model.mass() == 1.0);
-      model.set_mass(-1.0);
-      CHECK(model.mass() == 1.0);
+      CHECK(model2.data()->mass == 1.0);
       zEchoOn();
     }
   }
 
-  SECTION("COM position") {
-    ComZmpModel model;
-    Vec3D v;
-    fuzz.randomize(v);
-    REQUIRE_THAT(model.com_position(), !Equals(v));
-    model.set_com_position(v);
-    CHECK_THAT(model.com_position(), Equals(v));
-  }
-
-  SECTION("COM velocity") {
-    ComZmpModel model;
-    Vec3D v;
-    fuzz.randomize(v);
-    REQUIRE_THAT(model.com_velocity(), !Equals(v));
-    model.set_com_velocity(v);
-    CHECK_THAT(model.com_velocity(), Equals(v));
-  }
-
-  SECTION("COM acceleration") {
-    ComZmpModel model;
-    Vec3D v;
-    fuzz.randomize(v);
-    REQUIRE_THAT(model.com_acceleration(), !Equals(v));
-    model.set_com_acceleration(v);
-    CHECK_THAT(model.com_acceleration(), Equals(v));
-  }
-
-  SECTION("ZMP position") {
-    ComZmpModel model;
-    Vec3D v;
-    fuzz.randomize(v);
-    REQUIRE_THAT(model.zmp_position(), !Equals(v));
-    model.set_zmp_position(v);
-    CHECK_THAT(model.zmp_position(), Equals(v));
-  }
-
-  SECTION("Reaction force") {
-    ComZmpModel model;
-    Vec3D v;
-    fuzz.randomize(v);
-    REQUIRE_THAT(model.reaction_force(), !Equals(v));
-    model.set_reaction_force(v);
-    CHECK_THAT(model.reaction_force(), Equals(v));
-  }
-
-  SECTION("External force") {
-    ComZmpModel model;
-    Vec3D v;
-    fuzz.randomize(v);
-    REQUIRE_THAT(model.external_force(), !Equals(v));
-    model.set_external_force(v);
-    CHECK_THAT(model.external_force(), Equals(v));
-  }
-}
-
-TEST_CASE("COM-ZMP model has a mass as a parameter", "[corelib][humanoid]") {
-  SECTION("when instantiated with no paramters mass should be 1") {
-    ComZmpModel model;
-    CHECK(model.mass() == 1.0);
-  }
-
-  SECTION("can be instantiated by providing mass") {
-    {
-      ComZmpModel model(1.0);
-      CHECK(model.mass() == 1.0);
-    }
-    {
-      ComZmpModel model(3.0);
-      CHECK(model.mass() == 3.0);
-    }
-  }
-
-  SECTION("can provide mass after instantiation") {
-    ComZmpModel model;
-    REQUIRE(model.mass() == 1.0);
-
-    Fuzzer fuzz(0, 10);
-    for (auto i = 0; i < 3; ++i) {
-      double m = fuzz.get();
-      model.set_mass(m);
-      CHECK(model.mass() == m);
-    }
-  }
-
-  SECTION("when non-positive value is given as mass it should be 1") {
-    ComZmpModel model;
-
-    zEchoOff();
-    model.set_mass(3);
-    REQUIRE(model.mass() == 3.0);
-    model.set_mass(0);
-    CHECK(model.mass() == 1.0);
-
-    model.set_mass(3);
-    REQUIRE(model.mass() == 3.0);
-    model.set_mass(-1);
-    CHECK(model.mass() == 1.0);
-    zEchoOn();
-  }
-}
-
-TEST_CASE("check if you can set arbitrarly states", "[corelib][humanoid]") {
-  ComZmpModel model;
-  Fuzzer fuzz;
-
-  SECTION("COM position") {
-    Vec3D new_com_pos;
-    fuzz.randomize(new_com_pos);
-    REQUIRE_THAT(model.com_position(), !Equals(new_com_pos));
-    model.set_com_position(new_com_pos);
-    REQUIRE_THAT(model.com_position(), Equals(new_com_pos));
-  }
-  SECTION("COM velocity") {
-    Vec3D new_com_vel;
-    fuzz.randomize(new_com_vel);
-    REQUIRE_THAT(model.com_velocity(), !Equals(new_com_vel));
-    model.set_com_velocity(new_com_vel);
-    REQUIRE_THAT(model.com_velocity(), Equals(new_com_vel));
-  }
-  SECTION("ZMP position") {
-    Vec3D new_zmp_pos;
-    fuzz.randomize(new_zmp_pos);
-    REQUIRE_THAT(model.zmp_position(), !Equals(new_zmp_pos));
-    model.set_zmp_position(new_zmp_pos);
-    REQUIRE_THAT(model.zmp_position(), Equals(new_zmp_pos));
+  SECTION("ComZmpModel(Data t_data)") {
+    auto data = std::make_shared<ComZmpModelData>();
+    ComZmpModel model(data);
+    CHECK(model.data() == data);
   }
 }
 
@@ -429,16 +164,16 @@ SCENARIO("reset COM position", "[corelib][humanoid]") {
 
     fuzz.randomize(p);
     fuzz.randomize(v);
-    model.set_com_position(p);
-    model.set_com_velocity(v);
+    model.data()->com_position = p;
+    model.data()->com_velocity = v;
 
     WHEN("reset COM position") {
       fuzz.randomize(p);
       model.reset(p);
 
       THEN("COM position should be that value and velocity should be zero") {
-        CHECK_THAT(model.com_position(), Equals(p));
-        CHECK_THAT(model.com_velocity(), Equals(kVec3DZero));
+        CHECK_THAT(model.data()->com_position, Equals(p));
+        CHECK_THAT(model.data()->com_velocity, Equals(kVec3DZero));
       }
     }
   }
@@ -1034,11 +769,11 @@ TEST_CASE("test if acceleration is modified after update",
     for (auto& c : testcases) {
       Vec3D expected_com_acc = model.computeComAcc(c.com_pos, c.zmp_pos);
 
-      model.set_com_position(c.com_pos);
-      model.set_com_velocity(c.com_vel);
-      model.set_zmp_position(c.zmp_pos);
+      model.data()->com_position = c.com_pos;
+      model.data()->com_velocity = c.com_vel;
+      model.data()->zmp_position = c.zmp_pos;
       model.update();
-      CHECK_THAT(model.com_acceleration(), Equals(expected_com_acc));
+      CHECK_THAT(model.data()->com_acceleration, Equals(expected_com_acc));
     }
   }
 }
@@ -1049,31 +784,31 @@ SCENARIO("update COM position, velocity, acceleration", "[corelib][humanoid]") {
 
     WHEN("input ZMP position as (-1, -0.5, 0) and update") {
       Vec3D zmp_pos = {-1, -0.5, 0};
-      model.set_zmp_position(zmp_pos);
+      model.data()->zmp_position = zmp_pos;
       REQUIRE(model.update());
 
       THEN("horizontal velocity should be positive") {
-        Vec3D vel = model.com_velocity();
+        Vec3D vel = model.data()->com_velocity;
         CHECK(vel.x() > 0.0);
         CHECK(vel.y() > 0.0);
       }
       THEN("horizontal position should still be at zero") {
-        Vec3D pos = model.com_position();
+        Vec3D pos = model.data()->com_position;
         CHECK(pos.x() == 0.0);
         CHECK(pos.y() == 0.0);
       }
 
       WHEN("and update once more") {
-        model.set_zmp_position(zmp_pos);
+        model.data()->zmp_position = zmp_pos;
         REQUIRE(model.update());
 
         THEN("horizontal velocity should be positive") {
-          Vec3D vel = model.com_velocity();
+          Vec3D vel = model.data()->com_velocity;
           CHECK(vel.x() > 0.0);
           CHECK(vel.y() > 0.0);
         }
         THEN("horizontal position should move forward") {
-          Vec3D pos = model.com_position();
+          Vec3D pos = model.data()->com_position;
           CHECK(pos.x() > 0.0);
           CHECK(pos.y() > 0.0);
         }
@@ -1086,7 +821,7 @@ TEST_CASE("when COM height is zero, update should fail") {
   ComZmpModel model;
   Vec3D p = {0, 0, 0};
 
-  model.set_com_position(p);
+  model.data()->com_position = p;
   zEchoOff();
   CHECK_FALSE(model.update());
   zEchoOn();

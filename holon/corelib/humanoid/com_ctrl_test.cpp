@@ -275,9 +275,9 @@ TEST_CASE("check if desired ZMP position is modified after update",
     double expected_des_zeta;
 
     expected_des_zeta = ctrl.model().computeZeta(c.cmd_com_pos);
-    expected_des_zmp_pos =
-        ctrl.computeDesZmpPos(c.cmd_com_pos, ctrl.model().com_position(),
-                              ctrl.model().com_velocity(), expected_des_zeta);
+    expected_des_zmp_pos = ctrl.computeDesZmpPos(
+        c.cmd_com_pos, ctrl.model().data()->com_position,
+        ctrl.model().data()->com_velocity, expected_des_zeta);
 
     cmd->com_position = c.cmd_com_pos;
     ctrl.update();
@@ -296,7 +296,7 @@ SCENARIO("controller can regulate COM position at a point",
     WHEN("at first") {
       THEN("COM position is at (0, 0, 1)") {
         Vec3D expected_com_pos = {0, 0, 1};
-        CHECK_THAT(ctrl.model().com_position(), Equals(expected_com_pos));
+        CHECK_THAT(ctrl.model().data()->com_position, Equals(expected_com_pos));
       }
     }
     WHEN("update until 0.1 sec") {
@@ -306,7 +306,7 @@ SCENARIO("controller can regulate COM position at a point",
         t += ctrl.time_step();
       }
       THEN("COM position is between (0, 0, 1) and (0.1, -0.1, 1)") {
-        Vec3D pos = ctrl.model().com_position();
+        Vec3D pos = ctrl.model().data()->com_position;
         CAPTURE(pos);
         CHECK(pos.x() > 0.0);
         CHECK(pos.x() < 0.1);
@@ -321,7 +321,7 @@ SCENARIO("controller can regulate COM position at a point",
         t += ctrl.time_step();
       }
       THEN("COM lies at (0.1, -0.1, 1)") {
-        CHECK_THAT(ctrl.model().com_position(), Equals(cmd_com_pos));
+        CHECK_THAT(ctrl.model().data()->com_position, Equals(cmd_com_pos));
       }
     }
   }
@@ -332,7 +332,7 @@ TEST_CASE("com_ctrl: when COM height is zero, update should fail",
   ComCtrl ctrl;
   Vec3D p = {0, 0, 0};
 
-  ctrl.model().set_com_position(p);
+  ctrl.model().data()->com_position = p;
   zEchoOff();
   CHECK_FALSE(ctrl.update());
   zEchoOn();

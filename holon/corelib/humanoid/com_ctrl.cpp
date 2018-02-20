@@ -45,7 +45,7 @@ Vec3D ComCtrl::computeDesZmpPos(const Vec3D& t_ref_com_pos,
 }
 
 void ComCtrl::remapUserCommandsToInputs() {
-  Vec3D default_com_pos(0, 0, m_model.com_position().z());
+  Vec3D default_com_pos(0, 0, m_model.data()->com_position.z());
   m_inputs.com_position = m_user_cmds->com_position.value_or(default_com_pos);
 }
 
@@ -56,9 +56,9 @@ bool ComCtrl::update() {
   if (zIsTiny(m_outputs.zeta)) return false;
 
   m_outputs.zmp_position =
-      computeDesZmpPos(m_inputs.com_position, m_model.com_position(),
-                       m_model.com_velocity(), m_outputs.zeta);
-  m_model.set_zmp_position(m_outputs.zmp_position);
+      computeDesZmpPos(m_inputs.com_position, m_model.data()->com_position,
+                       m_model.data()->com_velocity, m_outputs.zeta);
+  m_model.data()->zmp_position = m_outputs.zmp_position;
   return m_model.update();
 }
 

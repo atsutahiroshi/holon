@@ -21,6 +21,7 @@
 #include "holon/corelib/humanoid/com_zmp_model.hpp"
 
 #include <roki/rk_g.h>
+#include <memory>
 #include <utility>
 
 namespace holon {
@@ -33,120 +34,38 @@ const Vec3D kG = {0, 0, RK_G};
 }  //
 
 ComZmpModelData::ComZmpModelData()
-    : m_mass(default_mass),
-      m_nu(kVec3DZ),
-      m_com_position(default_com_position),
-      m_com_velocity(kVec3DZero),
-      m_com_acceleration(kVec3DZero),
-      m_zmp_position(kVec3DZero),
-      m_reaction_force(0, 0, default_mass * RK_G),
-      m_external_force(kVec3DZero) {}
+    : mass(default_mass),
+      nu(kVec3DZ),
+      com_position(default_com_position),
+      com_velocity(kVec3DZero),
+      com_acceleration(kVec3DZero),
+      zmp_position(kVec3DZero),
+      reaction_force(0, 0, default_mass * RK_G),
+      external_force(kVec3DZero) {}
 
 ComZmpModelData::ComZmpModelData(double t_mass)
-    : m_mass(default_mass),
-      m_nu(kVec3DZ),
-      m_com_position(default_com_position),
-      m_com_velocity(kVec3DZero),
-      m_com_acceleration(kVec3DZero),
-      m_zmp_position(kVec3DZero),
-      m_reaction_force(0, 0, default_mass * RK_G),
-      m_external_force(kVec3DZero) {
-  set_mass(t_mass);
-  m_reaction_force.set_z(m_mass * RK_G);
+    : mass(t_mass),
+      nu(kVec3DZ),
+      com_position(default_com_position),
+      com_velocity(kVec3DZero),
+      com_acceleration(kVec3DZero),
+      zmp_position(kVec3DZero),
+      reaction_force(0, 0, t_mass * RK_G),
+      external_force(kVec3DZero) {}
+
+ComZmpModel::ComZmpModel() : m_time_step(default_time_step) {
+  m_data = std::make_shared<ComZmpModelData>();
 }
 
-ComZmpModelData& ComZmpModelData::set_mass(double t_mass) {
-  if (zIsTiny(t_mass) || t_mass < 0) {
-    ZRUNERROR("mass must be positive value (given: %g)", t_mass);
-    m_mass = default_mass;
-  } else {
-    m_mass = t_mass;
-  }
-  return *this;
+ComZmpModel::ComZmpModel(double t_mass) : m_time_step(default_time_step) {
+  if (isMassValid(t_mass))
+    m_data = std::make_shared<ComZmpModelData>(t_mass);
+  else
+    m_data = std::make_shared<ComZmpModelData>();
 }
 
-ComZmpModelData& ComZmpModelData::set_com_position(
-    const Vec3D& t_com_position) {
-  m_com_position = t_com_position;
-  return *this;
-}
-
-ComZmpModelData& ComZmpModelData::set_com_velocity(
-    const Vec3D& t_com_velocity) {
-  m_com_velocity = t_com_velocity;
-  return *this;
-}
-
-ComZmpModelData& ComZmpModelData::set_com_acceleration(
-    const Vec3D& t_com_acceleration) {
-  m_com_acceleration = t_com_acceleration;
-  return *this;
-}
-
-ComZmpModelData& ComZmpModelData::set_zmp_position(
-    const Vec3D& t_zmp_position) {
-  m_zmp_position = t_zmp_position;
-  return *this;
-}
-
-ComZmpModelData& ComZmpModelData::set_reaction_force(
-    const Vec3D& t_reaction_force) {
-  m_reaction_force = t_reaction_force;
-  return *this;
-}
-
-ComZmpModelData& ComZmpModelData::set_external_force(
-    const Vec3D& t_external_force) {
-  m_external_force = t_external_force;
-  return *this;
-}
-
-ComZmpModelData& ComZmpModelData::reset(const Vec3D& t_com_position) {
-  m_com_position = t_com_position;
-  m_com_velocity.clear();
-  return *this;
-}
-
-ComZmpModel::ComZmpModel() : m_data(), m_time_step(default_time_step) {}
-
-ComZmpModel::ComZmpModel(double t_mass)
-    : m_data(t_mass), m_time_step(default_time_step) {}
-
-ComZmpModel& ComZmpModel::set_mass(double t_mass) {
-  m_data.set_mass(t_mass);
-  return *this;
-}
-
-ComZmpModel& ComZmpModel::set_com_position(const Vec3D& t_com_position) {
-  m_data.set_com_position(t_com_position);
-  return *this;
-}
-
-ComZmpModel& ComZmpModel::set_com_velocity(const Vec3D& t_com_velocity) {
-  m_data.set_com_velocity(t_com_velocity);
-  return *this;
-}
-
-ComZmpModel& ComZmpModel::set_com_acceleration(
-    const Vec3D& t_com_acceleration) {
-  m_data.set_com_acceleration(t_com_acceleration);
-  return *this;
-}
-
-ComZmpModel& ComZmpModel::set_zmp_position(const Vec3D& t_zmp_position) {
-  m_data.set_zmp_position(t_zmp_position);
-  return *this;
-}
-
-ComZmpModel& ComZmpModel::set_reaction_force(const Vec3D& t_reaction_force) {
-  m_data.set_reaction_force(t_reaction_force);
-  return *this;
-}
-
-ComZmpModel& ComZmpModel::set_external_force(const Vec3D& t_external_force) {
-  m_data.set_external_force(t_external_force);
-  return *this;
-}
+ComZmpModel::ComZmpModel(ComZmpModel::Data t_data)
+    : m_data(t_data), m_time_step(default_time_step) {}
 
 ComZmpModel& ComZmpModel::set_time_step(double t_time_step) {
   if (!isTimeStepValid(t_time_step)) {
@@ -158,7 +77,8 @@ ComZmpModel& ComZmpModel::set_time_step(double t_time_step) {
 }
 
 ComZmpModel& ComZmpModel::reset(const Vec3D& t_com_position) {
-  m_data.reset(t_com_position);
+  m_data->com_position = t_com_position;
+  m_data->com_velocity.clear();
   return *this;
 }
 
@@ -274,13 +194,13 @@ Vec3D ComZmpModel::computeComAcc(const Vec3D& t_com_position,
 }
 
 bool ComZmpModel::update() {
-  if (zIsTiny(computeSqrZeta(com_position()))) return false;
-  Vec3D acc = computeComAcc(com_position(), zmp_position());
-  Vec3D pos = com_position() + time_step() * com_velocity();
-  Vec3D vel = com_velocity() + time_step() * acc;
-  m_data.set_com_position(pos);
-  m_data.set_com_velocity(vel);
-  m_data.set_com_acceleration(acc);
+  if (zIsTiny(computeSqrZeta(m_data->com_position))) return false;
+  Vec3D acc = computeComAcc(m_data->com_position, m_data->zmp_position);
+  Vec3D pos = m_data->com_position + time_step() * m_data->com_velocity;
+  Vec3D vel = m_data->com_velocity + time_step() * acc;
+  m_data->com_position = pos;
+  m_data->com_velocity = vel;
+  m_data->com_acceleration = acc;
   return true;
 }
 
@@ -298,7 +218,7 @@ bool ComZmpModel::isTimeStepValid(double t_time_step) const {
 }
 
 bool ComZmpModel::isMassValid(double t_mass) const {
-  if (t_mass < 0.0) {
+  if (zIsTiny(t_mass) || t_mass < 0.0) {
     ZRUNWARN("The mass must be positive. (given mass = %g)", t_mass);
     return false;
   }

@@ -78,17 +78,14 @@ class ComCtrl {
   ComCtrl& operator=(ComCtrl&&) = delete;
 
   // accessors
-  // TODO: remove non-const accessors to x and y
   inline ComCtrlX& x() noexcept { return m_x; }
   inline ComCtrlY& y() noexcept { return m_y; }
-  // TODO: remove accessor to model
+  // TODO: remove non-const accessor to model
   inline Model& model() noexcept { return m_model; }
   inline States& states() noexcept { return *m_states_ptr; }
-  inline Inputs& inputs() noexcept { return *m_inputs_ptr; }
   // const accessors
   inline const ComCtrlX& x() const noexcept { return m_x; }
   inline const ComCtrlY& y() const noexcept { return m_y; }
-  // TODO: remove accessor to model
   inline const Model& model() const noexcept { return m_model; }
   inline const States& states() const noexcept { return *m_states_ptr; }
   inline const Inputs& inputs() const noexcept { return *m_inputs_ptr; }

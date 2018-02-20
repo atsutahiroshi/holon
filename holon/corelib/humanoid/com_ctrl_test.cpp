@@ -60,7 +60,8 @@ TEST_CASE("ComCtrl::getUserCommands() provides a pointer to user commands",
   CHECK(cmd->com_position.value_or(kVec3DZero) == Vec3D(0, 0, 0.42));
 }
 
-SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
+SCENARIO("ComCtrl: compute desired ZMP position",
+         "[corelib][humanoid][ComCtrl]") {
   GIVEN("qx1 = 1.0, qx2 = 1.0, qy1 = 1.0, qy2 = 1.0, ref_com_pos = (0, 0, G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {0, 0, G};
@@ -77,7 +78,6 @@ SCENARIO("compute desired ZMP position", "[corelib][humanoid]") {
       Vec3D com_vel = {0, 0, 0};
 
       THEN("desire_zmp_pos = (0, 0, 0)") {
-        // Vec3D desired_zmp_pos;
         Vec3D expected_zmp_pos = {0, 0, 0};
         Vec3D desired_zmp_pos =
             ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);

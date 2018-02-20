@@ -62,15 +62,29 @@ void ComCtrl::remapUserCommandsToInputs() {
 }
 
 bool ComCtrl::update() {
+  // remap commanded values given by user to referential values for controller
   remapUserCommandsToInputs();
+
+  // compute desired reaction force along z-axis
+  // TODO: add computation of reaction force
+
+  // compute desired value of zeta from desired reaction force
+  // TODO: fix computation of zeta
+  // TODO: check if COM position should be given from inputs (states?)
   m_outputs_ptr->zeta =
       m_model.computeZeta(inputs().com_position, kVec3DZero, kVec3DZero);
   if (zIsTiny(outputs().zeta)) return false;
 
+  // compute desired ZMP position
   m_outputs_ptr->zmp_position =
       computeDesZmpPos(inputs().com_position, states().com_position,
                        states().com_velocity, outputs().zeta);
+
+  // update states of COM-ZMP model
+  // TODO: add reaction force
   m_states_ptr->zmp_position = outputs().zmp_position;
+
+  // TODO: add update of desired position, velocity and acceleration of COM
   return m_model.update();
 }
 

@@ -156,30 +156,8 @@ TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
   }
 }
 
-SCENARIO("reset COM position", "[corelib][humanoid]") {
-  GIVEN("initialize with random values") {
-    ComZmpModel model;
-    Fuzzer fuzz;
-    Vec3D p, v;
-
-    fuzz.randomize(p);
-    fuzz.randomize(v);
-    model.data()->com_position = p;
-    model.data()->com_velocity = v;
-
-    WHEN("reset COM position") {
-      fuzz.randomize(p);
-      model.reset(p);
-
-      THEN("COM position should be that value and velocity should be zero") {
-        CHECK_THAT(model.data()->com_position, Equals(p));
-        CHECK_THAT(model.data()->com_velocity, Equals(kVec3DZero));
-      }
-    }
-  }
-}
-
-TEST_CASE("check if you can set/get step time", "[corelib][humanoid]") {
+TEST_CASE("ComZmpModel: accessor/mutator of time step",
+          "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;
 
   SECTION("default value is 0.001") {
@@ -203,6 +181,30 @@ TEST_CASE("check if you can set/get step time", "[corelib][humanoid]") {
     model.set_time_step(-0.01);
     CHECK(model.time_step() == 0.001);
     zEchoOn();
+  }
+}
+
+SCENARIO("ComZmpModel: function to reset COM position",
+         "[corelib][humanoid][ComZmpModel]") {
+  GIVEN("initialize with random values") {
+    ComZmpModel model;
+    Fuzzer fuzz;
+    Vec3D p, v;
+
+    fuzz.randomize(p);
+    fuzz.randomize(v);
+    model.data()->com_position = p;
+    model.data()->com_velocity = v;
+
+    WHEN("reset COM position") {
+      fuzz.randomize(p);
+      model.reset(p);
+
+      THEN("COM position should be that value and velocity should be zero") {
+        CHECK_THAT(model.data()->com_position, Equals(p));
+        CHECK_THAT(model.data()->com_velocity, Equals(kVec3DZero));
+      }
+    }
   }
 }
 

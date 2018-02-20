@@ -49,11 +49,12 @@ class ComZmpModel {
   static constexpr double default_time_step = 0.001;
 
  public:
-  using Data = std::shared_ptr<ComZmpModelData>;
+  using Data = ComZmpModelData;
+  using DataPtr = std::shared_ptr<ComZmpModelData>;
 
   ComZmpModel();
   ComZmpModel(double t_mass);
-  ComZmpModel(Data t_data);
+  ComZmpModel(DataPtr t_data_ptr);
 
   // special member functions
   virtual ~ComZmpModel() = default;
@@ -63,11 +64,12 @@ class ComZmpModel {
   ComZmpModel& operator=(ComZmpModel&&) = delete;
 
   // accessors
-  inline const Data data() const noexcept { return m_data; }
+  inline const Data& data() const noexcept { return *m_data_ptr; }
+  inline const DataPtr& data_ptr() const noexcept { return m_data_ptr; }
   inline double time_step() const noexcept { return m_time_step; }
 
   // mutators
-  ComZmpModel& set_data(Data t_data);
+  ComZmpModel& set_data(DataPtr t_data_ptr);
   ComZmpModel& set_time_step(double t_time_step);
   ComZmpModel& reset(const Vec3D& t_com_position);
 
@@ -106,7 +108,7 @@ class ComZmpModel {
   bool update(double t_time_step);
 
  private:
-  Data m_data;
+  DataPtr m_data_ptr;
   double m_time_step;
 
   bool isTimeStepValid(double t_time_step) const;

@@ -54,19 +54,19 @@ ComZmpModelData::ComZmpModelData(double t_mass)
       external_force(kVec3DZero) {}
 
 ComZmpModel::ComZmpModel()
-    : m_data(std::make_shared<ComZmpModelData>()),
+    : m_data_ptr(std::make_shared<ComZmpModelData>()),
       m_time_step(default_time_step) {}
 
 ComZmpModel::ComZmpModel(double t_mass)
-    : m_data(isMassValid(t_mass) ? std::make_shared<ComZmpModelData>(t_mass)
-                                 : std::make_shared<ComZmpModelData>()),
+    : m_data_ptr(isMassValid(t_mass) ? std::make_shared<ComZmpModelData>(t_mass)
+                                     : std::make_shared<ComZmpModelData>()),
       m_time_step(default_time_step) {}
 
-ComZmpModel::ComZmpModel(Data t_data)
-    : m_data(t_data), m_time_step(default_time_step) {}
+ComZmpModel::ComZmpModel(DataPtr t_data)
+    : m_data_ptr(t_data), m_time_step(default_time_step) {}
 
-ComZmpModel& ComZmpModel::set_data(Data t_data) {
-  m_data = t_data;
+ComZmpModel& ComZmpModel::set_data(DataPtr t_data_ptr) {
+  m_data_ptr = t_data_ptr;
   return *this;
 }
 
@@ -80,8 +80,8 @@ ComZmpModel& ComZmpModel::set_time_step(double t_time_step) {
 }
 
 ComZmpModel& ComZmpModel::reset(const Vec3D& t_com_position) {
-  m_data->com_position = t_com_position;
-  m_data->com_velocity.clear();
+  m_data_ptr->com_position = t_com_position;
+  m_data_ptr->com_velocity.clear();
   return *this;
 }
 
@@ -171,29 +171,29 @@ Vec3D ComZmpModel::computeComAcc(const Vec3D& t_com_position,
                                  const Vec3D& t_zmp_position,
                                  const Vec3D& t_reaction_force) const {
   double zeta2 = computeSqrZeta(t_com_position, t_zmp_position,
-                                t_reaction_force, m_data->mass);
+                                t_reaction_force, data().mass);
   Vec3D acc = zeta2 * (t_com_position - t_zmp_position) - kG;
   return acc;
 }
 
 bool ComZmpModel::update() {
   // check if the value of zeta will be valid when computing acceleration
-  if (zIsTiny(computeSqrZeta(m_data->com_position, m_data->zmp_position,
-                             m_data->reaction_force, m_data->mass)))
+  if (zIsTiny(computeSqrZeta(data().com_position, data().zmp_position,
+                             data().reaction_force, data().mass)))
     return false;
 
   // compute acceleration from current COM / ZMP positions and reaction force
-  Vec3D acc = computeComAcc(m_data->com_position, m_data->zmp_position,
-                            m_data->reaction_force);
+  Vec3D acc = computeComAcc(data().com_position, data().zmp_position,
+                            data().reaction_force);
 
   // integrate COM position / velocity by one time step
-  Vec3D pos = m_data->com_position + time_step() * m_data->com_velocity;
-  Vec3D vel = m_data->com_velocity + time_step() * acc;
+  Vec3D pos = data().com_position + time_step() * data().com_velocity;
+  Vec3D vel = data().com_velocity + time_step() * acc;
 
   // update stetes
-  m_data->com_position = pos;
-  m_data->com_velocity = vel;
-  m_data->com_acceleration = acc;
+  m_data_ptr->com_position = pos;
+  m_data_ptr->com_velocity = vel;
+  m_data_ptr->com_acceleration = acc;
   return true;
 }
 

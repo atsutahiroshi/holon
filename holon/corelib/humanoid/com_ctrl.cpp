@@ -29,7 +29,7 @@ ComCtrl::ComCtrl()
     : m_x(),
       m_y(),
       m_model(),
-      m_states_ptr(m_model.data()),
+      m_states_ptr(m_model.data_ptr()),
       m_inputs_ptr(std::make_shared<ComCtrlInputs>()),
       m_outputs_ptr(std::make_shared<ComCtrlOutputs>()),
       m_user_cmds_ptr(std::make_shared<ComCtrlCommands>()),
@@ -68,7 +68,7 @@ Vec3D ComCtrl::computeDesZmpPos(const Vec3D& t_ref_com_pos,
 }
 
 void ComCtrl::remapUserCommandsToInputs() {
-  Vec3D default_com_pos(0, 0, m_model.data()->com_position.z());
+  Vec3D default_com_pos(0, 0, m_model.data().com_position.z());
   m_inputs_ptr->com_position = cmds().com_position.value_or(default_com_pos);
 }
 

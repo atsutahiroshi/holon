@@ -318,6 +318,19 @@ TEST_CASE("check if desired ZMP position is modified after update",
   }
 }
 
+TEST_CASE("ComCtrl::update() updates control paramters",
+          "[corelib][humanoid][ComCtrl]") {
+  ComCtrl ctrl;
+  auto cmd = ctrl.getUserCommands();
+
+  SECTION("COM position") {
+    Vec3D v = {1.2, -1.2, 1.5};
+    cmd->com_position = v;
+    ctrl.update();
+    CHECK(ctrl.inputs().com_position == v);
+  }
+}
+
 SCENARIO("controller can regulate COM position at a point",
          "[corelib][humanoid]") {
   GIVEN("command that COM position be at (0.1, -0.1, 1)") {

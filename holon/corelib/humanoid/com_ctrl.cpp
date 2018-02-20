@@ -59,14 +59,26 @@ void ComCtrlCommands::set_com_velocity(optional<double> t_vxd,
   vyd = t_vyd;
 }
 
+std::shared_ptr<ComCtrlCommands> ComCtrlCommandsFactory() {
+  return std::make_shared<ComCtrlCommands>();
+}
+
+std::shared_ptr<ComCtrlInputs> ComCtrlInputsFactory() {
+  return std::make_shared<ComCtrlInputs>();
+}
+
+std::shared_ptr<ComCtrlOutputs> ComCtrlOutputsFactory() {
+  return std::make_shared<ComCtrlOutputs>();
+}
+
 ComCtrl::ComCtrl()
     : m_x(),
       m_y(),
       m_model(),
       m_states_ptr(m_model.data_ptr()),
-      m_inputs_ptr(std::make_shared<ComCtrlInputs>()),
-      m_outputs_ptr(std::make_shared<ComCtrlOutputs>()),
-      m_user_cmds_ptr(std::make_shared<ComCtrlCommands>()),
+      m_inputs_ptr(ComCtrlInputsFactory()),
+      m_outputs_ptr(ComCtrlOutputsFactory()),
+      m_user_cmds_ptr(ComCtrlCommandsFactory()),
       m_initial_com_position(m_states_ptr->com_position) {}
 
 ComCtrl& ComCtrl::set_time_step(double t_time_step) {

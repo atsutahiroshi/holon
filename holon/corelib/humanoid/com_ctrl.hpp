@@ -62,6 +62,10 @@ struct ComCtrlOutputs {
   double zeta;
 };
 
+std::shared_ptr<ComCtrlCommands> ComCtrlCommandsFactory();
+std::shared_ptr<ComCtrlInputs> ComCtrlInputsFactory();
+std::shared_ptr<ComCtrlOutputs> ComCtrlOutputsFactory();
+
 class ComCtrl {
  public:
   using Model = ComZmpModel;

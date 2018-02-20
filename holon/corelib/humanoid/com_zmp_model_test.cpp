@@ -156,6 +156,23 @@ TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
   }
 }
 
+TEST_CASE("ComZmpModel: accessor/mutator of data",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+
+  SECTION("ComZmpModel can hold another Data pointer") {
+    auto data1 = std::make_shared<ComZmpModelData>();
+    REQUIRE(model.data() != data1);
+    model.set_data(data1);
+    CHECK(model.data() == data1);
+
+    auto data2 = std::make_shared<ComZmpModelData>();
+    REQUIRE(model.data() != data2);
+    model.set_data(data2);
+    CHECK(model.data() == data2);
+  }
+}
+
 TEST_CASE("ComZmpModel: accessor/mutator of time step",
           "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;

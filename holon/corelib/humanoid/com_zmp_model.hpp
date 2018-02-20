@@ -67,6 +67,7 @@ class ComZmpModel {
   inline double time_step() const noexcept { return m_time_step; }
 
   // mutators
+  ComZmpModel& set_data(Data t_data);
   ComZmpModel& set_time_step(double t_time_step);
   ComZmpModel& reset(const Vec3D& t_com_position);
 

@@ -64,8 +64,13 @@ ComZmpModel::ComZmpModel(double t_mass) : m_time_step(default_time_step) {
     m_data = std::make_shared<ComZmpModelData>();
 }
 
-ComZmpModel::ComZmpModel(ComZmpModel::Data t_data)
+ComZmpModel::ComZmpModel(Data t_data)
     : m_data(t_data), m_time_step(default_time_step) {}
+
+ComZmpModel& ComZmpModel::set_data(Data t_data) {
+  m_data = t_data;
+  return *this;
+}
 
 ComZmpModel& ComZmpModel::set_time_step(double t_time_step) {
   if (!isTimeStepValid(t_time_step)) {

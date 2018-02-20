@@ -97,8 +97,6 @@ class ComZmpModel {
                      const Vec3D& t_reaction_force, double t_mass,
                      const Vec3D& t_nu = kVec3DZ) const;
 
-  double computeSqrZeta(const Vec3D& t_com_position) const;
-  double computeZeta(const Vec3D& t_com_position) const;
   Vec3D computeComAcc(const Vec3D& t_com_position,
                       const Vec3D& t_zmp_position) const;
 

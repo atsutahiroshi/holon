@@ -48,7 +48,8 @@ BENCHMARK_F(ComCtrlBenchmark, GetQ1, 100, 1000) {
 BENCHMARK_F(ComCtrlBenchmark, SetQ1, 100, 1000) { ctrl.x().set_q1(1); }
 
 BENCHMARK_F(ComCtrlBenchmark, computeDesZmpPos, 100, 1000) {
-  double desired_zeta = ctrl.model().computeZeta(ref_com_pos);
+  double desired_zeta =
+      ctrl.model().computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
   Vec3D desired_zmp_pos =
       ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
   (void)desired_zmp_pos;

@@ -660,52 +660,6 @@ TEST_CASE(
   }
 }
 
-TEST_CASE("compute squared zeta in equation of motion based on COM-ZMP model",
-          "[corelib][humanoid]") {
-  ComZmpModel model;
-
-  SECTION("zeta should be computed according to the COM height") {
-    struct testcase_t {
-      double com_height;
-      double expected_zeta_squared;
-      double expected_zeta;
-    } testcases[] = {{1, G, sqrt(G)},
-                     {G, 1.0, 1.0},
-                     {2, G / 2, sqrt(G / 2)},
-                     {4, G / 4, sqrt(G / 4)}};
-
-    for (auto c : testcases) {
-      Vec3D pg = {0, 0, c.com_height};
-      CHECK(model.computeSqrZeta(pg) == Approx(c.expected_zeta_squared));
-      CHECK(model.computeZeta(pg) == Approx(c.expected_zeta));
-    }
-  }
-  SECTION("return 0 when the given COM height was 0") {
-    // Returning 0 when the height is 0 is due to avoiding zero-division,
-    // but this is not theoritically correct.
-    // This case should be handled as an exception somehow.
-    // TODO(*): handle zero-division error correctly
-    Vec3D pg = {0, 0, 0};
-    zEchoOff();
-    CHECK_FALSE(zIsInf(model.computeSqrZeta(pg)));
-    CHECK(model.computeSqrZeta(pg) == 0.0);
-    CHECK_FALSE(zIsInf(model.computeZeta(pg)));
-    CHECK(model.computeZeta(pg) == 0.0);
-    zEchoOn();
-  }
-  SECTION("return 0 when the given COM height was negative") {
-    // Return 0 when a negative valued was given as the height of COM.
-    // This should be handled as an exception as well.
-    // TODO(*): handle the case where a negative value is given
-    Vec3D pg = {0, 0, -1};
-    zEchoOff();
-    CHECK(model.computeSqrZeta(pg) == 0.0);
-    CHECK_FALSE(zIsNan(model.computeZeta(pg)));
-    CHECK(model.computeZeta(pg) == 0.0);
-    zEchoOn();
-  }
-}
-
 TEST_CASE("compute the COM acceleration based on COM-ZMP model",
           "[corelib][humanoid]") {
   ComZmpModel model;

@@ -82,7 +82,8 @@ SCENARIO("ComCtrl: compute desired ZMP position",
   GIVEN("qx1 = 1.0, qx2 = 1.0, qy1 = 1.0, qy2 = 1.0, ref_com_pos = (0, 0, G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {0, 0, G};
-    double desired_zeta = ctrl.model().computeZeta(ref_com_pos);
+    double desired_zeta =
+        ctrl.model().computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
 
     REQUIRE(desired_zeta == Approx(1.0));
     REQUIRE(ctrl.x().q1() == 1);
@@ -128,7 +129,8 @@ SCENARIO("ComCtrl: compute desired ZMP position",
   GIVEN("qx1 = 1, qx2 = 0.5, qy1 = 1.2, qy2 = 0.8, ref_com_pos = (0, 0, G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {0, 0, G};
-    double desired_zeta = ctrl.model().computeZeta(ref_com_pos);
+    double desired_zeta =
+        ctrl.model().computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
 
     ctrl.x().set_q1(1.0).set_q2(0.5);
     ctrl.y().set_q1(1.2).set_q2(0.8);
@@ -167,7 +169,8 @@ SCENARIO("ComCtrl: compute desired ZMP position",
       "G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {1, 0.5, G};
-    double desired_zeta = ctrl.model().computeZeta(ref_com_pos);
+    double desired_zeta =
+        ctrl.model().computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
 
     ctrl.x().set_q2(1.5);
 
@@ -217,7 +220,8 @@ SCENARIO("ComCtrl: compute desired ZMP position",
       "ref_com_pos = (0, 0.5, 0.5*G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {0, 0.5, 0.5 * G};
-    double desired_zeta = ctrl.model().computeZeta(ref_com_pos);
+    double desired_zeta =
+        ctrl.model().computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
 
     ctrl.x().set_q2(1.5);
     ctrl.y().set_q2(1.5);
@@ -301,7 +305,8 @@ TEST_CASE("check if desired ZMP position is modified after update",
     Vec3D expected_des_zmp_pos;
     double expected_des_zeta;
 
-    expected_des_zeta = ctrl.model().computeZeta(c.cmd_com_pos);
+    expected_des_zeta =
+        ctrl.model().computeZeta(c.cmd_com_pos, kVec3DZero, kVec3DZero);
     expected_des_zmp_pos = ctrl.computeDesZmpPos(
         c.cmd_com_pos, ctrl.model().data()->com_position,
         ctrl.model().data()->com_velocity, expected_des_zeta);

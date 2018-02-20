@@ -180,6 +180,15 @@ Vec3D ComZmpModel::computeComAcc(const Vec3D& t_com_position,
   return com_acc;
 }
 
+Vec3D ComZmpModel::computeComAcc(const Vec3D& t_com_position,
+                                 const Vec3D& t_zmp_position,
+                                 const Vec3D& t_reaction_force) const {
+  double zeta2 = computeSqrZeta(t_com_position, t_zmp_position,
+                                t_reaction_force, m_data->mass);
+  Vec3D acc = zeta2 * (t_com_position - t_zmp_position) - kG;
+  return acc;
+}
+
 bool ComZmpModel::update() {
   // check if the value of zeta will be valid when computing acceleration
   // TODO: check if this computation is correct

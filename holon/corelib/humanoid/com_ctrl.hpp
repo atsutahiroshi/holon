@@ -80,8 +80,6 @@ class ComCtrl {
   // accessors
   inline ComCtrlX& x() noexcept { return m_x; }
   inline ComCtrlY& y() noexcept { return m_y; }
-  // TODO: remove non-const accessor to model
-  inline Model& model() noexcept { return m_model; }
   inline States& states() noexcept { return *m_states_ptr; }
   // const accessors
   inline const Vec3D& initial_com_position() const noexcept {

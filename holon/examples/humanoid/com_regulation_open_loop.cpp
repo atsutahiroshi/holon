@@ -31,7 +31,7 @@ int main() {
   holon::Vec3D cmd_com_pos = {0, 0, 1};
   double t = 0;
 
-  ctrl.model().reset(initial_com_pos);
+  ctrl.reset(initial_com_pos);
   while (t < T) {
     cmd->com_position = cmd_com_pos;
     ctrl.update(DT);

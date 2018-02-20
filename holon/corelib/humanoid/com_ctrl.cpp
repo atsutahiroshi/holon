@@ -50,6 +50,12 @@ Vec3D ComCtrl::computeDesReactForce() const {
   return Vec3D(0, 0, m_states_ptr->mass * RK_G);
 }
 
+double ComCtrl::computeDesZeta(const Vec3D& t_reaction_force) const {
+  return m_model.computeZeta(m_states_ptr->com_position,
+                             m_states_ptr->zmp_position, t_reaction_force,
+                             m_states_ptr->mass);
+}
+
 Vec3D ComCtrl::computeDesZmpPos(const Vec3D& t_ref_com_pos,
                                 const Vec3D& t_com_pos, const Vec3D& t_com_vel,
                                 double t_desired_zeta) const {
@@ -71,13 +77,10 @@ bool ComCtrl::update() {
   remapUserCommandsToInputs();
 
   // compute desired reaction force along z-axis
-  // TODO: add computation of reaction force
+  m_outputs_ptr->reaction_force = computeDesReactForce();
 
   // compute desired value of zeta from desired reaction force
-  // TODO: fix computation of zeta
-  // TODO: check if COM position should be given from inputs (states?)
-  m_outputs_ptr->zeta =
-      m_model.computeZeta(inputs().com_position, kVec3DZero, kVec3DZero);
+  m_outputs_ptr->zeta = computeDesZeta(m_outputs_ptr->reaction_force);
   if (zIsTiny(outputs().zeta)) return false;
 
   // compute desired ZMP position
@@ -86,11 +89,15 @@ bool ComCtrl::update() {
                        states().com_velocity, outputs().zeta);
 
   // update states of COM-ZMP model
-  // TODO: add reaction force
+  m_states_ptr->reaction_force = outputs().reaction_force;
   m_states_ptr->zmp_position = outputs().zmp_position;
+  if (!m_model.update()) return false;
 
-  // TODO: add update of desired position, velocity and acceleration of COM
-  return m_model.update();
+  // update outputs of the controller
+  m_outputs_ptr->com_position = states().com_position;
+  m_outputs_ptr->com_velocity = states().com_velocity;
+  m_outputs_ptr->com_acceleration = states().com_acceleration;
+  return true;
 }
 
 bool ComCtrl::update(double t_time_step) {

@@ -52,6 +52,7 @@ struct ComCtrlOutputs {
   Vec3D com_velocity;
   Vec3D com_acceleration;
   Vec3D zmp_position;
+  Vec3D reaction_force;
   double zeta;
 };
 
@@ -105,6 +106,7 @@ class ComCtrl {
 
   // computing functions
   Vec3D computeDesReactForce() const;
+  double computeDesZeta(const Vec3D& t_reaction_force) const;
   Vec3D computeDesZmpPos(const Vec3D& t_ref_com_position,
                          const Vec3D& t_com_position,
                          const Vec3D& t_com_velocity,

@@ -370,12 +370,12 @@ TEST_CASE("com_ctrl: when COM height is zero, update should fail",
   zEchoOn();
 }
 
-TEST_CASE("when commanded COM height is zero, update should fail",
-          "[corelib][humanoid]") {
+TEST_CASE("ComCtrl::update() when given COM height is zero, update should fail",
+          "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
   Vec3D p = {0, 0, 0};
 
-  ctrl.getUserCommands()->com_position = p;
+  ctrl.states().com_position = p;
   zEchoOff();
   CHECK_FALSE(ctrl.update());
   zEchoOn();

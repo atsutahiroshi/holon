@@ -53,13 +53,20 @@ ComZmpModelData::ComZmpModelData(double t_mass)
       reaction_force(0, 0, t_mass * RK_G),
       external_force(kVec3DZero) {}
 
+std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory() {
+  return std::make_shared<ComZmpModelData>();
+}
+
+std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory(double t_mass) {
+  return std::make_shared<ComZmpModelData>(t_mass);
+}
+
 ComZmpModel::ComZmpModel()
-    : m_data_ptr(std::make_shared<ComZmpModelData>()),
-      m_time_step(default_time_step) {}
+    : m_data_ptr(ComZmpModelDataFactory()), m_time_step(default_time_step) {}
 
 ComZmpModel::ComZmpModel(double t_mass)
-    : m_data_ptr(isMassValid(t_mass) ? std::make_shared<ComZmpModelData>(t_mass)
-                                     : std::make_shared<ComZmpModelData>()),
+    : m_data_ptr(isMassValid(t_mass) ? ComZmpModelDataFactory(t_mass)
+                                     : ComZmpModelDataFactory()),
       m_time_step(default_time_step) {}
 
 ComZmpModel::ComZmpModel(DataPtr t_data)

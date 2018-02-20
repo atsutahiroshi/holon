@@ -45,6 +45,9 @@ struct ComZmpModelData {
   static const Vec3D default_com_position;
 };
 
+std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory();
+std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory(double t_mass);
+
 class ComZmpModel {
   static constexpr double default_time_step = 0.001;
 

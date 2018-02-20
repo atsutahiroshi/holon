@@ -150,7 +150,7 @@ TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
   }
 
   SECTION("ComZmpModel(Data t_data)") {
-    auto data = std::make_shared<ComZmpModelData>();
+    auto data = ComZmpModelDataFactory();
     ComZmpModel model(data);
     CHECK(&model.data() == data.get());
   }
@@ -161,12 +161,12 @@ TEST_CASE("ComZmpModel: accessor/mutator of data",
   ComZmpModel model;
 
   SECTION("ComZmpModel can hold another Data pointer") {
-    auto data1 = std::make_shared<ComZmpModelData>();
+    auto data1 = ComZmpModelDataFactory();
     REQUIRE(&model.data() != data1.get());
     model.set_data(data1);
     CHECK(&model.data() == data1.get());
 
-    auto data2 = std::make_shared<ComZmpModelData>();
+    auto data2 = ComZmpModelDataFactory();
     REQUIRE(&model.data() != data2.get());
     model.set_data(data2);
     CHECK(&model.data() == data2.get());
@@ -204,7 +204,7 @@ TEST_CASE("ComZmpModel: accessor/mutator of time step",
 SCENARIO("ComZmpModel: function to reset COM position",
          "[corelib][humanoid][ComZmpModel]") {
   GIVEN("initialize with random values") {
-    auto data = std::make_shared<ComZmpModelData>();
+    auto data = ComZmpModelDataFactory();
     ComZmpModel model(data);
     Fuzzer fuzz;
 
@@ -733,7 +733,7 @@ TEST_CASE("modify step time after calling update with double type",
 
 TEST_CASE("test if acceleration is modified after update",
           "[corelib][humanoid]") {
-  auto data = std::make_shared<ComZmpModelData>();
+  auto data = ComZmpModelDataFactory();
   ComZmpModel model(data);
   Vec3D force = model.data().reaction_force;
   double mass = model.data().mass;
@@ -760,7 +760,7 @@ TEST_CASE("test if acceleration is modified after update",
 
 SCENARIO("update COM position, velocity, acceleration", "[corelib][humanoid]") {
   GIVEN("COM stays at (0, 0, 1)") {
-    auto data = std::make_shared<ComZmpModelData>();
+    auto data = ComZmpModelDataFactory();
     ComZmpModel model(data);
 
     WHEN("input ZMP position as (-1, -0.5, 0) and update") {
@@ -799,7 +799,7 @@ SCENARIO("update COM position, velocity, acceleration", "[corelib][humanoid]") {
 }
 
 TEST_CASE("when COM height is zero, update should fail") {
-  auto data = std::make_shared<ComZmpModelData>();
+  auto data = ComZmpModelDataFactory();
   ComZmpModel model(data);
   Vec3D p = {0, 0, 0};
 

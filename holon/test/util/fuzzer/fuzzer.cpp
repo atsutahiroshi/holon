@@ -54,4 +54,9 @@ Vec3D Fuzzer::randomize(Vec3D& v) {
   return v;
 }
 
+template <>
+Vec3D Fuzzer::get<Vec3D>() {
+  return Vec3D((*this)(), (*this)(), (*this)());
+}
+
 }  // namespace holon

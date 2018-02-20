@@ -77,6 +77,17 @@ TEST_CASE("make uniform distribution with a specific seed",
   }
 }
 
+TEST_CASE("calling by ()operator", "[test][util][fuzzer]") {
+  Fuzzer fuzz;
+  std::vector<double> outdated_values;
+
+  for (auto i = 0; i < 10; ++i) {
+    double n = fuzz();
+    REQUIRE_THAT(outdated_values, !VectorContains(n));
+    outdated_values.push_back(n);
+  }
+}
+
 TEST_CASE("randomize elements in zVec3D", "[test][util][fuzzer]") {
   Fuzzer fuzz;
 
@@ -99,5 +110,12 @@ TEST_CASE("randomize elements in Vec3D", "[test][util][fuzzer]") {
   }
 }
 
+TEST_CASE("get randomized Vec3D", "[test][util][fuzzer]") {
+  Fuzzer fuzz;
+
+  for (auto i = 0; i < 10; ++i) {
+    REQUIRE_THAT(fuzz.get<Vec3D>(), !Equals(fuzz.get<Vec3D>()));
+  }
+}
 }  // namespace
 }  // namespace holon

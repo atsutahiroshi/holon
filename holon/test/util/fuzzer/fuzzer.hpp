@@ -45,7 +45,12 @@ class Fuzzer {
   Fuzzer& operator=(const Fuzzer&) = delete;
   Fuzzer& operator=(Fuzzer&&) = delete;
 
-  inline double get() { return m_distribution(m_engine); }
+  // functions
+  double operator()() { return m_distribution(m_engine); }
+  template <typename T = double>
+  T get() {
+    return T((*this)());
+  }
   zVec3D randomize(zVec3D& v);
   Vec3D randomize(Vec3D& v);
 
@@ -55,6 +60,9 @@ class Fuzzer {
   std::mt19937 m_engine;
   std::uniform_real_distribution<double> m_distribution;
 };
+
+template <>
+Vec3D Fuzzer::get<Vec3D>();
 
 }  // namespace holon
 

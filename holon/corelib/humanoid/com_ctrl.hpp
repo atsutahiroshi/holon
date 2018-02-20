@@ -31,6 +31,7 @@
 namespace holon {
 
 struct ComCtrlCommands {
+  // TODO: make position and velocity just doubles
   optional<Vec3D> com_position;
   optional<Vec3D> com_velocity;
   optional<double> qx1, qx2;
@@ -56,11 +57,15 @@ struct ComCtrlOutputs {
 
 class ComCtrl {
  public:
-  typedef std::shared_ptr<ComCtrlCommands> UserCommands;
-  typedef ComCtrlInputs Inputs;
-  typedef ComCtrlOutputs Outputs;
-  typedef ComZmpModelData States;
-  typedef ComZmpModel Model;
+  using Model = ComZmpModel;
+  using States = ComZmpModelData;
+  using Inputs = ComCtrlInputs;
+  using Outputs = ComCtrlOutputs;
+  using UserCommands = ComCtrlCommands;
+  using StatesPtr = std::shared_ptr<States>;
+  using InputsPtr = std::shared_ptr<Inputs>;
+  using OutputsPtr = std::shared_ptr<Outputs>;
+  using UserCommandsPtr = std::shared_ptr<UserCommands>;
 
   // constructors
   ComCtrl();
@@ -73,23 +78,31 @@ class ComCtrl {
   ComCtrl& operator=(ComCtrl&&) = delete;
 
   // accessors
+  // TODO: remove non-const accessors to x and y
   inline ComCtrlX& x() noexcept { return m_x; }
   inline ComCtrlY& y() noexcept { return m_y; }
+  // TODO: remove accessor to model
   inline Model& model() noexcept { return m_model; }
-  inline Inputs& inputs() noexcept { return m_inputs; }
+  inline States& states() noexcept { return *m_states_ptr; }
+  inline Inputs& inputs() noexcept { return *m_inputs_ptr; }
   // const accessors
   inline const ComCtrlX& x() const noexcept { return m_x; }
   inline const ComCtrlY& y() const noexcept { return m_y; }
+  // TODO: remove accessor to model
   inline const Model& model() const noexcept { return m_model; }
-  inline const Inputs& inputs() const noexcept { return m_inputs; }
-  inline const Outputs& outputs() const noexcept { return m_outputs; }
+  inline const States& states() const noexcept { return *m_states_ptr; }
+  inline const Inputs& inputs() const noexcept { return *m_inputs_ptr; }
+  inline const Outputs& outputs() const noexcept { return *m_outputs_ptr; }
+  inline const UserCommands& cmds() const noexcept { return *m_user_cmds_ptr; }
   inline double time_step() const noexcept { return model().time_step(); }
 
   // mutators
   ComCtrl& set_time_step(double t_time_step);
 
   //
-  inline UserCommands getUserCommands() const noexcept { return m_user_cmds; }
+  inline UserCommandsPtr getUserCommands() const noexcept {
+    return m_user_cmds_ptr;
+  }
 
   // computing functions
   Vec3D computeDesZmpPos(const Vec3D& t_ref_com_position,
@@ -105,11 +118,10 @@ class ComCtrl {
   ComCtrlX m_x;
   ComCtrlY m_y;
   Model m_model;
-
-  UserCommands m_user_cmds;
-  Inputs m_inputs;
-  Outputs m_outputs;
-  // States m_states;
+  StatesPtr m_states_ptr;
+  InputsPtr m_inputs_ptr;
+  OutputsPtr m_outputs_ptr;
+  UserCommandsPtr m_user_cmds_ptr;
 
   void remapUserCommandsToInputs();
 };

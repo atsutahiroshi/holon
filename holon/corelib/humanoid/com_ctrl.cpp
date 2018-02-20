@@ -24,9 +24,14 @@
 
 namespace holon {
 
-ComCtrl::ComCtrl() : m_x(), m_y(), m_model() {
-  m_user_cmds = std::make_shared<ComCtrlCommands>();
-}
+ComCtrl::ComCtrl()
+    : m_x(),
+      m_y(),
+      m_model(),
+      m_states_ptr(m_model.data()),
+      m_inputs_ptr(std::make_shared<ComCtrlInputs>()),
+      m_outputs_ptr(std::make_shared<ComCtrlOutputs>()),
+      m_user_cmds_ptr(std::make_shared<ComCtrlCommands>()) {}
 
 ComCtrl& ComCtrl::set_time_step(double t_time_step) {
   m_model.set_time_step(t_time_step);
@@ -46,19 +51,19 @@ Vec3D ComCtrl::computeDesZmpPos(const Vec3D& t_ref_com_pos,
 
 void ComCtrl::remapUserCommandsToInputs() {
   Vec3D default_com_pos(0, 0, m_model.data()->com_position.z());
-  m_inputs.com_position = m_user_cmds->com_position.value_or(default_com_pos);
+  m_inputs_ptr->com_position = cmds().com_position.value_or(default_com_pos);
 }
 
 bool ComCtrl::update() {
   remapUserCommandsToInputs();
-  m_outputs.zeta =
-      m_model.computeZeta(m_inputs.com_position, kVec3DZero, kVec3DZero);
-  if (zIsTiny(m_outputs.zeta)) return false;
+  m_outputs_ptr->zeta =
+      m_model.computeZeta(inputs().com_position, kVec3DZero, kVec3DZero);
+  if (zIsTiny(outputs().zeta)) return false;
 
-  m_outputs.zmp_position =
-      computeDesZmpPos(m_inputs.com_position, m_model.data()->com_position,
-                       m_model.data()->com_velocity, m_outputs.zeta);
-  m_model.data()->zmp_position = m_outputs.zmp_position;
+  m_outputs_ptr->zmp_position =
+      computeDesZmpPos(inputs().com_position, states().com_position,
+                       states().com_velocity, outputs().zeta);
+  m_states_ptr->zmp_position = outputs().zmp_position;
   return m_model.update();
 }
 

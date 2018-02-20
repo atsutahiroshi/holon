@@ -33,6 +33,15 @@ using Catch::Matchers::Equals;
 
 const double G = RK_G;
 
+TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
+  ComCtrl ctrl;
+  REQUIRE(&ctrl.states());
+  REQUIRE(&ctrl.inputs());
+  REQUIRE(&ctrl.outputs());
+  REQUIRE(&ctrl.cmds());
+  REQUIRE(ctrl.model().data().get() == &ctrl.states());
+}
+
 TEST_CASE("ComCtrl::getUserCommands() provides a pointer to user commands",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;

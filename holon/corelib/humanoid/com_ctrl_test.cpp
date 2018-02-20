@@ -38,8 +38,11 @@ TEST_CASE("ComCtrlCommands::clear() should clear all the values") {
   ComCtrlCommands cmd;
 
   // randomize all
-  cmd.com_position = fuzz.get<Vec3D>();
-  cmd.com_velocity = fuzz.get<Vec3D>();
+  cmd.xd = fuzz.get();
+  cmd.yd = fuzz.get();
+  cmd.zd = fuzz.get();
+  cmd.vxd = fuzz.get();
+  cmd.vyd = fuzz.get();
   cmd.qx1 = fuzz.get();
   cmd.qx2 = fuzz.get();
   cmd.qy1 = fuzz.get();
@@ -51,8 +54,11 @@ TEST_CASE("ComCtrlCommands::clear() should clear all the values") {
   cmd.clear();
 
   // check
-  CHECK(cmd.com_position == nullopt);
-  CHECK(cmd.com_velocity == nullopt);
+  CHECK(cmd.xd == nullopt);
+  CHECK(cmd.yd == nullopt);
+  CHECK(cmd.zd == nullopt);
+  CHECK(cmd.vxd == nullopt);
+  CHECK(cmd.vyd == nullopt);
   CHECK(cmd.qx1 == nullopt);
   CHECK(cmd.qx2 == nullopt);
   CHECK(cmd.qy1 == nullopt);
@@ -81,17 +87,17 @@ TEST_CASE("ComCtrl::getUserCommands() provides a pointer to user commands",
   ComCtrl ctrl;
 
   auto cmd = ctrl.getUserCommands();
-  CHECK(cmd->com_position == nullopt);
-  CHECK(cmd->com_position != kVec3DZero);
-  CHECK_FALSE(cmd->com_position);
-  CHECK_FALSE(cmd->com_position.has_value());
-  CHECK_THROWS_AS(cmd->com_position.value(), bad_optional_access);
-  CHECK(cmd->com_position.value_or(kVec3DZero) == kVec3DZero);
+  CHECK(cmd->xd == nullopt);
+  CHECK(cmd->xd != 0.0);
+  CHECK_FALSE(cmd->xd);
+  CHECK_FALSE(cmd->xd.has_value());
+  CHECK_THROWS_AS(cmd->xd.value(), bad_optional_access);
+  CHECK(cmd->xd.value_or(0.0) == 0.0);
 
-  cmd->com_position = Vec3D(0, 0, 0.42);
-  CHECK(cmd->com_position == Vec3D(0, 0, 0.42));
-  CHECK(cmd->com_position.value() == Vec3D(0, 0, 0.42));
-  CHECK(cmd->com_position.value_or(kVec3DZero) == Vec3D(0, 0, 0.42));
+  cmd->xd = 0.42;
+  CHECK(cmd->xd == 0.42);
+  CHECK(cmd->xd.value() == 0.42);
+  CHECK(cmd->xd.value_or(0.0) == 0.42);
 }
 
 TEST_CASE("ComCtrl::reset(const Vec3D&) should reset initial COM position") {
@@ -339,7 +345,7 @@ TEST_CASE("check if desired ZMP position is modified after update",
         ctrl.computeDesZmpPos(c.cmd_com_pos, ctrl.states().com_position,
                               ctrl.states().com_velocity, expected_des_zeta);
 
-    cmd->com_position = c.cmd_com_pos;
+    cmd->set_com_position(c.cmd_com_pos);
     ctrl.update();
     CHECK(ctrl.outputs().zeta == expected_des_zeta);
     CHECK_THAT(ctrl.outputs().zmp_position, Equals(expected_des_zmp_pos));
@@ -360,7 +366,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
     }
     SECTION("set user command") {
       Vec3D v = {1.2, -1.2, 1.5};
-      cmd->com_position = v;
+      cmd->set_com_position(v);
       ctrl.update();
       CHECK(ctrl.inputs().com_position == v);
     }
@@ -377,8 +383,8 @@ TEST_CASE("ComCtrl::update() updates control paramters",
       CHECK(ctrl.inputs().com_velocity == kVec3DZero);
     }
     SECTION("set user command") {
-      Vec3D v = {1.2, -1.2, 1.5};
-      cmd->com_velocity = v;
+      Vec3D v = {1.2, -1.2, 0};
+      cmd->set_com_velocity(v.x(), v.y());
       ctrl.update();
       CHECK(ctrl.inputs().com_velocity == v);
     }
@@ -483,7 +489,7 @@ SCENARIO("controller can regulate COM position at a point",
   GIVEN("command that COM position be at (0.1, -0.1, 1)") {
     ComCtrl ctrl;
     Vec3D cmd_com_pos = {0.1, -0.1, 1};
-    ctrl.getUserCommands()->com_position = cmd_com_pos;
+    ctrl.getUserCommands()->set_com_position(cmd_com_pos);
 
     WHEN("at first") {
       THEN("COM position is at (0, 0, 1)") {

@@ -33,7 +33,7 @@ int main() {
 
   ctrl.reset(initial_com_pos);
   while (t < T) {
-    cmd->com_position = cmd_com_pos;
+    cmd->set_com_position(cmd_com_pos);
     ctrl.update(DT);
     std::cout << t << " ";
     std::cout << ctrl.states().com_position.data() << " ";

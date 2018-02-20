@@ -31,14 +31,18 @@
 namespace holon {
 
 struct ComCtrlCommands {
-  // TODO: make position and velocity just doubles
-  optional<Vec3D> com_position;
-  optional<Vec3D> com_velocity;
-  optional<double> qx1, qx2;
-  optional<double> qy1, qy2;
-  optional<double> qz1, qz2;
+  using opt_double = optional<double>;
+
+  opt_double xd, yd, zd;
+  opt_double vxd, vyd;
+  opt_double qx1, qx2;
+  opt_double qy1, qy2;
+  opt_double qz1, qz2;
 
   void clear();
+  void set_com_position(const Vec3D& t_com_position);
+  void set_com_position(opt_double t_xd, opt_double t_yd, opt_double t_zd);
+  void set_com_velocity(opt_double t_vxd, opt_double t_vyd);
 };
 
 struct ComCtrlInputs {

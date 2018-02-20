@@ -26,14 +26,37 @@
 namespace holon {
 
 void ComCtrlCommands::clear() {
-  com_position = nullopt;
-  com_velocity = nullopt;
+  xd = nullopt;
+  yd = nullopt;
+  zd = nullopt;
+  vxd = nullopt;
+  vyd = nullopt;
   qx1 = nullopt;
   qx2 = nullopt;
   qy1 = nullopt;
   qy2 = nullopt;
   qz1 = nullopt;
   qz2 = nullopt;
+}
+
+void ComCtrlCommands::set_com_position(const Vec3D& t_com_position) {
+  xd = t_com_position.x();
+  yd = t_com_position.y();
+  zd = t_com_position.z();
+}
+
+void ComCtrlCommands::set_com_position(optional<double> t_xd,
+                                       optional<double> t_yd,
+                                       optional<double> t_zd) {
+  xd = t_xd;
+  yd = t_yd;
+  zd = t_zd;
+}
+
+void ComCtrlCommands::set_com_velocity(optional<double> t_vxd,
+                                       optional<double> t_vyd) {
+  vxd = t_vxd;
+  vyd = t_vyd;
 }
 
 ComCtrl::ComCtrl()
@@ -79,9 +102,14 @@ Vec3D ComCtrl::computeDesZmpPos(const Vec3D& t_ref_com_pos,
 }
 
 void ComCtrl::remapUserCommandsToInputs() {
-  m_inputs_ptr->com_position =
-      cmds().com_position.value_or(m_initial_com_position);
-  m_inputs_ptr->com_velocity = cmds().com_velocity.value_or(kVec3DZero);
+  m_inputs_ptr->com_position[0] =
+      cmds().xd.value_or(m_initial_com_position.x());
+  m_inputs_ptr->com_position[1] =
+      cmds().yd.value_or(m_initial_com_position.y());
+  m_inputs_ptr->com_position[2] =
+      cmds().zd.value_or(m_initial_com_position.z());
+  m_inputs_ptr->com_velocity[0] = cmds().vxd.value_or(0);
+  m_inputs_ptr->com_velocity[1] = cmds().vyd.value_or(0);
   m_inputs_ptr->qx1 = cmds().qx1.value_or(ComCtrlX::default_q1);
   m_inputs_ptr->qx2 = cmds().qx2.value_or(ComCtrlX::default_q2);
   m_inputs_ptr->qy1 = cmds().qy1.value_or(ComCtrlY::default_q1);

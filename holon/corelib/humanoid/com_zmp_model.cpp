@@ -191,16 +191,18 @@ Vec3D ComZmpModel::computeComAcc(const Vec3D& t_com_position,
 
 bool ComZmpModel::update() {
   // check if the value of zeta will be valid when computing acceleration
-  // TODO: check if this computation is correct
   if (zIsTiny(computeSqrZeta(m_data->com_position, m_data->zmp_position,
-                             kVec3DZero)))
+                             m_data->reaction_force, m_data->mass)))
     return false;
 
   // compute acceleration from current COM / ZMP positions and reaction force
-  Vec3D acc = computeComAcc(m_data->com_position, m_data->zmp_position);
+  Vec3D acc = computeComAcc(m_data->com_position, m_data->zmp_position,
+                            m_data->reaction_force);
+
   // integrate COM position / velocity by one time step
   Vec3D pos = m_data->com_position + time_step() * m_data->com_velocity;
   Vec3D vel = m_data->com_velocity + time_step() * acc;
+
   // update stetes
   m_data->com_position = pos;
   m_data->com_velocity = vel;

@@ -664,6 +664,8 @@ TEST_CASE(
 TEST_CASE("compute the COM acceleration based on COM-ZMP model",
           "[corelib][humanoid]") {
   ComZmpModel model;
+  Vec3D force = model.data().reaction_force;
+  double mass = model.data().mass;
 
   SECTION("case: the COM height is assumed to be const, namely zeta is const") {
     struct testcase_t {
@@ -701,8 +703,7 @@ TEST_CASE("compute the COM acceleration based on COM-ZMP model",
     };
 
     for (auto c : testcases) {
-      Vec3D acc = model.computeComAcc(c.com_pos, c.zmp_pos,
-                                      model.data().reaction_force);
+      Vec3D acc = model.computeComAcc(c.com_pos, c.zmp_pos, force, mass);
       CAPTURE(&c.com_pos);
       CAPTURE(&c.zmp_pos);
       CHECK_THAT(acc, Equals(c.expected_acc));
@@ -734,6 +735,8 @@ TEST_CASE("test if acceleration is modified after update",
           "[corelib][humanoid]") {
   auto data = std::make_shared<ComZmpModelData>();
   ComZmpModel model(data);
+  Vec3D force = model.data().reaction_force;
+  double mass = model.data().mass;
 
   SECTION("update acceleration") {
     struct testcase_t {
@@ -743,8 +746,8 @@ TEST_CASE("test if acceleration is modified after update",
     } testcases[] = {{{0, 0, 1}, {0, 0, 0}, {1, 0, 0}},
                      {{0, 0.1, 1}, {0.1, -0.1, 0}, {0.2, 0.1, 0}}};
     for (auto& c : testcases) {
-      Vec3D expected_com_acc = model.computeComAcc(c.com_pos, c.zmp_pos,
-                                                   model.data().reaction_force);
+      Vec3D expected_com_acc =
+          model.computeComAcc(c.com_pos, c.zmp_pos, force, mass);
 
       data->com_position = c.com_pos;
       data->com_velocity = c.com_vel;

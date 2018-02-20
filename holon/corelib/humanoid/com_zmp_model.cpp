@@ -167,24 +167,67 @@ double ComZmpModel::computeZeta(const Vec3D& t_com_position,
                              t_mass, t_nu));
 }
 
+Vec3D ComZmpModel::computeReactForce(const Vec3D& t_com_acceleration,
+                                     double t_mass) const {
+  return t_mass * (t_com_acceleration + kG);
+}
+
+Vec3D ComZmpModel::computeReactForce(const Vec3D& t_com_position,
+                                     const Vec3D& t_zmp_position,
+                                     double t_sqr_zeta, double t_mass) const {
+  return t_mass * t_sqr_zeta * (t_com_position - t_zmp_position);
+}
+
+Vec3D ComZmpModel::computeReactForce(const Vec3D& t_com_position,
+                                     const Vec3D& t_zmp_position,
+                                     const Vec3D& t_com_acceleration,
+                                     double t_mass, const Vec3D& t_nu) const {
+  double sqr_zeta =
+      computeSqrZeta(t_com_position, t_zmp_position, t_com_acceleration, t_nu);
+  return computeReactForce(t_com_position, t_zmp_position, sqr_zeta, t_mass);
+}
+
+Vec3D ComZmpModel::computeComAcc(const Vec3D& t_reaction_force, double t_mass,
+                                 const Vec3D& t_external_force) const {
+  return (t_reaction_force + t_external_force) / t_mass - kG;
+}
+
+Vec3D ComZmpModel::computeComAcc(const Vec3D& t_com_position,
+                                 const Vec3D& t_zmp_position, double t_sqr_zeta,
+                                 double t_mass,
+                                 const Vec3D& t_external_force) const {
+  return t_sqr_zeta * (t_com_position - t_zmp_position) - kG +
+         t_external_force / t_mass;
+}
 Vec3D ComZmpModel::computeComAcc(const Vec3D& t_com_position,
                                  const Vec3D& t_zmp_position,
-                                 const Vec3D& t_reaction_force) const {
-  double zeta2 = computeSqrZeta(t_com_position, t_zmp_position,
-                                t_reaction_force, data().mass);
-  Vec3D acc = zeta2 * (t_com_position - t_zmp_position) - kG;
-  return acc;
+                                 const Vec3D& t_reaction_force, double t_mass,
+                                 const Vec3D& t_external_force,
+                                 const Vec3D& t_nu) const {
+  double sqr_zeta = computeSqrZeta(t_com_position, t_zmp_position,
+                                   t_reaction_force, t_mass, t_nu);
+  return computeComAcc(t_com_position, t_zmp_position, sqr_zeta, t_mass,
+                       t_external_force);
 }
+
+// Vec3D ComZmpModel::computeComAcc(const Vec3D& t_com_position,
+//                                  const Vec3D& t_zmp_position,
+//                                  const Vec3D& t_reaction_force) const {
+//   double zeta2 = computeSqrZeta(t_com_position, t_zmp_position,
+//                                 t_reaction_force, data().mass);
+//   Vec3D acc = zeta2 * (t_com_position - t_zmp_position) - kG;
+//   return acc;
+// }
 
 bool ComZmpModel::update() {
   // check if the value of zeta will be valid when computing acceleration
-  if (zIsTiny(computeSqrZeta(data().com_position, data().zmp_position,
-                             data().reaction_force, data().mass)))
-    return false;
+  double sqr_zeta = computeSqrZeta(data().com_position, data().zmp_position,
+                                   data().reaction_force, data().mass);
+  if (zIsTiny(sqr_zeta)) return false;
 
   // compute acceleration from current COM / ZMP positions and reaction force
-  Vec3D acc = computeComAcc(data().com_position, data().zmp_position,
-                            data().reaction_force);
+  Vec3D acc = computeComAcc(data().com_position, data().zmp_position, sqr_zeta,
+                            data().mass, data().external_force);
 
   // integrate COM position / velocity by one time step
   Vec3D pos = data().com_position + time_step() * data().com_velocity;

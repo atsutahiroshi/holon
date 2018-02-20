@@ -99,9 +99,26 @@ class ComZmpModel {
                      const Vec3D& t_reaction_force, double t_mass,
                      const Vec3D& t_nu = kVec3DZ) const;
 
+  // functions to compute reaction force
+  Vec3D computeReactForce(const Vec3D& t_com_acceleration, double t_mass) const;
+  Vec3D computeReactForce(const Vec3D& t_com_position,
+                          const Vec3D& t_zmp_position, double t_sqr_zeta,
+                          double t_mass) const;
+  Vec3D computeReactForce(const Vec3D& t_com_position,
+                          const Vec3D& t_zmp_position,
+                          const Vec3D& t_com_acceleration, double t_mass,
+                          const Vec3D& t_nu = kVec3DZ) const;
+
   // functions to compute COM acceleration
+  Vec3D computeComAcc(const Vec3D& t_reaction_force, double t_mass,
+                      const Vec3D& t_external_force = kVec3DZero) const;
   Vec3D computeComAcc(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
-                      const Vec3D& t_reaction_force) const;
+                      double t_sqr_zeta, double t_mass = 1,
+                      const Vec3D& t_external_force = kVec3DZero) const;
+  Vec3D computeComAcc(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
+                      const Vec3D& t_reaction_force, double t_mass,
+                      const Vec3D& t_external_force = kVec3DZero,
+                      const Vec3D& t_nu = kVec3DZ) const;
 
   // update functions
   bool update();

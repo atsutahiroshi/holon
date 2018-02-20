@@ -104,6 +104,7 @@ class ComCtrl {
   }
 
   // computing functions
+  Vec3D computeDesReactForce() const;
   Vec3D computeDesZmpPos(const Vec3D& t_ref_com_position,
                          const Vec3D& t_com_position,
                          const Vec3D& t_com_velocity,

@@ -20,6 +20,7 @@
 
 #include "holon/corelib/humanoid/com_ctrl.hpp"
 
+#include <roki/rk_g.h>
 #include <memory>
 
 namespace holon {
@@ -43,6 +44,10 @@ ComCtrl& ComCtrl::reset(const Vec3D& t_com_position) {
   m_initial_com_position = t_com_position;
   m_model.reset(m_initial_com_position);
   return *this;
+}
+
+Vec3D ComCtrl::computeDesReactForce() const {
+  return Vec3D(0, 0, m_states_ptr->mass * RK_G);
 }
 
 Vec3D ComCtrl::computeDesZmpPos(const Vec3D& t_ref_com_pos,

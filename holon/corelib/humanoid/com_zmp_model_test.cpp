@@ -661,6 +661,237 @@ TEST_CASE(
   }
 }
 
+TEST_CASE("ComZmpModel::computeReactForce(const Vec3D&,double)",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+
+  SECTION("case: various COM acceleration with fixed mass = 1") {
+    double mass = 1;
+    struct testcase_t {
+      Vec3D acc;
+      Vec3D expected_force;
+    } testcases[] = {{{0, 0, -G}, {0, 0, 0}},
+                     {{1, 2, 3}, {1, 2, 3 + G}},
+                     {{-1, -3, G}, {-1, -3, 2 * G}}};
+    for (const auto& c : testcases) {
+      INFO("m = " << mass << ", acc = " << c.acc);
+      CHECK(model.computeReactForce(c.acc, mass) == c.expected_force);
+    }
+  }
+
+  SECTION("case: various mass with fixed acceleration = (-1, 1, -0.5g)") {
+    Vec3D acc(-1, 1, -0.5 * G);
+    struct testcase_t {
+      double mass;
+      Vec3D expected_force;
+    } testcases[] = {
+        {1, {-1, 1, 0.5 * G}}, {3, {-3, 3, 1.5 * G}}, {5, {-5, 5, 2.5 * G}}};
+    for (const auto& c : testcases) {
+      INFO("m = " << c.mass << ", acc = " << acc);
+      CHECK(model.computeReactForce(acc, c.mass) == c.expected_force);
+    }
+  }
+}
+
+TEST_CASE(
+    "ComZmpModel::computeReactForce(const Vec3D&,const Vec3D&,double,double)",
+    "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+
+  SECTION("mass = 1, zeta2 = G, various COM / ZMP position") {
+    double mass = 1;
+    double zeta2 = G;
+    struct testcase_t {
+      Vec3D com;
+      Vec3D zmp;
+      Vec3D expected_force;
+    } testcases[] = {{{0, 0, 1}, {0, 0, 0}, {0, 0, G}},
+                     {{1, 2, 2}, {-1, -1, 1}, {2 * G, 3 * G, G}},
+                     {{-1, 0.5, 1}, {1, 0.5, 0}, {-2 * G, 0, G}}};
+    for (const auto& c : testcases) {
+      INFO("m = " << mass << ", zeta2 = " << zeta2 << ", com = " << c.com
+                  << ", zmp = " << c.zmp);
+      CHECK(model.computeReactForce(c.com, c.zmp, zeta2, mass) ==
+            c.expected_force);
+    }
+  }
+
+  SECTION("COM = (1, -1, 1), ZMP = (0, 0, 0), various mass and zeta2") {
+    Vec3D com(1, -1, 1);
+    Vec3D zmp(0, 0, 0);
+    struct testcase_t {
+      double mass;
+      double zeta2;
+      Vec3D expected_force;
+    } testcases[] = {{1, 2, {2, -2, 2}},
+                     {0.5, 1, {0.5, -0.5, 0.5}},
+                     {3, G, {3 * G, -3 * G, 3 * G}}};
+    for (const auto& c : testcases) {
+      INFO("m = " << c.mass << ", zeta2 = " << c.zeta2 << ", com = " << com
+                  << ", zmp = " << zmp);
+      CHECK(model.computeReactForce(com, zmp, c.zeta2, c.mass) ==
+            c.expected_force);
+    }
+  }
+}
+
+TEST_CASE(
+    "ComZmpModel::computeReactForce(const Vec3D&,const Vec3D&,const "
+    "Vec3D&,double)",
+    "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+
+  struct testcase_t {
+    Vec3D com_p;
+    Vec3D zmp_p;
+    Vec3D com_a;
+    double mass;
+    Vec3D expected_force;
+  } testcases[] = {{{0, 0, 1}, {0, 0, 0}, {0, 0, 0}, 1, {0, 0, G}},
+                   {{1, 2, 2}, {0, -1, 0}, {1, 0, G}, 1, {G, 3. * G, 2. * G}},
+                   {{-1, 0.5, 2},
+                    {1, 1, 0.5},
+                    {0, 0, -0.5 * G},
+                    2,
+                    {-4. * G / 3, -G / 3, G}}};
+  for (const auto& c : testcases) {
+    INFO("m = " << c.mass << ", com = " << c.com_p << ", zmp = " << c.zmp_p
+                << ", com acc = " << c.com_a);
+    CHECK(model.computeReactForce(c.com_p, c.zmp_p, c.com_a, c.mass) ==
+          c.expected_force);
+  }
+}
+
+TEST_CASE("ComZmpModel::computeComAcc(const Vec3D&,double)",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+
+  SECTION("without additional force") {
+    struct testcase_t {
+      Vec3D f;
+      double m;
+      Vec3D expected_acc;
+    } testcases[] = {{{1, 1, 0}, 1, {1, 1, -G}},
+                     {{-1, 2, G}, 2, {-0.5, 1, -0.5 * G}},
+                     {{0, -1, -0.5 * G}, 1.5, {0, -2. / 3, -4. * G / 3}}};
+    for (const auto& c : testcases) {
+      INFO("m = " << c.m << ", f = " << c.f);
+      CHECK(model.computeComAcc(c.f, c.m) == c.expected_acc);
+    }
+  }
+  SECTION("with additional force") {
+    struct testcase_t {
+      Vec3D f;
+      double m;
+      Vec3D ef;
+      Vec3D expected_acc;
+    } testcases[] = {
+        {{1, 1, 0}, 1, {0, 1, 1}, {1, 2, -G + 1}},
+        {{-1, 2, G}, 2, {-2, 2, 2 * G}, {-1.5, 2, 0.5 * G}},
+        {{0, -1, -0.5 * G}, 1.5, {0.5, -0.5, 0.5 * G}, {1. / 3, -1, -G}}};
+    for (const auto& c : testcases) {
+      INFO("m = " << c.m << ", f = " << c.f << ", added f = " << c.ef);
+      CHECK(model.computeComAcc(c.f, c.m, c.ef) == c.expected_acc);
+    }
+  }
+}
+
+TEST_CASE("ComZmpModel::computeComAcc(const Vec3D&,const Vec3D&,double)",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+
+  SECTION("without additional force") {
+    struct testcase_t {
+      Vec3D com;
+      Vec3D zmp;
+      double zeta2;
+      Vec3D expected_acc;
+    } testcases[] = {{{0, 0, 1}, {0, 0, 0}, G, {0, 0, 0}},
+                     {{1, 2, 2.5}, {-1, 1, 0.5}, 2, {4, 2, 4. - G}},
+                     {{-1, 1.5, 2}, {0.5, 1.5, 0}, 1.5, {-2.25, 0, 3. - G}}};
+    for (const auto& c : testcases) {
+      INFO("zeta2 = " << c.zeta2 << ", com = " << c.com << ", zmp = " << c.zmp);
+      CHECK(model.computeComAcc(c.com, c.zmp, c.zeta2) == c.expected_acc);
+    }
+  }
+  SECTION("with additional force") {
+    struct testcase_t {
+      Vec3D com;
+      Vec3D zmp;
+      double zeta2;
+      double m;
+      Vec3D ef;
+      Vec3D expected_acc;
+    } testcases[] = {
+        {{0, 0, 1}, {0, 0, 0}, G, 1, {1, 1, 1}, {1, 1, 1}},
+        {{1, 2, 2.5}, {-1, 1, 0.5}, 2, 1.5, {1.5, -1.5, 3}, {5, 1, 6. - G}},
+        {{-1, 1.5, 2}, {0.5, 1.5, 0}, 1.5, 1, {-1, 2, 3}, {-3.25, 2, 6. - G}}};
+    for (const auto& c : testcases) {
+      INFO("zeta2 = " << c.zeta2 << ", com = " << c.com << ", zmp = " << c.zmp
+                      << ", mass = " << c.m << ", ef = " << c.ef);
+      CHECK(model.computeComAcc(c.com, c.zmp, c.zeta2, c.m, c.ef) ==
+            c.expected_acc);
+    }
+  }
+}
+
+TEST_CASE(
+    "ComZmpModel::computeComAcc(const Vec3D&,const Vec3D&,const "
+    "Vec3D&,double)",
+    "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+
+  SECTION("without additional force") {
+    struct testcase_t {
+      Vec3D com;
+      Vec3D zmp;
+      double m;
+      Vec3D f;
+      Vec3D expected_acc;
+    } testcases[] = {
+        {{0, 0, 1}, {0, 0, 0}, 1, {0, 0, G}, {0, 0, 0}},
+        {{1, 2, 2.5},
+         {-1, 0, 0.5},
+         1.5,
+         {0, 0, 1},
+         {2. / 3, 2. / 3, 2. / 3 - G}},
+        {{-1, 1.5, 2}, {0.5, -1.5, 0}, 2, {0, 0, 2}, {-3. / 4, 3. / 2, 1 - G}}};
+    for (const auto& c : testcases) {
+      INFO("com = " << c.com << ", zmp = " << c.zmp << ", mass = " << c.m
+                    << ", f = " << c.f);
+      CHECK(model.computeComAcc(c.com, c.zmp, c.f, c.m) == c.expected_acc);
+    }
+  }
+  SECTION("with additional force") {
+    struct testcase_t {
+      Vec3D com;
+      Vec3D zmp;
+      double m;
+      Vec3D f;
+      Vec3D ef;
+      Vec3D expected_acc;
+    } testcases[] = {{{0, 0, 1}, {0, 0, 0}, 1, {0, 0, G}, {1, 2, 3}, {1, 2, 3}},
+                     {{1, 2, 2.5},
+                      {-1, 0, 0.5},
+                      1.5,
+                      {0, 0, 1},
+                      {0.5, -0.5, 0.5},
+                      {1, 1. / 3, 1 - G}},
+                     {{-1, 1.5, 2},
+                      {0.5, -1.5, 0},
+                      2,
+                      {0, 0, 2},
+                      {-1, 1, G},
+                      {-5. / 4, 2, 1 - 0.5 * G}}};
+    for (const auto& c : testcases) {
+      INFO("com = " << c.com << ", zmp = " << c.zmp << ", mass = " << c.m
+                    << ", f = " << c.f << ", ef = " << c.ef);
+      CHECK(model.computeComAcc(c.com, c.zmp, c.f, c.m, c.ef) ==
+            c.expected_acc);
+    }
+  }
+}
+
 TEST_CASE("compute the COM acceleration based on COM-ZMP model",
           "[corelib][humanoid]") {
   ComZmpModel model;

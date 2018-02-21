@@ -1,4 +1,4 @@
-/* com_regulation_open_loop - example of regulation of COM
+/* com_regulation_example - example of regulation of COM
  *
  * Copyright (c) 2018 Hiroshi Atsuta <atsuta.hiroshi@gmail.com>
  *

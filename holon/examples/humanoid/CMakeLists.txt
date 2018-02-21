@@ -1,5 +1,5 @@
 set(HOLON_HUMANOID_EXAMPLE_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_regulation_open_loop.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/com_regulation_example.cpp
   )
 
 foreach(src ${HOLON_HUMANOID_EXAMPLE_SOURCES})

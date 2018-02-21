@@ -15,3 +15,9 @@ foreach(src ${HOLON_HUMANOID_EXAMPLE_SOURCES})
 endforeach()
 
 add_subdirectory(tests)
+
+configure_file(
+  tools/com_regulation_example_plot.py
+  tools/com_regulation_example_plot.py
+  COPYONLY
+  )

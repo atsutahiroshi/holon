@@ -8,6 +8,7 @@ import unittest
 
 
 SAMPLE_DATA_FILENAME = "data/com_regulation_example.dat"
+TESTING_DATA_FILENAME = "result.dat"
 TEST_EXECUTABLE = "../com_regulation_example"
 
 
@@ -18,10 +19,10 @@ def load_sample_data():
 
 def generate_testing_data():
     cmd = [TEST_EXECUTABLE]
-    with open('result.dat', 'w') as fobj:
+    with open(TESTING_DATA_FILENAME, 'w') as fobj:
         proc = Popen(cmd, stdout=fobj)
         proc.wait(timeout=1)
-    data = np.loadtxt('result.dat')
+    data = np.loadtxt(TESTING_DATA_FILENAME)
     return data
 
 

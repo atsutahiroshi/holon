@@ -13,3 +13,5 @@ foreach(src ${HOLON_HUMANOID_EXAMPLE_SOURCES})
     )
   target_link_libraries(${target} PUBLIC holon)
 endforeach()
+
+add_subdirectory(tests)

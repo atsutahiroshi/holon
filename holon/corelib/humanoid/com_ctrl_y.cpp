@@ -51,10 +51,10 @@ double ComCtrlY::computeDesZmpPos(double t_yd, double t_y, double t_v,
 
 double ComCtrlY::computeDesZmpPos(const Vec3D& t_ref_com_position,
                                   const Vec3D& t_com_position,
-                                  const Vec3D& t_com_veocity,
+                                  const Vec3D& t_com_velocity,
                                   double t_zeta) const noexcept {
   return computeDesZmpPos(t_ref_com_position.y(), t_com_position.y(),
-                          t_com_veocity.y(), t_zeta);
+                          t_com_velocity.y(), t_zeta);
 }
 
 }  // namespace holon

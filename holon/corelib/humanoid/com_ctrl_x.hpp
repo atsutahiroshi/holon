@@ -55,7 +55,7 @@ class ComCtrlX {
                           double t_zeta) const noexcept;
   double computeDesZmpPos(const Vec3D& t_ref_com_position,
                           const Vec3D& t_com_position,
-                          const Vec3D& t_com_veocity, double t_zeta) const
+                          const Vec3D& t_com_velocity, double t_zeta) const
       noexcept;
 
  private:

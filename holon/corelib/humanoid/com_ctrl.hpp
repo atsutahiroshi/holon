@@ -39,6 +39,7 @@ struct ComCtrlCommands {
   opt_double qx1, qx2;
   opt_double qy1, qy2;
   opt_double qz1, qz2;
+  opt_double vhp;
 
   void clear();
   void set_com_position(const Vec3D& t_com_position);
@@ -52,6 +53,7 @@ struct ComCtrlInputs {
   double qx1, qx2;
   double qy1, qy2;
   double qz1, qz2;
+  double vhp;
 };
 
 struct ComCtrlOutputs {

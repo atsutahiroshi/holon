@@ -49,6 +49,7 @@ TEST_CASE("ComCtrlCommands::clear() should clear all the values") {
   cmd.qy2 = fuzz.get();
   cmd.qz1 = fuzz.get();
   cmd.qz2 = fuzz.get();
+  cmd.vhp = fuzz.get();
 
   // clear
   cmd.clear();
@@ -65,6 +66,7 @@ TEST_CASE("ComCtrlCommands::clear() should clear all the values") {
   CHECK(cmd.qy2 == nullopt);
   CHECK(cmd.qz1 == nullopt);
   CHECK(cmd.qz2 == nullopt);
+  CHECK(cmd.vhp == nullopt);
 }
 
 TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
@@ -473,6 +475,24 @@ TEST_CASE("ComCtrl::update() updates control paramters",
       CHECK(ctrl.inputs().qz2 == 1.0);
       CHECK(ctrl.z().q1() == 1.0);
       CHECK(ctrl.z().q2() == 1.0);
+    }
+  }
+
+  SECTION("Virtual horizontal plane") {
+    inputs->vhp = fuzz.get<double>();
+    SECTION("default") {
+      ctrl.update();
+      CHECK(ctrl.inputs().vhp == 0.0);
+    }
+    SECTION("set user command") {
+      cmd->vhp = 0.1;
+      ctrl.update();
+      CHECK(ctrl.inputs().vhp == 0.1);
+    }
+    SECTION("clear") {
+      cmd->clear();
+      ctrl.update();
+      CHECK(ctrl.inputs().vhp == 0.0);
     }
   }
 

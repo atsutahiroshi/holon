@@ -37,6 +37,7 @@ void ComCtrlCommands::clear() {
   qy2 = nullopt;
   qz1 = nullopt;
   qz2 = nullopt;
+  vhp = nullopt;
 }
 
 void ComCtrlCommands::set_com_position(const Vec3D& t_com_position) {
@@ -133,6 +134,7 @@ void ComCtrl::remapUserCommandsToInputs() {
   m_inputs_ptr->qy2 = cmds().qy2.value_or(ComCtrlY::default_q2);
   m_inputs_ptr->qz1 = cmds().qz1.value_or(ComCtrlZ::default_q1);
   m_inputs_ptr->qz2 = cmds().qz2.value_or(ComCtrlZ::default_q2);
+  m_inputs_ptr->vhp = cmds().vhp.value_or(0);
 }
 
 void ComCtrl::updateCtrlParam() {

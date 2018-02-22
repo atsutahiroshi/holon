@@ -56,8 +56,8 @@ class ComZmpModel {
   using DataPtr = std::shared_ptr<ComZmpModelData>;
 
   ComZmpModel();
-  ComZmpModel(double t_mass);
-  ComZmpModel(DataPtr t_data_ptr);
+  explicit ComZmpModel(double t_mass);
+  explicit ComZmpModel(DataPtr t_data_ptr);
 
   // special member functions
   virtual ~ComZmpModel() = default;

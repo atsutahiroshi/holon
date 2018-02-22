@@ -107,7 +107,7 @@ class ComCtrl {
   inline const States& states() const noexcept { return *m_states_ptr; }
   inline const Inputs& inputs() const noexcept { return *m_inputs_ptr; }
   inline const Outputs& outputs() const noexcept { return *m_outputs_ptr; }
-  inline const Commands& commands() const noexcept { return *m_user_cmds_ptr; }
+  inline const Commands& commands() const noexcept { return *m_commands_ptr; }
   inline const StatesPtr& states_ptr() const noexcept { return m_states_ptr; }
   inline const InputsPtr& inputs_ptr() const noexcept { return m_inputs_ptr; }
   inline const OutputsPtr& outputs_ptr() const noexcept {
@@ -128,7 +128,7 @@ class ComCtrl {
 
   //
   inline InputsPtr getInputsPtr() const noexcept { return m_inputs_ptr; }
-  inline CommandsPtr getCommands() const noexcept { return m_user_cmds_ptr; }
+  inline CommandsPtr getCommands() const noexcept { return m_commands_ptr; }
 
   // computing functions
   double computeDesVrtReactForce(double t_zd, double t_z, double t_vz,
@@ -152,7 +152,7 @@ class ComCtrl {
   StatesPtr m_states_ptr;
   InputsPtr m_inputs_ptr;
   OutputsPtr m_outputs_ptr;
-  CommandsPtr m_user_cmds_ptr;
+  CommandsPtr m_commands_ptr;
   Vec3D m_initial_com_position;
 
   void updateCtrlParam();

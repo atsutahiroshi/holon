@@ -80,7 +80,7 @@ ComCtrl::ComCtrl()
       m_states_ptr(m_model.data_ptr()),
       m_inputs_ptr(ComCtrlInputsFactory()),
       m_outputs_ptr(ComCtrlOutputsFactory()),
-      m_user_cmds_ptr(ComCtrlCommandsFactory()),
+      m_commands_ptr(ComCtrlCommandsFactory()),
       m_initial_com_position(m_states_ptr->com_position) {}
 
 ComCtrl& ComCtrl::set_states_ptr(StatesPtr t_states_ptr) {

@@ -2,12 +2,14 @@ set(HOLON_CORELIB_HUMANOID_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/com_ctrl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/com_ctrl_x.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/com_ctrl_y.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/com_ctrl_z.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/com_zmp_model.cpp
   )
 set(HOLON_CORELIB_HUMANOID_TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/com_ctrl_test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/com_ctrl_x_test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/com_ctrl_y_test.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/com_ctrl_z_test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/com_zmp_model_test.cpp
   )
 

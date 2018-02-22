@@ -70,6 +70,7 @@ class ComZmpModel {
   inline const Data& data() const noexcept { return *m_data_ptr; }
   inline const DataPtr& data_ptr() const noexcept { return m_data_ptr; }
   inline double time_step() const noexcept { return m_time_step; }
+  inline double mass() const noexcept { return data().mass; }
 
   // mutators
   ComZmpModel& set_data(DataPtr t_data_ptr);

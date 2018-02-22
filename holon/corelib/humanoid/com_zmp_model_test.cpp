@@ -201,6 +201,32 @@ TEST_CASE("ComZmpModel: accessor/mutator of time step",
   }
 }
 
+TEST_CASE("ComZmpModel::mass() returns mass value",
+          "[corelib][humanoid][ComZmpModel]") {
+  SECTION("case 1") {
+    ComZmpModel model;
+    auto data = model.data_ptr();
+    CHECK(model.mass() == 1.0);
+    data->mass = 10;
+    CHECK(model.mass() == 10.0);
+  }
+  SECTION("case 2") {
+    auto data = ComZmpModelDataFactory(2);
+    ComZmpModel model(data);
+    CHECK(model.mass() == 2.0);
+    data->mass = 20;
+    CHECK(model.mass() == 20.0);
+  }
+  SECTION("case 3") {
+    ComZmpModel model;
+    auto data = ComZmpModelDataFactory(3);
+    model.set_data(data);
+    CHECK(model.mass() == 3.0);
+    data->mass = 30;
+    CHECK(model.mass() == 30.0);
+  }
+}
+
 SCENARIO("ComZmpModel: function to reset COM position",
          "[corelib][humanoid][ComZmpModel]") {
   GIVEN("initialize with random values") {

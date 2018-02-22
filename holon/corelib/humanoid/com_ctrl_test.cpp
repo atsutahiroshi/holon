@@ -360,8 +360,11 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   Vec3D p0 = {0.1, -0.1, 1.5};
   ctrl.reset(p0);
   auto cmd = ctrl.getUserCommands();
+  auto inputs = ctrl.getInputsPtr();
 
+  Fuzzer fuzz;
   SECTION("COM position") {
+    inputs->com_position = fuzz.get<Vec3D>();
     SECTION("default") {
       ctrl.update();
       CHECK(ctrl.inputs().com_position == p0);
@@ -380,6 +383,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   }
 
   SECTION("COM velocity") {
+    inputs->com_velocity = fuzz.get<Vec3D>();
     SECTION("default") {
       ctrl.update();
       CHECK(ctrl.inputs().com_velocity == kVec3DZero);
@@ -398,6 +402,8 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   }
 
   SECTION("qx1 and qx2") {
+    inputs->qx1 = fuzz.get<double>();
+    inputs->qx2 = fuzz.get<double>();
     SECTION("default") {
       ctrl.update();
       CHECK(ctrl.inputs().qx1 == 1.0);
@@ -425,6 +431,8 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   }
 
   SECTION("qy1 and qy2") {
+    inputs->qy1 = fuzz.get<double>();
+    inputs->qy2 = fuzz.get<double>();
     SECTION("default") {
       ctrl.update();
       CHECK(ctrl.inputs().qy1 == 1.0);
@@ -452,6 +460,8 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   }
 
   SECTION("qz1 and qz2") {
+    inputs->qz1 = fuzz.get<double>();
+    inputs->qz2 = fuzz.get<double>();
     SECTION("default") {
       ctrl.update();
       CHECK(ctrl.inputs().qz1 == 1.0);

@@ -115,6 +115,7 @@ class ComCtrl {
   ComCtrl& reset(const Vec3D& t_com_position);
 
   //
+  inline InputsPtr getInputsPtr() const noexcept { return m_inputs_ptr; }
   inline UserCommandsPtr getUserCommands() const noexcept {
     return m_user_cmds_ptr;
   }

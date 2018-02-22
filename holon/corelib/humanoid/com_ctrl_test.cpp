@@ -420,7 +420,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   Vec3D p0 = {0.1, -0.1, 1.5};
   ctrl.reset(p0);
   auto cmd = ctrl.getCommands();
-  auto inputs = ctrl.getInputsPtr();
+  auto inputs = ctrl.inputs_ptr();
 
   Fuzzer fuzz;
   SECTION("COM position") {

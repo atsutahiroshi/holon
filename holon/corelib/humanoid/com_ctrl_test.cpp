@@ -84,6 +84,17 @@ TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
   }
 }
 
+TEST_CASE("ComCtrl::reset(const Vec3D&) should reset initial COM position") {
+  ComCtrl ctrl;
+  Vec3D supposed_pi = {0, 0, 1.5};
+  REQUIRE_THAT(ctrl.initial_com_position(), !Equals(supposed_pi));
+
+  ctrl.reset(supposed_pi);
+  CHECK_THAT(ctrl.initial_com_position(), Equals(supposed_pi));
+  CHECK_THAT(ctrl.states().com_position, Equals(supposed_pi));
+  CHECK_THAT(ctrl.states().com_velocity, Equals(kVec3DZero));
+}
+
 TEST_CASE("ComCtrl::getCommands() provides a pointer to user commands",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
@@ -101,18 +112,6 @@ TEST_CASE("ComCtrl::getCommands() provides a pointer to user commands",
   CHECK(cmd->xd.value() == 0.42);
   CHECK(cmd->xd.value_or(0.0) == 0.42);
 }
-
-TEST_CASE("ComCtrl::reset(const Vec3D&) should reset initial COM position") {
-  ComCtrl ctrl;
-  Vec3D supposed_pi = {0, 0, 1.5};
-  REQUIRE_THAT(ctrl.initial_com_position(), !Equals(supposed_pi));
-
-  ctrl.reset(supposed_pi);
-  CHECK_THAT(ctrl.initial_com_position(), Equals(supposed_pi));
-  CHECK_THAT(ctrl.states().com_position, Equals(supposed_pi));
-  CHECK_THAT(ctrl.states().com_velocity, Equals(kVec3DZero));
-}
-
 SCENARIO("ComCtrl::computeDesHrzZmpPos computes desired ZMP position ",
          "[corelib][humanoid][ComCtrl]") {
   GIVEN("qx1 = 1.0, qx2 = 1.0, qy1 = 1.0, qy2 = 1.0, ref_com_pos = (0, 0, G)") {

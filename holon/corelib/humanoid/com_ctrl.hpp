@@ -25,6 +25,7 @@
 #include "holon/corelib/common/optional.hpp"
 #include "holon/corelib/humanoid/com_ctrl_x.hpp"
 #include "holon/corelib/humanoid/com_ctrl_y.hpp"
+#include "holon/corelib/humanoid/com_ctrl_z.hpp"
 #include "holon/corelib/humanoid/com_zmp_model.hpp"
 #include "holon/corelib/math/vec3d.hpp"
 
@@ -91,6 +92,7 @@ class ComCtrl {
   // accessors
   inline ComCtrlX& x() noexcept { return m_x; }
   inline ComCtrlY& y() noexcept { return m_y; }
+  inline ComCtrlZ& z() noexcept { return m_z; }
   inline States& states() noexcept { return *m_states_ptr; }
   // const accessors
   inline const Vec3D& initial_com_position() const noexcept {
@@ -98,6 +100,7 @@ class ComCtrl {
   }
   inline const ComCtrlX& x() const noexcept { return m_x; }
   inline const ComCtrlY& y() const noexcept { return m_y; }
+  inline const ComCtrlZ& z() const noexcept { return m_z; }
   inline const Model& model() const noexcept { return m_model; }
   inline const States& states() const noexcept { return *m_states_ptr; }
   inline const Inputs& inputs() const noexcept { return *m_inputs_ptr; }
@@ -115,7 +118,9 @@ class ComCtrl {
   }
 
   // computing functions
-  Vec3D computeDesReactForce() const;
+  Vec3D computeDesReactForce(const Vec3D& t_ref_com_position,
+                             const Vec3D& t_com_position,
+                             const Vec3D& t_com_velocity, double t_mass) const;
   double computeDesZeta(const Vec3D& t_reaction_force) const;
   Vec3D computeDesZmpPos(const Vec3D& t_ref_com_position,
                          const Vec3D& t_com_position,
@@ -129,6 +134,7 @@ class ComCtrl {
  private:
   ComCtrlX m_x;
   ComCtrlY m_y;
+  ComCtrlZ m_z;
   Model m_model;
   StatesPtr m_states_ptr;
   InputsPtr m_inputs_ptr;

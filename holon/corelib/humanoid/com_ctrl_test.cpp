@@ -449,7 +449,6 @@ TEST_CASE("ComCtrl::update() updates control paramters",
     }
   }
 
-#if 0
   SECTION("qz1 and qz2") {
     SECTION("default") {
       ctrl.update();
@@ -476,7 +475,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
       CHECK(ctrl.z().q2() == 1.0);
     }
   }
-#endif
+
   SECTION("New variable") {
     SECTION("default") {}
     SECTION("set user command") {}
@@ -520,6 +519,45 @@ SCENARIO("controller can regulate COM position at a point",
       }
       THEN("COM lies at (0.1, -0.1, 1)") {
         CHECK_THAT(ctrl.states().com_position, Equals(cmd_com_pos));
+      }
+    }
+  }
+}
+
+SCENARIO("regulate COM position along vertical direction",
+         "[corelib][humanoid][ComCtrl]") {
+  GIVEN(
+      "desired COM position = (0, 0, 0.42), "
+      "initial COM position = (0, 0, 0.4)") {
+    ComCtrl ctrl;
+    Vec3D pd = {0, 0, 0.42};
+    Vec3D p0 = {0, 0, 0.4};
+    ctrl.reset(p0);
+    ctrl.getUserCommands()->set_com_position(pd);
+    REQUIRE(ctrl.states().com_position == p0);
+    REQUIRE(ctrl.cmds().zd == 0.42);
+
+    WHEN("update until 0.1 sec") {
+      double t = 0;
+      while (t < 0.1) {
+        ctrl.update();
+        t += ctrl.time_step();
+      }
+      THEN("COM position should be between (0,0,0.4) and (0,0,0.42)") {
+        CAPTURE(ctrl.states().com_position);
+        CHECK(ctrl.states().com_position.z() > 0.4);
+        CHECK(ctrl.states().com_position.z() < 0.42);
+      }
+    }
+    WHEN("update until 10 sec") {
+      double t = 0;
+      while (t < 10) {
+        ctrl.update();
+        t += ctrl.time_step();
+      }
+      THEN("COM position should be at (0,0,0.42)") {
+        CAPTURE(ctrl.states().com_position);
+        CHECK_THAT(ctrl.states().com_position, Equals(pd));
       }
     }
   }

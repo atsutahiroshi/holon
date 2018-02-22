@@ -92,8 +92,13 @@ ComCtrl& ComCtrl::reset(const Vec3D& t_com_position) {
   return *this;
 }
 
-Vec3D ComCtrl::computeDesReactForce() const {
-  return Vec3D(0, 0, m_states_ptr->mass * RK_G);
+Vec3D ComCtrl::computeDesReactForce(const Vec3D& t_ref_com_position,
+                                    const Vec3D& t_com_position,
+                                    const Vec3D& t_com_velocity,
+                                    double t_mass) const {
+  double fz = m_z.computeDesReactForce(t_ref_com_position, t_com_position,
+                                       t_com_velocity, t_mass);
+  return Vec3D(0, 0, fz);
 }
 
 double ComCtrl::computeDesZeta(const Vec3D& t_reaction_force) const {
@@ -126,6 +131,8 @@ void ComCtrl::remapUserCommandsToInputs() {
   m_inputs_ptr->qx2 = cmds().qx2.value_or(ComCtrlX::default_q2);
   m_inputs_ptr->qy1 = cmds().qy1.value_or(ComCtrlY::default_q1);
   m_inputs_ptr->qy2 = cmds().qy2.value_or(ComCtrlY::default_q2);
+  m_inputs_ptr->qz1 = cmds().qz1.value_or(ComCtrlZ::default_q1);
+  m_inputs_ptr->qz2 = cmds().qz2.value_or(ComCtrlZ::default_q2);
 }
 
 void ComCtrl::updateCtrlParam() {
@@ -133,6 +140,8 @@ void ComCtrl::updateCtrlParam() {
   x().set_q2(inputs().qx2);
   y().set_q1(inputs().qy1);
   y().set_q2(inputs().qy2);
+  z().set_q1(inputs().qz1);
+  z().set_q2(inputs().qz2);
 }
 
 bool ComCtrl::update() {
@@ -143,7 +152,9 @@ bool ComCtrl::update() {
   updateCtrlParam();
 
   // compute desired reaction force along z-axis
-  m_outputs_ptr->reaction_force = computeDesReactForce();
+  m_outputs_ptr->reaction_force =
+      computeDesReactForce(inputs().com_position, states().com_position,
+                           states().com_velocity, states().mass);
 
   // compute desired value of zeta from desired reaction force
   m_outputs_ptr->zeta = computeDesZeta(m_outputs_ptr->reaction_force);

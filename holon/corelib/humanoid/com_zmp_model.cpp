@@ -244,6 +244,7 @@ bool ComZmpModel::update() {
   m_data_ptr->com_position = pos;
   m_data_ptr->com_velocity = vel;
   m_data_ptr->com_acceleration = acc;
+  m_data_ptr->reaction_force = computeReactForce(acc, data().mass);
   return true;
 }
 

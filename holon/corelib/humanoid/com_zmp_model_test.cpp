@@ -1040,5 +1040,20 @@ TEST_CASE("when COM height is zero, update should fail") {
   zEchoOn();
 }
 
+TEST_CASE("ComZmpModel::update keeps consistency of vertical reaction force",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+  auto data = model.data_ptr();
+  model.reset(Vec3D(0, 0, 0.42));
+
+  double desired_fz = 10;
+  Vec3D desired_zmp = {-1, 0.42, 0};
+  data->reaction_force = Vec3D(0, 0, 10);
+  data->zmp_position = desired_zmp;
+  model.update();
+  CHECK(data->reaction_force == Vec3D(10. / 0.42, -10, desired_fz));
+  CHECK(data->com_acceleration == Vec3D(10. / 0.42, -10, 10 - G));
+}
+
 }  // namespace
 }  // namespace holon

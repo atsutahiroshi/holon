@@ -82,6 +82,22 @@ ComCtrl::ComCtrl()
       m_user_cmds_ptr(ComCtrlCommandsFactory()),
       m_initial_com_position(m_states_ptr->com_position) {}
 
+ComCtrl& ComCtrl::set_states_ptr(StatesPtr t_states_ptr) {
+  m_states_ptr = t_states_ptr;
+  m_model.set_data_ptr(t_states_ptr);
+  return *this;
+}
+
+ComCtrl& ComCtrl::set_inputs_ptr(InputsPtr t_inputs_ptr) {
+  m_inputs_ptr = t_inputs_ptr;
+  return *this;
+}
+
+ComCtrl& ComCtrl::set_outputs_ptr(OutputsPtr t_outputs_ptr) {
+  m_outputs_ptr = t_outputs_ptr;
+  return *this;
+}
+
 ComCtrl& ComCtrl::set_time_step(double t_time_step) {
   m_model.set_time_step(t_time_step);
   return *this;

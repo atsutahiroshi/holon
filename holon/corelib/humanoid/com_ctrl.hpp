@@ -99,20 +99,30 @@ class ComCtrl {
   inline ComCtrlZ& z() noexcept { return m_z; }
   inline States& states() noexcept { return *m_states_ptr; }
   // const accessors
-  inline const Vec3D& initial_com_position() const noexcept {
-    return m_initial_com_position;
-  }
   inline const ComCtrlX& x() const noexcept { return m_x; }
   inline const ComCtrlY& y() const noexcept { return m_y; }
   inline const ComCtrlZ& z() const noexcept { return m_z; }
+
   inline const Model& model() const noexcept { return m_model; }
   inline const States& states() const noexcept { return *m_states_ptr; }
   inline const Inputs& inputs() const noexcept { return *m_inputs_ptr; }
   inline const Outputs& outputs() const noexcept { return *m_outputs_ptr; }
   inline const Commands& commands() const noexcept { return *m_user_cmds_ptr; }
+  inline const StatesPtr& states_ptr() const noexcept { return m_states_ptr; }
+  inline const InputsPtr& inputs_ptr() const noexcept { return m_inputs_ptr; }
+  inline const OutputsPtr& outputs_ptr() const noexcept {
+    return m_outputs_ptr;
+  }
+
   inline double time_step() const noexcept { return model().time_step(); }
+  inline const Vec3D& initial_com_position() const noexcept {
+    return m_initial_com_position;
+  }
 
   // mutators
+  ComCtrl& set_states_ptr(StatesPtr t_states_ptr);
+  ComCtrl& set_inputs_ptr(InputsPtr t_inputs_ptr);
+  ComCtrl& set_outputs_ptr(OutputsPtr t_outputs_ptr);
   ComCtrl& set_time_step(double t_time_step);
   ComCtrl& reset(const Vec3D& t_com_position);
 

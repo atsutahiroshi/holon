@@ -84,6 +84,51 @@ TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
   }
 }
 
+TEST_CASE("ComCtrl::set_states_ptr can set another pointer to states data",
+          "[corelib][humanoid][ComCtrl]") {
+  ComCtrl ctrl;
+  {
+    auto states1 = ComZmpModelDataFactory(3);
+    REQUIRE(ctrl.states_ptr().get() != states1.get());
+    ctrl.set_states_ptr(states1);
+    REQUIRE(ctrl.states_ptr().get() == states1.get());
+    REQUIRE(ctrl.states().mass == 3.0);
+    REQUIRE(ctrl.model().data_ptr().get() == states1.get());
+    REQUIRE(ctrl.model().mass() == 3.0);
+    REQUIRE(states1.use_count() == 3);
+  }
+  REQUIRE(ctrl.states_ptr().use_count() == 2);
+  ctrl.states_ptr()->mass = 5.0;
+  REQUIRE(ctrl.states().mass == 5.0);
+  REQUIRE(ctrl.model().mass() == 5.0);
+}
+
+TEST_CASE("ComCtrl::set_inputs_ptr can set another pointer to inputs data",
+          "[corelib][humanoid][ComCtrl]") {
+  ComCtrl ctrl;
+  {
+    auto inputs1 = ComCtrlInputsFactory();
+    REQUIRE(ctrl.inputs_ptr().get() != inputs1.get());
+    ctrl.set_inputs_ptr(inputs1);
+    REQUIRE(ctrl.inputs_ptr().get() == inputs1.get());
+    REQUIRE(inputs1.use_count() == 2);
+  }
+  REQUIRE(ctrl.inputs_ptr().use_count() == 1);
+}
+
+TEST_CASE("ComCtrl::set_outputs_ptr can set another pointer to outputs data",
+          "[corelib][humanoid][ComCtrl]") {
+  ComCtrl ctrl;
+  {
+    auto outputs1 = ComCtrlOutputsFactory();
+    REQUIRE(ctrl.outputs_ptr().get() != outputs1.get());
+    ctrl.set_outputs_ptr(outputs1);
+    REQUIRE(ctrl.outputs_ptr().get() == outputs1.get());
+    REQUIRE(outputs1.use_count() == 2);
+  }
+  REQUIRE(ctrl.outputs_ptr().use_count() == 1);
+}
+
 TEST_CASE("ComCtrl::reset(const Vec3D&) should reset initial COM position") {
   ComCtrl ctrl;
   Vec3D supposed_pi = {0, 0, 1.5};

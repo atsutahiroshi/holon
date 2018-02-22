@@ -75,6 +75,7 @@ std::shared_ptr<ComCtrlOutputs> ComCtrlOutputsFactory() {
 ComCtrl::ComCtrl()
     : m_x(),
       m_y(),
+      m_z(),
       m_model(),
       m_states_ptr(m_model.data_ptr()),
       m_inputs_ptr(ComCtrlInputsFactory()),

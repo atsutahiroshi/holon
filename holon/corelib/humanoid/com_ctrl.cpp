@@ -150,13 +150,13 @@ bool ComCtrl::update() {
   updateCtrlParam();
 
   // compute desired vertical reaction force
-  double fz = computeDesVrtReactForce(inputs().com_position.z(),
-                                      states().com_position.z(),
-                                      states().com_velocity.z(), states().mass);
+  double fz = computeDesVrtReactForce(
+      inputs().com_position.z(), states().com_position.z(),
+      states().com_velocity.z(), model().mass());
 
   // compute desired value of zeta from desired reaction force
   double zeta = computeDesZeta(states().com_position.z(), inputs().vhp, fz,
-                               states().mass);
+                               model().mass());
   // m_outputs_ptr->zeta = computeDesZeta(m_outputs_ptr->reaction_force);
   if (zIsTiny(zeta)) return false;
 

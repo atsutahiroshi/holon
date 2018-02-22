@@ -73,7 +73,7 @@ class ComZmpModel {
   inline double mass() const noexcept { return data().mass; }
 
   // mutators
-  ComZmpModel& set_data(DataPtr t_data_ptr);
+  ComZmpModel& set_data_ptr(DataPtr t_data_ptr);
   ComZmpModel& set_time_step(double t_time_step);
   ComZmpModel& reset(const Vec3D& t_com_position);
 

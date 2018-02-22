@@ -72,7 +72,7 @@ ComZmpModel::ComZmpModel(double t_mass)
 ComZmpModel::ComZmpModel(DataPtr t_data)
     : m_data_ptr(t_data), m_time_step(default_time_step) {}
 
-ComZmpModel& ComZmpModel::set_data(DataPtr t_data_ptr) {
+ComZmpModel& ComZmpModel::set_data_ptr(DataPtr t_data_ptr) {
   m_data_ptr = t_data_ptr;
   return *this;
 }

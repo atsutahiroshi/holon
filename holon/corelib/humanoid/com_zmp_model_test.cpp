@@ -163,12 +163,12 @@ TEST_CASE("ComZmpModel: accessor/mutator of data",
   SECTION("ComZmpModel can hold another Data pointer") {
     auto data1 = ComZmpModelDataFactory();
     REQUIRE(&model.data() != data1.get());
-    model.set_data(data1);
+    model.set_data_ptr(data1);
     CHECK(&model.data() == data1.get());
 
     auto data2 = ComZmpModelDataFactory();
     REQUIRE(&model.data() != data2.get());
-    model.set_data(data2);
+    model.set_data_ptr(data2);
     CHECK(&model.data() == data2.get());
   }
 }
@@ -220,7 +220,7 @@ TEST_CASE("ComZmpModel::mass() returns mass value",
   SECTION("case 3") {
     ComZmpModel model;
     auto data = ComZmpModelDataFactory(3);
-    model.set_data(data);
+    model.set_data_ptr(data);
     CHECK(model.mass() == 3.0);
     data->mass = 30;
     CHECK(model.mass() == 30.0);

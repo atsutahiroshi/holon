@@ -113,13 +113,14 @@ TEST_CASE("ComCtrl::reset(const Vec3D&) should reset initial COM position") {
   CHECK_THAT(ctrl.states().com_velocity, Equals(kVec3DZero));
 }
 
-SCENARIO("ComCtrl: compute desired ZMP position",
+SCENARIO("ComCtrl::computeDesHrzZmpPos computes desired ZMP position ",
          "[corelib][humanoid][ComCtrl]") {
   GIVEN("qx1 = 1.0, qx2 = 1.0, qy1 = 1.0, qy2 = 1.0, ref_com_pos = (0, 0, G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {0, 0, G};
     double desired_zeta =
         ctrl.model().computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
+    double xz, yz;
 
     REQUIRE(desired_zeta == Approx(1.0));
     REQUIRE(ctrl.x().q1() == 1);
@@ -131,33 +132,36 @@ SCENARIO("ComCtrl: compute desired ZMP position",
       Vec3D com_pos = {0, 0, G};
       Vec3D com_vel = {0, 0, 0};
 
-      THEN("desire_zmp_pos = (0, 0, 0)") {
+      THEN("desired_zmp_pos = (0, 0, 0)") {
         Vec3D expected_zmp_pos = {0, 0, 0};
-        Vec3D desired_zmp_pos =
-            ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
-        CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
+        std::tie(xz, yz) = ctrl.computeDesHrzZmpPos(ref_com_pos, com_pos,
+                                                    com_vel, desired_zeta);
+        CHECK(xz == Approx(expected_zmp_pos.x()));
+        CHECK(yz == Approx(expected_zmp_pos.y()));
       }
     }
     WHEN("com_pos = (1, 3, G), com_vel = (0, -1, 0)") {
       Vec3D com_pos = {1, 3, G};
       Vec3D com_vel = {0, -1, 0};
 
-      THEN("desire_zmp_pos = (2, 4, 0)") {
+      THEN("desired_zmp_pos = (2, 4, 0)") {
         Vec3D expected_zmp_pos = {2, 4, 0};
-        Vec3D desired_zmp_pos =
-            ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
-        CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
+        std::tie(xz, yz) = ctrl.computeDesHrzZmpPos(ref_com_pos, com_pos,
+                                                    com_vel, desired_zeta);
+        CHECK(xz == Approx(expected_zmp_pos.x()));
+        CHECK(yz == Approx(expected_zmp_pos.y()));
       }
     }
     WHEN("com_pos = (0, -2, G), com_vel = (-2, 2, 0)") {
       Vec3D com_pos = {0, -2, G};
       Vec3D com_vel = {-2, 2, 0};
 
-      THEN("desire_zmp_pos = (-4, 0, 0)") {
+      THEN("desired_zmp_pos = (-4, 0, 0)") {
         Vec3D expected_zmp_pos = {-4, 0, 0};
-        Vec3D desired_zmp_pos =
-            ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
-        CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
+        std::tie(xz, yz) = ctrl.computeDesHrzZmpPos(ref_com_pos, com_pos,
+                                                    com_vel, desired_zeta);
+        CHECK(xz == Approx(expected_zmp_pos.x()));
+        CHECK(yz == Approx(expected_zmp_pos.y()));
       }
     }
   }
@@ -167,6 +171,7 @@ SCENARIO("ComCtrl: compute desired ZMP position",
     Vec3D ref_com_pos = {0, 0, G};
     double desired_zeta =
         ctrl.model().computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
+    double xz, yz;
 
     ctrl.x().set_q1(1.0).set_q2(0.5);
     ctrl.y().set_q1(1.2).set_q2(0.8);
@@ -181,32 +186,35 @@ SCENARIO("ComCtrl: compute desired ZMP position",
       Vec3D com_pos = {1, 1, G};
       Vec3D com_vel = {0, 0, 0};
 
-      THEN("desire_zmp_pos = (1.5, 1.96, 0)") {
+      THEN("desired_zmp_pos = (1.5, 1.96, 0)") {
         Vec3D expected_zmp_pos = {1.5, 1.96, 0};
-        Vec3D desired_zmp_pos =
-            ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
-        CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
+        std::tie(xz, yz) = ctrl.computeDesHrzZmpPos(ref_com_pos, com_pos,
+                                                    com_vel, desired_zeta);
+        CHECK(xz == Approx(expected_zmp_pos.x()));
+        CHECK(yz == Approx(expected_zmp_pos.y()));
       }
     }
     WHEN("com_pos = (-2, 3, G), com_vel = (2, -1, 0)") {
       Vec3D com_pos = {-2, 3, G};
       Vec3D com_vel = {2, -1, 0};
 
-      THEN("desire_zmp_pos = (0, 3.88, 0)") {
+      THEN("desired_zmp_pos = (0, 3.88, 0)") {
         Vec3D expected_zmp_pos = {0, 3.88, 0};
-        Vec3D desired_zmp_pos =
-            ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
-        CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
+        std::tie(xz, yz) = ctrl.computeDesHrzZmpPos(ref_com_pos, com_pos,
+                                                    com_vel, desired_zeta);
+        CHECK(xz == Approx(expected_zmp_pos.x()));
+        CHECK(yz == Approx(expected_zmp_pos.y()));
       }
     }
   }
   GIVEN(
-      "qx1 = 1.0, qx2 = 1.5, qy1 = 1.0, qy2 = 1.0, ref_com_pos = (1, 0.5, "
-      "G)") {
+      "qx1 = 1.0, qx2 = 1.5, qy1 = 1.0, qy2 = 1.0, "
+      "ref_com_pos = (1, 0.5, G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {1, 0.5, G};
     double desired_zeta =
         ctrl.model().computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
+    double xz, yz;
 
     ctrl.x().set_q2(1.5);
 
@@ -220,33 +228,36 @@ SCENARIO("ComCtrl: compute desired ZMP position",
       Vec3D com_pos = {1, 0, G};
       Vec3D com_vel = {0, 0, 0};
 
-      THEN("desire_zmp_pos = (1, -0.5, 0)") {
+      THEN("desired_zmp_pos = (1, -0.5, 0)") {
         Vec3D expected_zmp_pos = {1, -0.5, 0};
-        Vec3D desired_zmp_pos =
-            ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
-        CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
+        std::tie(xz, yz) = ctrl.computeDesHrzZmpPos(ref_com_pos, com_pos,
+                                                    com_vel, desired_zeta);
+        CHECK(xz == Approx(expected_zmp_pos.x()));
+        CHECK(yz == Approx(expected_zmp_pos.y()));
       }
     }
     WHEN("com_pos = (0, 3, G), com_vel = (-2, -1, 0)") {
       Vec3D com_pos = {0, 3, G};
       Vec3D com_vel = {-2, -1, 0};
 
-      THEN("desire_zmp_pos = (-6.5, 3.5, 0)") {
+      THEN("desired_zmp_pos = (-6.5, 3.5, 0)") {
         Vec3D expected_zmp_pos = {-6.5, 3.5, 0};
-        Vec3D desired_zmp_pos =
-            ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
-        CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
+        std::tie(xz, yz) = ctrl.computeDesHrzZmpPos(ref_com_pos, com_pos,
+                                                    com_vel, desired_zeta);
+        CHECK(xz == Approx(expected_zmp_pos.x()));
+        CHECK(yz == Approx(expected_zmp_pos.y()));
       }
     }
     WHEN("com_pos = (-2, 0, G), com_vel = (3, -2, 0)") {
       Vec3D com_pos = {-2, 0, G};
       Vec3D com_vel = {3, -2, 0};
 
-      THEN("desire_zmp_pos = (1, -4.5, 0)") {
+      THEN("desired_zmp_pos = (1, -4.5, 0)") {
         Vec3D expected_zmp_pos = {1, -4.5, 0};
-        Vec3D desired_zmp_pos =
-            ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
-        CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
+        std::tie(xz, yz) = ctrl.computeDesHrzZmpPos(ref_com_pos, com_pos,
+                                                    com_vel, desired_zeta);
+        CHECK(xz == Approx(expected_zmp_pos.x()));
+        CHECK(yz == Approx(expected_zmp_pos.y()));
       }
     }
   }
@@ -258,6 +269,7 @@ SCENARIO("ComCtrl: compute desired ZMP position",
     Vec3D ref_com_pos = {0, 0.5, 0.5 * G};
     double desired_zeta =
         ctrl.model().computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
+    double xz, yz;
 
     ctrl.x().set_q2(1.5);
     ctrl.y().set_q2(1.5);
@@ -272,34 +284,37 @@ SCENARIO("ComCtrl: compute desired ZMP position",
       Vec3D com_pos = {0, 0, G};
       Vec3D com_vel = {0, 0, 0};
 
-      THEN("desire_zmp_pos = (0, -0.75, 0)") {
+      THEN("desired_zmp_pos = (0, -0.75, 0)") {
         Vec3D expected_zmp_pos = {0, -0.75, 0};
-        Vec3D desired_zmp_pos =
-            ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
-        CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
+        std::tie(xz, yz) = ctrl.computeDesHrzZmpPos(ref_com_pos, com_pos,
+                                                    com_vel, desired_zeta);
+        CHECK(xz == Approx(expected_zmp_pos.x()));
+        CHECK(yz == Approx(expected_zmp_pos.y()));
       }
     }
     WHEN("com_pos = (1, 3, G), com_vel = (0, -2, 0)") {
       Vec3D com_pos = {1, 3, G};
       Vec3D com_vel = {0, -2, 0};
 
-      THEN("desire_zmp_pos = (2.5, 2.5*(3-sqrt(2))-0.75, 0)") {
+      THEN("desired_zmp_pos = (2.5, 2.5*(3-sqrt(2))-0.75, 0)") {
         Vec3D expected_zmp_pos = {2.5, 2.5 * (3 - sqrt(2)) - 0.75, 0};
-        Vec3D desired_zmp_pos =
-            ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
-        CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
+        std::tie(xz, yz) = ctrl.computeDesHrzZmpPos(ref_com_pos, com_pos,
+                                                    com_vel, desired_zeta);
+        CHECK(xz == Approx(expected_zmp_pos.x()));
+        CHECK(yz == Approx(expected_zmp_pos.y()));
       }
     }
     WHEN("com_pos = (-2, 0, G), com_vel = (3, -1, 0)") {
       Vec3D com_pos = {-2, 0, G};
       Vec3D com_vel = {3, -1, 0};
 
-      THEN("desire_zmp_pos = (2.5*(-2+1.5*sqrt(2)), -1.25*sqrt(2)-0.75, 0)") {
+      THEN("desired_zmp_pos = (2.5*(-2+1.5*sqrt(2)), -1.25*sqrt(2)-0.75, 0)") {
         Vec3D expected_zmp_pos = {2.5 * (-2 + 1.5 * sqrt(2)),
                                   -1.25 * sqrt(2) - 0.75, 0};
-        Vec3D desired_zmp_pos =
-            ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
-        CHECK_THAT(desired_zmp_pos, Equals(expected_zmp_pos));
+        std::tie(xz, yz) = ctrl.computeDesHrzZmpPos(ref_com_pos, com_pos,
+                                                    com_vel, desired_zeta);
+        CHECK(xz == Approx(expected_zmp_pos.x()));
+        CHECK(yz == Approx(expected_zmp_pos.y()));
       }
     }
   }
@@ -338,19 +353,20 @@ TEST_CASE("check if desired ZMP position is modified after update",
     Vec3D cmd_com_pos;
   } testcases[] = {{{0, 0, 1}}, {{0.1, 0, 1}}, {{0.1, -0.1, 1}}};
   for (auto& c : testcases) {
-    Vec3D expected_des_zmp_pos;
+    double expected_xz, expected_yz;
     double expected_des_zeta;
 
     expected_des_zeta =
         ctrl.model().computeZeta(c.cmd_com_pos, kVec3DZero, kVec3DZero);
-    expected_des_zmp_pos =
-        ctrl.computeDesZmpPos(c.cmd_com_pos, ctrl.states().com_position,
-                              ctrl.states().com_velocity, expected_des_zeta);
+    std::tie(expected_xz, expected_yz) =
+        ctrl.computeDesHrzZmpPos(c.cmd_com_pos, ctrl.states().com_position,
+                                 ctrl.states().com_velocity, expected_des_zeta);
 
     cmd->set_com_position(c.cmd_com_pos);
     ctrl.update();
     CHECK(ctrl.outputs().zeta == expected_des_zeta);
-    CHECK_THAT(ctrl.outputs().zmp_position, Equals(expected_des_zmp_pos));
+    CHECK(ctrl.outputs().zmp_position.x() == Approx(expected_xz));
+    CHECK(ctrl.outputs().zmp_position.y() == Approx(expected_yz));
   }
 }
 

@@ -22,6 +22,7 @@
 #define HOLON_HUMANOID_COM_CTRL_HPP_
 
 #include <memory>
+#include <tuple>
 #include "holon/corelib/common/optional.hpp"
 #include "holon/corelib/humanoid/com_ctrl_x.hpp"
 #include "holon/corelib/humanoid/com_ctrl_y.hpp"
@@ -80,6 +81,7 @@ class ComCtrl {
   using InputsPtr = std::shared_ptr<Inputs>;
   using OutputsPtr = std::shared_ptr<Outputs>;
   using UserCommandsPtr = std::shared_ptr<UserCommands>;
+  using HrzPos = std::tuple<double, double>;
 
   // constructors
   ComCtrl();
@@ -121,14 +123,14 @@ class ComCtrl {
   }
 
   // computing functions
-  Vec3D computeDesReactForce(const Vec3D& t_ref_com_position,
+  double computeDesVrtReactForce(double t_zd, double t_z, double t_vz,
+                                 double t_mass) const;
+  double computeDesZeta(double t_z, double t_zz, double t_fz,
+                        double t_mass) const;
+  HrzPos computeDesHrzZmpPos(const Vec3D& t_ref_com_position,
                              const Vec3D& t_com_position,
-                             const Vec3D& t_com_velocity, double t_mass) const;
-  double computeDesZeta(const Vec3D& t_reaction_force) const;
-  Vec3D computeDesZmpPos(const Vec3D& t_ref_com_position,
-                         const Vec3D& t_com_position,
-                         const Vec3D& t_com_velocity,
-                         double t_desired_zeta) const;
+                             const Vec3D& t_com_velocity,
+                             double t_desired_zeta) const;
 
   // update functions
   bool update();

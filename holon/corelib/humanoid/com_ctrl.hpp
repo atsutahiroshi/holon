@@ -76,11 +76,11 @@ class ComCtrl {
   using States = ComZmpModelData;
   using Inputs = ComCtrlInputs;
   using Outputs = ComCtrlOutputs;
-  using UserCommands = ComCtrlCommands;
+  using Commands = ComCtrlCommands;
   using StatesPtr = std::shared_ptr<States>;
   using InputsPtr = std::shared_ptr<Inputs>;
   using OutputsPtr = std::shared_ptr<Outputs>;
-  using UserCommandsPtr = std::shared_ptr<UserCommands>;
+  using CommandsPtr = std::shared_ptr<Commands>;
   using HrzPos = std::tuple<double, double>;
 
   // constructors
@@ -109,7 +109,7 @@ class ComCtrl {
   inline const States& states() const noexcept { return *m_states_ptr; }
   inline const Inputs& inputs() const noexcept { return *m_inputs_ptr; }
   inline const Outputs& outputs() const noexcept { return *m_outputs_ptr; }
-  inline const UserCommands& cmds() const noexcept { return *m_user_cmds_ptr; }
+  inline const Commands& commands() const noexcept { return *m_user_cmds_ptr; }
   inline double time_step() const noexcept { return model().time_step(); }
 
   // mutators
@@ -118,9 +118,7 @@ class ComCtrl {
 
   //
   inline InputsPtr getInputsPtr() const noexcept { return m_inputs_ptr; }
-  inline UserCommandsPtr getUserCommands() const noexcept {
-    return m_user_cmds_ptr;
-  }
+  inline CommandsPtr getCommands() const noexcept { return m_user_cmds_ptr; }
 
   // computing functions
   double computeDesVrtReactForce(double t_zd, double t_z, double t_vz,
@@ -144,11 +142,11 @@ class ComCtrl {
   StatesPtr m_states_ptr;
   InputsPtr m_inputs_ptr;
   OutputsPtr m_outputs_ptr;
-  UserCommandsPtr m_user_cmds_ptr;
+  CommandsPtr m_user_cmds_ptr;
   Vec3D m_initial_com_position;
 
   void updateCtrlParam();
-  void remapUserCommandsToInputs();
+  void remapCommandsToInputs();
 };
 
 }  // namespace holon

@@ -26,7 +26,7 @@ const double DT = 0.01;
 
 int main() {
   holon::ComCtrl ctrl;
-  auto cmd = ctrl.getUserCommands();
+  auto cmd = ctrl.getCommands();
   holon::Vec3D initial_com_pos = {0.1, -0.1, 1};
   holon::Vec3D cmd_com_pos = {0, 0, 1};
   double t = 0;

@@ -75,7 +75,7 @@ TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
     REQUIRE(&ctrl.states());
     REQUIRE(&ctrl.inputs());
     REQUIRE(&ctrl.outputs());
-    REQUIRE(&ctrl.cmds());
+    REQUIRE(&ctrl.commands());
     REQUIRE(&ctrl.model().data() == &ctrl.states());
   }
 
@@ -84,11 +84,11 @@ TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
   }
 }
 
-TEST_CASE("ComCtrl::getUserCommands() provides a pointer to user commands",
+TEST_CASE("ComCtrl::getCommands() provides a pointer to user commands",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
 
-  auto cmd = ctrl.getUserCommands();
+  auto cmd = ctrl.getCommands();
   CHECK(cmd->xd == nullopt);
   CHECK(cmd->xd != 0.0);
   CHECK_FALSE(cmd->xd);
@@ -347,7 +347,7 @@ TEST_CASE("check if time step is modified after update",
 TEST_CASE("check if desired ZMP position is modified after update",
           "[corelib][humanoid]") {
   ComCtrl ctrl;
-  auto cmd = ctrl.getUserCommands();
+  auto cmd = ctrl.getCommands();
 
   struct testcase_t {
     Vec3D cmd_com_pos;
@@ -375,7 +375,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   ComCtrl ctrl;
   Vec3D p0 = {0.1, -0.1, 1.5};
   ctrl.reset(p0);
-  auto cmd = ctrl.getUserCommands();
+  auto cmd = ctrl.getCommands();
   auto inputs = ctrl.getInputsPtr();
 
   Fuzzer fuzz;
@@ -534,7 +534,7 @@ SCENARIO("controller can regulate COM position at a point",
   GIVEN("command that COM position be at (0.1, -0.1, 1)") {
     ComCtrl ctrl;
     Vec3D cmd_com_pos = {0.1, -0.1, 1};
-    ctrl.getUserCommands()->set_com_position(cmd_com_pos);
+    ctrl.getCommands()->set_com_position(cmd_com_pos);
 
     WHEN("at first") {
       THEN("COM position is at (0, 0, 1)") {
@@ -579,9 +579,9 @@ SCENARIO("regulate COM position along vertical direction",
     Vec3D pd = {0, 0, 0.42};
     Vec3D p0 = {0, 0, 0.4};
     ctrl.reset(p0);
-    ctrl.getUserCommands()->set_com_position(pd);
+    ctrl.getCommands()->set_com_position(pd);
     REQUIRE(ctrl.states().com_position == p0);
-    REQUIRE(ctrl.cmds().zd == 0.42);
+    REQUIRE(ctrl.commands().zd == 0.42);
 
     WHEN("update until 0.1 sec") {
       double t = 0;

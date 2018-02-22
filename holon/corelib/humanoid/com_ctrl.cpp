@@ -114,23 +114,23 @@ ComCtrl::HrzPos ComCtrl::computeDesHrzZmpPos(const Vec3D& t_ref_com_position,
   return std::make_tuple(xz, yz);
 }
 
-void ComCtrl::remapUserCommandsToInputs() {
+void ComCtrl::remapCommandsToInputs() {
   m_inputs_ptr->com_position[0] =
-      cmds().xd.value_or(m_initial_com_position.x());
+      commands().xd.value_or(m_initial_com_position.x());
   m_inputs_ptr->com_position[1] =
-      cmds().yd.value_or(m_initial_com_position.y());
+      commands().yd.value_or(m_initial_com_position.y());
   m_inputs_ptr->com_position[2] =
-      cmds().zd.value_or(m_initial_com_position.z());
-  m_inputs_ptr->com_velocity[0] = cmds().vxd.value_or(0);
-  m_inputs_ptr->com_velocity[1] = cmds().vyd.value_or(0);
+      commands().zd.value_or(m_initial_com_position.z());
+  m_inputs_ptr->com_velocity[0] = commands().vxd.value_or(0);
+  m_inputs_ptr->com_velocity[1] = commands().vyd.value_or(0);
   m_inputs_ptr->com_velocity[2] = 0;
-  m_inputs_ptr->qx1 = cmds().qx1.value_or(ComCtrlX::default_q1);
-  m_inputs_ptr->qx2 = cmds().qx2.value_or(ComCtrlX::default_q2);
-  m_inputs_ptr->qy1 = cmds().qy1.value_or(ComCtrlY::default_q1);
-  m_inputs_ptr->qy2 = cmds().qy2.value_or(ComCtrlY::default_q2);
-  m_inputs_ptr->qz1 = cmds().qz1.value_or(ComCtrlZ::default_q1);
-  m_inputs_ptr->qz2 = cmds().qz2.value_or(ComCtrlZ::default_q2);
-  m_inputs_ptr->vhp = cmds().vhp.value_or(0);
+  m_inputs_ptr->qx1 = commands().qx1.value_or(ComCtrlX::default_q1);
+  m_inputs_ptr->qx2 = commands().qx2.value_or(ComCtrlX::default_q2);
+  m_inputs_ptr->qy1 = commands().qy1.value_or(ComCtrlY::default_q1);
+  m_inputs_ptr->qy2 = commands().qy2.value_or(ComCtrlY::default_q2);
+  m_inputs_ptr->qz1 = commands().qz1.value_or(ComCtrlZ::default_q1);
+  m_inputs_ptr->qz2 = commands().qz2.value_or(ComCtrlZ::default_q2);
+  m_inputs_ptr->vhp = commands().vhp.value_or(0);
 }
 
 void ComCtrl::updateCtrlParam() {
@@ -144,7 +144,7 @@ void ComCtrl::updateCtrlParam() {
 
 bool ComCtrl::update() {
   // remap commanded values given by user to referential values for controller
-  remapUserCommandsToInputs();
+  remapCommandsToInputs();
 
   // update control parameters
   updateCtrlParam();

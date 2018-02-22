@@ -49,7 +49,7 @@ int main() {
   // ComCtrl ctrl(model);
   ComCtrl ctrl;
   ctrl.states().com_position = model.data().com_position;
-  auto cmd = ctrl.getUserCommands();
+  auto cmd = ctrl.getCommands();
   Vec3D cmd_com_pos = {0, 0, 1};
 
   double t = 0;

@@ -36,6 +36,33 @@ using Catch::Matchers::Equals;
 
 const double G = RK_G;
 
+void RandomizeData(ComZmpModelData* data) {
+  Fuzzer fuzz;
+  Fuzzer positive(0, 10);
+
+  data->mass = positive();
+  data->nu = fuzz.get<Vec3D>();
+  data->com_position = fuzz.get<Vec3D>();
+  data->com_position.set_z(positive());
+  data->com_velocity = fuzz.get<Vec3D>();
+  data->com_acceleration = fuzz.get<Vec3D>();
+  data->zmp_position = fuzz.get<Vec3D>();
+  data->reaction_force = fuzz.get<Vec3D>();
+  data->external_force = fuzz.get<Vec3D>();
+}
+
+#define CHECK_COMZMPMODELDATA_MEMBER(a, b, var) CHECK(a.var == b.var)
+void CheckData(const ComZmpModelData& a, const ComZmpModelData& b) {
+  CHECK_COMZMPMODELDATA_MEMBER(a, b, mass);
+  CHECK_COMZMPMODELDATA_MEMBER(a, b, nu);
+  CHECK_COMZMPMODELDATA_MEMBER(a, b, com_position);
+  CHECK_COMZMPMODELDATA_MEMBER(a, b, com_velocity);
+  CHECK_COMZMPMODELDATA_MEMBER(a, b, com_acceleration);
+  CHECK_COMZMPMODELDATA_MEMBER(a, b, zmp_position);
+  CHECK_COMZMPMODELDATA_MEMBER(a, b, reaction_force);
+  CHECK_COMZMPMODELDATA_MEMBER(a, b, external_force);
+}
+
 TEST_CASE("ComZmpModelData: constructor",
           "[corelib][humanoid][ComZmpModelData]") {
   double default_mass = 1;
@@ -72,21 +99,16 @@ TEST_CASE("ComZmpModelData: constructor",
 
 TEST_CASE("ComZmpModelData: copy constructor") {
   ComZmpModelData a;
-  a.mass = 1.5;
-  a.com_position = Vec3D(1.0, 2.0, 3.0);
+  RandomizeData(&a);
   ComZmpModelData b(a);
-  CHECK(b.mass == a.mass);
-  CHECK_THAT(b.com_position, Equals(a.com_position));
+  CheckData(a, b);
 }
 
 TEST_CASE("ComZmpModelData: copy assignment operator") {
   ComZmpModelData a, b;
-  a.mass = 1.5;
-  a.com_position = Vec3D(1.0, 2.0, 3.0);
-
+  RandomizeData(&a);
   b = a;
-  CHECK(b.mass == a.mass);
-  CHECK_THAT(b.com_position, Equals(a.com_position));
+  CheckData(a, b);
 }
 
 TEST_CASE("ComZmpModelData: move constructor") {

@@ -200,8 +200,7 @@ bool ComCtrl::update() {
                           states().com_velocity, zeta);
 
   // update states of COM-ZMP model
-  m_states_ptr->reaction_force = Vec3D(0, 0, fz);
-  m_states_ptr->zmp_position = Vec3D(xz, yz, inputs().vhp);
+  m_model.inputZmpPos(Vec3D(xz, yz, inputs().vhp), fz);
   if (!m_model.update()) return false;
 
   // update outputs of the controller

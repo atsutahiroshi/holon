@@ -256,9 +256,9 @@ bool ComZmpModel::update() {
                                    data().reaction_force, data().mass);
   if (zIsTiny(sqr_zeta)) return false;
 
-  // compute acceleration from current COM / ZMP positions and reaction force
-  Vec3D acc = computeComAcc(data().com_position, data().zmp_position, sqr_zeta,
-                            data().mass, data().external_force);
+  // compute acceleration from reaction force
+  Vec3D acc =
+      computeComAcc(data().reaction_force, mass(), data().external_force);
 
   // integrate COM position / velocity by one time step
   Vec3D pos = data().com_position + time_step() * data().com_velocity;
@@ -268,7 +268,7 @@ bool ComZmpModel::update() {
   m_data_ptr->com_position = pos;
   m_data_ptr->com_velocity = vel;
   m_data_ptr->com_acceleration = acc;
-  m_data_ptr->reaction_force = computeReactForce(acc, data().mass);
+  // m_data_ptr->reaction_force = computeReactForce(acc, data().mass);
   return true;
 }
 

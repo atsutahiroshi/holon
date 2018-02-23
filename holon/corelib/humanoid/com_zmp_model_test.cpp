@@ -1085,12 +1085,9 @@ TEST_CASE("ComZmpModel::inputZmpPos computes reaction force from ZMP position",
   }
 }
 
-TEST_CASE("test if acceleration is modified after update",
-          "[corelib][humanoid]") {
-  auto data = ComZmpModelDataFactory();
-  ComZmpModel model(data);
-  Vec3D force = model.data().reaction_force;
-  double mass = model.data().mass;
+TEST_CASE("ComZmpModel::update computes COM acceleration",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
 
   SECTION("update acceleration") {
     struct testcase_t {
@@ -1100,12 +1097,12 @@ TEST_CASE("test if acceleration is modified after update",
     } testcases[] = {{{0, 0, 1}, {0, 0, 0}, {1, 0, 0}},
                      {{0, 0.1, 1}, {0.1, -0.1, 0}, {0.2, 0.1, 0}}};
     for (auto& c : testcases) {
-      Vec3D expected_com_acc =
-          model.computeComAcc(c.com_pos, c.zmp_pos, force, mass);
+      Vec3D f = model.computeReactForce(c.com_pos, c.zmp_pos, model.mass() * G);
+      Vec3D expected_com_acc = model.computeComAcc(f, model.mass());
 
-      data->com_position = c.com_pos;
-      data->com_velocity = c.com_vel;
-      data->zmp_position = c.zmp_pos;
+      model.data_ptr()->com_position = c.com_pos;
+      model.data_ptr()->com_velocity = c.com_vel;
+      model.inputZmpPos(c.zmp_pos);
       model.update();
       CHECK_THAT(model.data().com_acceleration, Equals(expected_com_acc));
     }
@@ -1119,7 +1116,7 @@ SCENARIO("update COM position, velocity, acceleration", "[corelib][humanoid]") {
 
     WHEN("input ZMP position as (-1, -0.5, 0) and update") {
       Vec3D zmp_pos = {-1, -0.5, 0};
-      data->zmp_position = zmp_pos;
+      model.inputZmpPos(zmp_pos);
       REQUIRE(model.update());
 
       THEN("horizontal velocity should be positive") {
@@ -1171,8 +1168,7 @@ TEST_CASE("ComZmpModel::update keeps consistency of vertical reaction force",
 
   double desired_fz = 10;
   Vec3D desired_zmp = {-1, 0.42, 0};
-  data->reaction_force = Vec3D(0, 0, 10);
-  data->zmp_position = desired_zmp;
+  model.inputZmpPos(desired_zmp, desired_fz);
   model.update();
   CHECK(data->reaction_force == Vec3D(10. / 0.42, -10, desired_fz));
   CHECK(data->com_acceleration == Vec3D(10. / 0.42, -10, 10 - G));

@@ -63,7 +63,7 @@ int main() {
     ctrl.update(DT);
 
     // update simulator
-    model.data_ptr()->zmp_position = ctrl.outputs().zmp_position;
+    model.inputZmpPos(ctrl.outputs().zmp_position);
     apply_external_force(model, t);
     model.update(DT);
 

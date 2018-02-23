@@ -36,6 +36,7 @@ struct ComZmpModelData {
   Vec3D zmp_position;
   Vec3D reaction_force;
   Vec3D external_force;
+  Vec3D total_force;
 
   // constructors
   ComZmpModelData();

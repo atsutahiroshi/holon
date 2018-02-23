@@ -33,16 +33,6 @@ namespace {
 const Vec3D kG = {0, 0, RK_G};
 }  //
 
-ComZmpModelData::ComZmpModelData()
-    : mass(default_mass),
-      nu(kVec3DZ),
-      com_position(default_com_position),
-      com_velocity(kVec3DZero),
-      com_acceleration(kVec3DZero),
-      zmp_position(kVec3DZero),
-      reaction_force(0, 0, default_mass * RK_G),
-      external_force(kVec3DZero) {}
-
 ComZmpModelData::ComZmpModelData(double t_mass)
     : mass(t_mass),
       nu(kVec3DZ),
@@ -51,7 +41,10 @@ ComZmpModelData::ComZmpModelData(double t_mass)
       com_acceleration(kVec3DZero),
       zmp_position(kVec3DZero),
       reaction_force(0, 0, t_mass * RK_G),
-      external_force(kVec3DZero) {}
+      external_force(kVec3DZero),
+      total_force(reaction_force) {}
+
+ComZmpModelData::ComZmpModelData() : ComZmpModelData(default_mass) {}
 
 std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory() {
   return std::make_shared<ComZmpModelData>();
@@ -268,7 +261,7 @@ bool ComZmpModel::update() {
   m_data_ptr->com_position = pos;
   m_data_ptr->com_velocity = vel;
   m_data_ptr->com_acceleration = acc;
-  // m_data_ptr->reaction_force = computeReactForce(acc, data().mass);
+  m_data_ptr->total_force = data().reaction_force + data().external_force;
   return true;
 }
 

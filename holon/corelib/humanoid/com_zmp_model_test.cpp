@@ -49,6 +49,7 @@ void RandomizeData(ComZmpModelData* data) {
   data->zmp_position = fuzz.get<Vec3D>();
   data->reaction_force = fuzz.get<Vec3D>();
   data->external_force = fuzz.get<Vec3D>();
+  data->total_force = fuzz.get<Vec3D>();
 }
 
 #define CHECK_COMZMPMODELDATA_MEMBER(a, b, var) CHECK(a.var == b.var)
@@ -61,6 +62,7 @@ void CheckData(const ComZmpModelData& a, const ComZmpModelData& b) {
   CHECK_COMZMPMODELDATA_MEMBER(a, b, zmp_position);
   CHECK_COMZMPMODELDATA_MEMBER(a, b, reaction_force);
   CHECK_COMZMPMODELDATA_MEMBER(a, b, external_force);
+  CHECK_COMZMPMODELDATA_MEMBER(a, b, total_force);
 }
 
 TEST_CASE("ComZmpModelData: constructor",
@@ -78,6 +80,7 @@ TEST_CASE("ComZmpModelData: constructor",
     CHECK_THAT(data.zmp_position, Equals(kVec3DZero));
     CHECK_THAT(data.reaction_force, Equals(Vec3D(0, 0, G)));
     CHECK_THAT(data.external_force, Equals(kVec3DZero));
+    CHECK_THAT(data.total_force, Equals(Vec3D(0, 0, G)));
   }
 
   SECTION("with parameters") {
@@ -93,6 +96,7 @@ TEST_CASE("ComZmpModelData: constructor",
       CHECK_THAT(data.zmp_position, Equals(kVec3DZero));
       CHECK_THAT(data.reaction_force, Equals(Vec3D(0, 0, m * G)));
       CHECK_THAT(data.external_force, Equals(kVec3DZero));
+      CHECK_THAT(data.total_force, Equals(Vec3D(0, 0, m * G)));
     }
   }
 }
@@ -1172,6 +1176,24 @@ TEST_CASE("ComZmpModel::update keeps consistency of vertical reaction force",
   model.update();
   CHECK(data->reaction_force == Vec3D(10. / 0.42, -10, desired_fz));
   CHECK(data->com_acceleration == Vec3D(10. / 0.42, -10, 10 - G));
+}
+
+TEST_CASE("ComZmpModel::update computes total force being applied to COM",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+  auto data = model.data_ptr();
+  model.reset(Vec3D(0, 0, 0.42));
+
+  double desired_fz = 15;
+  Vec3D desired_zmp = {-1, 0.42, 0};
+  Vec3D ext_force = {1.2, -1.2, -0.2};
+  model.inputZmpPos(desired_zmp, desired_fz);
+  model.set_external_force(ext_force);
+  model.update();
+  CHECK(data->reaction_force == Vec3D(15. / 0.42, -15, desired_fz));
+  CHECK(data->external_force == Vec3D(1.2, -1.2, -0.2));
+  CHECK(data->total_force == Vec3D(15. / 0.42 + 1.2, -16.2, 14.8));
+  CHECK(data->com_acceleration == Vec3D(15. / 0.42 + 1.2, -16.2, 14.8 - G));
 }
 
 }  // namespace

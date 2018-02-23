@@ -131,6 +131,18 @@ ComCtrl::HrzPos ComCtrl::computeDesHrzZmpPos(const Vec3D& t_ref_com_position,
   return std::make_tuple(xz, yz);
 }
 
+void ComCtrl::feedback(const Model& t_model) { feedback(t_model.data_ptr()); }
+
+void ComCtrl::feedback(const Model::DataPtr& t_data_ptr) {
+  feedback(t_data_ptr->com_position, t_data_ptr->com_velocity);
+}
+
+void ComCtrl::feedback(const Vec3D& t_com_position,
+                       const Vec3D& t_com_velocity) {
+  m_states_ptr->com_position = t_com_position;
+  m_states_ptr->com_velocity = t_com_velocity;
+}
+
 void ComCtrl::remapCommandsToInputs() {
   m_inputs_ptr->com_position[0] =
       commands().xd.value_or(m_initial_com_position.x());

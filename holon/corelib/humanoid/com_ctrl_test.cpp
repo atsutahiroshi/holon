@@ -364,6 +364,50 @@ SCENARIO("ComCtrl::computeDesHrzZmpPos computes desired ZMP position ",
   }
 }
 
+TEST_CASE("ComCtrl::feedback should copy COM position / velocity",
+          "[corelib][humanoid][ComCtrl]") {
+  ComCtrl ctrl;
+  Fuzzer fuzz;
+
+  SECTION("ComCtrl::feedback(const Vec3D&,const Vec3D&)") {
+    Vec3D p = fuzz.get<Vec3D>();
+    Vec3D v = fuzz.get<Vec3D>();
+    REQUIRE(ctrl.states().com_position != p);
+    REQUIRE(ctrl.states().com_velocity != v);
+    ctrl.feedback(p, v);
+    CHECK(ctrl.states().com_position == p);
+    CHECK(ctrl.states().com_velocity == v);
+  }
+
+  SECTION("ComCtrl::feedback(const Model::DataPtr&)") {
+    Vec3D p = fuzz.get<Vec3D>();
+    Vec3D v = fuzz.get<Vec3D>();
+    auto data = ComZmpModelDataFactory();
+    data->com_position = p;
+    data->com_velocity = v;
+
+    REQUIRE(ctrl.states().com_position != p);
+    REQUIRE(ctrl.states().com_velocity != v);
+    ctrl.feedback(data);
+    CHECK(ctrl.states().com_position == p);
+    CHECK(ctrl.states().com_velocity == v);
+  }
+
+  SECTION("ComCtrl::feedback(const Model&)") {
+    Vec3D p = fuzz.get<Vec3D>();
+    Vec3D v = fuzz.get<Vec3D>();
+    ComCtrl::Model model;
+    model.data_ptr()->com_position = p;
+    model.data_ptr()->com_velocity = v;
+
+    REQUIRE(ctrl.states().com_position != p);
+    REQUIRE(ctrl.states().com_velocity != v);
+    ctrl.feedback(model);
+    CHECK(ctrl.states().com_position == p);
+    CHECK(ctrl.states().com_velocity == v);
+  }
+}
+
 TEST_CASE("check if time step is modified after update",
           "[corelib][humanoid]") {
   ComCtrl ctrl;

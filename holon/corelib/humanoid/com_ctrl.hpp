@@ -140,6 +140,9 @@ class ComCtrl {
                              double t_desired_zeta) const;
 
   // update functions
+  void feedback(const Model& t_model);
+  void feedback(const Model::DataPtr& t_data_ptr);
+  void feedback(const Vec3D& t_com_position, const Vec3D& t_com_velocity);
   bool update();
   bool update(double t_time_step);
 

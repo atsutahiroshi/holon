@@ -85,6 +85,7 @@ class ComCtrl {
 
   // constructors
   ComCtrl();
+  explicit ComCtrl(const Model& t_model);
 
   // special member functions
   virtual ~ComCtrl() = default;

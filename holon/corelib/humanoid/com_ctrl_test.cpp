@@ -84,6 +84,28 @@ TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
   }
 }
 
+TEST_CASE("ComCtrl(const Model&) constructor", "[corelib][humanoid][ComCtrl]") {
+  ComCtrl::Model model;
+  Fuzzer fuzz;
+  auto p = fuzz.get<Vec3D>();
+  auto v = fuzz.get<Vec3D>();
+  model.data_ptr()->com_position = p;
+  model.data_ptr()->com_velocity = v;
+
+  ComCtrl ctrl(model);
+  CHECK(ctrl.states().com_position == p);
+  CHECK(ctrl.states().com_velocity == v);
+
+  p = fuzz.get<Vec3D>();
+  v = fuzz.get<Vec3D>();
+  ctrl.states().com_position = p;
+  ctrl.states().com_velocity = v;
+  CHECK(model.data().com_position != p);
+  CHECK(model.data().com_velocity != v);
+  CHECK(ctrl.states().com_position == p);
+  CHECK(ctrl.states().com_velocity == v);
+}
+
 TEST_CASE("ComCtrl::set_states_ptr can set another pointer to states data",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;

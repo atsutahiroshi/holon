@@ -151,6 +151,7 @@ TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
   SECTION("default constructor (no parameters)") {
     ComZmpModel model;
     CHECK(model.data().mass == default_mass);
+    CHECK(model.data().com_position == default_com_position);
   }
 
   SECTION("ComZmpModel(double t_mass)") {

@@ -74,6 +74,8 @@ class ComZmpModel {
 
   // mutators
   ComZmpModel& set_data_ptr(DataPtr t_data_ptr);
+  ComZmpModel& set_external_force(const Vec3D& t_external_force);
+  ComZmpModel& clear_external_force() { return set_external_force(kVec3DZero); }
   ComZmpModel& set_time_step(double t_time_step);
   ComZmpModel& reset(const Vec3D& t_com_position);
 

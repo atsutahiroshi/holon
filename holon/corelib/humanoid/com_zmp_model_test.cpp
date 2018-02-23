@@ -223,6 +223,18 @@ TEST_CASE("ComZmpModel: accessor/mutator of time step",
   }
 }
 
+TEST_CASE("ComZmpModel::set_external_force() set external force",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+  Fuzzer fuzz;
+  Vec3D v = fuzz.get<Vec3D>();
+  model.set_external_force(v);
+  CHECK(model.data().external_force == v);
+
+  model.clear_external_force();
+  CHECK(model.data().external_force == kVec3DZero);
+}
+
 TEST_CASE("ComZmpModel::mass() returns mass value",
           "[corelib][humanoid][ComZmpModel]") {
   SECTION("case 1") {

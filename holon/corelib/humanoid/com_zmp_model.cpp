@@ -77,6 +77,11 @@ ComZmpModel& ComZmpModel::set_data_ptr(DataPtr t_data_ptr) {
   return *this;
 }
 
+ComZmpModel& ComZmpModel::set_external_force(const Vec3D& t_external_force) {
+  m_data_ptr->external_force = t_external_force;
+  return *this;
+}
+
 ComZmpModel& ComZmpModel::set_time_step(double t_time_step) {
   if (!isTimeStepValid(t_time_step)) {
     m_time_step = default_time_step;

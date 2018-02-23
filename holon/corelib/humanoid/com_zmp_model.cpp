@@ -262,6 +262,9 @@ bool ComZmpModel::update() {
   m_data_ptr->com_velocity = vel;
   m_data_ptr->com_acceleration = acc;
   m_data_ptr->total_force = data().reaction_force + data().external_force;
+
+  // remove external force for next step
+  clear_external_force();
   return true;
 }
 

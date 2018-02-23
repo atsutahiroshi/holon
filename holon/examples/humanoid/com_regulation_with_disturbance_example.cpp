@@ -37,8 +37,6 @@ void apply_external_force(ComZmpModel* model, double t) {
     model->set_external_force(force1);
   } else if (t > 6 && t < 6.1) {
     model->set_external_force(force2);
-  } else {
-    model->clear_external_force();
   }
 }
 

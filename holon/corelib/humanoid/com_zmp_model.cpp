@@ -92,6 +92,12 @@ ComZmpModel& ComZmpModel::reset(const Vec3D& t_com_position) {
   return *this;
 }
 
+void ComZmpModel::copy_data(const ComZmpModel& t_model) {
+  copy_data(t_model.data());
+}
+
+void ComZmpModel::copy_data(const Data& t_data) { *m_data_ptr = t_data; }
+
 double ComZmpModel::computeSqrZeta(double t_com_position_z,
                                    double t_zmp_position_z,
                                    double t_com_acceleration_z) const {

@@ -274,6 +274,26 @@ SCENARIO("ComZmpModel: function to reset COM position",
   }
 }
 
+TEST_CASE("ComZmpModel::copy_data should copy data from argument",
+          "[corelib][humanoid][ComZmpModel]") {
+  Fuzzer fuzz;
+
+  SECTION("ComZmpModel::copy_data(const ComZmpModel&)") {
+    ComZmpModel a, b;
+    RandomizeData(a.data_ptr().get());
+    b.copy_data(a);
+    CheckData(b.data(), a.data());
+  }
+  SECTION("ComZmpModel::copy_data(const Data&)") {
+    ComZmpModelData data;
+    RandomizeData(&data);
+
+    ComZmpModel model;
+    model.copy_data(data);
+    CheckData(model.data(), data);
+  }
+}
+
 TEST_CASE("ComZmpModel::computeSqrZeta(double,double,double)",
           "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;

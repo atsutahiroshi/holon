@@ -77,6 +77,10 @@ class ComZmpModel {
   ComZmpModel& set_time_step(double t_time_step);
   ComZmpModel& reset(const Vec3D& t_com_position);
 
+  // copy data
+  void copy_data(const ComZmpModel& t_model);
+  void copy_data(const Data& t_data);
+
   // functions to compute squared zeta
   double computeSqrZeta(double t_com_position_z, double t_zmp_position_z,
                         double t_com_acceleration_z) const;

@@ -842,6 +842,27 @@ TEST_CASE(
   }
 }
 
+TEST_CASE("ComZmpModel::computeReactForce(const Vec3D&,const Vec3D&,double)",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+
+  struct testcase_t {
+    Vec3D com_p;
+    Vec3D zmp_p;
+    double fz;
+    Vec3D expected_force;
+  } testcases[] = {{{0, 0, 1}, {0, 0, 0}, 1, {0, 0, 1}},
+                   {{0, 0, 1}, {0, 0, 0}, 1.5, {0, 0, 1.5}},
+                   {{1, -1, 2}, {0, 1, 0.5}, 1.1, {2.2 / 3, -4.4 / 3, 1.1}},
+                   {{1, -1, 2}, {0, 1, 0.5}, 30, {20, -40, 30}},
+                   {{-0.5, 1.9, 1.4}, {1, -1.1, -0.1}, 1, {-1, 2, 1}},
+                   {{-0.5, 1.9, 1.4}, {1, -1.1, -0.1}, 10, {-10, 20, 10}}};
+  for (const auto& c : testcases) {
+    INFO("com = " << c.com_p << ", zmp = " << c.zmp_p << ", fz = " << c.fz);
+    CHECK(model.computeReactForce(c.com_p, c.zmp_p, c.fz) == c.expected_force);
+  }
+}
+
 TEST_CASE("ComZmpModel::computeComAcc(const Vec3D&,double)",
           "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;

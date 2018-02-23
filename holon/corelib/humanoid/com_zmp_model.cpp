@@ -205,6 +205,16 @@ Vec3D ComZmpModel::computeReactForce(const Vec3D& t_com_position,
   return computeReactForce(t_com_position, t_zmp_position, sqr_zeta, t_mass);
 }
 
+Vec3D ComZmpModel::computeReactForce(const Vec3D& t_com_position,
+                                     const Vec3D& t_zmp_position,
+                                     double t_reaction_force_z) const {
+  if (!isComZmpDiffValid(t_com_position, t_zmp_position))
+    return Vec3D(0, 0, t_reaction_force_z);
+  double m_sqr_zeta =
+      t_reaction_force_z / (t_com_position.z() - t_zmp_position.z());
+  return m_sqr_zeta * (t_com_position - t_zmp_position);
+}
+
 Vec3D ComZmpModel::computeComAcc(const Vec3D& t_reaction_force, double t_mass,
                                  const Vec3D& t_external_force) const {
   return (t_reaction_force + t_external_force) / t_mass - kG;

@@ -118,6 +118,9 @@ class ComZmpModel {
                           const Vec3D& t_zmp_position,
                           const Vec3D& t_com_acceleration, double t_mass,
                           const Vec3D& t_nu = kVec3DZ) const;
+  Vec3D computeReactForce(const Vec3D& t_com_position,
+                          const Vec3D& t_zmp_position,
+                          double t_reaction_force_z) const;
 
   // functions to compute COM acceleration
   Vec3D computeComAcc(const Vec3D& t_reaction_force, double t_mass,

@@ -22,6 +22,7 @@
 #define HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
 
 #include <memory>
+#include "holon/corelib/common/optional.hpp"
 #include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
@@ -134,6 +135,11 @@ class ComZmpModel {
                       const Vec3D& t_nu = kVec3DZ) const;
 
   // update functions
+  void inputZmpPos(const Vec3D& t_zmp_position,
+                   optional<double> t_reaction_force_z = nullopt);
+  void inputReactForce(const Vec3D& t_reaction_force);
+  void inputComAcc(const Vec3D& t_com_acceleration);
+
   bool update();
   bool update(double t_time_step);
 

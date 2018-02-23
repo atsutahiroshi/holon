@@ -1064,6 +1064,27 @@ TEST_CASE("modify step time after calling update with double type",
   CHECK(model.time_step() == dt2);
 }
 
+TEST_CASE("ComZmpModel::inputZmpPos computes reaction force from ZMP position",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+  SECTION("COM height assumed to be constant") {
+    Vec3D pz = {1, -1, 0};
+    Vec3D expected_f =
+        model.computeReactForce(model.data().com_position, pz, G);
+    model.inputZmpPos(pz);
+    CHECK(model.data().reaction_force == expected_f);
+  }
+  SECTION("COM moves along vertical direction as well") {
+    Vec3D pz = {-0.5, 1.2, -0.1};
+    double fz = 10;
+    Vec3D expected_f =
+        model.computeReactForce(model.data().com_position, pz, fz);
+    model.inputZmpPos(pz, fz);
+    CHECK(model.data().zmp_position == pz);
+    CHECK(model.data().reaction_force == expected_f);
+  }
+}
+
 TEST_CASE("test if acceleration is modified after update",
           "[corelib][humanoid]") {
   auto data = ComZmpModelDataFactory();

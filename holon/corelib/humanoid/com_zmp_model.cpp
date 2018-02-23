@@ -238,6 +238,18 @@ Vec3D ComZmpModel::computeComAcc(const Vec3D& t_com_position,
                        t_external_force);
 }
 
+void ComZmpModel::inputZmpPos(const Vec3D& t_zmp_position,
+                              optional<double> t_reaction_force_z) {
+  double fz = t_reaction_force_z.value_or(mass() * RK_G);
+  m_data_ptr->zmp_position = t_zmp_position;
+  inputReactForce(
+      computeReactForce(data().com_position, data().zmp_position, fz));
+}
+
+void ComZmpModel::inputReactForce(const Vec3D& t_reaction_force) {
+  m_data_ptr->reaction_force = t_reaction_force;
+}
+
 bool ComZmpModel::update() {
   // check if the value of zeta will be valid when computing acceleration
   double sqr_zeta = computeSqrZeta(data().com_position, data().zmp_position,

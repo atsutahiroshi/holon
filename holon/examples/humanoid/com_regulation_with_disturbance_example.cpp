@@ -29,16 +29,16 @@ using holon::Vec3D;
 using holon::ComZmpModel;
 using holon::ComCtrl;
 
-void apply_external_force(const ComZmpModel& model, double t) {
+void apply_external_force(ComZmpModel* model, double t) {
   Vec3D force1 = {1, -1, 0};
   Vec3D force2 = {-1.5, 1.5, 0};
 
   if (t > 4 && t < 4.1) {
-    model.data_ptr()->external_force = force1;
+    model->set_external_force(force1);
   } else if (t > 6 && t < 6.1) {
-    model.data_ptr()->external_force = force2;
+    model->set_external_force(force2);
   } else {
-    model.data_ptr()->external_force = holon::kVec3DZero;
+    model->clear_external_force();
   }
 }
 
@@ -46,25 +46,22 @@ int main() {
   ComZmpModel model;
   model.reset(Vec3D(0.1, -0.1, 1));
 
-  // ComCtrl ctrl(model);
-  ComCtrl ctrl;
-  ctrl.states().com_position = model.data().com_position;
+  ComCtrl ctrl(model);
   auto cmd = ctrl.getCommands();
   Vec3D cmd_com_pos = {0, 0, 1};
 
   double t = 0;
   while (t < T) {
     // feedback
-    ctrl.states().com_position = model.data().com_position;
-    ctrl.states().com_velocity = model.data().com_velocity;
+    ctrl.feedback(model);
 
     // update controller
     cmd->set_com_position(cmd_com_pos);
     ctrl.update(DT);
 
     // update simulator
+    apply_external_force(&model, t);
     model.inputZmpPos(ctrl.outputs().zmp_position);
-    apply_external_force(model, t);
     model.update(DT);
 
     // logging

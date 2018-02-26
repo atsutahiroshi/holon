@@ -27,7 +27,7 @@ namespace holon {
 const double ComCtrlY::default_q1 = 1.0;
 const double ComCtrlY::default_q2 = 1.0;
 const double ComCtrlY::default_rho = 0.0;
-const double ComCtrlY::default_dist = 1.0;
+const double ComCtrlY::default_dist = 0.0;
 const double ComCtrlY::default_kr = 1.0;
 
 ComCtrlY::ComCtrlY(double t_q1, double t_q2, double t_dist)

@@ -45,7 +45,7 @@ TEST_CASE("ComCtrlY(): constructor", "[corelib][humanoid][ComCtrlY]") {
     CHECK(ctrl.q1() == 0.5);
     CHECK(ctrl.q2() == 1.5);
     CHECK(ctrl.rho() == ComCtrlY::default_rho);
-    CHECK(ctrl.dist() == 1.0);
+    CHECK(ctrl.dist() == 0.0);
     CHECK(ctrl.kr() == ComCtrlY::default_kr);
   }
 

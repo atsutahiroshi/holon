@@ -67,13 +67,22 @@ ComCtrlY& ComCtrlY::set_kr(double t_kr) {
   return *this;
 }
 
+double ComCtrlY::computeNonlinearDumping(double t_yd, double t_y, double t_v,
+                                         double t_zeta) const noexcept {
+  if (zIsTiny(m_rho) || m_rho < 0.0) return 1.0;
+  double r2 = zSqr(t_y - t_yd) + zSqr(t_v / t_zeta) / (m_q1 * m_q2);
+  double rz = 0.5 * m_dist;
+  return 1.0 - m_rho * exp(m_kr * (1.0 - zSqr((m_q1 * m_q2 + 1.0) / rz) * r2));
+}
+
 double ComCtrlY::computeDesZmpPos(double t_yd, double t_y, double t_v,
                                   double t_zeta) const noexcept {
   if (zIsTiny(t_zeta) || t_zeta < 0) {
     ZRUNERROR("ZETA should be positive. (given: %f)", t_zeta);
     return 0;
   }
-  return t_y + (m_q1 * m_q2) * (t_y - t_yd) + (m_q1 + m_q2) * t_v / t_zeta;
+  double nd = computeNonlinearDumping(t_yd, t_y, t_v, t_zeta);
+  return t_y + (m_q1 * m_q2) * (t_y - t_yd) + (m_q1 + m_q2) * nd * t_v / t_zeta;
 }
 
 double ComCtrlY::computeDesZmpPos(const Vec3D& t_ref_com_position,

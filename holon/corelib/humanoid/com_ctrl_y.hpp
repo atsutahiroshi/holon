@@ -74,6 +74,9 @@ class ComCtrlY {
   double m_rho;
   double m_dist;
   double m_kr;
+
+  double computeNonlinearDumping(double t_yd, double t_y, double t_v,
+                                 double t_zeta) const noexcept;
 };
 
 }  // namespace holon

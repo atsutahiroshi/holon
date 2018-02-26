@@ -324,5 +324,26 @@ TEST_CASE("compute desired ZMP position along y-axis when vectors are given",
   }
 }
 
+TEST_CASE(
+    "When foot distance is not given, nonlinear dumping term should always 1",
+    "[corelib][humanoid][ComCtrlY]") {
+  ComCtrlY ctrl;
+  double zeta = 1;
+  double yd = 0.5;
+  ctrl.set_rho(1.0);
+  REQUIRE(ctrl.dist() == 0.0);
+  REQUIRE(ctrl.rho() == 1.0);
+
+  struct testcase_t {
+    double y, vy;
+    double expected_yz;
+  } testcases[] = {
+      {0, 0, -0.5}, {1, 0, 1.5}, {3, -1, 3.5}, {0, -2, -4.5}, {-2, 3, 1.5}};
+
+  for (auto& c : testcases) {
+    CHECK(ctrl.computeDesZmpPos(yd, c.y, c.vy, zeta) == Approx(c.expected_yz));
+  }
+}
+
 }  // namespace
 }  // namespace holon

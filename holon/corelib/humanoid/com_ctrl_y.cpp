@@ -70,6 +70,7 @@ ComCtrlY& ComCtrlY::set_kr(double t_kr) {
 double ComCtrlY::computeNonlinearDumping(double t_yd, double t_y, double t_v,
                                          double t_zeta) const noexcept {
   if (zIsTiny(m_rho) || m_rho < 0.0) return 1.0;
+  if (zIsTiny(m_dist) || m_dist < 0.0) return 1.0;
   double r2 = zSqr(t_y - t_yd) + zSqr(t_v / t_zeta) / (m_q1 * m_q2);
   double rz = 0.5 * m_dist;
   return 1.0 - m_rho * exp(m_kr * (1.0 - zSqr((m_q1 * m_q2 + 1.0) / rz) * r2));

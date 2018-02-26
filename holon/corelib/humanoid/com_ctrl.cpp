@@ -126,6 +126,11 @@ ComCtrl& ComCtrl::reset(const Vec3D& t_com_position) {
   return *this;
 }
 
+ComCtrl& ComCtrl::reset(const Vec3D& t_com_position, double t_foot_dist) {
+  m_initial_foot_dist = t_foot_dist;
+  return reset(t_com_position);
+}
+
 double ComCtrl::computeDesVrtReactForce(double t_zd, double t_z, double t_vz,
                                         double t_mass) const {
   return m_z.computeDesReactForce(t_zd, t_z, t_vz, t_mass);

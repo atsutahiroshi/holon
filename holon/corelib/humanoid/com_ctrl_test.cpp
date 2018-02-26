@@ -194,6 +194,22 @@ TEST_CASE("ComCtrl::reset(const Vec3D&) should reset initial COM position",
   CHECK_THAT(ctrl.states().com_velocity, Equals(kVec3DZero));
 }
 
+TEST_CASE(
+    "ComCtrl::reset(const Vec3D&, double) resets initial COM position and foot "
+    "distance") {
+  ComCtrl ctrl;
+  Vec3D p0 = {-0.1, 0.1, 1.5};
+  double dist = Fuzzer(0, 1).get();
+  REQUIRE_THAT(ctrl.initial_com_position(), !Equals(p0));
+  REQUIRE(ctrl.initial_foot_dist() != dist);
+
+  ctrl.reset(p0, dist);
+  CHECK_THAT(ctrl.initial_com_position(), Equals(p0));
+  CHECK_THAT(ctrl.states().com_position, Equals(p0));
+  CHECK_THAT(ctrl.states().com_velocity, Equals(kVec3DZero));
+  CHECK(ctrl.initial_foot_dist() == dist);
+}
+
 TEST_CASE("ComCtrl::getCommands() provides a pointer to user commands",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;

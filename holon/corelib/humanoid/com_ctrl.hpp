@@ -131,6 +131,7 @@ class ComCtrl {
   ComCtrl& set_initial_foot_dist(double t_initial_foot_dist);
   ComCtrl& set_time_step(double t_time_step);
   ComCtrl& reset(const Vec3D& t_com_position);
+  ComCtrl& reset(const Vec3D& t_com_position, double t_foot_dist);
 
   //
   inline CommandsPtr getCommands() const noexcept { return m_commands_ptr; }

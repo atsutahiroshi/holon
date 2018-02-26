@@ -1,4 +1,5 @@
 set(HOLON_HUMANOID_EXAMPLE_SOURCES
+  ${CMAKE_CURRENT_SOURCE_DIR}/com_oscillation_example.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/com_regulation_example.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/com_regulation_with_disturbance_example.cpp
   )

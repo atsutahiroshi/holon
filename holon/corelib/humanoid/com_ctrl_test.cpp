@@ -864,9 +864,45 @@ TEST_CASE("ComCtrl::update() when given COM height is zero, update should fail",
 
 SCENARIO("Controller makes COM oscillate sideward",
          "[corelib][humanoid][ComCtrl]") {
-  GIVEN("With rho = 0, no oscillation happens") {
+  GIVEN("Referential COM is at (0, 0, 0.42)") {
     ComCtrl ctrl;
     Vec3D pd = {0, 0, 0.42};
+    double dist = 0.5;
+    ctrl.reset(pd, dist);
+    auto cmd = ctrl.getCommands();
+    cmd->set_com_position(pd);
+    cmd->dist = dist;
+
+    WHEN("With rho = 0, update until 5 sec") {
+      cmd->rho = 0;
+      double t = 0;
+      while (t < 5) {
+        ctrl.update();
+        t += ctrl.time_step();
+      }
+      THEN("No oscillation happens") {
+        CHECK(ctrl.states().com_position == pd);
+      }
+    }
+    WHEN("With rho = 1, update until 5 sec") {
+      cmd->rho = 1;
+      double t = 0;
+      double yzmax = 0, yzmin = 0;
+      ctrl.states().com_velocity[1] += 0.0001;
+      while (t < 5) {
+        ctrl.update();
+        if (ctrl.states().zmp_position.y() > yzmax)
+          yzmax = ctrl.states().zmp_position.y();
+        if (ctrl.states().zmp_position.y() < yzmin)
+          yzmin = ctrl.states().zmp_position.y();
+        t += ctrl.time_step();
+      }
+      THEN("Oscillates with amplitude of 0.5") {
+        CAPTURE(yzmax);
+        CAPTURE(yzmin);
+        CHECK((yzmax - yzmin) == Approx(dist).epsilon(0.01));
+      }
+    }
   }
 }
 

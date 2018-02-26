@@ -182,14 +182,15 @@ TEST_CASE("ComCtrl::set_initial_foot_dist sets canonical foot distance",
   CHECK(ctrl.y().dist() != dist);
 }
 
-TEST_CASE("ComCtrl::reset(const Vec3D&) should reset initial COM position") {
+TEST_CASE("ComCtrl::reset(const Vec3D&) should reset initial COM position",
+          "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
-  Vec3D supposed_pi = {0, 0, 1.5};
-  REQUIRE_THAT(ctrl.initial_com_position(), !Equals(supposed_pi));
+  Vec3D p0 = {0, 0, 1.5};
+  REQUIRE_THAT(ctrl.initial_com_position(), !Equals(p0));
 
-  ctrl.reset(supposed_pi);
-  CHECK_THAT(ctrl.initial_com_position(), Equals(supposed_pi));
-  CHECK_THAT(ctrl.states().com_position, Equals(supposed_pi));
+  ctrl.reset(p0);
+  CHECK_THAT(ctrl.initial_com_position(), Equals(p0));
+  CHECK_THAT(ctrl.states().com_position, Equals(p0));
   CHECK_THAT(ctrl.states().com_velocity, Equals(kVec3DZero));
 }
 

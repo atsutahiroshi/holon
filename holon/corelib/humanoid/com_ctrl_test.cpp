@@ -84,7 +84,7 @@ TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
   }
 
   SECTION("check if canonical foot distance be initialized") {
-    CHECK(ctrl.canonical_foot_dist() == ComCtrlY::default_dist);
+    CHECK(ctrl.initial_foot_dist() == ComCtrlY::default_dist);
   }
 }
 
@@ -171,14 +171,14 @@ TEST_CASE("ComCtrl::set_initial_com_position sets initial COM position",
   CHECK(ctrl.states().com_velocity != kVec3DZero);
 }
 
-TEST_CASE("ComCtrl::set_canonical_foot_dist sets canonical foot distance",
+TEST_CASE("ComCtrl::set_initial_foot_dist sets canonical foot distance",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
   double dist = Fuzzer(0, 1).get<double>();
-  REQUIRE(ctrl.canonical_foot_dist() != dist);
+  REQUIRE(ctrl.initial_foot_dist() != dist);
 
-  ctrl.set_canonical_foot_dist(dist);
-  CHECK(ctrl.canonical_foot_dist() == dist);
+  ctrl.set_initial_foot_dist(dist);
+  CHECK(ctrl.initial_foot_dist() == dist);
   CHECK(ctrl.y().dist() != dist);
 }
 

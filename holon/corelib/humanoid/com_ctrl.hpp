@@ -119,8 +119,8 @@ class ComCtrl {
   inline const Vec3D& initial_com_position() const noexcept {
     return m_initial_com_position;
   }
-  inline double canonical_foot_dist() const noexcept {
-    return m_canonical_foot_dist;
+  inline double initial_foot_dist() const noexcept {
+    return m_initial_foot_dist;
   }
 
   // mutators
@@ -128,7 +128,7 @@ class ComCtrl {
   ComCtrl& set_inputs_ptr(InputsPtr t_inputs_ptr);
   ComCtrl& set_outputs_ptr(OutputsPtr t_outputs_ptr);
   ComCtrl& set_initial_com_position(const Vec3D& t_com_position);
-  ComCtrl& set_canonical_foot_dist(double t_canonical_foot_dist);
+  ComCtrl& set_initial_foot_dist(double t_initial_foot_dist);
   ComCtrl& set_time_step(double t_time_step);
   ComCtrl& reset(const Vec3D& t_com_position);
 
@@ -162,7 +162,7 @@ class ComCtrl {
   OutputsPtr m_outputs_ptr;
   CommandsPtr m_commands_ptr;
   Vec3D m_initial_com_position;
-  double m_canonical_foot_dist;
+  double m_initial_foot_dist;
 
   void updateCtrlParam();
   void remapCommandsToInputs();

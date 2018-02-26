@@ -37,6 +37,9 @@ void ComCtrlCommands::clear() {
   qy2 = nullopt;
   qz1 = nullopt;
   qz2 = nullopt;
+  rho = nullopt;
+  dist = nullopt;
+  kr = nullopt;
   vhp = nullopt;
 }
 
@@ -178,6 +181,9 @@ void ComCtrl::remapCommandsToInputs() {
   m_inputs_ptr->qx2 = commands().qx2.value_or(ComCtrlX::default_q2);
   m_inputs_ptr->qy1 = commands().qy1.value_or(ComCtrlY::default_q1);
   m_inputs_ptr->qy2 = commands().qy2.value_or(ComCtrlY::default_q2);
+  m_inputs_ptr->rho = commands().rho.value_or(ComCtrlY::default_rho);
+  m_inputs_ptr->dist = commands().dist.value_or(m_initial_foot_dist);
+  m_inputs_ptr->kr = commands().kr.value_or(ComCtrlY::default_kr);
   m_inputs_ptr->qz1 = commands().qz1.value_or(ComCtrlZ::default_q1);
   m_inputs_ptr->qz2 = commands().qz2.value_or(ComCtrlZ::default_q2);
   m_inputs_ptr->vhp = commands().vhp.value_or(0);
@@ -188,6 +194,9 @@ void ComCtrl::updateCtrlParam() {
   x().set_q2(inputs().qx2);
   y().set_q1(inputs().qy1);
   y().set_q2(inputs().qy2);
+  y().set_rho(inputs().rho);
+  y().set_dist(inputs().dist);
+  y().set_kr(inputs().kr);
   z().set_q1(inputs().qz1);
   z().set_q2(inputs().qz2);
 }

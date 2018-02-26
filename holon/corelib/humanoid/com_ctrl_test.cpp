@@ -49,6 +49,9 @@ TEST_CASE("ComCtrlCommands::clear() should clear all the values") {
   cmd.qy2 = fuzz.get();
   cmd.qz1 = fuzz.get();
   cmd.qz2 = fuzz.get();
+  cmd.rho = fuzz.get();
+  cmd.dist = fuzz.get();
+  cmd.kr = fuzz.get();
   cmd.vhp = fuzz.get();
 
   // clear
@@ -66,6 +69,9 @@ TEST_CASE("ComCtrlCommands::clear() should clear all the values") {
   CHECK(cmd.qy2 == nullopt);
   CHECK(cmd.qz1 == nullopt);
   CHECK(cmd.qz2 == nullopt);
+  CHECK(cmd.rho == nullopt);
+  CHECK(cmd.dist == nullopt);
+  CHECK(cmd.kr == nullopt);
   CHECK(cmd.vhp == nullopt);
 }
 
@@ -532,7 +538,8 @@ TEST_CASE("ComCtrl::update() updates control paramters",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
   Vec3D p0 = {0.1, -0.1, 1.5};
-  ctrl.reset(p0);
+  double dist = 0.42;
+  ctrl.reset(p0, dist);
   auto cmd = ctrl.getCommands();
   auto inputs = ctrl.inputs_ptr();
 
@@ -680,6 +687,72 @@ TEST_CASE("ComCtrl::update() updates control paramters",
     }
   }
 
+  SECTION("Stepping activation parameter") {
+    inputs->rho = fuzz();
+    ctrl.y().set_rho(fuzz());
+    SECTION("default") {
+      ctrl.update();
+      CHECK(ctrl.inputs().rho == 0.0);
+      CHECK(ctrl.y().rho() == 0.0);
+    }
+    SECTION("set user command") {
+      cmd->rho = 1.0;
+      ctrl.update();
+      CHECK(ctrl.inputs().rho == 1.0);
+      CHECK(ctrl.y().rho() == 1.0);
+    }
+    SECTION("clear") {
+      cmd->clear();
+      ctrl.update();
+      CHECK(ctrl.inputs().rho == 0.0);
+      CHECK(ctrl.y().rho() == 0.0);
+    }
+  }
+
+  SECTION("Canonical foot distance") {
+    inputs->dist = fuzz();
+    ctrl.y().set_dist(fuzz());
+    SECTION("default") {
+      ctrl.update();
+      CHECK(ctrl.inputs().dist == dist);
+      CHECK(ctrl.y().dist() == dist);
+    }
+    SECTION("set user command") {
+      cmd->dist = 1.0;
+      ctrl.update();
+      CHECK(ctrl.inputs().dist == 1.0);
+      CHECK(ctrl.y().dist() == 1.0);
+    }
+    SECTION("clear") {
+      cmd->clear();
+      ctrl.update();
+      CHECK(ctrl.inputs().dist == dist);
+      CHECK(ctrl.y().dist() == dist);
+    }
+  }
+
+  SECTION("initial energy exersion") {
+    inputs->kr = fuzz();
+    ctrl.y().set_kr(fuzz());
+    SECTION("default") {
+      ctrl.update();
+      CHECK(ctrl.inputs().kr == 1.0);
+      CHECK(ctrl.y().kr() == 1.0);
+    }
+    SECTION("set user command") {
+      cmd->kr = 0.5;
+      ctrl.update();
+      CHECK(ctrl.inputs().kr == 0.5);
+      CHECK(ctrl.y().kr() == 0.5);
+    }
+    SECTION("clear") {
+      cmd->clear();
+      ctrl.update();
+      CHECK(ctrl.inputs().kr == 1.0);
+      CHECK(ctrl.y().kr() == 1.0);
+    }
+  }
+
   SECTION("New variable") {
     SECTION("default") {}
     SECTION("set user command") {}
@@ -787,6 +860,14 @@ TEST_CASE("ComCtrl::update() when given COM height is zero, update should fail",
   zEchoOff();
   CHECK_FALSE(ctrl.update());
   zEchoOn();
+}
+
+SCENARIO("Controller makes COM oscillate sideward",
+         "[corelib][humanoid][ComCtrl]") {
+  GIVEN("With rho = 0, no oscillation happens") {
+    ComCtrl ctrl;
+    Vec3D pd = {0, 0, 0.42};
+  }
 }
 
 }  // namespace

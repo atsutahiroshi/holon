@@ -40,6 +40,7 @@ struct ComCtrlCommands {
   opt_double qx1, qx2;
   opt_double qy1, qy2;
   opt_double qz1, qz2;
+  opt_double rho, dist, kr;
   opt_double vhp;
 
   void clear();
@@ -54,6 +55,7 @@ struct ComCtrlInputs {
   double qx1, qx2;
   double qy1, qy2;
   double qz1, qz2;
+  double rho, dist, kr;
   double vhp;
 };
 

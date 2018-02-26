@@ -93,6 +93,7 @@ TEST_CASE("ComCtrl(const Model&) constructor", "[corelib][humanoid][ComCtrl]") {
   model.data_ptr()->com_velocity = v;
 
   ComCtrl ctrl(model);
+  CHECK(ctrl.initial_com_position() == p);
   CHECK(ctrl.states().com_position == p);
   CHECK(ctrl.states().com_velocity == v);
 
@@ -102,6 +103,7 @@ TEST_CASE("ComCtrl(const Model&) constructor", "[corelib][humanoid][ComCtrl]") {
   ctrl.states().com_velocity = v;
   CHECK(model.data().com_position != p);
   CHECK(model.data().com_velocity != v);
+  CHECK(ctrl.initial_com_position() != p);
   CHECK(ctrl.states().com_position == p);
   CHECK(ctrl.states().com_velocity == v);
 }

@@ -85,6 +85,7 @@ ComCtrl::ComCtrl()
 
 ComCtrl::ComCtrl(const Model& t_model) : ComCtrl() {
   m_model.copy_data(t_model);
+  m_initial_com_position = m_states_ptr->com_position;
 }
 
 ComCtrl& ComCtrl::set_states_ptr(StatesPtr t_states_ptr) {

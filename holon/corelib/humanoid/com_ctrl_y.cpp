@@ -26,9 +26,21 @@ namespace holon {
 
 const double ComCtrlY::default_q1 = 1.0;
 const double ComCtrlY::default_q2 = 1.0;
+const double ComCtrlY::default_rho = 0.0;
+const double ComCtrlY::default_dist = 1.0;
+const double ComCtrlY::default_kr = 1.0;
 
-ComCtrlY::ComCtrlY() : m_q1(default_q1), m_q2(default_q2) {}
-ComCtrlY::ComCtrlY(double t_q1, double t_q2) : m_q1(t_q1), m_q2(t_q2) {}
+ComCtrlY::ComCtrlY(double t_q1, double t_q2, double t_dist)
+    : m_q1(t_q1),
+      m_q2(t_q2),
+      m_rho(default_rho),
+      m_dist(t_dist),
+      m_kr(default_kr) {}
+
+ComCtrlY::ComCtrlY(double t_q1, double t_q2)
+    : ComCtrlY(t_q1, t_q2, default_dist) {}
+
+ComCtrlY::ComCtrlY() : ComCtrlY(default_q1, default_q2, default_dist) {}
 
 ComCtrlY& ComCtrlY::set_q1(double t_q1) {
   m_q1 = t_q1;

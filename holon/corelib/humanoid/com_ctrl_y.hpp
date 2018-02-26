@@ -29,11 +29,15 @@ class ComCtrlY {
  public:
   static const double default_q1;
   static const double default_q2;
+  static const double default_rho;
+  static const double default_dist;
+  static const double default_kr;
 
  public:
   // constructors
   ComCtrlY();
   ComCtrlY(double t_q1, double t_q2);
+  ComCtrlY(double t_q1, double t_q2, double t_dist);
 
   // special member functions
   virtual ~ComCtrlY() = default;
@@ -45,10 +49,16 @@ class ComCtrlY {
   // accessors
   inline double q1() const noexcept { return m_q1; }
   inline double q2() const noexcept { return m_q2; }
+  inline double rho() const noexcept { return m_rho; }
+  inline double dist() const noexcept { return m_dist; }
+  inline double kr() const noexcept { return m_kr; }
 
   // mutators
   ComCtrlY& set_q1(double t_q1);
   ComCtrlY& set_q2(double t_q2);
+  ComCtrlY& set_rho(double t_rho);
+  ComCtrlY& set_dist(double t_dist);
+  ComCtrlY& set_kr(double t_kr);
 
   // functions
   double computeDesZmpPos(double t_yd, double t_y, double t_v,
@@ -61,6 +71,9 @@ class ComCtrlY {
  private:
   double m_q1;
   double m_q2;
+  double m_rho;
+  double m_dist;
+  double m_kr;
 };
 
 }  // namespace holon

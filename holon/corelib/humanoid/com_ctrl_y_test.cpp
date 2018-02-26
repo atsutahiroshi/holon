@@ -28,6 +28,37 @@
 namespace holon {
 namespace {
 
+TEST_CASE("ComCtrlY(): constructor", "[corelib][humanoid][ComCtrlY]") {
+  Fuzzer fuzz;
+
+  SECTION("default constructor") {
+    ComCtrlY ctrl;
+    CHECK(ctrl.q1() == ComCtrlY::default_q1);
+    CHECK(ctrl.q2() == ComCtrlY::default_q2);
+    CHECK(ctrl.rho() == ComCtrlY::default_rho);
+    CHECK(ctrl.dist() == ComCtrlY::default_dist);
+    CHECK(ctrl.kr() == ComCtrlY::default_kr);
+  }
+
+  SECTION("with arguments") {
+    ComCtrlY ctrl(0.5, 1.5);
+    CHECK(ctrl.q1() == 0.5);
+    CHECK(ctrl.q2() == 1.5);
+    CHECK(ctrl.rho() == ComCtrlY::default_rho);
+    CHECK(ctrl.dist() == 1.0);
+    CHECK(ctrl.kr() == ComCtrlY::default_kr);
+  }
+
+  SECTION("with arguments") {
+    ComCtrlY ctrl(0.8, 1.2, 0.42);
+    CHECK(ctrl.q1() == 0.8);
+    CHECK(ctrl.q2() == 1.2);
+    CHECK(ctrl.rho() == ComCtrlY::default_rho);
+    CHECK(ctrl.dist() == 0.42);
+    CHECK(ctrl.kr() == ComCtrlY::default_kr);
+  }
+}
+
 TEST_CASE("control poles along y-axis can be assigned", "[corelib][humanoid]") {
   Fuzzer fuzz;
 

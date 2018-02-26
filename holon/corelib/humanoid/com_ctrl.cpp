@@ -81,7 +81,8 @@ ComCtrl::ComCtrl()
       m_inputs_ptr(ComCtrlInputsFactory()),
       m_outputs_ptr(ComCtrlOutputsFactory()),
       m_commands_ptr(ComCtrlCommandsFactory()),
-      m_initial_com_position(m_states_ptr->com_position) {}
+      m_initial_com_position(m_states_ptr->com_position),
+      m_canonical_foot_dist(m_y.dist()) {}
 
 ComCtrl::ComCtrl(const Model& t_model) : ComCtrl() {
   m_model.copy_data(t_model);
@@ -101,6 +102,16 @@ ComCtrl& ComCtrl::set_inputs_ptr(InputsPtr t_inputs_ptr) {
 
 ComCtrl& ComCtrl::set_outputs_ptr(OutputsPtr t_outputs_ptr) {
   m_outputs_ptr = t_outputs_ptr;
+  return *this;
+}
+
+ComCtrl& ComCtrl::set_initial_com_position(const Vec3D& t_com_position) {
+  m_initial_com_position = t_com_position;
+  return *this;
+}
+
+ComCtrl& ComCtrl::set_canonical_foot_dist(double t_canonical_foot_dist) {
+  m_canonical_foot_dist = t_canonical_foot_dist;
   return *this;
 }
 

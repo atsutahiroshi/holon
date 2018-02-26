@@ -52,6 +52,21 @@ ComCtrlY& ComCtrlY::set_q2(double t_q2) {
   return *this;
 }
 
+ComCtrlY& ComCtrlY::set_rho(double t_rho) {
+  m_rho = t_rho;
+  return *this;
+}
+
+ComCtrlY& ComCtrlY::set_dist(double t_dist) {
+  m_dist = t_dist;
+  return *this;
+}
+
+ComCtrlY& ComCtrlY::set_kr(double t_kr) {
+  m_kr = t_kr;
+  return *this;
+}
+
 double ComCtrlY::computeDesZmpPos(double t_yd, double t_y, double t_v,
                                   double t_zeta) const noexcept {
   if (zIsTiny(t_zeta) || t_zeta < 0) {

@@ -59,6 +59,43 @@ TEST_CASE("ComCtrlY(): constructor", "[corelib][humanoid][ComCtrlY]") {
   }
 }
 
+TEST_CASE("ComCtrlY: accessors / mutators", "[corelib][humanoid][ComCtrlY]") {
+  ComCtrlY ctrl;
+  Fuzzer fuzz(0, 1);
+
+  SECTION("q1 and q2") {
+    double q1 = fuzz();
+    double q2 = fuzz();
+    REQUIRE(ctrl.q1() != q1);
+    REQUIRE(ctrl.q2() != q2);
+    ctrl.set_q1(q1);
+    ctrl.set_q2(q2);
+    CHECK(ctrl.q1() == q1);
+    CHECK(ctrl.q2() == q2);
+  }
+
+  SECTION("rho") {
+    double rho = fuzz();
+    REQUIRE(ctrl.rho() != rho);
+    ctrl.set_rho(rho);
+    CHECK(ctrl.rho() == rho);
+  }
+
+  SECTION("dist") {
+    double dist = fuzz();
+    REQUIRE(ctrl.dist() != dist);
+    ctrl.set_dist(dist);
+    CHECK(ctrl.dist() == dist);
+  }
+
+  SECTION("kr") {
+    double kr = fuzz();
+    REQUIRE(ctrl.kr() != kr);
+    ctrl.set_kr(kr);
+    CHECK(ctrl.kr() == kr);
+  }
+}
+
 TEST_CASE("control poles along y-axis can be assigned", "[corelib][humanoid]") {
   Fuzzer fuzz;
 

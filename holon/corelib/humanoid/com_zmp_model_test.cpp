@@ -220,6 +220,18 @@ TEST_CASE("ComZmpModel: accessor/mutator of data",
   }
 }
 
+TEST_CASE("ComZmpModel: accessor/mutator", "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+  Fuzzer fuzz;
+
+  SECTION("initial COM position") {
+    auto v = fuzz.get<Vec3D>();
+    REQUIRE(model.initial_com_position() != v);
+    model.set_initial_com_position(v);
+    CHECK(model.initial_com_position() == v);
+  }
+}
+
 TEST_CASE("ComZmpModel: accessor/mutator of time step",
           "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;

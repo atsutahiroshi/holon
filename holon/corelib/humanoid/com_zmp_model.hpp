@@ -56,6 +56,7 @@ std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory(
 
 class ComZmpModel {
   static constexpr double default_time_step = 0.001;
+  using self_ref = ComZmpModel&;
 
  public:
   using Data = ComZmpModelData;
@@ -70,21 +71,25 @@ class ComZmpModel {
   virtual ~ComZmpModel() = default;
   ComZmpModel(const ComZmpModel&) = delete;
   ComZmpModel(ComZmpModel&&) = delete;
-  ComZmpModel& operator=(const ComZmpModel&) = delete;
-  ComZmpModel& operator=(ComZmpModel&&) = delete;
+  self_ref operator=(const ComZmpModel&) = delete;
+  self_ref operator=(ComZmpModel&&) = delete;
 
   // accessors
   inline const Data& data() const noexcept { return *m_data_ptr; }
   inline const DataPtr& data_ptr() const noexcept { return m_data_ptr; }
   inline double time_step() const noexcept { return m_time_step; }
+  inline Vec3D initial_com_position() const noexcept {
+    return m_initial_com_position;
+  }
   inline double mass() const noexcept { return data().mass; }
 
   // mutators
-  ComZmpModel& set_data_ptr(DataPtr t_data_ptr);
-  ComZmpModel& set_external_force(const Vec3D& t_external_force);
-  ComZmpModel& clear_external_force() { return set_external_force(kVec3DZero); }
-  ComZmpModel& set_time_step(double t_time_step);
-  ComZmpModel& reset(const Vec3D& t_com_position);
+  self_ref set_data_ptr(DataPtr t_data_ptr);
+  self_ref set_external_force(const Vec3D& t_external_force);
+  self_ref clear_external_force() { return set_external_force(kVec3DZero); }
+  self_ref set_time_step(double t_time_step);
+  self_ref set_initial_com_position(const Vec3D& t_initial_com_position);
+  self_ref reset(const Vec3D& t_com_position);
 
   // copy data
   void copy_data(const ComZmpModel& t_model);
@@ -151,6 +156,7 @@ class ComZmpModel {
 
  private:
   DataPtr m_data_ptr;
+  Vec3D m_initial_com_position;
   double m_time_step;
 
   bool isTimeStepValid(double t_time_step) const;

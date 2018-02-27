@@ -59,32 +59,39 @@ std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory(
 }
 
 ComZmpModel::ComZmpModel()
-    : m_data_ptr(ComZmpModelDataFactory()), m_time_step(default_time_step) {}
+    : m_data_ptr(ComZmpModelDataFactory()),
+      m_initial_com_position(m_data_ptr->com_position),
+      m_time_step(default_time_step) {}
 
 ComZmpModel::ComZmpModel(const Vec3D& t_com_position)
     : m_data_ptr(ComZmpModelDataFactory(t_com_position)),
+      m_initial_com_position(m_data_ptr->com_position),
       m_time_step(default_time_step) {}
 
 ComZmpModel::ComZmpModel(const Vec3D& t_com_position, double t_mass)
     : m_data_ptr(isMassValid(t_mass)
                      ? ComZmpModelDataFactory(t_com_position, t_mass)
                      : ComZmpModelDataFactory(t_com_position)),
+      m_initial_com_position(m_data_ptr->com_position),
       m_time_step(default_time_step) {}
 
 ComZmpModel::ComZmpModel(DataPtr t_data)
-    : m_data_ptr(t_data), m_time_step(default_time_step) {}
+    : m_data_ptr(t_data),
+      m_initial_com_position(m_data_ptr->com_position),
+      m_time_step(default_time_step) {}
 
-ComZmpModel& ComZmpModel::set_data_ptr(DataPtr t_data_ptr) {
+ComZmpModel::self_ref ComZmpModel::set_data_ptr(DataPtr t_data_ptr) {
   m_data_ptr = t_data_ptr;
   return *this;
 }
 
-ComZmpModel& ComZmpModel::set_external_force(const Vec3D& t_external_force) {
+ComZmpModel::self_ref ComZmpModel::set_external_force(
+    const Vec3D& t_external_force) {
   m_data_ptr->external_force = t_external_force;
   return *this;
 }
 
-ComZmpModel& ComZmpModel::set_time_step(double t_time_step) {
+ComZmpModel::self_ref ComZmpModel::set_time_step(double t_time_step) {
   if (!isTimeStepValid(t_time_step)) {
     m_time_step = default_time_step;
   } else {
@@ -93,7 +100,13 @@ ComZmpModel& ComZmpModel::set_time_step(double t_time_step) {
   return *this;
 }
 
-ComZmpModel& ComZmpModel::reset(const Vec3D& t_com_position) {
+ComZmpModel::self_ref ComZmpModel::set_initial_com_position(
+    const Vec3D& t_initial_com_position) {
+  m_initial_com_position = t_initial_com_position;
+  return *this;
+}
+
+ComZmpModel::self_ref ComZmpModel::reset(const Vec3D& t_com_position) {
   m_data_ptr->com_position = t_com_position;
   m_data_ptr->com_velocity.clear();
   return *this;

@@ -170,6 +170,7 @@ TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
     ComZmpModel model;
     CHECK(model.data().mass == default_mass);
     CHECK(model.data().com_position == default_com_position);
+    CHECK(model.initial_com_position() == default_com_position);
   }
 
   SECTION("ComZmpModel(double t_mass)") {
@@ -180,6 +181,7 @@ TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
       ComZmpModel model(p0, m);
       CHECK(model.data().mass == m);
       CHECK(model.data().com_position == p0);
+      CHECK(model.initial_com_position() == p0);
     }
 
     SECTION("mass should be positive") {
@@ -194,8 +196,10 @@ TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
 
   SECTION("ComZmpModel(Data t_data)") {
     auto data = ComZmpModelDataFactory();
+    data->com_position = Vec3D(0.1, 0.2, 0.3);
     ComZmpModel model(data);
     CHECK(&model.data() == data.get());
+    CHECK(model.initial_com_position() == data->com_position);
   }
 }
 

@@ -86,7 +86,7 @@ TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
   }
 
   SECTION("check if canonical foot distance be initialized") {
-    CHECK(ctrl.initial_foot_dist() == ComCtrlY::default_dist);
+    CHECK(ctrl.canonical_foot_dist() == ComCtrlY::default_dist);
   }
 }
 
@@ -159,14 +159,14 @@ TEST_CASE("ComCtrl::set_outputs_ptr can set another pointer to outputs data",
   REQUIRE(ctrl.outputs_ptr().use_count() == 1);
 }
 
-TEST_CASE("ComCtrl::set_initial_foot_dist sets canonical foot distance",
+TEST_CASE("ComCtrl::set_canonical_foot_dist sets canonical foot distance",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
   double dist = Fuzzer(0, 1).get<double>();
-  REQUIRE(ctrl.initial_foot_dist() != dist);
+  REQUIRE(ctrl.canonical_foot_dist() != dist);
 
-  ctrl.set_initial_foot_dist(dist);
-  CHECK(ctrl.initial_foot_dist() == dist);
+  ctrl.set_canonical_foot_dist(dist);
+  CHECK(ctrl.canonical_foot_dist() == dist);
   CHECK(ctrl.y().dist() != dist);
 }
 
@@ -189,13 +189,13 @@ TEST_CASE(
   Vec3D p0 = {-0.1, 0.1, 1.5};
   double dist = Fuzzer(0, 1).get();
   REQUIRE_THAT(ctrl.model().initial_com_position(), !Equals(p0));
-  REQUIRE(ctrl.initial_foot_dist() != dist);
+  REQUIRE(ctrl.canonical_foot_dist() != dist);
 
   ctrl.reset(p0, dist);
   CHECK_THAT(ctrl.model().initial_com_position(), Equals(p0));
   CHECK_THAT(ctrl.states().com_position, Equals(p0));
   CHECK_THAT(ctrl.states().com_velocity, Equals(kVec3DZero));
-  CHECK(ctrl.initial_foot_dist() == dist);
+  CHECK(ctrl.canonical_foot_dist() == dist);
 }
 
 TEST_CASE("ComCtrl::getCommands() provides a pointer to user commands",

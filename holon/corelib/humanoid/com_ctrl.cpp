@@ -84,7 +84,7 @@ ComCtrl::ComCtrl()
       m_inputs_ptr(ComCtrlInputsFactory()),
       m_outputs_ptr(ComCtrlOutputsFactory()),
       m_commands_ptr(ComCtrlCommandsFactory()),
-      m_initial_foot_dist(m_y.dist()) {}
+      m_canonical_foot_dist(m_y.dist()) {}
 
 ComCtrl::ComCtrl(const Model& t_model) : ComCtrl() {
   m_model.copy_data(t_model);
@@ -107,8 +107,8 @@ ComCtrl& ComCtrl::set_outputs_ptr(OutputsPtr t_outputs_ptr) {
   return *this;
 }
 
-ComCtrl& ComCtrl::set_initial_foot_dist(double t_initial_foot_dist) {
-  m_initial_foot_dist = t_initial_foot_dist;
+ComCtrl& ComCtrl::set_canonical_foot_dist(double t_canonical_foot_dist) {
+  m_canonical_foot_dist = t_canonical_foot_dist;
   return *this;
 }
 
@@ -123,7 +123,7 @@ ComCtrl& ComCtrl::reset(const Vec3D& t_com_position) {
 }
 
 ComCtrl& ComCtrl::reset(const Vec3D& t_com_position, double t_foot_dist) {
-  m_initial_foot_dist = t_foot_dist;
+  m_canonical_foot_dist = t_foot_dist;
   return reset(t_com_position);
 }
 
@@ -175,7 +175,7 @@ void ComCtrl::remapCommandsToInputs() {
   m_inputs_ptr->qy1 = commands().qy1.value_or(ComCtrlY::default_q1);
   m_inputs_ptr->qy2 = commands().qy2.value_or(ComCtrlY::default_q2);
   m_inputs_ptr->rho = commands().rho.value_or(ComCtrlY::default_rho);
-  m_inputs_ptr->dist = commands().dist.value_or(m_initial_foot_dist);
+  m_inputs_ptr->dist = commands().dist.value_or(m_canonical_foot_dist);
   m_inputs_ptr->kr = commands().kr.value_or(ComCtrlY::default_kr);
   m_inputs_ptr->qz1 = commands().qz1.value_or(ComCtrlZ::default_q1);
   m_inputs_ptr->qz2 = commands().qz2.value_or(ComCtrlZ::default_q2);

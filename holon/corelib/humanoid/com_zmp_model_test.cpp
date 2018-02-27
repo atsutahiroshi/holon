@@ -305,6 +305,7 @@ SCENARIO("ComZmpModel: function to reset COM position",
 
       THEN("COM position should be that value and velocity should be zero") {
         CHECK_THAT(model.data().com_position, Equals(p));
+        CHECK_THAT(model.initial_com_position(), Equals(p));
         CHECK_THAT(model.data().com_velocity, Equals(kVec3DZero));
       }
     }

@@ -109,6 +109,7 @@ ComZmpModel::self_ref ComZmpModel::set_initial_com_position(
 ComZmpModel::self_ref ComZmpModel::reset(const Vec3D& t_com_position) {
   m_data_ptr->com_position = t_com_position;
   m_data_ptr->com_velocity.clear();
+  set_initial_com_position(t_com_position);
   return *this;
 }
 

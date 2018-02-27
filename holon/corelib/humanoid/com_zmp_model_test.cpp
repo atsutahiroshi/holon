@@ -85,19 +85,17 @@ TEST_CASE("ComZmpModelData: constructor",
 
   SECTION("with parameters") {
     Fuzzer fuzz(0, 10);
-    for (auto i = 0; i < 10; ++i) {
-      double m = fuzz.get();
-      ComZmpModelData data(m);
-      CHECK(data.mass == m);
-      CHECK_THAT(data.nu, Equals(kVec3DZ));
-      CHECK_THAT(data.com_position, Equals(default_com_position));
-      CHECK_THAT(data.com_velocity, Equals(kVec3DZero));
-      CHECK_THAT(data.com_acceleration, Equals(kVec3DZero));
-      CHECK_THAT(data.zmp_position, Equals(kVec3DZero));
-      CHECK_THAT(data.reaction_force, Equals(Vec3D(0, 0, m * G)));
-      CHECK_THAT(data.external_force, Equals(kVec3DZero));
-      CHECK_THAT(data.total_force, Equals(Vec3D(0, 0, m * G)));
-    }
+    double m = fuzz.get();
+    ComZmpModelData data(m);
+    CHECK(data.mass == m);
+    CHECK_THAT(data.nu, Equals(kVec3DZ));
+    CHECK_THAT(data.com_position, Equals(default_com_position));
+    CHECK_THAT(data.com_velocity, Equals(kVec3DZero));
+    CHECK_THAT(data.com_acceleration, Equals(kVec3DZero));
+    CHECK_THAT(data.zmp_position, Equals(kVec3DZero));
+    CHECK_THAT(data.reaction_force, Equals(Vec3D(0, 0, m * G)));
+    CHECK_THAT(data.external_force, Equals(kVec3DZero));
+    CHECK_THAT(data.total_force, Equals(Vec3D(0, 0, m * G)));
   }
 }
 

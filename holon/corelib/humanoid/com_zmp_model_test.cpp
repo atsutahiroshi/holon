@@ -83,13 +83,29 @@ TEST_CASE("ComZmpModelData: constructor",
     CHECK_THAT(data.total_force, Equals(Vec3D(0, 0, G)));
   }
 
-  SECTION("with parameters") {
+  SECTION("with COM position") {
+    Fuzzer fuzz(0, 10);
+    auto p0 = fuzz.get<Vec3D>();
+    ComZmpModelData data(p0);
+    CHECK(data.mass == default_mass);
+    CHECK_THAT(data.nu, Equals(kVec3DZ));
+    CHECK_THAT(data.com_position, Equals(p0));
+    CHECK_THAT(data.com_velocity, Equals(kVec3DZero));
+    CHECK_THAT(data.com_acceleration, Equals(kVec3DZero));
+    CHECK_THAT(data.zmp_position, Equals(kVec3DZero));
+    CHECK_THAT(data.reaction_force, Equals(Vec3D(0, 0, G)));
+    CHECK_THAT(data.external_force, Equals(kVec3DZero));
+    CHECK_THAT(data.total_force, Equals(Vec3D(0, 0, G)));
+  }
+
+  SECTION("with COM position and mass") {
     Fuzzer fuzz(0, 10);
     double m = fuzz.get();
-    ComZmpModelData data(m);
+    auto p0 = fuzz.get<Vec3D>();
+    ComZmpModelData data(p0, m);
     CHECK(data.mass == m);
     CHECK_THAT(data.nu, Equals(kVec3DZ));
-    CHECK_THAT(data.com_position, Equals(default_com_position));
+    CHECK_THAT(data.com_position, Equals(p0));
     CHECK_THAT(data.com_velocity, Equals(kVec3DZero));
     CHECK_THAT(data.com_acceleration, Equals(kVec3DZero));
     CHECK_THAT(data.zmp_position, Equals(kVec3DZero));
@@ -125,7 +141,7 @@ TEST_CASE("ComZmpModelData: move constructor") {
   CHECK_THAT(b.com_position, Equals(com_pos));
 
   auto f = [](ComZmpModelData arg) { return arg; };
-  ComZmpModelData c = f(ComZmpModelData(mass));
+  ComZmpModelData c = f(ComZmpModelData(com_pos, mass));
   CHECK(c.mass == mass);
 }
 
@@ -141,7 +157,7 @@ TEST_CASE("ComZmpModelData: move assignment operator") {
   CHECK_THAT(b.com_position, Equals(com_pos));
 
   auto f = [](ComZmpModelData arg) { return arg; };
-  c = f(ComZmpModelData(mass));
+  c = f(ComZmpModelData(com_pos, mass));
   CHECK(c.mass == mass);
 }
 
@@ -160,15 +176,17 @@ TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
     Fuzzer fuzz(0, 10);
     for (auto i = 0; i < 10; ++i) {
       double m = fuzz.get();
-      ComZmpModel model(m);
+      auto p0 = fuzz.get<Vec3D>();
+      ComZmpModel model(p0, m);
       CHECK(model.data().mass == m);
+      CHECK(model.data().com_position == p0);
     }
 
     SECTION("mass should be positive") {
       zEchoOff();
-      ComZmpModel model1(-1.0);
+      ComZmpModel model1(kVec3DZ, -1.0);
       CHECK(model1.data().mass == 1.0);
-      ComZmpModel model2(0.0);
+      ComZmpModel model2(kVec3DZ, 0.0);
       CHECK(model2.data().mass == 1.0);
       zEchoOn();
     }
@@ -248,7 +266,7 @@ TEST_CASE("ComZmpModel::mass() returns mass value",
     CHECK(model.mass() == 10.0);
   }
   SECTION("case 2") {
-    auto data = ComZmpModelDataFactory(2);
+    auto data = ComZmpModelDataFactory(kVec3DZ, 2);
     ComZmpModel model(data);
     CHECK(model.mass() == 2.0);
     data->mass = 20;
@@ -256,7 +274,7 @@ TEST_CASE("ComZmpModel::mass() returns mass value",
   }
   SECTION("case 3") {
     ComZmpModel model;
-    auto data = ComZmpModelDataFactory(3);
+    auto data = ComZmpModelDataFactory(kVec3DZ, 3);
     model.set_data_ptr(data);
     CHECK(model.mass() == 3.0);
     data->mass = 30;

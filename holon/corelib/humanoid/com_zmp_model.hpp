@@ -28,6 +28,11 @@
 namespace holon {
 
 struct ComZmpModelData {
+ private:
+  static const double default_mass;
+  static const Vec3D default_com_position;
+
+ public:
   double mass;
   Vec3D nu;
   Vec3D com_position;
@@ -39,16 +44,15 @@ struct ComZmpModelData {
   Vec3D total_force;
 
   // constructors
-  ComZmpModelData();
-  explicit ComZmpModelData(double t_mass);
-
- private:
-  static const double default_mass;
-  static const Vec3D default_com_position;
+  ComZmpModelData(const Vec3D& t_com_position = default_com_position,
+                  double t_mass = default_mass);
 };
 
 std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory();
-std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory(double t_mass);
+std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory(
+    const Vec3D& t_com_position);
+std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory(
+    const Vec3D& t_com_position, double t_mass);
 
 class ComZmpModel {
   static constexpr double default_time_step = 0.001;
@@ -58,7 +62,8 @@ class ComZmpModel {
   using DataPtr = std::shared_ptr<ComZmpModelData>;
 
   ComZmpModel();
-  explicit ComZmpModel(double t_mass);
+  explicit ComZmpModel(const Vec3D& t_com_position);
+  ComZmpModel(const Vec3D& t_com_position, double mass);
   explicit ComZmpModel(DataPtr t_data_ptr);
 
   // special member functions

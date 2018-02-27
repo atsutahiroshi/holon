@@ -122,7 +122,7 @@ TEST_CASE("ComCtrl::set_states_ptr can set another pointer to states data",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
   {
-    auto states1 = ComZmpModelDataFactory(3);
+    auto states1 = ComZmpModelDataFactory(Vec3D(0, 0, 1), 3);
     REQUIRE(ctrl.states_ptr().get() != states1.get());
     ctrl.set_states_ptr(states1);
     REQUIRE(ctrl.states_ptr().get() == states1.get());

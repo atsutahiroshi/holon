@@ -33,10 +33,10 @@ namespace {
 const Vec3D kG = {0, 0, RK_G};
 }  //
 
-ComZmpModelData::ComZmpModelData(double t_mass)
+ComZmpModelData::ComZmpModelData(const Vec3D& t_com_position, double t_mass)
     : mass(t_mass),
       nu(kVec3DZ),
-      com_position(default_com_position),
+      com_position(t_com_position),
       com_velocity(kVec3DZero),
       com_acceleration(kVec3DZero),
       zmp_position(kVec3DZero),
@@ -44,22 +44,31 @@ ComZmpModelData::ComZmpModelData(double t_mass)
       external_force(kVec3DZero),
       total_force(reaction_force) {}
 
-ComZmpModelData::ComZmpModelData() : ComZmpModelData(default_mass) {}
-
 std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory() {
   return std::make_shared<ComZmpModelData>();
 }
 
-std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory(double t_mass) {
-  return std::make_shared<ComZmpModelData>(t_mass);
+std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory(
+    const Vec3D& t_com_position) {
+  return std::make_shared<ComZmpModelData>(t_com_position);
+}
+
+std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory(
+    const Vec3D& t_com_position, double t_mass) {
+  return std::make_shared<ComZmpModelData>(t_com_position, t_mass);
 }
 
 ComZmpModel::ComZmpModel()
     : m_data_ptr(ComZmpModelDataFactory()), m_time_step(default_time_step) {}
 
-ComZmpModel::ComZmpModel(double t_mass)
-    : m_data_ptr(isMassValid(t_mass) ? ComZmpModelDataFactory(t_mass)
-                                     : ComZmpModelDataFactory()),
+ComZmpModel::ComZmpModel(const Vec3D& t_com_position)
+    : m_data_ptr(ComZmpModelDataFactory(t_com_position)),
+      m_time_step(default_time_step) {}
+
+ComZmpModel::ComZmpModel(const Vec3D& t_com_position, double t_mass)
+    : m_data_ptr(isMassValid(t_mass)
+                     ? ComZmpModelDataFactory(t_com_position, t_mass)
+                     : ComZmpModelDataFactory(t_com_position)),
       m_time_step(default_time_step) {}
 
 ComZmpModel::ComZmpModel(DataPtr t_data)

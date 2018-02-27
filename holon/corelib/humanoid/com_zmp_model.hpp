@@ -21,6 +21,7 @@
 #ifndef HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
 #define HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
 
+#include <functional>
 #include <memory>
 #include "holon/corelib/common/optional.hpp"
 #include "holon/corelib/math/vec3d.hpp"
@@ -61,6 +62,7 @@ class ComZmpModel {
  public:
   using Data = ComZmpModelData;
   using DataPtr = std::shared_ptr<ComZmpModelData>;
+  using CallbackFunc = std::function<Vec3D(double, const Vec3D&, const Vec3D&)>;
 
   ComZmpModel();
   explicit ComZmpModel(const Vec3D& t_com_position);
@@ -151,6 +153,12 @@ class ComZmpModel {
   void inputReactForce(const Vec3D& t_reaction_force);
   void inputComAcc(const Vec3D& t_com_acceleration);
 
+  // callback functions
+  self_ref setExternalForceCallback(CallbackFunc t_f);
+  self_ref setReactionForceCallback(CallbackFunc t_f);
+  self_ref setZmpPositionCallback(CallbackFunc t_f);
+  self_ref setComAccelerationCallback(CallbackFunc t_f);
+
   bool update();
   bool update(double t_time_step);
 
@@ -172,6 +180,11 @@ class ComZmpModel {
   bool isComAccelerationValid(double t_com_acceleration_z) const;
   bool isComAccelerationValid(const Vec3D& t_com_acceleration,
                               const Vec3D& t_nu = kVec3DZ) const;
+
+  CallbackFunc m_external_force_f = nullptr;
+  CallbackFunc m_reaction_force_f = nullptr;
+  CallbackFunc m_zmp_position_f = nullptr;
+  CallbackFunc m_com_acceleration_f = nullptr;
 };
 
 }  // namespace holon

@@ -84,12 +84,11 @@ ComCtrl::ComCtrl()
       m_inputs_ptr(ComCtrlInputsFactory()),
       m_outputs_ptr(ComCtrlOutputsFactory()),
       m_commands_ptr(ComCtrlCommandsFactory()),
-      m_initial_com_position(m_states_ptr->com_position),
       m_initial_foot_dist(m_y.dist()) {}
 
 ComCtrl::ComCtrl(const Model& t_model) : ComCtrl() {
   m_model.copy_data(t_model);
-  m_initial_com_position = m_states_ptr->com_position;
+  m_model.set_initial_com_position(states().com_position);
 }
 
 ComCtrl& ComCtrl::set_states_ptr(StatesPtr t_states_ptr) {
@@ -108,11 +107,6 @@ ComCtrl& ComCtrl::set_outputs_ptr(OutputsPtr t_outputs_ptr) {
   return *this;
 }
 
-ComCtrl& ComCtrl::set_initial_com_position(const Vec3D& t_com_position) {
-  m_initial_com_position = t_com_position;
-  return *this;
-}
-
 ComCtrl& ComCtrl::set_initial_foot_dist(double t_initial_foot_dist) {
   m_initial_foot_dist = t_initial_foot_dist;
   return *this;
@@ -124,8 +118,7 @@ ComCtrl& ComCtrl::set_time_step(double t_time_step) {
 }
 
 ComCtrl& ComCtrl::reset(const Vec3D& t_com_position) {
-  m_initial_com_position = t_com_position;
-  m_model.reset(m_initial_com_position);
+  m_model.reset(t_com_position);
   return *this;
 }
 
@@ -169,11 +162,11 @@ void ComCtrl::feedback(const Vec3D& t_com_position,
 
 void ComCtrl::remapCommandsToInputs() {
   m_inputs_ptr->com_position[0] =
-      commands().xd.value_or(m_initial_com_position.x());
+      commands().xd.value_or(model().initial_com_position().x());
   m_inputs_ptr->com_position[1] =
-      commands().yd.value_or(m_initial_com_position.y());
+      commands().yd.value_or(model().initial_com_position().y());
   m_inputs_ptr->com_position[2] =
-      commands().zd.value_or(m_initial_com_position.z());
+      commands().zd.value_or(model().initial_com_position().z());
   m_inputs_ptr->com_velocity[0] = commands().vxd.value_or(0);
   m_inputs_ptr->com_velocity[1] = commands().vyd.value_or(0);
   m_inputs_ptr->com_velocity[2] = 0;

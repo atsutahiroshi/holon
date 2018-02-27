@@ -118,9 +118,6 @@ class ComCtrl {
   }
 
   inline double time_step() const noexcept { return model().time_step(); }
-  inline const Vec3D& initial_com_position() const noexcept {
-    return m_initial_com_position;
-  }
   inline double initial_foot_dist() const noexcept {
     return m_initial_foot_dist;
   }
@@ -129,7 +126,6 @@ class ComCtrl {
   ComCtrl& set_states_ptr(StatesPtr t_states_ptr);
   ComCtrl& set_inputs_ptr(InputsPtr t_inputs_ptr);
   ComCtrl& set_outputs_ptr(OutputsPtr t_outputs_ptr);
-  ComCtrl& set_initial_com_position(const Vec3D& t_com_position);
   ComCtrl& set_initial_foot_dist(double t_initial_foot_dist);
   ComCtrl& set_time_step(double t_time_step);
   ComCtrl& reset(const Vec3D& t_com_position);
@@ -164,7 +160,6 @@ class ComCtrl {
   InputsPtr m_inputs_ptr;
   OutputsPtr m_outputs_ptr;
   CommandsPtr m_commands_ptr;
-  Vec3D m_initial_com_position;
   double m_initial_foot_dist;
 
   void updateCtrlParam();

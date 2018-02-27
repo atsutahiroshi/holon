@@ -321,6 +321,8 @@ TEST_CASE("ComZmpModel::copy_data should copy data from argument",
     RandomizeData(a.data_ptr().get());
     b.copy_data(a);
     CheckData(b.data(), a.data());
+    // initial COM position should be intact
+    CHECK(b.initial_com_position() != a.data().com_position);
   }
   SECTION("ComZmpModel::copy_data(const Data&)") {
     ComZmpModelData data;
@@ -329,6 +331,8 @@ TEST_CASE("ComZmpModel::copy_data should copy data from argument",
     ComZmpModel model;
     model.copy_data(data);
     CheckData(model.data(), data);
+    // initial COM position should be intact
+    CHECK(model.initial_com_position() != data.com_position);
   }
 }
 

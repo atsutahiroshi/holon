@@ -85,10 +85,6 @@ TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
     REQUIRE(&ctrl.model().data() == &ctrl.states());
   }
 
-  SECTION("check if initial COM position be initialized") {
-    CHECK_THAT(ctrl.initial_com_position(), Equals(ctrl.states().com_position));
-  }
-
   SECTION("check if canonical foot distance be initialized") {
     CHECK(ctrl.initial_foot_dist() == ComCtrlY::default_dist);
   }
@@ -103,7 +99,7 @@ TEST_CASE("ComCtrl(const Model&) constructor", "[corelib][humanoid][ComCtrl]") {
   model.data_ptr()->com_velocity = v;
 
   ComCtrl ctrl(model);
-  CHECK(ctrl.initial_com_position() == p);
+  CHECK(ctrl.model().initial_com_position() == p);
   CHECK(ctrl.states().com_position == p);
   CHECK(ctrl.states().com_velocity == v);
 
@@ -113,7 +109,7 @@ TEST_CASE("ComCtrl(const Model&) constructor", "[corelib][humanoid][ComCtrl]") {
   ctrl.states().com_velocity = v;
   CHECK(model.data().com_position != p);
   CHECK(model.data().com_velocity != v);
-  CHECK(ctrl.initial_com_position() != p);
+  CHECK(ctrl.model().initial_com_position() != p);
   CHECK(ctrl.states().com_position == p);
   CHECK(ctrl.states().com_velocity == v);
 }
@@ -163,20 +159,6 @@ TEST_CASE("ComCtrl::set_outputs_ptr can set another pointer to outputs data",
   REQUIRE(ctrl.outputs_ptr().use_count() == 1);
 }
 
-TEST_CASE("ComCtrl::set_initial_com_position sets initial COM position",
-          "[corelib][humanoid][ComCtrl]") {
-  ComCtrl ctrl;
-  ctrl.states().com_position = Fuzzer(-1, 1).get<Vec3D>();
-  ctrl.states().com_velocity = Fuzzer(-1, 1).get<Vec3D>();
-  Vec3D p0 = {0.1, -0.1, 1.5};
-  REQUIRE(ctrl.initial_com_position() != p0);
-
-  ctrl.set_initial_com_position(p0);
-  CHECK(ctrl.initial_com_position() == p0);
-  CHECK(ctrl.states().com_position != p0);
-  CHECK(ctrl.states().com_velocity != kVec3DZero);
-}
-
 TEST_CASE("ComCtrl::set_initial_foot_dist sets canonical foot distance",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
@@ -192,10 +174,10 @@ TEST_CASE("ComCtrl::reset(const Vec3D&) should reset initial COM position",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
   Vec3D p0 = {0, 0, 1.5};
-  REQUIRE_THAT(ctrl.initial_com_position(), !Equals(p0));
+  REQUIRE_THAT(ctrl.model().initial_com_position(), !Equals(p0));
 
   ctrl.reset(p0);
-  CHECK_THAT(ctrl.initial_com_position(), Equals(p0));
+  CHECK_THAT(ctrl.model().initial_com_position(), Equals(p0));
   CHECK_THAT(ctrl.states().com_position, Equals(p0));
   CHECK_THAT(ctrl.states().com_velocity, Equals(kVec3DZero));
 }
@@ -206,11 +188,11 @@ TEST_CASE(
   ComCtrl ctrl;
   Vec3D p0 = {-0.1, 0.1, 1.5};
   double dist = Fuzzer(0, 1).get();
-  REQUIRE_THAT(ctrl.initial_com_position(), !Equals(p0));
+  REQUIRE_THAT(ctrl.model().initial_com_position(), !Equals(p0));
   REQUIRE(ctrl.initial_foot_dist() != dist);
 
   ctrl.reset(p0, dist);
-  CHECK_THAT(ctrl.initial_com_position(), Equals(p0));
+  CHECK_THAT(ctrl.model().initial_com_position(), Equals(p0));
   CHECK_THAT(ctrl.states().com_position, Equals(p0));
   CHECK_THAT(ctrl.states().com_velocity, Equals(kVec3DZero));
   CHECK(ctrl.initial_foot_dist() == dist);

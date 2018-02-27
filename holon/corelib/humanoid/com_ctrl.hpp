@@ -151,6 +151,10 @@ class ComCtrl {
   bool update();
   bool update(double t_time_step);
 
+  using CallbackFunc = ComZmpModel::CallbackFunc;
+  CallbackFunc getReactionForceUpdater();
+  CallbackFunc getZmpPositionUpdater();
+
  private:
   ComCtrlX m_x;
   ComCtrlY m_y;

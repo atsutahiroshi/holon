@@ -23,6 +23,7 @@
 
 #include <functional>
 #include <memory>
+#include <utility>
 #include "holon/corelib/common/optional.hpp"
 #include "holon/corelib/math/vec3d.hpp"
 
@@ -159,6 +160,10 @@ class ComZmpModel {
   self_ref setZmpPositionCallback(CallbackFunc t_f);
   self_ref setComAccelerationCallback(CallbackFunc t_f);
 
+  self_ref setZmpPos(const Vec3D& t_zmp_position,
+                     optional<double> t_reaction_force_z = nullopt);
+  self_ref setExternalForce(const Vec3D& t_external_force);
+
   bool update();
   bool update(double t_time_step);
 
@@ -185,6 +190,22 @@ class ComZmpModel {
   CallbackFunc m_reaction_force_f = nullptr;
   CallbackFunc m_zmp_position_f = nullptr;
   CallbackFunc m_com_acceleration_f = nullptr;
+
+  CallbackFunc getDefaultExternalForceUpdater();
+  CallbackFunc getDefaultReactionForceUpdater();
+  CallbackFunc getComAccUpdaterViaZmp();
+  CallbackFunc getComAccUpdaterViaForce();
+  CallbackFunc getComAccUpdater();
+  Vec3D updateComAccWithZmp(double t, const Vec3D& p, const Vec3D& v);
+  Vec3D updateComAccWithReactForce(double t, const Vec3D& p, const Vec3D& v);
+
+  std::pair<Vec3D, Vec3D> rk4_cat(std::pair<Vec3D, Vec3D> x, double dt,
+                                  std::pair<Vec3D, Vec3D> dx);
+  std::pair<Vec3D, Vec3D> rk4_f(double t, std::pair<Vec3D, Vec3D> x);
+  std::pair<Vec3D, Vec3D> updateRk4(double t, std::pair<Vec3D, Vec3D> x,
+                                    double dt);
+  std::pair<Vec3D, Vec3D> updateEuler(double t, std::pair<Vec3D, Vec3D> x,
+                                      double dt);
 };
 
 }  // namespace holon

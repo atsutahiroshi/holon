@@ -882,7 +882,8 @@ SCENARIO("Controller makes COM oscillate sideward",
       THEN("Oscillates with amplitude of 0.5") {
         CAPTURE(yzmax);
         CAPTURE(yzmin);
-        CHECK((yzmax - yzmin) == Approx(dist).epsilon(0.01));
+        // CHECK((yzmax - yzmin) == Approx(dist).epsilon(0.01));
+        CHECK((yzmax - yzmin) == Approx(dist));
       }
     }
   }

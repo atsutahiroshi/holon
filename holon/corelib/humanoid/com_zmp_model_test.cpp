@@ -1105,6 +1105,7 @@ TEST_CASE("modify step time after calling update with double type",
   CHECK(model.time_step() == dt2);
 }
 
+#if 0
 TEST_CASE("ComZmpModel::inputZmpPos computes reaction force from ZMP position",
           "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;
@@ -1112,7 +1113,8 @@ TEST_CASE("ComZmpModel::inputZmpPos computes reaction force from ZMP position",
     Vec3D pz = {1, -1, 0};
     Vec3D expected_f =
         model.computeReactForce(model.data().com_position, pz, G);
-    model.inputZmpPos(pz);
+    // model.inputZmpPos(pz);
+    model.setZmpPos(pz);
     CHECK(model.data().reaction_force == expected_f);
   }
   SECTION("COM moves along vertical direction as well") {
@@ -1120,11 +1122,13 @@ TEST_CASE("ComZmpModel::inputZmpPos computes reaction force from ZMP position",
     double fz = 10;
     Vec3D expected_f =
         model.computeReactForce(model.data().com_position, pz, fz);
-    model.inputZmpPos(pz, fz);
+    // model.inputZmpPos(pz, fz);
+    model.setZmpPos(pz, fz);
     CHECK(model.data().zmp_position == pz);
     CHECK(model.data().reaction_force == expected_f);
   }
 }
+#endif
 
 TEST_CASE("ComZmpModel::update computes COM acceleration",
           "[corelib][humanoid][ComZmpModel]") {
@@ -1143,7 +1147,8 @@ TEST_CASE("ComZmpModel::update computes COM acceleration",
 
       model.data_ptr()->com_position = c.com_pos;
       model.data_ptr()->com_velocity = c.com_vel;
-      model.inputZmpPos(c.zmp_pos);
+      // model.inputZmpPos(c.zmp_pos);
+      model.setZmpPos(c.zmp_pos);
       model.update();
       CHECK_THAT(model.data().com_acceleration, Equals(expected_com_acc));
     }
@@ -1157,7 +1162,10 @@ SCENARIO("update COM position, velocity, acceleration", "[corelib][humanoid]") {
 
     WHEN("input ZMP position as (-1, -0.5, 0) and update") {
       Vec3D zmp_pos = {-1, -0.5, 0};
-      model.inputZmpPos(zmp_pos);
+      // model.inputZmpPos(zmp_pos);
+      model.setZmpPos(zmp_pos);
+      REQUIRE(model.data().com_position == kVec3DZ);
+      REQUIRE(model.data().com_velocity == kVec3DZero);
       REQUIRE(model.update());
 
       THEN("horizontal velocity should be positive") {
@@ -1167,8 +1175,8 @@ SCENARIO("update COM position, velocity, acceleration", "[corelib][humanoid]") {
       }
       THEN("horizontal position should still be at zero") {
         Vec3D pos = model.data().com_position;
-        CHECK(pos.x() == 0.0);
-        CHECK(pos.y() == 0.0);
+        CHECK(pos.x() == Approx(0.0).margin(1e-5));
+        CHECK(pos.y() == Approx(0.0).margin(1e-5));
       }
 
       WHEN("and update once more") {
@@ -1196,7 +1204,11 @@ TEST_CASE("when COM height is zero, update should fail") {
   Vec3D p = {0, 0, 0};
 
   data->com_position = p;
+  model.setZmpPos(kVec3DZero);
   zEchoOff();
+  CAPTURE(model.data().com_position);
+  CAPTURE(model.data().com_velocity);
+  CAPTURE(model.data().com_acceleration);
   CHECK_FALSE(model.update());
   zEchoOn();
 }
@@ -1209,7 +1221,8 @@ TEST_CASE("ComZmpModel::update keeps consistency of vertical reaction force",
 
   double desired_fz = 10;
   Vec3D desired_zmp = {-1, 0.42, 0};
-  model.inputZmpPos(desired_zmp, desired_fz);
+  // model.inputZmpPos(desired_zmp, desired_fz);
+  model.setZmpPos(desired_zmp, desired_fz);
   model.update();
   CHECK(data->reaction_force == Vec3D(10. / 0.42, -10, desired_fz));
   CHECK(data->com_acceleration == Vec3D(10. / 0.42, -10, 10 - G));
@@ -1224,14 +1237,18 @@ TEST_CASE("ComZmpModel::update computes total force being applied to COM",
   double desired_fz = 15;
   Vec3D desired_zmp = {-1, 0.42, 0};
   Vec3D ext_force = {1.2, -1.2, -0.2};
-  model.inputZmpPos(desired_zmp, desired_fz);
-  model.set_external_force(ext_force);
+  // model.inputZmpPos(desired_zmp, desired_fz);
+  model.setZmpPos(desired_zmp, desired_fz);
+  // model.set_external_force(ext_force);
+  model.setExternalForce(ext_force);
   model.update();
   CHECK(data->reaction_force == Vec3D(15. / 0.42, -15, desired_fz));
   CHECK(data->total_force == Vec3D(15. / 0.42 + 1.2, -16.2, 14.8));
   CHECK(data->com_acceleration == Vec3D(15. / 0.42 + 1.2, -16.2, 14.8 - G));
 }
 
+#if 0
+// instead of clears, should be checked if total force is calculated correctly
 TEST_CASE("ComZmpModel::update clears external force in its data after update",
           "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;
@@ -1239,13 +1256,15 @@ TEST_CASE("ComZmpModel::update clears external force in its data after update",
   model.reset(Vec3D(0, 0, 0.42));
 
   Vec3D ext_force = {1.5, -1.5, -10};
-  model.set_external_force(ext_force);
+  // model.set_external_force(ext_force);
+  model.setExternalForce(ext_force);
   REQUIRE(data->reaction_force == Vec3D(0, 0, G));
   model.update();
   CHECK(data->total_force == Vec3D(1.5, -1.5, G - 10));
   CHECK(data->com_acceleration == Vec3D(1.5, -1.5, -10));
   CHECK(data->external_force == kVec3DZero);
 }
+#endif
 
 }  // namespace
 }  // namespace holon

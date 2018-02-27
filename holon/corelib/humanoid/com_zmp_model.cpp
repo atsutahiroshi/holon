@@ -287,6 +287,163 @@ ComZmpModel::self_ref ComZmpModel::setComAccelerationCallback(
   return *this;
 }
 
+ComZmpModel::self_ref ComZmpModel::setZmpPos(
+    const Vec3D& t_zmp_position, optional<double> t_reaction_force_z) {
+  double fz = t_reaction_force_z.value_or(mass() * RK_G);
+  auto fz_f = [fz](double, const Vec3D&, const Vec3D&) {
+    return Vec3D(0, 0, fz);
+  };
+  setReactionForceCallback(fz_f);
+  auto zmp_f = [t_zmp_position](double, const Vec3D&, const Vec3D&) {
+    return t_zmp_position;
+  };
+  return setZmpPositionCallback(zmp_f);
+}
+
+ComZmpModel::self_ref ComZmpModel::setExternalForce(
+    const Vec3D& t_external_force) {
+  auto ef_f = [t_external_force](double, const Vec3D&, const Vec3D&) {
+    return t_external_force;
+  };
+  return setExternalForceCallback(ef_f);
+}
+
+ComZmpModel::CallbackFunc ComZmpModel::getDefaultReactionForceUpdater() {
+  return [this](double, const Vec3D&, const Vec3D&) {
+    return Vec3D(0, 0, mass() * RK_G);
+  };
+}
+
+ComZmpModel::CallbackFunc ComZmpModel::getDefaultExternalForceUpdater() {
+  return [this](double, const Vec3D&, const Vec3D&) { return kVec3DZero; };
+}
+
+ComZmpModel::CallbackFunc ComZmpModel::getComAccUpdaterViaZmp() {
+  return [this](double t, const Vec3D& p, const Vec3D& v) {
+    auto f = m_reaction_force_f(t, p, v);
+    auto ef = m_external_force_f(t, p, v);
+    auto pz = m_zmp_position_f(t, p, v);
+    auto ddp = computeComAcc(p, pz, f, mass(), ef);
+    return ddp;
+  };
+}
+
+ComZmpModel::CallbackFunc ComZmpModel::getComAccUpdaterViaForce() {
+  return [this](double t, const Vec3D& p, const Vec3D& v) {
+    auto f = m_reaction_force_f(t, p, v);
+    auto ef = m_external_force_f(t, p, v);
+    auto ddp = computeComAcc(f, mass(), ef);
+    return ddp;
+  };
+}
+
+ComZmpModel::CallbackFunc ComZmpModel::getComAccUpdater() {
+  if (!m_reaction_force_f)
+    m_reaction_force_f = getDefaultReactionForceUpdater();
+  if (!m_external_force_f)
+    m_external_force_f = getDefaultExternalForceUpdater();
+  if (m_zmp_position_f) {
+    return [this](double t, const Vec3D& p, const Vec3D& v) {
+      auto f = m_reaction_force_f(t, p, v);
+      auto ef = m_external_force_f(t, p, v);
+      auto pz = m_zmp_position_f(t, p, v);
+      return computeComAcc(p, pz, f, mass(), ef);
+    };
+  } else {
+    return [this](double t, const Vec3D& p, const Vec3D& v) {
+      auto f = m_reaction_force_f(t, p, v);
+      auto ef = m_external_force_f(t, p, v);
+      return computeComAcc(f, mass(), ef);
+    };
+  }
+}
+
+std::pair<Vec3D, Vec3D> ComZmpModel::rk4_cat(std::pair<Vec3D, Vec3D> x,
+                                             double dt,
+                                             std::pair<Vec3D, Vec3D> dx) {
+  return std::make_pair(x.first + dt * dx.first, x.second + dt * dx.second);
+}
+
+std::pair<Vec3D, Vec3D> ComZmpModel::rk4_f(double t,
+                                           std::pair<Vec3D, Vec3D> x) {
+  return std::make_pair(x.second, m_com_acceleration_f(t, x.first, x.second));
+}
+
+std::pair<Vec3D, Vec3D> ComZmpModel::updateRk4(double t,
+                                               std::pair<Vec3D, Vec3D> x,
+                                               double dt) {
+  std::pair<Vec3D, Vec3D> k1, k2, k3, k4, xm;
+  double dt1, dt2, dt3;
+
+  dt1 = dt * 0.5;
+  dt2 = dt / 6;
+  dt3 = dt2 * 2;
+
+  k1 = rk4_f(t, x);
+  // std::cout << "x  = " << x.first << ", " << x.second << "\n";
+  // std::cerr << "k1 = " << k1.first << ", " << k1.second << "\n";
+  xm = rk4_cat(x, dt1, k1);
+  k2 = rk4_f(t + dt1, xm);
+  // std::cout << "xm = " << xm.first << ", " << xm.second << "\n";
+  // std::cerr << "k2 = " << k2.first << ", " << k2.second << "\n";
+  xm = rk4_cat(x, dt1, k2);
+  k3 = rk4_f(t + dt1, xm);
+  // std::cout << "xm = " << xm.first << ", " << xm.second << "\n";
+  // std::cerr << "k3 = " << k3.first << ", " << k3.second << "\n";
+  xm = rk4_cat(x, dt, k3);
+  k4 = rk4_f(t + dt, xm);
+  // std::cout << "xm = " << xm.first << ", " << xm.second << "\n";
+  // std::cerr << "k4 = " << k4.first << ", " << k4.second << "\n";
+
+  xm = x;
+  xm = rk4_cat(xm, dt2, k1);
+  xm = rk4_cat(xm, dt3, k2);
+  xm = rk4_cat(xm, dt3, k3);
+  xm = rk4_cat(xm, dt2, k4);
+  // std::cout << "xm = " << xm.first << ", " << xm.second << "\n";
+  return xm;
+}
+
+std::pair<Vec3D, Vec3D> ComZmpModel::updateEuler(double t,
+                                                 std::pair<Vec3D, Vec3D> x,
+                                                 double dt) {
+  return rk4_cat(x, dt, rk4_f(t, x));
+}
+
+#if 1
+bool ComZmpModel::update() {
+  if (!m_com_acceleration_f) {
+    m_com_acceleration_f = getComAccUpdater();
+  }
+  auto p = data().com_position;
+  auto v = data().com_velocity;
+  m_data_ptr->com_acceleration = m_com_acceleration_f(0, p, v);
+  m_data_ptr->reaction_force = m_reaction_force_f(0, p, v);
+  m_data_ptr->external_force = m_external_force_f(0, p, v);
+  m_data_ptr->total_force = data().reaction_force + data().external_force;
+  if (m_zmp_position_f) {
+    m_data_ptr->zmp_position = m_zmp_position_f(0, p, v);
+    double sqr_zeta = computeSqrZeta(p, data().zmp_position,
+                                     data().reaction_force, data().mass);
+    if (zIsTiny(sqr_zeta)) return false;
+  }
+
+  auto ret = updateRk4(0, std::make_pair(p, v), time_step());
+  // auto ret = updateEuler(0, std::make_pair(p, v), time_step());
+  m_data_ptr->com_position = ret.first;
+  m_data_ptr->com_velocity = ret.second;
+  m_data_ptr->com_acceleration = m_com_acceleration_f(0, p, v);
+  if (m_zmp_position_f) {
+    m_data_ptr->reaction_force =
+        computeReactForce(p, data().zmp_position, data().reaction_force.z());
+  } else {
+    m_data_ptr->reaction_force = m_reaction_force_f(0, p, v);
+  }
+  m_data_ptr->total_force = data().reaction_force + data().external_force;
+  m_data_ptr->external_force = kVec3DZero;
+  return true;
+}
+#else
 bool ComZmpModel::update() {
   // check if the value of zeta will be valid when computing acceleration
   double sqr_zeta = computeSqrZeta(data().com_position, data().zmp_position,
@@ -311,6 +468,7 @@ bool ComZmpModel::update() {
   clear_external_force();
   return true;
 }
+#endif
 
 bool ComZmpModel::update(double t_time_step) {
   set_time_step(t_time_step);

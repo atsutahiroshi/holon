@@ -48,11 +48,11 @@ int main() {
 
     if (yzmax < yz) {
       yzmax = yz;
-      std::cerr << "t = " << t << ", yzmax = " << yzmax << "\n";
+      // std::cerr << "t = " << t << ", yzmax = " << yzmax << "\n";
     }
     if (yzmin > yz) {
       yzmin = yz;
-      std::cerr << "t = " << t << ", yzmin = " << yzmin << "\n";
+      // std::cerr << "t = " << t << ", yzmin = " << yzmin << "\n";
     }
 
     std::cout << t << " ";
@@ -61,6 +61,6 @@ int main() {
     std::cout << ctrl.states().zmp_position.data() << "\n";
     t += DT;
   }
-  std::cerr << "dist = " << (yzmax - yzmin) << "\n";
+  // std::cerr << "dist = " << (yzmax - yzmin) << "\n";
   return 0;
 }

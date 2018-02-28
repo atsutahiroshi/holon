@@ -67,6 +67,11 @@ std::shared_ptr<ComZmpModelData> createComZmpModelData(
   return std::make_shared<ComZmpModelData>(t_com_position, t_mass);
 }
 
+ComZmpModelSystem::ComZmpModelSystem(ComZmpModelDataPtr t_data_ptr)
+    : m_data_ptr(t_data_ptr) {
+  std::cout << "count = " << m_data_ptr.use_count() << "\n";
+}
+
 ComZmpModel::ComZmpModel()
     : m_data_ptr(createComZmpModelData()),
       m_initial_com_position(m_data_ptr->com_position),

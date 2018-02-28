@@ -56,6 +56,24 @@ ComZmpModelDataPtr createComZmpModelData(const Vec3D& t_com_position);
 ComZmpModelDataPtr createComZmpModelData(const Vec3D& t_com_position,
                                          double t_mass);
 
+class ComZmpModelSystem {
+ public:
+  explicit ComZmpModelSystem(ComZmpModelDataPtr t_data_ptr);
+
+  // special member functions
+  virtual ~ComZmpModelSystem() noexcept = default;
+  ComZmpModelSystem(const ComZmpModelSystem&) = delete;
+  ComZmpModelSystem(ComZmpModelSystem&&) noexcept = delete;
+  ComZmpModelSystem& operator=(const ComZmpModelSystem&) = delete;
+  ComZmpModelSystem& operator=(ComZmpModelSystem&&) noexcept = delete;
+
+  // accessors
+  inline ComZmpModelDataPtr data_ptr() { return m_data_ptr; }
+
+ private:
+  ComZmpModelDataPtr m_data_ptr;
+};
+
 class ComZmpModel {
   static constexpr double default_time_step = 0.001;
   using self_ref = ComZmpModel&;

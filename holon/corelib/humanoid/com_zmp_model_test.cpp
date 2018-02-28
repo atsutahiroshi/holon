@@ -169,6 +169,18 @@ TEST_CASE("ComZmpModelData: move assignment operator") {
   CHECK(c.mass == mass);
 }
 
+// ComZmpModelSystem class
+TEST_CASE("ComZmpModelSystem: constructor",
+          "[corelib][humanoid][ComZmpModelSystem]") {
+  SECTION("constructor with data pointer") {
+    auto data = createComZmpModelData();
+    REQUIRE(data.use_count() == 1);
+    ComZmpModelSystem sys(data);
+    CHECK(sys.data_ptr().get() == data.get());
+    CHECK(data.use_count() == 2);
+  }
+}
+
 // ComZmpModel class
 TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
   double default_mass = 1;

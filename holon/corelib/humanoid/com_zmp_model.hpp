@@ -50,11 +50,11 @@ struct ComZmpModelData {
                   double t_mass = default_mass);
 };
 
-std::shared_ptr<ComZmpModelData> createComZmpModelData();
-std::shared_ptr<ComZmpModelData> createComZmpModelData(
-    const Vec3D& t_com_position);
-std::shared_ptr<ComZmpModelData> createComZmpModelData(
-    const Vec3D& t_com_position, double t_mass);
+using ComZmpModelDataPtr = std::shared_ptr<ComZmpModelData>;
+ComZmpModelDataPtr createComZmpModelData();
+ComZmpModelDataPtr createComZmpModelData(const Vec3D& t_com_position);
+ComZmpModelDataPtr createComZmpModelData(const Vec3D& t_com_position,
+                                         double t_mass);
 
 class ComZmpModel {
   static constexpr double default_time_step = 0.001;
@@ -62,7 +62,7 @@ class ComZmpModel {
 
  public:
   using Data = ComZmpModelData;
-  using DataPtr = std::shared_ptr<ComZmpModelData>;
+  using DataPtr = ComZmpModelDataPtr;
   using CallbackFunc = std::function<Vec3D(double, const Vec3D&, const Vec3D&)>;
 
   ComZmpModel();

@@ -72,6 +72,12 @@ ComZmpModelSystem::ComZmpModelSystem(ComZmpModelDataPtr t_data_ptr)
   std::cout << "count = " << m_data_ptr.use_count() << "\n";
 }
 
+ComZmpModelSystem::self_ref ComZmpModelSystem::set_data_ptr(
+    DataPtr t_data_ptr) {
+  m_data_ptr = t_data_ptr;
+  return *this;
+}
+
 ComZmpModel::ComZmpModel()
     : m_data_ptr(createComZmpModelData()),
       m_initial_com_position(m_data_ptr->com_position),

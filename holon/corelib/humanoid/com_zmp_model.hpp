@@ -57,8 +57,12 @@ ComZmpModelDataPtr createComZmpModelData(const Vec3D& t_com_position,
                                          double t_mass);
 
 class ComZmpModelSystem {
+  using Data = ComZmpModelData;
+  using DataPtr = ComZmpModelDataPtr;
+  using self_ref = ComZmpModelSystem&;
+
  public:
-  explicit ComZmpModelSystem(ComZmpModelDataPtr t_data_ptr);
+  explicit ComZmpModelSystem(DataPtr t_data_ptr);
 
   // special member functions
   virtual ~ComZmpModelSystem() noexcept = default;
@@ -68,10 +72,13 @@ class ComZmpModelSystem {
   ComZmpModelSystem& operator=(ComZmpModelSystem&&) noexcept = delete;
 
   // accessors
-  inline ComZmpModelDataPtr data_ptr() { return m_data_ptr; }
+  inline DataPtr data_ptr() { return m_data_ptr; }
+
+  // mutators
+  self_ref set_data_ptr(DataPtr t_data_ptr);
 
  private:
-  ComZmpModelDataPtr m_data_ptr;
+  DataPtr m_data_ptr;
 };
 
 class ComZmpModel {

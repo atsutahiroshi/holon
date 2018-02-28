@@ -181,6 +181,20 @@ TEST_CASE("ComZmpModelSystem: constructor",
   }
 }
 
+TEST_CASE("ComZmpModelSystem: accessors / mutators",
+          "[corelib][humanoid][ComZmpModelSystem]") {
+  auto data = createComZmpModelData();
+  ComZmpModelSystem sys(data);
+
+  SECTION("data pointer") {
+    auto data2 = createComZmpModelData();
+    sys.set_data_ptr(data2);
+    CHECK(data.use_count() == 1);
+    CHECK(sys.data_ptr().get() == data2.get());
+    CHECK(data2.use_count() == 2);
+  }
+}
+
 // ComZmpModel class
 TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
   double default_mass = 1;

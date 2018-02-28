@@ -30,6 +30,7 @@ namespace holon {
 namespace {
 
 using Catch::Matchers::Equals;
+using ComZmpModelFormula::computeZeta;
 
 const double G = RK_G;
 
@@ -220,8 +221,7 @@ SCENARIO("ComCtrl::computeDesHrzZmpPos computes desired ZMP position ",
   GIVEN("qx1 = 1.0, qx2 = 1.0, qy1 = 1.0, qy2 = 1.0, ref_com_pos = (0, 0, G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {0, 0, G};
-    double desired_zeta =
-        ctrl.model().computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
+    double desired_zeta = computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
     double xz, yz;
 
     REQUIRE(desired_zeta == Approx(1.0));
@@ -271,8 +271,7 @@ SCENARIO("ComCtrl::computeDesHrzZmpPos computes desired ZMP position ",
   GIVEN("qx1 = 1, qx2 = 0.5, qy1 = 1.2, qy2 = 0.8, ref_com_pos = (0, 0, G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {0, 0, G};
-    double desired_zeta =
-        ctrl.model().computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
+    double desired_zeta = computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
     double xz, yz;
 
     ctrl.x().set_q1(1.0).set_q2(0.5);
@@ -314,8 +313,7 @@ SCENARIO("ComCtrl::computeDesHrzZmpPos computes desired ZMP position ",
       "ref_com_pos = (1, 0.5, G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {1, 0.5, G};
-    double desired_zeta =
-        ctrl.model().computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
+    double desired_zeta = computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
     double xz, yz;
 
     ctrl.x().set_q2(1.5);
@@ -369,8 +367,7 @@ SCENARIO("ComCtrl::computeDesHrzZmpPos computes desired ZMP position ",
       "ref_com_pos = (0, 0.5, 0.5*G)") {
     ComCtrl ctrl;
     Vec3D ref_com_pos = {0, 0.5, 0.5 * G};
-    double desired_zeta =
-        ctrl.model().computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
+    double desired_zeta = computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
     double xz, yz;
 
     ctrl.x().set_q2(1.5);
@@ -502,8 +499,7 @@ TEST_CASE("check if desired ZMP position is modified after update",
     double expected_xz, expected_yz;
     double expected_des_zeta;
 
-    expected_des_zeta =
-        ctrl.model().computeZeta(c.cmd_com_pos, kVec3DZero, kVec3DZero);
+    expected_des_zeta = computeZeta(c.cmd_com_pos, kVec3DZero, kVec3DZero);
     std::tie(expected_xz, expected_yz) =
         ctrl.computeDesHrzZmpPos(c.cmd_com_pos, ctrl.states().com_position,
                                  ctrl.states().com_velocity, expected_des_zeta);

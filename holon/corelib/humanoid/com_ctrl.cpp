@@ -137,7 +137,7 @@ double ComCtrl::computeDesVrtReactForce(double t_zd, double t_z, double t_vz,
 
 double ComCtrl::computeDesZeta(double t_z, double t_zz, double t_fz,
                                double t_mass) const {
-  return m_model.computeZeta(t_z, t_zz, t_fz, t_mass);
+  return ComZmpModelFormula::computeZeta(t_z, t_zz, t_fz, t_mass);
 }
 
 ComCtrl::HrzPos ComCtrl::computeDesHrzZmpPos(const Vec3D& t_ref_com_position,

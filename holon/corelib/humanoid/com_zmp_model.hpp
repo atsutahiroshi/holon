@@ -50,10 +50,10 @@ struct ComZmpModelData {
                   double t_mass = default_mass);
 };
 
-std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory();
-std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory(
+std::shared_ptr<ComZmpModelData> createComZmpModelData();
+std::shared_ptr<ComZmpModelData> createComZmpModelData(
     const Vec3D& t_com_position);
-std::shared_ptr<ComZmpModelData> ComZmpModelDataFactory(
+std::shared_ptr<ComZmpModelData> createComZmpModelData(
     const Vec3D& t_com_position, double t_mass);
 
 class ComZmpModel {

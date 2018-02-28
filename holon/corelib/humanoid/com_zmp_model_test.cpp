@@ -195,7 +195,7 @@ TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
   }
 
   SECTION("ComZmpModel(Data t_data)") {
-    auto data = ComZmpModelDataFactory();
+    auto data = createComZmpModelData();
     data->com_position = Vec3D(0.1, 0.2, 0.3);
     ComZmpModel model(data);
     CHECK(&model.data() == data.get());
@@ -208,12 +208,12 @@ TEST_CASE("ComZmpModel: accessor/mutator of data",
   ComZmpModel model;
 
   SECTION("ComZmpModel can hold another Data pointer") {
-    auto data1 = ComZmpModelDataFactory();
+    auto data1 = createComZmpModelData();
     REQUIRE(&model.data() != data1.get());
     model.set_data_ptr(data1);
     CHECK(&model.data() == data1.get());
 
-    auto data2 = ComZmpModelDataFactory();
+    auto data2 = createComZmpModelData();
     REQUIRE(&model.data() != data2.get());
     model.set_data_ptr(data2);
     CHECK(&model.data() == data2.get());
@@ -282,7 +282,7 @@ TEST_CASE("ComZmpModel::mass() returns mass value",
     CHECK(model.mass() == 10.0);
   }
   SECTION("case 2") {
-    auto data = ComZmpModelDataFactory(kVec3DZ, 2);
+    auto data = createComZmpModelData(kVec3DZ, 2);
     ComZmpModel model(data);
     CHECK(model.mass() == 2.0);
     data->mass = 20;
@@ -290,7 +290,7 @@ TEST_CASE("ComZmpModel::mass() returns mass value",
   }
   SECTION("case 3") {
     ComZmpModel model;
-    auto data = ComZmpModelDataFactory(kVec3DZ, 3);
+    auto data = createComZmpModelData(kVec3DZ, 3);
     model.set_data_ptr(data);
     CHECK(model.mass() == 3.0);
     data->mass = 30;
@@ -301,7 +301,7 @@ TEST_CASE("ComZmpModel::mass() returns mass value",
 SCENARIO("ComZmpModel: function to reset COM position",
          "[corelib][humanoid][ComZmpModel]") {
   GIVEN("initialize with random values") {
-    auto data = ComZmpModelDataFactory();
+    auto data = createComZmpModelData();
     ComZmpModel model(data);
     Fuzzer fuzz;
 
@@ -1157,7 +1157,7 @@ TEST_CASE("ComZmpModel::update computes COM acceleration",
 
 SCENARIO("update COM position, velocity, acceleration", "[corelib][humanoid]") {
   GIVEN("COM stays at (0, 0, 1)") {
-    auto data = ComZmpModelDataFactory();
+    auto data = createComZmpModelData();
     ComZmpModel model(data);
 
     WHEN("input ZMP position as (-1, -0.5, 0) and update") {
@@ -1199,7 +1199,7 @@ SCENARIO("update COM position, velocity, acceleration", "[corelib][humanoid]") {
 }
 
 TEST_CASE("when COM height is zero, update should fail") {
-  auto data = ComZmpModelDataFactory();
+  auto data = createComZmpModelData();
   ComZmpModel model(data);
   Vec3D p = {0, 0, 0};
 

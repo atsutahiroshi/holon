@@ -118,7 +118,7 @@ TEST_CASE("ComCtrl::set_states_ptr can set another pointer to states data",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
   {
-    auto states1 = ComZmpModelDataFactory(Vec3D(0, 0, 1), 3);
+    auto states1 = createComZmpModelData(Vec3D(0, 0, 1), 3);
     REQUIRE(ctrl.states_ptr().get() != states1.get());
     ctrl.set_states_ptr(states1);
     REQUIRE(ctrl.states_ptr().get() == states1.get());
@@ -440,7 +440,7 @@ TEST_CASE("ComCtrl::feedback should copy COM position / velocity",
   SECTION("ComCtrl::feedback(const Model::DataPtr&)") {
     Vec3D p = fuzz.get<Vec3D>();
     Vec3D v = fuzz.get<Vec3D>();
-    auto data = ComZmpModelDataFactory();
+    auto data = createComZmpModelData();
     data->com_position = p;
     data->com_velocity = v;
 

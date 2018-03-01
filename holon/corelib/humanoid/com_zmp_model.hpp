@@ -60,6 +60,9 @@ class ComZmpModelSystem {
   using Data = ComZmpModelData;
   using DataPtr = ComZmpModelDataPtr;
   using self_ref = ComZmpModelSystem&;
+  using Vec3DPair = std::pair<Vec3D, Vec3D>;
+  using Function =
+      std::function<Vec3D(const Vec3D&, const Vec3D&, const double)>;
 
  public:
   explicit ComZmpModelSystem(DataPtr t_data_ptr);
@@ -71,14 +74,32 @@ class ComZmpModelSystem {
   ComZmpModelSystem& operator=(const ComZmpModelSystem&) = delete;
   ComZmpModelSystem& operator=(ComZmpModelSystem&&) noexcept = delete;
 
+  // operator()
+  void operator()(const Vec3DPair& x, Vec3DPair& dxdt, const double t);
+
   // accessors
   inline DataPtr data_ptr() { return m_data_ptr; }
 
   // mutators
   self_ref set_data_ptr(DataPtr t_data_ptr);
+  self_ref set_com_acceleration_f(Function t_com_acceleration_f);
+  self_ref set_reaction_force_f(Function t_reaction_force_f);
+  self_ref set_external_force_f(Function t_external_force_f);
+  self_ref set_zmp_position_f(Function t_zmp_position_f);
+
+  Function getDefaultComAccFunc();
+  Function getComAccFuncWithReactForce();
+  Function getComAccFuncWithZmpPos();
+  Function getDefaultReactForceFunc();
+  Function getDefaultExtForceFunc();
+  Function getDefaultZmpPosFunc();
 
  private:
   DataPtr m_data_ptr;
+  Function m_com_acceleration_f;
+  Function m_reaction_force_f;
+  Function m_external_force_f;
+  Function m_zmp_position_f;
 };
 
 class ComZmpModel {

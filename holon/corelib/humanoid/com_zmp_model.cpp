@@ -68,14 +68,105 @@ std::shared_ptr<ComZmpModelData> createComZmpModelData(
 }
 
 ComZmpModelSystem::ComZmpModelSystem(ComZmpModelDataPtr t_data_ptr)
-    : m_data_ptr(t_data_ptr) {
-  std::cout << "count = " << m_data_ptr.use_count() << "\n";
+    : m_data_ptr(t_data_ptr),
+      m_com_acceleration_f(getDefaultComAccFunc()),
+      m_reaction_force_f(getDefaultReactForceFunc()),
+      m_external_force_f(getDefaultExtForceFunc()),
+      m_zmp_position_f(nullptr) {}
+
+void ComZmpModelSystem::operator()(const Vec3DPair& x, Vec3DPair& dxdt,
+                                   const double t) {
+  assert(m_com_acceleration_f);
+  dxdt.first = x.second;
+  dxdt.second = m_com_acceleration_f(x.first, x.second, t);
+}
+
+ComZmpModelSystem::Function ComZmpModelSystem::getDefaultComAccFunc() {
+  return
+      [this](const Vec3D&, const Vec3D&, const double) { return kVec3DZero; };
+}
+
+ComZmpModelSystem::Function ComZmpModelSystem::getComAccFuncWithReactForce() {
+  return [this](const Vec3D& p, const Vec3D& v, const double t) {
+    return computeComAcc(m_reaction_force_f(p, v, t), m_data_ptr->mass,
+                         m_external_force_f(p, v, t));
+  };
+}
+ComZmpModelSystem::Function ComZmpModelSystem::getComAccFuncWithZmpPos() {
+  return [this](const Vec3D& p, const Vec3D& v, const double t) {
+    return computeComAcc(p, m_zmp_position_f(p, v, t),
+                         m_reaction_force_f(p, v, t), m_data_ptr->mass,
+                         m_external_force_f(p, v, t));
+  };
+}
+
+ComZmpModelSystem::Function ComZmpModelSystem::getDefaultReactForceFunc() {
+  return [this](const Vec3D&, const Vec3D&, const double) {
+    return Vec3D(0, 0, m_data_ptr->mass * RK_G);
+  };
+}
+
+ComZmpModelSystem::Function ComZmpModelSystem::getDefaultExtForceFunc() {
+  return
+      [this](const Vec3D&, const Vec3D&, const double) { return kVec3DZero; };
+}
+
+ComZmpModelSystem::Function ComZmpModelSystem::getDefaultZmpPosFunc() {
+  return nullptr;
 }
 
 ComZmpModelSystem::self_ref ComZmpModelSystem::set_data_ptr(
     DataPtr t_data_ptr) {
   m_data_ptr = t_data_ptr;
   return *this;
+}
+
+ComZmpModelSystem::self_ref ComZmpModelSystem::set_com_acceleration_f(
+    Function t_com_acceleration_f) {
+  if (t_com_acceleration_f)
+    m_com_acceleration_f = t_com_acceleration_f;
+  else
+    m_com_acceleration_f = getDefaultComAccFunc();
+  return *this;
+}
+
+ComZmpModelSystem::self_ref ComZmpModelSystem::set_reaction_force_f(
+    Function t_reaction_force_f) {
+  if (t_reaction_force_f)
+    m_reaction_force_f = t_reaction_force_f;
+  else
+    m_reaction_force_f = getDefaultReactForceFunc();
+
+  if (m_zmp_position_f)
+    return set_com_acceleration_f(getComAccFuncWithZmpPos());
+  else
+    return set_com_acceleration_f(getComAccFuncWithReactForce());
+}
+
+ComZmpModelSystem::self_ref ComZmpModelSystem::set_external_force_f(
+    Function t_external_force_f) {
+  if (t_external_force_f)
+    m_external_force_f = t_external_force_f;
+  else
+    m_external_force_f = getDefaultExtForceFunc();
+
+  if (m_zmp_position_f)
+    return set_com_acceleration_f(getComAccFuncWithZmpPos());
+  else
+    return set_com_acceleration_f(getComAccFuncWithReactForce());
+}
+
+ComZmpModelSystem::self_ref ComZmpModelSystem::set_zmp_position_f(
+    Function t_zmp_position_f) {
+  if (t_zmp_position_f)
+    m_zmp_position_f = t_zmp_position_f;
+  else
+    m_zmp_position_f = getDefaultZmpPosFunc();
+
+  if (m_zmp_position_f)
+    return set_com_acceleration_f(getComAccFuncWithZmpPos());
+  else
+    return set_com_acceleration_f(getComAccFuncWithReactForce());
 }
 
 ComZmpModel::ComZmpModel()

@@ -191,24 +191,24 @@ bool ComZmpModel::update() {
   auto p = data().com_position;
   auto v = data().com_velocity;
   if (m_system.isZmpPositionSet()) {
-    auto zmp = m_system.zmp_position(p, v, 0.0);
-    auto f = m_system.reaction_force(p, v, 0.0);
+    auto zmp = m_system.zmp_position(p, v, time());
+    auto f = m_system.reaction_force(p, v, time());
     auto zeta2 = computeSqrZeta(p, zmp, f, data().mass);
     if (zIsTiny(zeta2)) return false;
   }
   std::array<Vec3D, 2> state{{p, v}};
-  auto ret = integrator::update(m_system, state, 0.0, time_step());
+  auto ret = integrator::update(m_system, state, time(), time_step());
   m_data_ptr->com_position = ret[0];
   m_data_ptr->com_velocity = ret[1];
-  m_data_ptr->com_acceleration = m_system.com_acceleration(p, v, 0.0);
+  m_data_ptr->com_acceleration = m_system.com_acceleration(p, v, time());
   if (m_system.isZmpPositionSet()) {
-    m_data_ptr->zmp_position = m_system.zmp_position(p, v, 0.0);
-    auto fz = m_system.reaction_force(p, v, 0.0).z();
+    m_data_ptr->zmp_position = m_system.zmp_position(p, v, time());
+    auto fz = m_system.reaction_force(p, v, time()).z();
     m_data_ptr->reaction_force = computeReactForce(p, data().zmp_position, fz);
   } else {
-    m_data_ptr->reaction_force = m_system.reaction_force(p, v, 0.0);
+    m_data_ptr->reaction_force = m_system.reaction_force(p, v, time());
   }
-  m_data_ptr->external_force = m_system.external_force(p, v, 0.0);
+  m_data_ptr->external_force = m_system.external_force(p, v, time());
   m_data_ptr->total_force = data().reaction_force + data().external_force;
   m_time += time_step();
   return true;

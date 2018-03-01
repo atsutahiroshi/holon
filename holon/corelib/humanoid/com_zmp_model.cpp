@@ -73,7 +73,7 @@ State update_euler(const System& system, const State& initial_state, Time t,
                    Time dt) {
   State x, dx;
   system(initial_state, dx, t);
-  cat(x, dt, dx, x);
+  cat(initial_state, dt, dx, x);
   return x;
 }
 
@@ -198,6 +198,7 @@ bool ComZmpModel::update() {
   }
   std::array<Vec3D, 2> state{{p, v}};
   auto ret = integrator::update(m_system, state, time(), time_step());
+  // auto ret = integrator::update_euler(m_system, state, time(), time_step());
   m_data_ptr->com_position = ret[0];
   m_data_ptr->com_velocity = ret[1];
   m_data_ptr->com_acceleration = m_system.com_acceleration(p, v, time());

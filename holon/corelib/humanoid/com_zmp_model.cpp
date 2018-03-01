@@ -80,29 +80,33 @@ State update_euler(const System& system, const State& initial_state, Time t,
 }  // namespace integrator
 
 ComZmpModel::ComZmpModel()
-    : m_data_ptr(createComZmpModelData()),
-      m_initial_com_position(m_data_ptr->com_position),
+    : m_time(0),
       m_time_step(default_time_step),
+      m_data_ptr(createComZmpModelData()),
+      m_initial_com_position(m_data_ptr->com_position),
       m_system(m_data_ptr) {}
 
 ComZmpModel::ComZmpModel(const Vec3D& t_com_position)
-    : m_data_ptr(createComZmpModelData(t_com_position)),
-      m_initial_com_position(m_data_ptr->com_position),
+    : m_time(0),
       m_time_step(default_time_step),
+      m_data_ptr(createComZmpModelData(t_com_position)),
+      m_initial_com_position(m_data_ptr->com_position),
       m_system(m_data_ptr) {}
 
 ComZmpModel::ComZmpModel(const Vec3D& t_com_position, double t_mass)
-    : m_data_ptr(isMassValid(t_mass)
+    : m_time(0),
+      m_time_step(default_time_step),
+      m_data_ptr(isMassValid(t_mass)
                      ? createComZmpModelData(t_com_position, t_mass)
                      : createComZmpModelData(t_com_position)),
       m_initial_com_position(m_data_ptr->com_position),
-      m_time_step(default_time_step),
       m_system(m_data_ptr) {}
 
 ComZmpModel::ComZmpModel(DataPtr t_data)
-    : m_data_ptr(t_data),
-      m_initial_com_position(m_data_ptr->com_position),
+    : m_time(0),
       m_time_step(default_time_step),
+      m_data_ptr(t_data),
+      m_initial_com_position(m_data_ptr->com_position),
       m_system(m_data_ptr) {}
 
 ComZmpModel::self_ref ComZmpModel::set_data_ptr(DataPtr t_data_ptr) {
@@ -129,6 +133,7 @@ ComZmpModel::self_ref ComZmpModel::reset(const Vec3D& t_com_position) {
   m_data_ptr->com_position = t_com_position;
   m_data_ptr->com_velocity.clear();
   set_initial_com_position(t_com_position);
+  m_time = 0;
   return *this;
 }
 
@@ -205,6 +210,7 @@ bool ComZmpModel::update() {
   }
   m_data_ptr->external_force = m_system.external_force(p, v, 0.0);
   m_data_ptr->total_force = data().reaction_force + data().external_force;
+  m_time += time_step();
   return true;
 }
 

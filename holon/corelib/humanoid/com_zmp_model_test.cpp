@@ -78,6 +78,7 @@ TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
     CHECK(model.data().mass == default_mass);
     CHECK(model.data().com_position == default_com_position);
     CHECK(model.initial_com_position() == default_com_position);
+    CHECK(model.time() == 0.0);
   }
 
   SECTION("ComZmpModel(double t_mass)") {
@@ -89,6 +90,7 @@ TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
       CHECK(model.data().mass == m);
       CHECK(model.data().com_position == p0);
       CHECK(model.initial_com_position() == p0);
+      CHECK(model.time() == 0.0);
     }
 
     SECTION("mass should be positive") {
@@ -107,6 +109,7 @@ TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
     ComZmpModel model(data);
     CHECK(&model.data() == data.get());
     CHECK(model.initial_com_position() == data->com_position);
+    CHECK(model.time() == 0.0);
   }
 }
 
@@ -219,6 +222,16 @@ SCENARIO("ComZmpModel: function to reset COM position",
   }
 }
 
+TEST_CASE("ComZmpModel::reset() resets time to zero",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+  model.update();
+  model.update();
+  REQUIRE(model.time() != 0);
+  model.reset(kVec3DZ);
+  CHECK(model.time() == 0.0);
+}
+
 TEST_CASE("ComZmpModel::copy_data should copy data from argument",
           "[corelib][humanoid][ComZmpModel]") {
   Fuzzer fuzz;
@@ -243,8 +256,20 @@ TEST_CASE("ComZmpModel::copy_data should copy data from argument",
   }
 }
 
-TEST_CASE("modify step time after calling update with double type",
-          "[corelib][humanoid]") {
+TEST_CASE("ComZmpModel::update counts time",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+  REQUIRE(model.time() == 0.0);
+  model.update();
+  REQUIRE(model.time() == Approx(model.time_step()));
+  model.update();
+  REQUIRE(model.time() == Approx(2. * model.time_step()));
+  model.update();
+  REQUIRE(model.time() == Approx(3. * model.time_step()));
+}
+
+TEST_CASE("ComZmpModel::update(double) modify step time",
+          "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;
   Fuzzer fuzz(0.0001, 0.1);
   double dt1 = fuzz.get();
@@ -252,15 +277,45 @@ TEST_CASE("modify step time after calling update with double type",
 
   REQUIRE(model.time_step() != dt1);
   model.update(dt1);
-  CHECK(model.time_step() == dt1);
+  REQUIRE(model.time_step() == dt1);
   model.update();
-  CHECK(model.time_step() == dt1);
+  REQUIRE(model.time_step() == dt1);
 
   REQUIRE(model.time_step() != dt2);
   model.update(dt2);
-  CHECK(model.time_step() == dt2);
+  REQUIRE(model.time_step() == dt2);
   model.update();
-  CHECK(model.time_step() == dt2);
+  REQUIRE(model.time_step() == dt2);
+}
+
+TEST_CASE("ComZmpModel::update(double) counts time correctly",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+  Fuzzer fuzz(0.0001, 0.1);
+  double dt1 = fuzz.get();
+  double dt2 = fuzz.get();
+  double t = 0;
+
+  // REQUIRE(model.time_step() != dt1);
+  REQUIRE(model.time() == t);
+  model.update(dt1);
+  t += dt1;
+  REQUIRE(model.time() == t);
+  // REQUIRE(model.time_step() == dt1);
+  model.update();
+  t += dt1;
+  REQUIRE(model.time() == t);
+  // REQUIRE(model.time_step() == dt1);
+
+  // REQUIRE(model.time_step() != dt2);
+  model.update(dt2);
+  t += dt2;
+  REQUIRE(model.time() == t);
+  // REQUIRE(model.time_step() == dt2);
+  model.update();
+  t += dt2;
+  REQUIRE(model.time() == t);
+  // REQUIRE(model.time_step() == dt2);
 }
 
 TEST_CASE("ComZmpModel::update computes COM acceleration",

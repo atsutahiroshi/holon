@@ -51,17 +51,18 @@ class ComZmpModel {
   self_ref operator=(ComZmpModel&&) = delete;
 
   // accessors
+  inline double time() const noexcept { return m_time; }
+  inline double time_step() const noexcept { return m_time_step; }
   inline const Data& data() const noexcept { return *m_data_ptr; }
   inline const DataPtr& data_ptr() const noexcept { return m_data_ptr; }
-  inline double time_step() const noexcept { return m_time_step; }
   inline Vec3D initial_com_position() const noexcept {
     return m_initial_com_position;
   }
   inline double mass() const noexcept { return data().mass; }
 
   // mutators
-  self_ref set_data_ptr(DataPtr t_data_ptr);
   self_ref set_time_step(double t_time_step);
+  self_ref set_data_ptr(DataPtr t_data_ptr);
   self_ref set_initial_com_position(const Vec3D& t_initial_com_position);
   self_ref reset(const Vec3D& t_com_position);
 
@@ -83,9 +84,10 @@ class ComZmpModel {
   bool update(double t_time_step);
 
  private:
+  double m_time;
+  double m_time_step;
   DataPtr m_data_ptr;
   Vec3D m_initial_com_position;
-  double m_time_step;
   System m_system;
 
   bool isTimeStepValid(double t_time_step) const;

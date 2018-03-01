@@ -320,7 +320,22 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
     }
   }
 
-  SECTION("Mass value is not 1") {}
+  SECTION("Mass value is not 1") {
+    data->mass = 2.5;
+    Vec3D zmp = {1, -1, 0};
+    auto f_zmp = [zmp](const Vec3D&, const Vec3D&, const double) {
+      return zmp;
+    };
+    Vec3D ef = fuzz.get<Vec3D>();
+    auto f_ef = [ef](const Vec3D&, const Vec3D&, const double) { return ef; };
+    auto expected =
+        computeComAcc(p, zmp, Vec3D(0, 0, data->mass * G), data->mass, ef);
+    sys.set_zmp_position_f(f_zmp);
+    sys.set_external_force_f(f_ef);
+    sys(std::make_pair(p, v), dxdt, t);
+    CHECK(dxdt.first == v);
+    CHECK(dxdt.second == expected);
+  }
 }
 
 // ComZmpModel class

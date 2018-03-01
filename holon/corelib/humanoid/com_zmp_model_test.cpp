@@ -1423,24 +1423,20 @@ TEST_CASE("ComZmpModel::update computes total force being applied to COM",
   CHECK(data->com_acceleration == Vec3D(15. / 0.42 + 1.2, -16.2, 14.8 - G));
 }
 
-#if 0
-// instead of clears, should be checked if total force is calculated correctly
-TEST_CASE("ComZmpModel::update clears external force in its data after update",
+TEST_CASE("ComZmpModel::update() updates external force in data",
           "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;
   auto data = model.data_ptr();
   model.reset(Vec3D(0, 0, 0.42));
 
   Vec3D ext_force = {1.5, -1.5, -10};
-  // model.set_external_force(ext_force);
   model.setExternalForce(ext_force);
   REQUIRE(data->reaction_force == Vec3D(0, 0, G));
   model.update();
   CHECK(data->total_force == Vec3D(1.5, -1.5, G - 10));
   CHECK(data->com_acceleration == Vec3D(1.5, -1.5, -10));
-  CHECK(data->external_force == kVec3DZero);
+  CHECK(data->external_force == ext_force);
 }
-#endif
 
 }  // namespace
 }  // namespace holon

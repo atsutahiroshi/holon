@@ -525,18 +525,18 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   SECTION("COM position") {
     inputs->com_position = fuzz.get<Vec3D>();
     SECTION("default") {
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().com_position == p0);
     }
     SECTION("set user command") {
       Vec3D v = {1.2, -1.2, 1.5};
       cmd->set_com_position(v);
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().com_position == v);
     }
     SECTION("clear") {
       cmd->clear();
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().com_position == p0);
     }
   }
@@ -544,18 +544,18 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   SECTION("COM velocity") {
     inputs->com_velocity = fuzz.get<Vec3D>();
     SECTION("default") {
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().com_velocity == kVec3DZero);
     }
     SECTION("set user command") {
       Vec3D v = {1.2, -1.2, 0};
       cmd->set_com_velocity(v.x(), v.y());
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().com_velocity == v);
     }
     SECTION("clear") {
       cmd->clear();
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().com_velocity == kVec3DZero);
     }
   }
@@ -564,7 +564,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
     inputs->qx1 = fuzz.get<double>();
     inputs->qx2 = fuzz.get<double>();
     SECTION("default") {
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qx1 == 1.0);
       CHECK(ctrl.inputs().qx2 == 1.0);
       CHECK(ctrl.x().q1() == 1.0);
@@ -573,7 +573,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
     SECTION("set user command") {
       cmd->qx1 = 0.8;
       cmd->qx2 = 0.5;
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qx1 == 0.8);
       CHECK(ctrl.inputs().qx2 == 0.5);
       CHECK(ctrl.x().q1() == 0.8);
@@ -581,7 +581,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
     }
     SECTION("clear") {
       cmd->clear();
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qx1 == 1.0);
       CHECK(ctrl.inputs().qx2 == 1.0);
       CHECK(ctrl.x().q1() == 1.0);
@@ -593,7 +593,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
     inputs->qy1 = fuzz.get<double>();
     inputs->qy2 = fuzz.get<double>();
     SECTION("default") {
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qy1 == 1.0);
       CHECK(ctrl.inputs().qy2 == 1.0);
       CHECK(ctrl.y().q1() == 1.0);
@@ -602,7 +602,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
     SECTION("set user command") {
       cmd->qy1 = 0.8;
       cmd->qy2 = 0.5;
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qy1 == 0.8);
       CHECK(ctrl.inputs().qy2 == 0.5);
       CHECK(ctrl.y().q1() == 0.8);
@@ -610,7 +610,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
     }
     SECTION("clear") {
       cmd->clear();
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qy1 == 1.0);
       CHECK(ctrl.inputs().qy2 == 1.0);
       CHECK(ctrl.y().q1() == 1.0);
@@ -622,7 +622,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
     inputs->qz1 = fuzz.get<double>();
     inputs->qz2 = fuzz.get<double>();
     SECTION("default") {
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qz1 == 1.0);
       CHECK(ctrl.inputs().qz2 == 1.0);
       CHECK(ctrl.z().q1() == 1.0);
@@ -631,7 +631,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
     SECTION("set user command") {
       cmd->qz1 = 0.8;
       cmd->qz2 = 0.5;
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qz1 == 0.8);
       CHECK(ctrl.inputs().qz2 == 0.5);
       CHECK(ctrl.z().q1() == 0.8);
@@ -639,7 +639,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
     }
     SECTION("clear") {
       cmd->clear();
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qz1 == 1.0);
       CHECK(ctrl.inputs().qz2 == 1.0);
       CHECK(ctrl.z().q1() == 1.0);
@@ -650,17 +650,17 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   SECTION("Virtual horizontal plane") {
     inputs->vhp = fuzz.get<double>();
     SECTION("default") {
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().vhp == 0.0);
     }
     SECTION("set user command") {
       cmd->vhp = 0.1;
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().vhp == 0.1);
     }
     SECTION("clear") {
       cmd->clear();
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().vhp == 0.0);
     }
   }
@@ -669,19 +669,19 @@ TEST_CASE("ComCtrl::update() updates control paramters",
     inputs->rho = fuzz();
     ctrl.y().set_rho(fuzz());
     SECTION("default") {
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().rho == 0.0);
       CHECK(ctrl.y().rho() == 0.0);
     }
     SECTION("set user command") {
       cmd->rho = 1.0;
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().rho == 1.0);
       CHECK(ctrl.y().rho() == 1.0);
     }
     SECTION("clear") {
       cmd->clear();
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().rho == 0.0);
       CHECK(ctrl.y().rho() == 0.0);
     }
@@ -691,19 +691,19 @@ TEST_CASE("ComCtrl::update() updates control paramters",
     inputs->dist = fuzz();
     ctrl.y().set_dist(fuzz());
     SECTION("default") {
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().dist == dist);
       CHECK(ctrl.y().dist() == dist);
     }
     SECTION("set user command") {
       cmd->dist = 1.0;
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().dist == 1.0);
       CHECK(ctrl.y().dist() == 1.0);
     }
     SECTION("clear") {
       cmd->clear();
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().dist == dist);
       CHECK(ctrl.y().dist() == dist);
     }
@@ -713,19 +713,19 @@ TEST_CASE("ComCtrl::update() updates control paramters",
     inputs->kr = fuzz();
     ctrl.y().set_kr(fuzz());
     SECTION("default") {
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().kr == 1.0);
       CHECK(ctrl.y().kr() == 1.0);
     }
     SECTION("set user command") {
       cmd->kr = 0.5;
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().kr == 0.5);
       CHECK(ctrl.y().kr() == 0.5);
     }
     SECTION("clear") {
       cmd->clear();
-      ctrl.update();
+      REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().kr == 1.0);
       CHECK(ctrl.y().kr() == 1.0);
     }

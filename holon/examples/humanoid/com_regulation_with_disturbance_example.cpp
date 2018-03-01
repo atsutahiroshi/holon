@@ -34,11 +34,11 @@ void apply_external_force(ComZmpModel* model, double t) {
   Vec3D force2 = {-1.5, 1.5, 0};
 
   if (t > 4 && t < 4.1) {
-    model->setExternalForce(force1);
+    model->setFixedExternalForce(force1);
   } else if (t > 6 && t < 6.1) {
-    model->setExternalForce(force2);
+    model->setFixedExternalForce(force2);
   } else {
-    model->setExternalForce(holon::kVec3DZero);
+    model->setFixedExternalForce(holon::kVec3DZero);
   }
 }
 
@@ -78,8 +78,6 @@ int main() {
 
     // update simulator
     apply_external_force(&model, t);
-    // model.inputZmpPos(ctrl.outputs().zmp_position);
-    // model.setZmpPos(ctrl.outputs().zmp_position);
     model.update(DT);
 
     // logging

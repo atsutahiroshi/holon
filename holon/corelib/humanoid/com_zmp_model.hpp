@@ -165,9 +165,9 @@ class ComZmpModel {
   self_ref setZmpPositionCallback(CallbackFunc t_f);
   self_ref setComAccelerationCallback(CallbackFunc t_f);
 
-  self_ref setZmpPos(const Vec3D& t_zmp_position,
-                     optional<double> t_reaction_force_z = nullopt);
-  self_ref setExternalForce(const Vec3D& t_external_force);
+  self_ref setFixedZmpPosition(const Vec3D& t_zmp_position,
+                               optional<double> t_reaction_force_z = nullopt);
+  self_ref setFixedExternalForce(const Vec3D& t_external_force);
 
   bool update();
   bool update(double t_time_step);

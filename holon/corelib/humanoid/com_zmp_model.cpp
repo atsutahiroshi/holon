@@ -298,7 +298,7 @@ ComZmpModel::self_ref ComZmpModel::setComAccelerationCallback(
   return *this;
 }
 
-ComZmpModel::self_ref ComZmpModel::setZmpPos(
+ComZmpModel::self_ref ComZmpModel::setFixedZmpPosition(
     const Vec3D& t_zmp_position, optional<double> t_reaction_force_z) {
   double fz = t_reaction_force_z.value_or(mass() * RK_G);
   auto fz_f = [fz](const Vec3D&, const Vec3D&, const double) {
@@ -312,7 +312,7 @@ ComZmpModel::self_ref ComZmpModel::setZmpPos(
   return *this;
 }
 
-ComZmpModel::self_ref ComZmpModel::setExternalForce(
+ComZmpModel::self_ref ComZmpModel::setFixedExternalForce(
     const Vec3D& t_external_force) {
   auto ef_f = [t_external_force](const Vec3D&, const Vec3D&, const double) {
     return t_external_force;

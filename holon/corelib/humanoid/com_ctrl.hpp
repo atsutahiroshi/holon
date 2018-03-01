@@ -117,6 +117,7 @@ class ComCtrl {
     return m_outputs_ptr;
   }
 
+  inline double time() const noexcept { return model().time(); }
   inline double time_step() const noexcept { return model().time_step(); }
   inline double canonical_foot_dist() const noexcept {
     return m_canonical_foot_dist;

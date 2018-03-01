@@ -21,6 +21,7 @@
 #include "holon/corelib/humanoid/com_ctrl.hpp"
 
 #include <roki/rk_g.h>
+#include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_formula.hpp"
 
 #include "catch.hpp"
 #include "holon/test/util/catch/custom_matchers.hpp"

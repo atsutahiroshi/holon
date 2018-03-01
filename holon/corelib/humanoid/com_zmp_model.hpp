@@ -21,102 +21,12 @@
 #ifndef HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
 #define HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
 
-#include <array>
-#include <functional>
-#include <memory>
-#include <utility>
 #include "holon/corelib/common/optional.hpp"
+#include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_data.hpp"
+#include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_system.hpp"
 #include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
-
-struct ComZmpModelData {
- private:
-  static const double default_mass;
-  static const Vec3D default_com_position;
-
- public:
-  double mass;
-  Vec3D nu;
-  Vec3D com_position;
-  Vec3D com_velocity;
-  Vec3D com_acceleration;
-  Vec3D zmp_position;
-  Vec3D reaction_force;
-  Vec3D external_force;
-  Vec3D total_force;
-
-  // constructors
-  ComZmpModelData(const Vec3D& t_com_position = default_com_position,
-                  double t_mass = default_mass);
-};
-
-using ComZmpModelDataPtr = std::shared_ptr<ComZmpModelData>;
-ComZmpModelDataPtr createComZmpModelData();
-ComZmpModelDataPtr createComZmpModelData(const Vec3D& t_com_position);
-ComZmpModelDataPtr createComZmpModelData(const Vec3D& t_com_position,
-                                         double t_mass);
-
-class ComZmpModelSystem {
-  using Data = ComZmpModelData;
-  using DataPtr = ComZmpModelDataPtr;
-  using self_ref = ComZmpModelSystem&;
-
- public:
-  using State = std::array<Vec3D, 2>;
-  using Function =
-      std::function<Vec3D(const Vec3D&, const Vec3D&, const double)>;
-
- public:
-  explicit ComZmpModelSystem(DataPtr t_data_ptr);
-
-  // special member functions
-  virtual ~ComZmpModelSystem() noexcept = default;
-  ComZmpModelSystem(const ComZmpModelSystem&) = default;
-  ComZmpModelSystem(ComZmpModelSystem&&) noexcept = delete;
-  ComZmpModelSystem& operator=(const ComZmpModelSystem&) = delete;
-  ComZmpModelSystem& operator=(ComZmpModelSystem&&) noexcept = delete;
-
-  // operator()
-  void operator()(const State& x, State& dxdt, const double t) const;
-
-  // accessors
-  inline DataPtr data_ptr() { return m_data_ptr; }
-  Vec3D com_acceleration(const Vec3D& p, const Vec3D& v, const double t) {
-    return m_com_acceleration_f(p, v, t);
-  }
-  Vec3D reaction_force(const Vec3D& p, const Vec3D& v, const double t) {
-    return m_reaction_force_f(p, v, t);
-  }
-  Vec3D external_force(const Vec3D& p, const Vec3D& v, const double t) {
-    return m_external_force_f(p, v, t);
-  }
-  Vec3D zmp_position(const Vec3D& p, const Vec3D& v, const double t) {
-    return m_zmp_position_f(p, v, t);
-  }
-  inline bool isZmpPositionSet() { return static_cast<bool>(m_zmp_position_f); }
-
-  // mutators
-  self_ref set_data_ptr(DataPtr t_data_ptr);
-  self_ref set_com_acceleration_f(Function t_com_acceleration_f);
-  self_ref set_reaction_force_f(Function t_reaction_force_f);
-  self_ref set_external_force_f(Function t_external_force_f);
-  self_ref set_zmp_position_f(Function t_zmp_position_f);
-
-  Function getDefaultComAccFunc();
-  Function getComAccFuncWithReactForce();
-  Function getComAccFuncWithZmpPos();
-  Function getDefaultReactForceFunc();
-  Function getDefaultExtForceFunc();
-  Function getDefaultZmpPosFunc();
-
- private:
-  DataPtr m_data_ptr;
-  Function m_com_acceleration_f;
-  Function m_reaction_force_f;
-  Function m_external_force_f;
-  Function m_zmp_position_f;
-};
 
 class ComZmpModel {
   static constexpr double default_time_step = 0.001;
@@ -180,69 +90,6 @@ class ComZmpModel {
 
   bool isTimeStepValid(double t_time_step) const;
 };
-
-namespace ComZmpModelFormula {
-
-// functions to compute squared zeta
-double computeSqrZeta(double t_com_position_z, double t_zmp_position_z,
-                      double t_com_acceleration_z);
-double computeSqrZeta(double t_com_position_z, double t_zmp_position_z,
-                      double t_reation_force_z, double t_mass);
-double computeSqrZeta(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
-                      const Vec3D& t_com_acceleration,
-                      const Vec3D& t_nu = kVec3DZ);
-double computeSqrZeta(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
-                      const Vec3D& t_reaction_force, double t_mass,
-                      const Vec3D& t_nu = kVec3DZ);
-
-// functions to compute zeta
-double computeZeta(double t_com_position_z, double t_zmp_position_z,
-                   double t_com_acceleration_z);
-double computeZeta(double t_com_position_z, double t_zmp_position_z,
-                   double t_reation_force_z, double t_mass);
-double computeZeta(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
-                   const Vec3D& t_com_acceleration,
-                   const Vec3D& t_nu = kVec3DZ);
-double computeZeta(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
-                   const Vec3D& t_reaction_force, double t_mass,
-                   const Vec3D& t_nu = kVec3DZ);
-
-// functions to compute reaction force
-Vec3D computeReactForce(const Vec3D& t_com_acceleration, double t_mass);
-Vec3D computeReactForce(const Vec3D& t_com_position,
-                        const Vec3D& t_zmp_position, double t_sqr_zeta,
-                        double t_mass);
-Vec3D computeReactForce(const Vec3D& t_com_position,
-                        const Vec3D& t_zmp_position,
-                        const Vec3D& t_com_acceleration, double t_mass,
-                        const Vec3D& t_nu = kVec3DZ);
-Vec3D computeReactForce(const Vec3D& t_com_position,
-                        const Vec3D& t_zmp_position, double t_reaction_force_z);
-
-// functions to compute COM acceleration
-Vec3D computeComAcc(const Vec3D& t_reaction_force, double t_mass,
-                    const Vec3D& t_external_force = kVec3DZero);
-Vec3D computeComAcc(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
-                    double t_sqr_zeta, double t_mass = 1,
-                    const Vec3D& t_external_force = kVec3DZero);
-Vec3D computeComAcc(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
-                    const Vec3D& t_reaction_force, double t_mass,
-                    const Vec3D& t_external_force = kVec3DZero,
-                    const Vec3D& t_nu = kVec3DZ);
-
-// functions to check if some relation is correct
-bool isMassValid(double t_mass);
-bool isComZmpDiffValid(double t_com_position_z, double t_zmp_position_z);
-bool isComZmpDiffValid(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
-                       const Vec3D& t_nu = kVec3DZ);
-bool isReactionForceValid(double t_reaction_force_z);
-bool isReactionForceValid(const Vec3D& t_reaction_force,
-                          const Vec3D& t_nu = kVec3DZ);
-bool isComAccelerationValid(double t_com_acceleration_z);
-bool isComAccelerationValid(const Vec3D& t_com_acceleration,
-                            const Vec3D& t_nu = kVec3DZ);
-
-}  // namespace ComZmpModelFormula
 
 }  // namespace holon
 

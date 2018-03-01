@@ -19,6 +19,7 @@
  */
 
 #include "holon/corelib/humanoid/com_ctrl.hpp"
+#include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_formula.hpp"
 
 #include "hayai.hpp"
 

@@ -1415,9 +1415,7 @@ TEST_CASE("ComZmpModel::update computes total force being applied to COM",
   double desired_fz = 15;
   Vec3D desired_zmp = {-1, 0.42, 0};
   Vec3D ext_force = {1.2, -1.2, -0.2};
-  // model.inputZmpPos(desired_zmp, desired_fz);
   model.setZmpPos(desired_zmp, desired_fz);
-  // model.set_external_force(ext_force);
   model.setExternalForce(ext_force);
   model.update();
   CHECK(data->reaction_force == Vec3D(15. / 0.42, -15, desired_fz));

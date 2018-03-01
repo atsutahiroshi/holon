@@ -126,8 +126,6 @@ class ComZmpModel {
   using Data = ComZmpModelData;
   using DataPtr = ComZmpModelDataPtr;
   using System = ComZmpModelSystem;
-  // using CallbackFunc = std::function<Vec3D(double, const Vec3D&, const
-  // Vec3D&)>;
   using CallbackFunc = ComZmpModelSystem::Function;
 
   ComZmpModel();
@@ -153,6 +151,7 @@ class ComZmpModel {
 
   // mutators
   self_ref set_data_ptr(DataPtr t_data_ptr);
+  // depricated
   self_ref set_external_force(const Vec3D& t_external_force);
   self_ref clear_external_force() { return set_external_force(kVec3DZero); }
   self_ref set_time_step(double t_time_step);
@@ -164,6 +163,7 @@ class ComZmpModel {
   void copy_data(const Data& t_data);
 
   // update functions
+  // depricated
   void inputZmpPos(const Vec3D& t_zmp_position,
                    optional<double> t_reaction_force_z = nullopt);
   void inputReactForce(const Vec3D& t_reaction_force);
@@ -189,27 +189,6 @@ class ComZmpModel {
   System m_system;
 
   bool isTimeStepValid(double t_time_step) const;
-
-  // CallbackFunc m_external_force_f = nullptr;
-  // CallbackFunc m_reaction_force_f = nullptr;
-  // CallbackFunc m_zmp_position_f = nullptr;
-  // CallbackFunc m_com_acceleration_f = nullptr;
-
-  // CallbackFunc getDefaultExternalForceUpdater();
-  // CallbackFunc getDefaultReactionForceUpdater();
-  // CallbackFunc getComAccUpdaterViaZmp();
-  // CallbackFunc getComAccUpdaterViaForce();
-  // CallbackFunc getComAccUpdater();
-  // Vec3D updateComAccWithZmp(double t, const Vec3D& p, const Vec3D& v);
-  // Vec3D updateComAccWithReactForce(double t, const Vec3D& p, const Vec3D& v);
-
-  // std::pair<Vec3D, Vec3D> rk4_cat(std::pair<Vec3D, Vec3D> x, double dt,
-  //                                 std::pair<Vec3D, Vec3D> dx);
-  // std::pair<Vec3D, Vec3D> rk4_f(double t, std::pair<Vec3D, Vec3D> x);
-  // std::pair<Vec3D, Vec3D> updateRk4(double t, std::pair<Vec3D, Vec3D> x,
-  //                                   double dt);
-  // std::pair<Vec3D, Vec3D> updateEuler(double t, std::pair<Vec3D, Vec3D> x,
-  //                                     double dt);
 };
 
 namespace ComZmpModelFormula {

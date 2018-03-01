@@ -29,17 +29,15 @@ int main() {
   auto cmd = ctrl.getCommands();
   holon::Vec3D initial_com_pos = {0.1, -0.1, 1};
   holon::Vec3D cmd_com_pos = {0, 0, 1};
-  double t = 0;
 
   ctrl.reset(initial_com_pos);
-  while (t < T) {
+  while (ctrl.time() < T) {
     cmd->set_com_position(cmd_com_pos);
     ctrl.update(DT);
-    std::cout << t << " ";
+    std::cout << ctrl.time() << " ";
     std::cout << ctrl.states().com_position.data() << " ";
     std::cout << ctrl.states().com_velocity.data() << " ";
     std::cout << ctrl.states().zmp_position.data() << "\n";
-    t += ctrl.time_step();
   }
   return 0;
 }

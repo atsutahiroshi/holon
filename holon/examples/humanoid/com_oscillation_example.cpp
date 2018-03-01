@@ -33,7 +33,6 @@ int main() {
   Vec3D p0 = {0, 0, 0.42};
   Vec3D pd = {0, 0, 0.42};
   double dist = 0.1;
-  double t = 0;
 
   ctrl.reset(p0);
   ctrl.states().com_velocity = {0, 0.00001, 0};
@@ -43,24 +42,21 @@ int main() {
   double yzmin = 0;
   double yzmax = 0;
   const double& yz = ctrl.states().zmp_position[1];
-  while (t < T) {
+  while (ctrl.time() < T) {
     ctrl.update(DT);
 
     if (yzmax < yz) {
       yzmax = yz;
-      // std::cerr << "t = " << t << ", yzmax = " << yzmax << "\n";
     }
     if (yzmin > yz) {
       yzmin = yz;
-      // std::cerr << "t = " << t << ", yzmin = " << yzmin << "\n";
     }
 
-    std::cout << t << " ";
+    std::cout << ctrl.time() << " ";
     std::cout << ctrl.states().com_position.data() << " ";
     std::cout << ctrl.states().com_velocity.data() << " ";
     std::cout << ctrl.states().zmp_position.data() << "\n";
-    t += DT;
   }
-  // std::cerr << "dist = " << (yzmax - yzmin) << "\n";
+  std::cerr << "actual dist = " << (yzmax - yzmin) << "\n";
   return 0;
 }

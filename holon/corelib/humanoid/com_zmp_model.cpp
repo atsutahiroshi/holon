@@ -169,6 +169,56 @@ ComZmpModelSystem::self_ref ComZmpModelSystem::set_zmp_position_f(
     return set_com_acceleration_f(getComAccFuncWithReactForce());
 }
 
+namespace integrator {
+
+template <typename State, typename Time>
+void cat(State state, Time dt, State deriv, State& state_out) {
+  auto x = state.begin();
+  auto dx = deriv.begin();
+  auto x_out = state_out.begin();
+  for (; x_out != state_out.end(); ++x, ++dx, ++x_out) {
+    x_out = x + dt * dx;
+  }
+}
+
+template <typename System, typename State, typename Time>
+State update(System system, State initial_state, Time t, Time dt) {
+  State k1, k2, k3, k4, x;
+  Time dt1, dt2, dt3;
+
+  dt1 = dt * 0.5;
+  dt2 = dt / 6;
+  dt3 = dt2 * 2;
+
+  system(initial_state, k1, t);
+
+  cat(initial_state, dt1, k1, x);
+  system(x, k2, t + dt1);
+
+  cat(initial_state, dt1, k2, x);
+  system(x, k3, t + dt1);
+
+  cat(initial_state, dt, k3, x);
+  system(x, k4, t + dt);
+
+  x = initial_state;
+  cat(x, dt2, k1, x);
+  cat(x, dt3, k2, x);
+  cat(x, dt3, k3, x);
+  cat(x, dt2, k4, x);
+  return x;
+}
+
+template <typename System, typename State, typename Time>
+State update_euler(System system, State initial_state, Time t, Time dt) {
+  State x, dx;
+  system(initial_state, dx, t);
+  cat(x, dt, dx, x);
+  return x;
+}
+
+}  // namespace integrator
+
 ComZmpModel::ComZmpModel()
     : m_data_ptr(createComZmpModelData()),
       m_initial_com_position(m_data_ptr->com_position),

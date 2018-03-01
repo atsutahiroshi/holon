@@ -71,14 +71,14 @@ class ComZmpModelSystem {
   explicit ComZmpModelSystem(DataPtr t_data_ptr);
 
   // special member functions
-  // virtual ~ComZmpModelSystem() noexcept = default;
-  // ComZmpModelSystem(const ComZmpModelSystem&) = delete;
-  // ComZmpModelSystem(ComZmpModelSystem&&) noexcept = delete;
-  // ComZmpModelSystem& operator=(const ComZmpModelSystem&) = delete;
-  // ComZmpModelSystem& operator=(ComZmpModelSystem&&) noexcept = delete;
+  virtual ~ComZmpModelSystem() noexcept = default;
+  ComZmpModelSystem(const ComZmpModelSystem&) = default;
+  ComZmpModelSystem(ComZmpModelSystem&&) noexcept = delete;
+  ComZmpModelSystem& operator=(const ComZmpModelSystem&) = delete;
+  ComZmpModelSystem& operator=(ComZmpModelSystem&&) noexcept = delete;
 
   // operator()
-  void operator()(const State& x, State& dxdt, const double t);
+  void operator()(const State& x, State& dxdt, const double t) const;
 
   // accessors
   inline DataPtr data_ptr() { return m_data_ptr; }

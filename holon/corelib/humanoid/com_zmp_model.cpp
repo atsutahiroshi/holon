@@ -75,7 +75,7 @@ ComZmpModelSystem::ComZmpModelSystem(ComZmpModelDataPtr t_data_ptr)
       m_zmp_position_f(nullptr) {}
 
 void ComZmpModelSystem::operator()(const State& x, State& dxdt,
-                                   const double t) {
+                                   const double t) const {
   assert(m_com_acceleration_f);
   dxdt[0] = x[1];
   dxdt[1] = m_com_acceleration_f(x[0], x[1], t);
@@ -172,7 +172,7 @@ ComZmpModelSystem::self_ref ComZmpModelSystem::set_zmp_position_f(
 namespace integrator {
 
 template <typename State, typename Time>
-void cat(State state, Time dt, State deriv, State& state_out) {
+void cat(const State& state, Time dt, const State& deriv, State& state_out) {
   auto x = state.begin();
   auto dx = deriv.begin();
   auto x_out = state_out.begin();
@@ -182,7 +182,8 @@ void cat(State state, Time dt, State deriv, State& state_out) {
 }
 
 template <typename System, typename State, typename Time>
-State update(System system, State initial_state, Time t, Time dt) {
+State update(const System& system, const State& initial_state, Time t,
+             Time dt) {
   State k1, k2, k3, k4, x;
   Time dt1, dt2, dt3;
 
@@ -191,13 +192,10 @@ State update(System system, State initial_state, Time t, Time dt) {
   dt3 = dt2 * 2;
 
   system(initial_state, k1, t);
-
   cat(initial_state, dt1, k1, x);
   system(x, k2, t + dt1);
-
   cat(initial_state, dt1, k2, x);
   system(x, k3, t + dt1);
-
   cat(initial_state, dt, k3, x);
   system(x, k4, t + dt);
 
@@ -210,7 +208,8 @@ State update(System system, State initial_state, Time t, Time dt) {
 }
 
 template <typename System, typename State, typename Time>
-State update_euler(System system, State initial_state, Time t, Time dt) {
+State update_euler(const System& system, const State& initial_state, Time t,
+                   Time dt) {
   State x, dx;
   system(initial_state, dx, t);
   cat(x, dt, dx, x);

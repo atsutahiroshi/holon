@@ -43,7 +43,7 @@ void apply_external_force(ComZmpModel* model, double t) {
 }
 
 ComZmpModel::CallbackFunc external_force() {
-  return [](double t, const Vec3D&, const Vec3D&) {
+  return [](const Vec3D&, const Vec3D&, const double t) {
     Vec3D force1 = {1, -1, 0};
     Vec3D force2 = {-1.5, 1.5, 0};
     if (t > 4 && t < 4.1) {

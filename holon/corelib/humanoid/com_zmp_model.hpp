@@ -21,6 +21,7 @@
 #ifndef HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
 #define HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
 
+#include <array>
 #include <functional>
 #include <memory>
 #include <utility>
@@ -60,7 +61,9 @@ class ComZmpModelSystem {
   using Data = ComZmpModelData;
   using DataPtr = ComZmpModelDataPtr;
   using self_ref = ComZmpModelSystem&;
-  using Vec3DPair = std::pair<Vec3D, Vec3D>;
+
+ public:
+  using State = std::array<Vec3D, 2>;
   using Function =
       std::function<Vec3D(const Vec3D&, const Vec3D&, const double)>;
 
@@ -68,17 +71,30 @@ class ComZmpModelSystem {
   explicit ComZmpModelSystem(DataPtr t_data_ptr);
 
   // special member functions
-  virtual ~ComZmpModelSystem() noexcept = default;
-  ComZmpModelSystem(const ComZmpModelSystem&) = delete;
-  ComZmpModelSystem(ComZmpModelSystem&&) noexcept = delete;
-  ComZmpModelSystem& operator=(const ComZmpModelSystem&) = delete;
-  ComZmpModelSystem& operator=(ComZmpModelSystem&&) noexcept = delete;
+  // virtual ~ComZmpModelSystem() noexcept = default;
+  // ComZmpModelSystem(const ComZmpModelSystem&) = delete;
+  // ComZmpModelSystem(ComZmpModelSystem&&) noexcept = delete;
+  // ComZmpModelSystem& operator=(const ComZmpModelSystem&) = delete;
+  // ComZmpModelSystem& operator=(ComZmpModelSystem&&) noexcept = delete;
 
   // operator()
-  void operator()(const Vec3DPair& x, Vec3DPair& dxdt, const double t);
+  void operator()(const State& x, State& dxdt, const double t);
 
   // accessors
   inline DataPtr data_ptr() { return m_data_ptr; }
+  Vec3D com_acceleration(const Vec3D& p, const Vec3D& v, const double t) {
+    return m_com_acceleration_f(p, v, t);
+  }
+  Vec3D reaction_force(const Vec3D& p, const Vec3D& v, const double t) {
+    return m_reaction_force_f(p, v, t);
+  }
+  Vec3D external_force(const Vec3D& p, const Vec3D& v, const double t) {
+    return m_external_force_f(p, v, t);
+  }
+  Vec3D zmp_position(const Vec3D& p, const Vec3D& v, const double t) {
+    return m_zmp_position_f(p, v, t);
+  }
+  inline bool isZmpPositionSet() { return static_cast<bool>(m_zmp_position_f); }
 
   // mutators
   self_ref set_data_ptr(DataPtr t_data_ptr);
@@ -109,7 +125,10 @@ class ComZmpModel {
  public:
   using Data = ComZmpModelData;
   using DataPtr = ComZmpModelDataPtr;
-  using CallbackFunc = std::function<Vec3D(double, const Vec3D&, const Vec3D&)>;
+  using System = ComZmpModelSystem;
+  // using CallbackFunc = std::function<Vec3D(double, const Vec3D&, const
+  // Vec3D&)>;
+  using CallbackFunc = ComZmpModelSystem::Function;
 
   ComZmpModel();
   explicit ComZmpModel(const Vec3D& t_com_position);
@@ -167,29 +186,30 @@ class ComZmpModel {
   DataPtr m_data_ptr;
   Vec3D m_initial_com_position;
   double m_time_step;
+  System m_system;
 
   bool isTimeStepValid(double t_time_step) const;
 
-  CallbackFunc m_external_force_f = nullptr;
-  CallbackFunc m_reaction_force_f = nullptr;
-  CallbackFunc m_zmp_position_f = nullptr;
-  CallbackFunc m_com_acceleration_f = nullptr;
+  // CallbackFunc m_external_force_f = nullptr;
+  // CallbackFunc m_reaction_force_f = nullptr;
+  // CallbackFunc m_zmp_position_f = nullptr;
+  // CallbackFunc m_com_acceleration_f = nullptr;
 
-  CallbackFunc getDefaultExternalForceUpdater();
-  CallbackFunc getDefaultReactionForceUpdater();
-  CallbackFunc getComAccUpdaterViaZmp();
-  CallbackFunc getComAccUpdaterViaForce();
-  CallbackFunc getComAccUpdater();
-  Vec3D updateComAccWithZmp(double t, const Vec3D& p, const Vec3D& v);
-  Vec3D updateComAccWithReactForce(double t, const Vec3D& p, const Vec3D& v);
+  // CallbackFunc getDefaultExternalForceUpdater();
+  // CallbackFunc getDefaultReactionForceUpdater();
+  // CallbackFunc getComAccUpdaterViaZmp();
+  // CallbackFunc getComAccUpdaterViaForce();
+  // CallbackFunc getComAccUpdater();
+  // Vec3D updateComAccWithZmp(double t, const Vec3D& p, const Vec3D& v);
+  // Vec3D updateComAccWithReactForce(double t, const Vec3D& p, const Vec3D& v);
 
-  std::pair<Vec3D, Vec3D> rk4_cat(std::pair<Vec3D, Vec3D> x, double dt,
-                                  std::pair<Vec3D, Vec3D> dx);
-  std::pair<Vec3D, Vec3D> rk4_f(double t, std::pair<Vec3D, Vec3D> x);
-  std::pair<Vec3D, Vec3D> updateRk4(double t, std::pair<Vec3D, Vec3D> x,
-                                    double dt);
-  std::pair<Vec3D, Vec3D> updateEuler(double t, std::pair<Vec3D, Vec3D> x,
-                                      double dt);
+  // std::pair<Vec3D, Vec3D> rk4_cat(std::pair<Vec3D, Vec3D> x, double dt,
+  //                                 std::pair<Vec3D, Vec3D> dx);
+  // std::pair<Vec3D, Vec3D> rk4_f(double t, std::pair<Vec3D, Vec3D> x);
+  // std::pair<Vec3D, Vec3D> updateRk4(double t, std::pair<Vec3D, Vec3D> x,
+  //                                   double dt);
+  // std::pair<Vec3D, Vec3D> updateEuler(double t, std::pair<Vec3D, Vec3D> x,
+  //                                     double dt);
 };
 
 namespace ComZmpModelFormula {

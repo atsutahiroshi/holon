@@ -198,21 +198,22 @@ void ComCtrl::updateCtrlParam() {
 }
 
 ComCtrl::CallbackFunc ComCtrl::getReactionForceUpdater() {
-  return [this](double t, const Vec3D& p, const Vec3D& v) {
-    (void)t;
+  return [this](const Vec3D& p, const Vec3D& v, const double /* t */) {
     double fz;
     fz = computeDesVrtReactForce(inputs().com_position.z(), p.z(), v.z(),
                                  model().mass());
-    m_outputs_ptr->reaction_force = Vec3D(0, 0, fz);
-    return outputs().reaction_force;
+    // m_outputs_ptr->reaction_force = Vec3D(0, 0, fz);
+    // return outputs().reaction_force;
+    return Vec3D(0, 0, fz);
   };
 }
 
 ComCtrl::CallbackFunc ComCtrl::getZmpPositionUpdater() {
-  return [this](double t, const Vec3D& p, const Vec3D& v) {
-    (void)t;
-    double zeta = computeDesZeta(p.z(), inputs().vhp,
-                                 outputs().reaction_force.z(), model().mass());
+  return [this](const Vec3D& p, const Vec3D& v, const double /* t */) {
+    double fz;
+    fz = computeDesVrtReactForce(inputs().com_position.z(), p.z(), v.z(),
+                                 model().mass());
+    double zeta = computeDesZeta(p.z(), inputs().vhp, fz, model().mass());
     double xz, yz;
     std::tie(xz, yz) = computeDesHrzZmpPos(inputs().com_position, p, v, zeta);
     return Vec3D(xz, yz, inputs().vhp);
@@ -244,7 +245,7 @@ bool ComCtrl::update() {
                           states().com_velocity, zeta);
 
   // update states of COM-ZMP model
-  m_model.inputZmpPos(Vec3D(xz, yz, inputs().vhp), fz);
+  // m_model.inputZmpPos(Vec3D(xz, yz, inputs().vhp), fz);
   if (!m_model.update()) return false;
 
   // update outputs of the controller

@@ -202,35 +202,34 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
   ComZmpModelSystem sys(data);
   Vec3D p = {0, 1, 2};
   Vec3D v = {1, -2, -1};
-  std::pair<Vec3D, Vec3D> dxdt;
+  std::array<Vec3D, 2> x{{p, v}};
+  std::array<Vec3D, 2> dxdt;
   double t = 0;
 
   SECTION("When function to compute acceleration is specified, use this") {
     auto a = fuzz.get<Vec3D>();
     auto f_acc = [a](const Vec3D&, const Vec3D&, const double) { return a; };
     sys.set_com_acceleration_f(f_acc);
-    sys(std::make_pair(p, v), dxdt, t);
-    CHECK(dxdt.first == v);
-    CHECK(dxdt.second == a);
+    sys(x, dxdt, t);
+    CHECK(dxdt[0] == v);
+    CHECK(dxdt[1] == a);
   }
 
   SECTION("When function to compute reaction force is specified, use this") {
     auto f = fuzz.get<Vec3D>();
     auto f_force = [f](const Vec3D&, const Vec3D&, const double) { return f; };
     sys.set_reaction_force_f(f_force);
-    sys(std::make_pair(p, v), dxdt, t);
-    CAPTURE(f);
-    CHECK(dxdt.first == v);
-    CHECK(dxdt.second == f - Vec3D(0, 0, G));  // \ddot{p} = \frac{f}{m} - g
+    sys(x, dxdt, t);
+    CHECK(dxdt[0] == v);
+    CHECK(dxdt[1] == f - Vec3D(0, 0, G));  // \ddot{p} = \frac{f}{m} - g
 
     SECTION("External force is also specified, use this as well") {
       auto ef = fuzz.get<Vec3D>();
       auto f_ef = [ef](const Vec3D&, const Vec3D&, const double) { return ef; };
       sys.set_external_force_f(f_ef);
-      sys(std::make_pair(p, v), dxdt, t);
-      CAPTURE(ef);
-      CHECK(dxdt.first == v);
-      CHECK(dxdt.second ==
+      sys(x, dxdt, t);
+      CHECK(dxdt[0] == v);
+      CHECK(dxdt[1] ==
             f + ef - Vec3D(0, 0, G));  // \ddot{p} = \frac{f + f_{e}}{m} - g
     }
   }
@@ -239,10 +238,9 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
     auto ef = fuzz.get<Vec3D>();
     auto f_ef = [ef](const Vec3D&, const Vec3D&, const double) { return ef; };
     sys.set_external_force_f(f_ef);
-    sys(std::make_pair(p, v), dxdt, t);
-    CAPTURE(ef);
-    CHECK(dxdt.first == v);
-    CHECK(dxdt.second == ef);  // \ddot{p} = \frac{mg + f_{e}}{m} - g
+    sys(x, dxdt, t);
+    CHECK(dxdt[0] == v);
+    CHECK(dxdt[1] == ef);  // \ddot{p} = \frac{mg + f_{e}}{m} - g
   }
 
   SECTION("When ZMP position is specified, calculate acceleration from it") {
@@ -253,11 +251,9 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
     auto expected =
         computeComAcc(p, zmp, Vec3D(0, 0, data->mass * G), data->mass);
     sys.set_zmp_position_f(f_zmp);
-    sys(std::make_pair(p, v), dxdt, t);
-    CAPTURE(zmp);
-    CAPTURE(p);
-    CHECK(dxdt.first == v);
-    CHECK(dxdt.second == expected);
+    sys(x, dxdt, t);
+    CHECK(dxdt[0] == v);
+    CHECK(dxdt[1] == expected);
   }
 
   SECTION("When ZMP position and rection force are specified") {
@@ -271,16 +267,16 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
     SECTION("Specify fz first then ZMP") {
       sys.set_reaction_force_f(f_fz);
       sys.set_zmp_position_f(f_zmp);
-      sys(std::make_pair(p, v), dxdt, t);
-      CHECK(dxdt.first == v);
-      CHECK(dxdt.second == expected);
+      sys(x, dxdt, t);
+      CHECK(dxdt[0] == v);
+      CHECK(dxdt[1] == expected);
     }
     SECTION("Specify ZMP first then fz") {
       sys.set_zmp_position_f(f_zmp);
       sys.set_reaction_force_f(f_fz);
-      sys(std::make_pair(p, v), dxdt, t);
-      CHECK(dxdt.first == v);
-      CHECK(dxdt.second == expected);
+      sys(x, dxdt, t);
+      CHECK(dxdt[0] == v);
+      CHECK(dxdt[1] == expected);
     }
   }
 
@@ -298,25 +294,25 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
       sys.set_reaction_force_f(f_fz);
       sys.set_zmp_position_f(f_zmp);
       sys.set_external_force_f(f_ef);
-      sys(std::make_pair(p, v), dxdt, t);
-      CHECK(dxdt.first == v);
-      CHECK(dxdt.second == expected);
+      sys(x, dxdt, t);
+      CHECK(dxdt[0] == v);
+      CHECK(dxdt[1] == expected);
     }
     SECTION("Specify them in the following order: ZMP, fz, ef") {
       sys.set_zmp_position_f(f_zmp);
       sys.set_reaction_force_f(f_fz);
       sys.set_external_force_f(f_ef);
-      sys(std::make_pair(p, v), dxdt, t);
-      CHECK(dxdt.first == v);
-      CHECK(dxdt.second == expected);
+      sys(x, dxdt, t);
+      CHECK(dxdt[0] == v);
+      CHECK(dxdt[1] == expected);
     }
     SECTION("Specify them in the following order: fz, ef, ZMP") {
       sys.set_reaction_force_f(f_fz);
       sys.set_external_force_f(f_ef);
       sys.set_zmp_position_f(f_zmp);
-      sys(std::make_pair(p, v), dxdt, t);
-      CHECK(dxdt.first == v);
-      CHECK(dxdt.second == expected);
+      sys(x, dxdt, t);
+      CHECK(dxdt[0] == v);
+      CHECK(dxdt[1] == expected);
     }
   }
 
@@ -332,10 +328,20 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
         computeComAcc(p, zmp, Vec3D(0, 0, data->mass * G), data->mass, ef);
     sys.set_zmp_position_f(f_zmp);
     sys.set_external_force_f(f_ef);
-    sys(std::make_pair(p, v), dxdt, t);
-    CHECK(dxdt.first == v);
-    CHECK(dxdt.second == expected);
+    sys(x, dxdt, t);
+    CHECK(dxdt[0] == v);
+    CHECK(dxdt[1] == expected);
   }
+}
+
+TEST_CASE("ComZmpModelSystem::isZmpPositionSet() returns if it is set",
+          "[corelib][humanoid][ComZmpModelSystem]") {
+  auto data = createComZmpModelData();
+  ComZmpModelSystem sys(data);
+  CHECK_FALSE(sys.isZmpPositionSet());
+  sys.set_zmp_position_f(
+      [](const Vec3D&, const Vec3D&, const double) { return kVec3DZero; });
+  CHECK(sys.isZmpPositionSet());
 }
 
 // ComZmpModel class

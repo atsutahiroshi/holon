@@ -151,9 +151,6 @@ class ComZmpModel {
 
   // mutators
   self_ref set_data_ptr(DataPtr t_data_ptr);
-  // depricated
-  self_ref set_external_force(const Vec3D& t_external_force);
-  self_ref clear_external_force() { return set_external_force(kVec3DZero); }
   self_ref set_time_step(double t_time_step);
   self_ref set_initial_com_position(const Vec3D& t_initial_com_position);
   self_ref reset(const Vec3D& t_com_position);
@@ -161,13 +158,6 @@ class ComZmpModel {
   // copy data
   void copy_data(const ComZmpModel& t_model);
   void copy_data(const Data& t_data);
-
-  // update functions
-  // depricated
-  void inputZmpPos(const Vec3D& t_zmp_position,
-                   optional<double> t_reaction_force_z = nullopt);
-  void inputReactForce(const Vec3D& t_reaction_force);
-  void inputComAcc(const Vec3D& t_com_acceleration);
 
   // callback functions
   self_ref setExternalForceCallback(CallbackFunc t_f);

@@ -249,12 +249,6 @@ ComZmpModel::self_ref ComZmpModel::set_data_ptr(DataPtr t_data_ptr) {
   return *this;
 }
 
-ComZmpModel::self_ref ComZmpModel::set_external_force(
-    const Vec3D& t_external_force) {
-  m_data_ptr->external_force = t_external_force;
-  return *this;
-}
-
 ComZmpModel::self_ref ComZmpModel::set_time_step(double t_time_step) {
   if (!isTimeStepValid(t_time_step)) {
     m_time_step = default_time_step;
@@ -282,18 +276,6 @@ void ComZmpModel::copy_data(const ComZmpModel& t_model) {
 }
 
 void ComZmpModel::copy_data(const Data& t_data) { *m_data_ptr = t_data; }
-
-void ComZmpModel::inputZmpPos(const Vec3D& t_zmp_position,
-                              optional<double> t_reaction_force_z) {
-  double fz = t_reaction_force_z.value_or(mass() * RK_G);
-  m_data_ptr->zmp_position = t_zmp_position;
-  inputReactForce(
-      computeReactForce(data().com_position, data().zmp_position, fz));
-}
-
-void ComZmpModel::inputReactForce(const Vec3D& t_reaction_force) {
-  m_data_ptr->reaction_force = t_reaction_force;
-}
 
 ComZmpModel::self_ref ComZmpModel::setExternalForceCallback(CallbackFunc t_f) {
   m_system.set_external_force_f(t_f);

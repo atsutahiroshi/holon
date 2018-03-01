@@ -443,18 +443,6 @@ TEST_CASE("ComZmpModel: accessor/mutator of time step",
   }
 }
 
-TEST_CASE("ComZmpModel::set_external_force() set external force",
-          "[corelib][humanoid][ComZmpModel]") {
-  ComZmpModel model;
-  Fuzzer fuzz;
-  Vec3D v = fuzz.get<Vec3D>();
-  model.set_external_force(v);
-  CHECK(model.data().external_force == v);
-
-  model.clear_external_force();
-  CHECK(model.data().external_force == kVec3DZero);
-}
-
 TEST_CASE("ComZmpModel::mass() returns mass value",
           "[corelib][humanoid][ComZmpModel]") {
   SECTION("case 1") {
@@ -1282,31 +1270,6 @@ TEST_CASE("modify step time after calling update with double type",
   model.update();
   CHECK(model.time_step() == dt2);
 }
-
-#if 0
-TEST_CASE("ComZmpModel::inputZmpPos computes reaction force from ZMP position",
-          "[corelib][humanoid][ComZmpModel]") {
-  ComZmpModel model;
-  SECTION("COM height assumed to be constant") {
-    Vec3D pz = {1, -1, 0};
-    Vec3D expected_f =
-        computeReactForce(model.data().com_position, pz, G);
-    // model.inputZmpPos(pz);
-    model.setZmpPos(pz);
-    CHECK(model.data().reaction_force == expected_f);
-  }
-  SECTION("COM moves along vertical direction as well") {
-    Vec3D pz = {-0.5, 1.2, -0.1};
-    double fz = 10;
-    Vec3D expected_f =
-        computeReactForce(model.data().com_position, pz, fz);
-    // model.inputZmpPos(pz, fz);
-    model.setZmpPos(pz, fz);
-    CHECK(model.data().zmp_position == pz);
-    CHECK(model.data().reaction_force == expected_f);
-  }
-}
-#endif
 
 TEST_CASE("ComZmpModel::update computes COM acceleration",
           "[corelib][humanoid][ComZmpModel]") {

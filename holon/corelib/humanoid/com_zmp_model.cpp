@@ -178,12 +178,17 @@ ComZmpModel::self_ref ComZmpModel::setFixedZmpPosition(
   return *this;
 }
 
+ComZmpModel::self_ref ComZmpModel::setFixedReactionForce(
+    const Vec3D& t_reaction_force) {
+  m_system.set_reaction_force_f([t_reaction_force](
+      const Vec3D&, const Vec3D&, const double) { return t_reaction_force; });
+  return *this;
+}
+
 ComZmpModel::self_ref ComZmpModel::setFixedExternalForce(
     const Vec3D& t_external_force) {
-  auto ef_f = [t_external_force](const Vec3D&, const Vec3D&, const double) {
-    return t_external_force;
-  };
-  m_system.set_external_force_f(ef_f);
+  m_system.set_external_force_f([t_external_force](
+      const Vec3D&, const Vec3D&, const double) { return t_external_force; });
   return *this;
 }
 

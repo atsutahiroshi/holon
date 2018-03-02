@@ -79,6 +79,7 @@ class ComZmpModel {
 
   self_ref setFixedZmpPosition(const Vec3D& t_zmp_position,
                                optional<double> t_reaction_force_z = nullopt);
+  self_ref setFixedReactionForce(const Vec3D& t_reaction_force);
   self_ref setFixedExternalForce(const Vec3D& t_external_force);
 
   bool update();

@@ -277,6 +277,18 @@ TEST_CASE("ComZmpModel::setFixedZmpPosition sets fixed ZMP position",
   }
 }
 
+TEST_CASE("ComZmpModel::setFixedReactionForce sets reaction force",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+  Fuzzer fuzz;
+  auto p = fuzz.get<Vec3D>();
+  auto v = fuzz.get<Vec3D>();
+  auto t = fuzz();
+  auto f = fuzz.get<Vec3D>();
+  model.setFixedReactionForce(f);
+  CHECK(model.system().reaction_force(p, v, t) == f);
+}
+
 TEST_CASE("ComZmpModel::setFixedExternalForce sets external force",
           "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;

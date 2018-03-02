@@ -21,8 +21,6 @@
 #ifndef HOLON_HUMANOID_COM_CTRL_HPP_
 #define HOLON_HUMANOID_COM_CTRL_HPP_
 
-#include <memory>
-#include <tuple>
 #include "holon/corelib/common/optional.hpp"
 #include "holon/corelib/humanoid/com_ctrl_x.hpp"
 #include "holon/corelib/humanoid/com_ctrl_y.hpp"

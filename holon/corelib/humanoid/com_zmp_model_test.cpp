@@ -256,6 +256,39 @@ TEST_CASE("ComZmpModel::copy_data should copy data from argument",
   }
 }
 
+TEST_CASE("ComZmpModel::setFixedZmpPosition sets fixed ZMP position",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+  Fuzzer fuzz;
+  auto p = fuzz.get<Vec3D>();
+  auto v = fuzz.get<Vec3D>();
+  auto t = fuzz();
+  SECTION("set ZMP only") {
+    auto pz = fuzz.get<Vec3D>();
+    model.setFixedZmpPosition(pz);
+    CHECK(model.system().zmp_position(p, v, t) == pz);
+  }
+  SECTION("ZMP and fz") {
+    auto pz = fuzz.get<Vec3D>();
+    auto fz = fuzz();
+    model.setFixedZmpPosition(pz, fz);
+    CHECK(model.system().zmp_position(p, v, t) == pz);
+    CHECK(model.system().reaction_force(p, v, t) == Vec3D(0, 0, fz));
+  }
+}
+
+TEST_CASE("ComZmpModel::setFixedExternalForce sets external force",
+          "[corelib][humanoid][ComZmpModel]") {
+  ComZmpModel model;
+  Fuzzer fuzz;
+  auto p = fuzz.get<Vec3D>();
+  auto v = fuzz.get<Vec3D>();
+  auto t = fuzz();
+  auto fe = fuzz.get<Vec3D>();
+  model.setFixedExternalForce(fe);
+  CHECK(model.system().external_force(p, v, t) == fe);
+}
+
 TEST_CASE("ComZmpModel::update counts time",
           "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;

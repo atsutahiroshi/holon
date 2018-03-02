@@ -49,18 +49,19 @@ void ComZmpModelSystem::operator()(const State& x, State& dxdt,
   dxdt[1] = m_com_acceleration_f(x[0], x[1], t);
 }
 
-ComZmpModelSystem::Function ComZmpModelSystem::getDefaultComAccFunc() {
+ComZmpModelSystem::Function ComZmpModelSystem::getDefaultComAccFunc() const {
   return
       [this](const Vec3D&, const Vec3D&, const double) { return kVec3DZero; };
 }
 
-ComZmpModelSystem::Function ComZmpModelSystem::getComAccFuncWithReactForce() {
+ComZmpModelSystem::Function ComZmpModelSystem::getComAccFuncWithReactForce()
+    const {
   return [this](const Vec3D& p, const Vec3D& v, const double t) {
     return computeComAcc(m_reaction_force_f(p, v, t), m_data_ptr->mass,
                          m_external_force_f(p, v, t));
   };
 }
-ComZmpModelSystem::Function ComZmpModelSystem::getComAccFuncWithZmpPos() {
+ComZmpModelSystem::Function ComZmpModelSystem::getComAccFuncWithZmpPos() const {
   return [this](const Vec3D& p, const Vec3D& v, const double t) {
     return computeComAcc(p, m_zmp_position_f(p, v, t),
                          m_reaction_force_f(p, v, t), m_data_ptr->mass,
@@ -68,18 +69,19 @@ ComZmpModelSystem::Function ComZmpModelSystem::getComAccFuncWithZmpPos() {
   };
 }
 
-ComZmpModelSystem::Function ComZmpModelSystem::getDefaultReactForceFunc() {
+ComZmpModelSystem::Function ComZmpModelSystem::getDefaultReactForceFunc()
+    const {
   return [this](const Vec3D&, const Vec3D&, const double) {
     return Vec3D(0, 0, m_data_ptr->mass * RK_G);
   };
 }
 
-ComZmpModelSystem::Function ComZmpModelSystem::getDefaultExtForceFunc() {
+ComZmpModelSystem::Function ComZmpModelSystem::getDefaultExtForceFunc() const {
   return
       [this](const Vec3D&, const Vec3D&, const double) { return kVec3DZero; };
 }
 
-ComZmpModelSystem::Function ComZmpModelSystem::getDefaultZmpPosFunc() {
+ComZmpModelSystem::Function ComZmpModelSystem::getDefaultZmpPosFunc() const {
   return nullptr;
 }
 

@@ -49,20 +49,26 @@ class ComZmpModelSystem {
   void operator()(const State& x, State& dxdt, const double t) const;
 
   // accessors
-  inline DataPtr data_ptr() { return m_data_ptr; }
-  Vec3D com_acceleration(const Vec3D& p, const Vec3D& v, const double t) {
+  inline DataPtr data_ptr() const { return m_data_ptr; }
+  inline Vec3D com_acceleration(const Vec3D& p, const Vec3D& v,
+                                const double t) const {
     return m_com_acceleration_f(p, v, t);
   }
-  Vec3D reaction_force(const Vec3D& p, const Vec3D& v, const double t) {
+  inline Vec3D reaction_force(const Vec3D& p, const Vec3D& v,
+                              const double t) const {
     return m_reaction_force_f(p, v, t);
   }
-  Vec3D external_force(const Vec3D& p, const Vec3D& v, const double t) {
+  inline Vec3D external_force(const Vec3D& p, const Vec3D& v,
+                              const double t) const {
     return m_external_force_f(p, v, t);
   }
-  Vec3D zmp_position(const Vec3D& p, const Vec3D& v, const double t) {
+  inline Vec3D zmp_position(const Vec3D& p, const Vec3D& v,
+                            const double t) const {
     return m_zmp_position_f(p, v, t);
   }
-  inline bool isZmpPositionSet() { return static_cast<bool>(m_zmp_position_f); }
+  inline bool isZmpPositionSet() const {
+    return static_cast<bool>(m_zmp_position_f);
+  }
 
   // mutators
   self_ref set_data_ptr(DataPtr t_data_ptr);
@@ -71,12 +77,12 @@ class ComZmpModelSystem {
   self_ref set_external_force_f(Function t_external_force_f);
   self_ref set_zmp_position_f(Function t_zmp_position_f);
 
-  Function getDefaultComAccFunc();
-  Function getComAccFuncWithReactForce();
-  Function getComAccFuncWithZmpPos();
-  Function getDefaultReactForceFunc();
-  Function getDefaultExtForceFunc();
-  Function getDefaultZmpPosFunc();
+  Function getDefaultComAccFunc() const;
+  Function getComAccFuncWithReactForce() const;
+  Function getComAccFuncWithZmpPos() const;
+  Function getDefaultReactForceFunc() const;
+  Function getDefaultExtForceFunc() const;
+  Function getDefaultZmpPosFunc() const;
 
  private:
   DataPtr m_data_ptr;

@@ -29,6 +29,8 @@ using ComZmpModelFormula::computeSqrZeta;
 using ComZmpModelFormula::computeZeta;
 using ComZmpModelFormula::computeReactForce;
 using ComZmpModelFormula::isMassValid;
+using ComZmpModelFormula::isComZmpDiffValid;
+using ComZmpModelFormula::isReactionForceValid;
 
 namespace integrator {
 
@@ -208,20 +210,24 @@ ComZmpModel::self_ref ComZmpModel::removeExternalForce() {
   return *this;
 }
 
-bool ComZmpModel::update() {
-  auto p = data().com_position;
-  auto v = data().com_velocity;
+bool ComZmpModel::isUpdatable(const Vec3D& p, const Vec3D& v) {
+  if (!isMassValid(data().mass)) return false;
   if (m_system.isZmpPositionSet()) {
-    auto zmp = m_system.zmp_position(p, v, time());
+    auto pz = m_system.zmp_position(p, v, time());
+    if (!isComZmpDiffValid(p, pz)) return false;
+  } else {
     auto f = m_system.reaction_force(p, v, time());
-    auto zeta2 = computeSqrZeta(p, zmp, f, data().mass);
-    if (zIsTiny(zeta2)) return false;
+    if (!isReactionForceValid(f)) return false;
   }
+  return true;
+}
+
+void ComZmpModel::updateData(const Vec3D& p, const Vec3D& v) {
   std::array<Vec3D, 2> state{{p, v}};
-  auto ret = integrator::update(m_system, state, time(), time_step());
-  // auto ret = integrator::update_euler(m_system, state, time(), time_step());
-  m_data_ptr->com_position = ret[0];
-  m_data_ptr->com_velocity = ret[1];
+  state = integrator::update(m_system, state, time(), time_step());
+  // state = integrator::update_euler(m_system, state, time(), time_step());
+  m_data_ptr->com_position = state[0];
+  m_data_ptr->com_velocity = state[1];
   m_data_ptr->com_acceleration = m_system.com_acceleration(p, v, time());
   if (m_system.isZmpPositionSet()) {
     m_data_ptr->zmp_position = m_system.zmp_position(p, v, time());
@@ -232,6 +238,13 @@ bool ComZmpModel::update() {
   }
   m_data_ptr->external_force = m_system.external_force(p, v, time());
   m_data_ptr->total_force = data().reaction_force + data().external_force;
+}
+
+bool ComZmpModel::update() {
+  auto p = data().com_position;
+  auto v = data().com_velocity;
+  if (!isUpdatable(p, v)) return false;
+  updateData(p, v);
   m_time += time_step();
   return true;
 }

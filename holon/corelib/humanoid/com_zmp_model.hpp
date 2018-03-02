@@ -96,6 +96,8 @@ class ComZmpModel {
   System m_system;
 
   bool isTimeStepValid(double t_time_step) const;
+  bool isUpdatable(const Vec3D& p, const Vec3D& v);
+  void updateData(const Vec3D& p, const Vec3D& v);
 };
 
 }  // namespace holon

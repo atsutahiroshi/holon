@@ -49,11 +49,8 @@ BENCHMARK_F(ComCtrlBenchmark, GetQ1, 100, 1000) {
 BENCHMARK_F(ComCtrlBenchmark, SetQ1, 100, 1000) { ctrl.x().set_q1(1); }
 
 BENCHMARK_F(ComCtrlBenchmark, computeDesZmpPos, 100, 1000) {
-  double desired_zeta =
-      ComZmpModelFormula::computeZeta(ref_com_pos, kVec3DZero, kVec3DZero);
-  auto desired_zmp_pos =
-      ctrl.computeDesHrzZmpPos(ref_com_pos, com_pos, com_vel, desired_zeta);
-  (void)desired_zmp_pos;
+  ctrl.inputs_ptr()->com_position = ref_com_pos;
+  auto desired_zmp_pos = ctrl.computeDesZmpPos(com_pos, com_vel, 0);
 }
 
 }  // namespace

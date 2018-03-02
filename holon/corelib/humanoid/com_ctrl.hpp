@@ -134,16 +134,6 @@ class ComCtrl {
   //
   inline CommandsPtr getCommands() const noexcept { return m_commands_ptr; }
 
-  // computing functions
-  double computeDesVrtReactForce(double t_zd, double t_z, double t_vz,
-                                 double t_mass) const;
-  double computeDesZeta(double t_z, double t_zz, double t_fz,
-                        double t_mass) const;
-  HrzPos computeDesHrzZmpPos(const Vec3D& t_ref_com_position,
-                             const Vec3D& t_com_position,
-                             const Vec3D& t_com_velocity,
-                             double t_desired_zeta) const;
-
   // update functions
   void feedback(const Model& t_model);
   void feedback(const Model::DataPtr& t_data_ptr);
@@ -152,9 +142,6 @@ class ComCtrl {
   bool update(double t_time_step);
 
   using CallbackFunc = ComZmpModel::CallbackFunc;
-  CallbackFunc getReactionForceUpdater();
-  CallbackFunc getZmpPositionUpdater();
-
   Vec3D computeDesReactForce(const Vec3D& t_com_position,
                              const Vec3D& t_com_velocity, const double t);
   Vec3D computeDesZmpPos(const Vec3D& t_com_position,

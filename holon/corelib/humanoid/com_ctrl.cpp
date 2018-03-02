@@ -86,8 +86,8 @@ ComCtrl::ComCtrl()
       m_outputs_ptr(ComCtrlOutputsFactory()),
       m_commands_ptr(ComCtrlCommandsFactory()),
       m_canonical_foot_dist(m_y.dist()) {
-  m_model.setReactionForceCallback(getReactionForceUpdater());
-  m_model.setZmpPositionCallback(getZmpPositionUpdater());
+  m_model.setReactionForceCallback(getReactionForceCallback());
+  m_model.setZmpPositionCallback(getZmpPositionCallback());
 }
 
 ComCtrl::ComCtrl(const Model& t_model) : ComCtrl() {
@@ -131,27 +131,6 @@ ComCtrl& ComCtrl::reset(const Vec3D& t_com_position, double t_foot_dist) {
   return reset(t_com_position);
 }
 
-double ComCtrl::computeDesVrtReactForce(double t_zd, double t_z, double t_vz,
-                                        double t_mass) const {
-  return m_z.computeDesReactForce(t_zd, t_z, t_vz, t_mass);
-}
-
-double ComCtrl::computeDesZeta(double t_z, double t_zz, double t_fz,
-                               double t_mass) const {
-  return ComZmpModelFormula::computeZeta(t_z, t_zz, t_fz, t_mass);
-}
-
-ComCtrl::HrzPos ComCtrl::computeDesHrzZmpPos(const Vec3D& t_ref_com_position,
-                                             const Vec3D& t_com_position,
-                                             const Vec3D& t_com_velocity,
-                                             double t_desired_zeta) const {
-  double xz = m_x.computeDesZmpPos(t_ref_com_position, t_com_position,
-                                   t_com_velocity, t_desired_zeta);
-  double yz = m_y.computeDesZmpPos(t_ref_com_position, t_com_position,
-                                   t_com_velocity, t_desired_zeta);
-  return std::make_tuple(xz, yz);
-}
-
 void ComCtrl::feedback(const Model& t_model) { feedback(t_model.data_ptr()); }
 
 void ComCtrl::feedback(const Model::DataPtr& t_data_ptr) {
@@ -162,29 +141,6 @@ void ComCtrl::feedback(const Vec3D& t_com_position,
                        const Vec3D& t_com_velocity) {
   m_states_ptr->com_position = t_com_position;
   m_states_ptr->com_velocity = t_com_velocity;
-}
-
-ComCtrl::CallbackFunc ComCtrl::getReactionForceUpdater() {
-  return [this](const Vec3D& p, const Vec3D& v, const double /* t */) {
-    double fz;
-    fz = computeDesVrtReactForce(inputs().com_position.z(), p.z(), v.z(),
-                                 model().mass());
-    // m_outputs_ptr->reaction_force = Vec3D(0, 0, fz);
-    // return outputs().reaction_force;
-    return Vec3D(0, 0, fz);
-  };
-}
-
-ComCtrl::CallbackFunc ComCtrl::getZmpPositionUpdater() {
-  return [this](const Vec3D& p, const Vec3D& v, const double /* t */) {
-    double fz;
-    fz = computeDesVrtReactForce(inputs().com_position.z(), p.z(), v.z(),
-                                 model().mass());
-    double zeta = computeDesZeta(p.z(), inputs().vhp, fz, model().mass());
-    double xz, yz;
-    std::tie(xz, yz) = computeDesHrzZmpPos(inputs().com_position, p, v, zeta);
-    return Vec3D(xz, yz, inputs().vhp);
-  };
 }
 
 Vec3D ComCtrl::computeDesReactForce(const Vec3D& t_com_position,

@@ -155,6 +155,13 @@ class ComCtrl {
   CallbackFunc getReactionForceUpdater();
   CallbackFunc getZmpPositionUpdater();
 
+  Vec3D computeDesReactForce(const Vec3D& t_com_position,
+                             const Vec3D& t_com_velocity, const double t);
+  Vec3D computeDesZmpPos(const Vec3D& t_com_position,
+                         const Vec3D& t_com_velocity, const double t);
+  CallbackFunc getReactionForceCallback();
+  CallbackFunc getZmpPositionCallback();
+
  private:
   ComCtrlX m_x;
   ComCtrlY m_y;

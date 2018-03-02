@@ -217,6 +217,7 @@ TEST_CASE("ComCtrl::getCommands() provides a pointer to user commands",
   CHECK(cmd->xd.value() == 0.42);
   CHECK(cmd->xd.value_or(0.0) == 0.42);
 }
+
 SCENARIO("ComCtrl::computeDesHrzZmpPos computes desired ZMP position ",
          "[corelib][humanoid][ComCtrl]") {
   GIVEN("qx1 = 1.0, qx2 = 1.0, qy1 = 1.0, qy2 = 1.0, ref_com_pos = (0, 0, G)") {
@@ -880,6 +881,168 @@ SCENARIO("Controller makes COM oscillate sideward",
         CAPTURE(yzmin);
         CHECK((yzmax - yzmin) == Approx(dist));
         // FAIL(yzmax - yzmin);
+      }
+    }
+  }
+}
+
+SCENARIO("ComCtrl::computeDesZmpPos computes desired ZMP position",
+         "[corelib][humanoid][ComCtrl]") {
+  double t = 0;
+  GIVEN("qx1 = 1.0, qx2 = 1.0, qy1 = 1.0, qy2 = 1.0, ref_com_pos = (0, 0, G)") {
+    ComCtrl ctrl;
+    Vec3D pd = {0, 0, G};
+    ctrl.inputs_ptr()->com_position = pd;
+
+    // REQUIRE(desired_zeta == Approx(1.0));
+    REQUIRE(ctrl.x().q1() == 1);
+    REQUIRE(ctrl.x().q2() == 1);
+    REQUIRE(ctrl.y().q1() == 1);
+    REQUIRE(ctrl.y().q2() == 1);
+
+    WHEN("p = (0, 0, G), v = (0, 0, 0)") {
+      Vec3D p = {0, 0, G};
+      Vec3D v = {0, 0, 0};
+
+      THEN("desired_pz = (0, 0, 0)") {
+        Vec3D expected_pz = {0, 0, 0};
+        CHECK(ctrl.computeDesZmpPos(p, v, t) == expected_pz);
+      }
+    }
+    WHEN("p = (1, 3, G), v = (0, -1, 0)") {
+      Vec3D p = {1, 3, G};
+      Vec3D v = {0, -1, 0};
+
+      THEN("desired_pz = (2, 4, 0)") {
+        Vec3D expected_pz = {2, 4, 0};
+        CHECK(ctrl.computeDesZmpPos(p, v, t) == expected_pz);
+      }
+    }
+    WHEN("p = (0, -2, G), v = (-2, 2, 0)") {
+      Vec3D p = {0, -2, G};
+      Vec3D v = {-2, 2, 0};
+
+      THEN("desired_pz = (-4, 0, 0)") {
+        Vec3D expected_pz = {-4, 0, 0};
+        CHECK(ctrl.computeDesZmpPos(p, v, t) == expected_pz);
+      }
+    }
+  }
+
+  GIVEN("qx1 = 1, qx2 = 0.5, qy1 = 1.2, qy2 = 0.8, pd = (0, 0, G)") {
+    ComCtrl ctrl;
+    Vec3D pd = {0, 0, G};
+    ctrl.inputs_ptr()->com_position = pd;
+    ctrl.x().set_q1(1.0).set_q2(0.5);
+    ctrl.y().set_q1(1.2).set_q2(0.8);
+
+    REQUIRE(ctrl.x().q1() == 1.0);
+    REQUIRE(ctrl.x().q2() == 0.5);
+    REQUIRE(ctrl.y().q1() == 1.2);
+    REQUIRE(ctrl.y().q2() == 0.8);
+
+    WHEN("p = (1, 1, G), v = (0, 0, 0)") {
+      Vec3D p = {1, 1, G};
+      Vec3D v = {0, 0, 0};
+
+      THEN("desired_pz = (1.5, 1.96, 0)") {
+        Vec3D expected_pz = {1.5, 1.96, 0};
+        CHECK(ctrl.computeDesZmpPos(p, v, t) == expected_pz);
+      }
+    }
+    WHEN("p = (-2, 3, G), v = (2, -1, 0)") {
+      Vec3D p = {-2, 3, G};
+      Vec3D v = {2, -1, 0};
+
+      THEN("desired_pz = (0, 3.88, 0)") {
+        Vec3D expected_pz = {0, 3.88, 0};
+        CHECK(ctrl.computeDesZmpPos(p, v, t) == expected_pz);
+      }
+    }
+  }
+  GIVEN(
+      "qx1 = 1.0, qx2 = 1.5, qy1 = 1.0, qy2 = 1.0, "
+      "pd = (1, 0.5, G)") {
+    ComCtrl ctrl;
+    Vec3D pd = {1, 0.5, G};
+    ctrl.inputs_ptr()->com_position = pd;
+    ctrl.x().set_q2(1.5);
+
+    REQUIRE(ctrl.x().q1() == 1);
+    REQUIRE(ctrl.x().q2() == 1.5);
+    REQUIRE(ctrl.y().q1() == 1);
+    REQUIRE(ctrl.y().q2() == 1);
+
+    WHEN("p = (1, 0, G), v = (0, 0, 0)") {
+      Vec3D p = {1, 0, G};
+      Vec3D v = {0, 0, 0};
+
+      THEN("desired_pz = (1, -0.5, 0)") {
+        Vec3D expected_pz = {1, -0.5, 0};
+        CHECK(ctrl.computeDesZmpPos(p, v, t) == expected_pz);
+      }
+    }
+    WHEN("p = (0, 3, G), v = (-2, -1, 0)") {
+      Vec3D p = {0, 3, G};
+      Vec3D v = {-2, -1, 0};
+
+      THEN("desired_pz = (-6.5, 3.5, 0)") {
+        Vec3D expected_pz = {-6.5, 3.5, 0};
+        CHECK(ctrl.computeDesZmpPos(p, v, t) == expected_pz);
+      }
+    }
+    WHEN("p = (-2, 0, G), v = (3, -2, 0)") {
+      Vec3D p = {-2, 0, G};
+      Vec3D v = {3, -2, 0};
+
+      THEN("desired_pz = (1, -4.5, 0)") {
+        Vec3D expected_pz = {1, -4.5, 0};
+        CHECK(ctrl.computeDesZmpPos(p, v, t) == expected_pz);
+      }
+    }
+  }
+
+  GIVEN(
+      "qx1 = 1.0, qx2 = 1.5, qy1 = 1.0, qy2 = 1.5, "
+      "pd = (0, 0.5, 0.5*G)") {
+    ComCtrl ctrl;
+    Vec3D pd = {0, 0.5, 0.5 * G};
+    ctrl.inputs_ptr()->com_position = pd;
+    ctrl.x().set_q2(1.5);
+    ctrl.y().set_q2(1.5);
+
+    REQUIRE(ctrl.x().q1() == 1);
+    REQUIRE(ctrl.x().q2() == 1.5);
+    REQUIRE(ctrl.y().q1() == 1);
+    REQUIRE(ctrl.y().q2() == 1.5);
+
+    WHEN("p = (0, 0, 0.5*G), v = (0, 0, 0)") {
+      Vec3D p = {0, 0, 0.5 * G};
+      Vec3D v = {0, 0, 0};
+
+      THEN("desired_pz = (0, -0.75, 0)") {
+        Vec3D expected_pz = {0, -0.75, 0};
+        CHECK(ctrl.computeDesZmpPos(p, v, t) == expected_pz);
+      }
+    }
+
+    WHEN("p = (1, 3, 0.5*G), v = (0, -2, 0)") {
+      Vec3D p = {1, 3, 0.5 * G};
+      Vec3D v = {0, -2, 0};
+
+      THEN("desired_pz = (2.5, 2.5*(3-sqrt(2))-0.75, 0)") {
+        Vec3D expected_pz = {2.5, 2.5 * (3 - sqrt(2)) - 0.75, 0};
+        CHECK(ctrl.computeDesZmpPos(p, v, t) == expected_pz);
+      }
+    }
+    WHEN("p = (-2, 0, 0.5*G), v = (3, -1, 0)") {
+      Vec3D p = {-2, 0, 0.5 * G};
+      Vec3D v = {3, -1, 0};
+
+      THEN("desired_pz = (2.5*(-2+1.5*sqrt(2)), -1.25*sqrt(2)-0.75, 0)") {
+        Vec3D expected_pz = {2.5 * (-2 + 1.5 * sqrt(2)), -1.25 * sqrt(2) - 0.75,
+                             0};
+        CHECK(ctrl.computeDesZmpPos(p, v, t) == expected_pz);
       }
     }
   }

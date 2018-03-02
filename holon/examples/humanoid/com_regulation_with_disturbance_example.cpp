@@ -49,7 +49,6 @@ int main() {
   auto cmd = ctrl.getCommands();
   Vec3D cmd_com_pos = {0, 0, 1};
 
-  model.setZmpPositionCallback(ctrl.getZmpPositionCallback());
   model.setExternalForceCallback(external_force);
 
   while (model.time() < T) {
@@ -61,6 +60,7 @@ int main() {
     ctrl.update(DT);
 
     // update simulator
+    model.setZmpPosition(ctrl.outputs().zmp_position);
     model.update(DT);
 
     // logging

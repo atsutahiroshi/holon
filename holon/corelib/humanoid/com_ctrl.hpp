@@ -65,7 +65,6 @@ struct ComCtrlOutputs {
   Vec3D com_acceleration;
   Vec3D zmp_position;
   Vec3D reaction_force;
-  double zeta;
 };
 
 std::shared_ptr<ComCtrlCommands> ComCtrlCommandsFactory();
@@ -167,8 +166,9 @@ class ComCtrl {
   CommandsPtr m_commands_ptr;
   double m_canonical_foot_dist;
 
-  void updateCtrlParam();
   void remapCommandsToInputs();
+  void updateCtrlParam();
+  void updateOutputs();
 };
 
 }  // namespace holon

@@ -507,7 +507,6 @@ TEST_CASE("check if desired ZMP position is modified after update",
 
     cmd->set_com_position(c.cmd_com_pos);
     ctrl.update();
-    CHECK(ctrl.outputs().zeta == expected_des_zeta);
     CHECK(ctrl.outputs().zmp_position.x() == Approx(expected_xz));
     CHECK(ctrl.outputs().zmp_position.y() == Approx(expected_yz));
   }

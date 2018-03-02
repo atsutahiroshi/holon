@@ -256,7 +256,7 @@ TEST_CASE("ComZmpModel::copy_data should copy data from argument",
   }
 }
 
-TEST_CASE("ComZmpModel::setFixedZmpPosition sets fixed ZMP position",
+TEST_CASE("ComZmpModel::setZmpPosition sets fixed ZMP position",
           "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;
   Fuzzer fuzz;
@@ -265,19 +265,19 @@ TEST_CASE("ComZmpModel::setFixedZmpPosition sets fixed ZMP position",
   auto t = fuzz();
   SECTION("set ZMP only") {
     auto pz = fuzz.get<Vec3D>();
-    model.setFixedZmpPosition(pz);
+    model.setZmpPosition(pz);
     CHECK(model.system().zmp_position(p, v, t) == pz);
   }
   SECTION("ZMP and fz") {
     auto pz = fuzz.get<Vec3D>();
     auto fz = fuzz();
-    model.setFixedZmpPosition(pz, fz);
+    model.setZmpPosition(pz, fz);
     CHECK(model.system().zmp_position(p, v, t) == pz);
     CHECK(model.system().reaction_force(p, v, t) == Vec3D(0, 0, fz));
   }
 }
 
-TEST_CASE("ComZmpModel::removeFixedZmpPosition removes ZMP position",
+TEST_CASE("ComZmpModel::removeZmpPosition removes ZMP position",
           "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;
   Fuzzer fuzz;
@@ -286,24 +286,24 @@ TEST_CASE("ComZmpModel::removeFixedZmpPosition removes ZMP position",
   auto t = fuzz();
   SECTION("set ZMP only then remove it") {
     auto pz = fuzz.get<Vec3D>();
-    model.setFixedZmpPosition(pz);
+    model.setZmpPosition(pz);
     CHECK(model.system().zmp_position(p, v, t) == pz);
-    model.removeFixedZmpPosition();
+    model.removeZmpPosition();
     CHECK_FALSE(model.system().isZmpPositionSet());
   }
   SECTION("set ZMP and fz then remove them") {
     auto pz = fuzz.get<Vec3D>();
     auto fz = fuzz();
-    model.setFixedZmpPosition(pz, fz);
+    model.setZmpPosition(pz, fz);
     CHECK(model.system().zmp_position(p, v, t) == pz);
     CHECK(model.system().reaction_force(p, v, t) == Vec3D(0, 0, fz));
-    model.removeFixedZmpPosition();
+    model.removeZmpPosition();
     CHECK_FALSE(model.system().isZmpPositionSet());
     CHECK(model.system().reaction_force(p, v, t) == Vec3D(0, 0, G));
   }
 }
 
-TEST_CASE("ComZmpModel::setFixedReactionForce sets reaction force",
+TEST_CASE("ComZmpModel::setReactionForce sets reaction force",
           "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;
   Fuzzer fuzz;
@@ -311,11 +311,11 @@ TEST_CASE("ComZmpModel::setFixedReactionForce sets reaction force",
   auto v = fuzz.get<Vec3D>();
   auto t = fuzz();
   auto f = fuzz.get<Vec3D>();
-  model.setFixedReactionForce(f);
+  model.setReactionForce(f);
   CHECK(model.system().reaction_force(p, v, t) == f);
 }
 
-TEST_CASE("ComZmpModel::removeFixedReactionForce removess reaction force",
+TEST_CASE("ComZmpModel::removeReactionForce removess reaction force",
           "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;
   Fuzzer fuzz;
@@ -323,13 +323,13 @@ TEST_CASE("ComZmpModel::removeFixedReactionForce removess reaction force",
   auto v = fuzz.get<Vec3D>();
   auto t = fuzz();
   auto f = fuzz.get<Vec3D>();
-  model.setFixedReactionForce(f);
+  model.setReactionForce(f);
   CHECK(model.system().reaction_force(p, v, t) == f);
-  model.removeFixedReactionForce();
+  model.removeReactionForce();
   CHECK(model.system().reaction_force(p, v, t) == Vec3D(0, 0, G));
 }
 
-TEST_CASE("ComZmpModel::setFixedExternalForce sets external force",
+TEST_CASE("ComZmpModel::setExternalForce sets external force",
           "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;
   Fuzzer fuzz;
@@ -337,11 +337,11 @@ TEST_CASE("ComZmpModel::setFixedExternalForce sets external force",
   auto v = fuzz.get<Vec3D>();
   auto t = fuzz();
   auto fe = fuzz.get<Vec3D>();
-  model.setFixedExternalForce(fe);
+  model.setExternalForce(fe);
   CHECK(model.system().external_force(p, v, t) == fe);
 }
 
-TEST_CASE("ComZmpModel::removeFixedExternalForce removes external force",
+TEST_CASE("ComZmpModel::removeExternalForce removes external force",
           "[corelib][humanoid][ComZmpModel]") {
   ComZmpModel model;
   Fuzzer fuzz;
@@ -349,9 +349,9 @@ TEST_CASE("ComZmpModel::removeFixedExternalForce removes external force",
   auto v = fuzz.get<Vec3D>();
   auto t = fuzz();
   auto fe = fuzz.get<Vec3D>();
-  model.setFixedExternalForce(fe);
+  model.setExternalForce(fe);
   CHECK(model.system().external_force(p, v, t) == fe);
-  model.removeFixedExternalForce();
+  model.removeExternalForce();
   CHECK(model.system().external_force(p, v, t) == kVec3DZero);
 }
 
@@ -435,7 +435,7 @@ TEST_CASE("ComZmpModel::update computes COM acceleration",
       model.data_ptr()->com_position = c.com_pos;
       model.data_ptr()->com_velocity = c.com_vel;
       // model.inputZmpPos(c.zmp_pos);
-      model.setFixedZmpPosition(c.zmp_pos);
+      model.setZmpPosition(c.zmp_pos);
       model.update();
       CHECK_THAT(model.data().com_acceleration, Equals(expected_com_acc));
     }
@@ -450,7 +450,7 @@ SCENARIO("update COM position, velocity, acceleration", "[corelib][humanoid]") {
     WHEN("input ZMP position as (-1, -0.5, 0) and update") {
       Vec3D zmp_pos = {-1, -0.5, 0};
       // model.inputZmpPos(zmp_pos);
-      model.setFixedZmpPosition(zmp_pos);
+      model.setZmpPosition(zmp_pos);
       REQUIRE(model.data().com_position == kVec3DZ);
       REQUIRE(model.data().com_velocity == kVec3DZero);
       REQUIRE(model.update());
@@ -491,7 +491,7 @@ TEST_CASE("when COM height is zero, update should fail") {
   Vec3D p = {0, 0, 0};
 
   data->com_position = p;
-  model.setFixedZmpPosition(kVec3DZero);
+  model.setZmpPosition(kVec3DZero);
   zEchoOff();
   CAPTURE(model.data().com_position);
   CAPTURE(model.data().com_velocity);
@@ -509,7 +509,7 @@ TEST_CASE("ComZmpModel::update keeps consistency of vertical reaction force",
   double desired_fz = 10;
   Vec3D desired_zmp = {-1, 0.42, 0};
   // model.inputZmpPos(desired_zmp, desired_fz);
-  model.setFixedZmpPosition(desired_zmp, desired_fz);
+  model.setZmpPosition(desired_zmp, desired_fz);
   model.update();
   CHECK(data->reaction_force == Vec3D(10. / 0.42, -10, desired_fz));
   CHECK(data->com_acceleration == Vec3D(10. / 0.42, -10, 10 - G));
@@ -524,8 +524,8 @@ TEST_CASE("ComZmpModel::update computes total force being applied to COM",
   double desired_fz = 15;
   Vec3D desired_zmp = {-1, 0.42, 0};
   Vec3D ext_force = {1.2, -1.2, -0.2};
-  model.setFixedZmpPosition(desired_zmp, desired_fz);
-  model.setFixedExternalForce(ext_force);
+  model.setZmpPosition(desired_zmp, desired_fz);
+  model.setExternalForce(ext_force);
   model.update();
   CHECK(data->reaction_force == Vec3D(15. / 0.42, -15, desired_fz));
   CHECK(data->total_force == Vec3D(15. / 0.42 + 1.2, -16.2, 14.8));
@@ -539,7 +539,7 @@ TEST_CASE("ComZmpModel::update() updates external force in data",
   model.reset(Vec3D(0, 0, 0.42));
 
   Vec3D ext_force = {1.5, -1.5, -10};
-  model.setFixedExternalForce(ext_force);
+  model.setExternalForce(ext_force);
   REQUIRE(data->reaction_force == Vec3D(0, 0, G));
   model.update();
   CHECK(data->total_force == Vec3D(1.5, -1.5, G - 10));

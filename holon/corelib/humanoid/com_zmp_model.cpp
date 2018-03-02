@@ -164,7 +164,7 @@ ComZmpModel::self_ref ComZmpModel::setComAccelerationCallback(
   return *this;
 }
 
-ComZmpModel::self_ref ComZmpModel::setFixedZmpPosition(
+ComZmpModel::self_ref ComZmpModel::setZmpPosition(
     const Vec3D& t_zmp_position, optional<double> t_reaction_force_z) {
   double fz = t_reaction_force_z.value_or(mass() * RK_G);
   auto fz_f = [fz](const Vec3D&, const Vec3D&, const double) {
@@ -178,32 +178,32 @@ ComZmpModel::self_ref ComZmpModel::setFixedZmpPosition(
   return *this;
 }
 
-ComZmpModel::self_ref ComZmpModel::setFixedReactionForce(
+ComZmpModel::self_ref ComZmpModel::setReactionForce(
     const Vec3D& t_reaction_force) {
   m_system.set_reaction_force_f([t_reaction_force](
       const Vec3D&, const Vec3D&, const double) { return t_reaction_force; });
   return *this;
 }
 
-ComZmpModel::self_ref ComZmpModel::setFixedExternalForce(
+ComZmpModel::self_ref ComZmpModel::setExternalForce(
     const Vec3D& t_external_force) {
   m_system.set_external_force_f([t_external_force](
       const Vec3D&, const Vec3D&, const double) { return t_external_force; });
   return *this;
 }
 
-ComZmpModel::self_ref ComZmpModel::removeFixedZmpPosition() {
+ComZmpModel::self_ref ComZmpModel::removeZmpPosition() {
   m_system.set_reaction_force_f(m_system.getDefaultReactForceFunc());
   m_system.set_zmp_position_f(m_system.getDefaultZmpPosFunc());
   return *this;
 }
 
-ComZmpModel::self_ref ComZmpModel::removeFixedReactionForce() {
+ComZmpModel::self_ref ComZmpModel::removeReactionForce() {
   m_system.set_reaction_force_f(m_system.getDefaultReactForceFunc());
   return *this;
 }
 
-ComZmpModel::self_ref ComZmpModel::removeFixedExternalForce() {
+ComZmpModel::self_ref ComZmpModel::removeExternalForce() {
   m_system.set_external_force_f(m_system.getDefaultExtForceFunc());
   return *this;
 }

@@ -2,14 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+from numpy.testing import assert_allclose
 from subprocess import Popen
 import os
 import unittest
 
 
-SAMPLE_DATA_FILENAME = "data/com_regulation_with_disturbance_example.dat"
-TESTING_DATA_FILENAME = "result.dat"
-TEST_EXECUTABLE = "../com_regulation_with_disturbance_example"
+THIS_EXAMPLE_NAME = "com_regulation_with_disturbance_example"
+SAMPLE_DATA_FILENAME = os.path.join("data", THIS_EXAMPLE_NAME + ".dat")
+TESTING_DATA_FILENAME = os.path.join(".", THIS_EXAMPLE_NAME + ".dat")
+TEST_EXECUTABLE = os.path.join("..", THIS_EXAMPLE_NAME)
 
 
 def load_sample_data():
@@ -42,8 +44,8 @@ class TestComRegulationWithDisturbance(unittest.TestCase):
         # check if generated data matches sample data
         sample = load_sample_data()
         testing = generate_testing_data()
-        self.assertTrue(np.allclose(sample, testing),
-                        msg="sample and testing data do not match")
+        assert_allclose(sample, testing,
+                        err_msg="sample and testing data do not match")
 
 
 if __name__ == '__main__':

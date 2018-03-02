@@ -192,6 +192,22 @@ ComZmpModel::self_ref ComZmpModel::setFixedExternalForce(
   return *this;
 }
 
+ComZmpModel::self_ref ComZmpModel::removeFixedZmpPosition() {
+  m_system.set_reaction_force_f(m_system.getDefaultReactForceFunc());
+  m_system.set_zmp_position_f(m_system.getDefaultZmpPosFunc());
+  return *this;
+}
+
+ComZmpModel::self_ref ComZmpModel::removeFixedReactionForce() {
+  m_system.set_reaction_force_f(m_system.getDefaultReactForceFunc());
+  return *this;
+}
+
+ComZmpModel::self_ref ComZmpModel::removeFixedExternalForce() {
+  m_system.set_external_force_f(m_system.getDefaultExtForceFunc());
+  return *this;
+}
+
 bool ComZmpModel::update() {
   auto p = data().com_position;
   auto v = data().com_velocity;

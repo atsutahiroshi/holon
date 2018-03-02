@@ -28,6 +28,41 @@
 namespace holon {
 namespace {
 
+TEST_CASE("ComCtrlX(): constructor", "[corelib][humanoid][ComCtrlX]") {
+  Fuzzer fuzz;
+
+  SECTION("default constructor") {
+    ComCtrlX ctrl;
+    CHECK(ctrl.q1() == ComCtrlX::default_q1);
+    CHECK(ctrl.q2() == ComCtrlX::default_q2);
+  }
+
+  SECTION("with arguments") {
+    ComCtrlX ctrl(0.5, 1.5);
+    CHECK(ctrl.q1() == 0.5);
+    CHECK(ctrl.q2() == 1.5);
+  }
+}
+
+TEST_CASE("ComCtrlX: accessors / mutators", "[corelib][humanoid][ComCtrlX]") {
+  ComCtrlX ctrl;
+  Fuzzer fuzz(0, 1);
+
+  SECTION("q1") {
+    double q1 = fuzz();
+    REQUIRE(ctrl.q1() != q1);
+    ctrl.set_q1(q1);
+    CHECK(ctrl.q1() == q1);
+  }
+
+  SECTION("q2") {
+    double q2 = fuzz();
+    REQUIRE(ctrl.q2() != q2);
+    ctrl.set_q2(q2);
+    CHECK(ctrl.q2() == q2);
+  }
+}
+
 TEST_CASE("control poles along x-axis can be assigned", "[corelib][humanoid]") {
   Fuzzer fuzz;
 

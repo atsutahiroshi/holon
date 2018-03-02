@@ -59,6 +59,7 @@ class ComZmpModel {
     return m_initial_com_position;
   }
   inline double mass() const noexcept { return data().mass; }
+  inline const System& system() const noexcept { return m_system; }
 
   // mutators
   self_ref set_time_step(double t_time_step);

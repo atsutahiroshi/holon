@@ -26,8 +26,10 @@ namespace holon {
 
 const double ComCtrlX::default_q1 = 1.0;
 const double ComCtrlX::default_q2 = 1.0;
+const double ComCtrlX::default_vd = 0.0;
 
-ComCtrlX::ComCtrlX(double t_q1, double t_q2) : m_q1(t_q1), m_q2(t_q2) {}
+ComCtrlX::ComCtrlX(double t_q1, double t_q2)
+    : m_q1(t_q1), m_q2(t_q2), m_vd(default_vd) {}
 
 ComCtrlX::ComCtrlX() : ComCtrlX(default_q1, default_q2) {}
 
@@ -38,6 +40,11 @@ ComCtrlX& ComCtrlX::set_q1(double t_q1) {
 
 ComCtrlX& ComCtrlX::set_q2(double t_q2) {
   m_q2 = t_q2;
+  return *this;
+}
+
+ComCtrlX& ComCtrlX::set_vd(double t_vd) {
+  m_vd = t_vd;
   return *this;
 }
 

@@ -29,6 +29,7 @@ class ComCtrlX {
  public:
   static const double default_q1;
   static const double default_q2;
+  static const double default_vd;
 
  public:
   // constructors
@@ -45,10 +46,12 @@ class ComCtrlX {
   // accessors
   inline double q1() const noexcept { return m_q1; }
   inline double q2() const noexcept { return m_q2; }
+  inline double vd() const noexcept { return m_vd; }
 
   // mutators
   ComCtrlX& set_q1(double t_q1);
   ComCtrlX& set_q2(double t_q2);
+  ComCtrlX& set_vd(double t_vd);
 
   // functions
   double computeDesZmpPos(double t_xd, double t_x, double t_v,
@@ -61,6 +64,7 @@ class ComCtrlX {
  private:
   double m_q1;
   double m_q2;
+  double m_vd;
 };
 
 }  // namespace holon

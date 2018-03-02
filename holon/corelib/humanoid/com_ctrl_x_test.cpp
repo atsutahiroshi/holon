@@ -35,12 +35,14 @@ TEST_CASE("ComCtrlX(): constructor", "[corelib][humanoid][ComCtrlX]") {
     ComCtrlX ctrl;
     CHECK(ctrl.q1() == ComCtrlX::default_q1);
     CHECK(ctrl.q2() == ComCtrlX::default_q2);
+    CHECK(ctrl.vd() == ComCtrlX::default_vd);
   }
 
   SECTION("with arguments") {
     ComCtrlX ctrl(0.5, 1.5);
     CHECK(ctrl.q1() == 0.5);
     CHECK(ctrl.q2() == 1.5);
+    CHECK(ctrl.vd() == ComCtrlX::default_vd);
   }
 }
 
@@ -60,6 +62,13 @@ TEST_CASE("ComCtrlX: accessors / mutators", "[corelib][humanoid][ComCtrlX]") {
     REQUIRE(ctrl.q2() != q2);
     ctrl.set_q2(q2);
     CHECK(ctrl.q2() == q2);
+  }
+
+  SECTION("vd") {
+    double vd = fuzz();
+    REQUIRE(ctrl.vd() != vd);
+    ctrl.set_vd(vd);
+    CHECK(ctrl.vd() == vd);
   }
 }
 

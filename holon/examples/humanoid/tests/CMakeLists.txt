@@ -1,4 +1,5 @@
 set(HOLON_EXAMPLE_HUMANOID_TEST_SCRIPTS
+  ${CMAKE_CURRENT_SOURCE_DIR}/com_oscillation_example_test.py
   ${CMAKE_CURRENT_SOURCE_DIR}/com_regulation_example_test.py
   ${CMAKE_CURRENT_SOURCE_DIR}/com_regulation_with_disturbance_example_test.py
   )

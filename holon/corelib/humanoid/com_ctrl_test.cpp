@@ -77,6 +77,62 @@ TEST_CASE("ComCtrlCommands::clear() should clear all the values") {
   CHECK(cmd.vhp == nullopt);
 }
 
+TEST_CASE("ComCtrlInputs: constructor", "[ComCtrlInputs]") {
+  SECTION("default constructor") {
+    ComCtrlInputs inputs;
+    CHECK(inputs.com_position == ComZmpModelData::default_com_position);
+    CHECK(inputs.com_velocity == kVec3DZero);
+    CHECK(inputs.qx1 == ComCtrlX::default_q1);
+    CHECK(inputs.qx2 == ComCtrlX::default_q2);
+    CHECK(inputs.qy1 == ComCtrlY::default_q1);
+    CHECK(inputs.qy2 == ComCtrlY::default_q2);
+    CHECK(inputs.rho == ComCtrlY::default_rho);
+    CHECK(inputs.dist == ComCtrlY::default_dist);
+    CHECK(inputs.kr == ComCtrlY::default_kr);
+    CHECK(inputs.qz1 == ComCtrlZ::default_q1);
+    CHECK(inputs.qz2 == ComCtrlZ::default_q2);
+    CHECK(inputs.vhp == 0);
+  }
+
+  SECTION("const ComZmpModelData&") {
+    Fuzzer fuzz(0, 5);
+    auto p0 = fuzz.get<Vec3D>();
+    auto data = createComZmpModelData(p0);
+    ComCtrlInputs inputs(*data);
+    CHECK(inputs.com_position == p0);
+    CHECK(inputs.com_velocity == kVec3DZero);
+    CHECK(inputs.qx1 == ComCtrlX::default_q1);
+    CHECK(inputs.qx2 == ComCtrlX::default_q2);
+    CHECK(inputs.qy1 == ComCtrlY::default_q1);
+    CHECK(inputs.qy2 == ComCtrlY::default_q2);
+    CHECK(inputs.rho == ComCtrlY::default_rho);
+    CHECK(inputs.dist == ComCtrlY::default_dist);
+    CHECK(inputs.kr == ComCtrlY::default_kr);
+    CHECK(inputs.qz1 == ComCtrlZ::default_q1);
+    CHECK(inputs.qz2 == ComCtrlZ::default_q2);
+    CHECK(inputs.vhp == 0);
+  }
+
+  SECTION("const ComZmpModel&") {
+    Fuzzer fuzz(0, 5);
+    auto p0 = fuzz.get<Vec3D>();
+    ComZmpModel model(p0);
+    ComCtrlInputs inputs(model);
+    CHECK(inputs.com_position == p0);
+    CHECK(inputs.com_velocity == kVec3DZero);
+    CHECK(inputs.qx1 == ComCtrlX::default_q1);
+    CHECK(inputs.qx2 == ComCtrlX::default_q2);
+    CHECK(inputs.qy1 == ComCtrlY::default_q1);
+    CHECK(inputs.qy2 == ComCtrlY::default_q2);
+    CHECK(inputs.rho == ComCtrlY::default_rho);
+    CHECK(inputs.dist == ComCtrlY::default_dist);
+    CHECK(inputs.kr == ComCtrlY::default_kr);
+    CHECK(inputs.qz1 == ComCtrlZ::default_q1);
+    CHECK(inputs.qz2 == ComCtrlZ::default_q2);
+    CHECK(inputs.vhp == 0);
+  }
+}
+
 TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
   SECTION("check if member pointers are preserved") {

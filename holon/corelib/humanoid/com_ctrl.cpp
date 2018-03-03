@@ -64,6 +64,37 @@ void ComCtrlCommands::set_com_velocity(optional<double> t_vxd,
   vyd = t_vyd;
 }
 
+ComCtrlInputs::ComCtrlInputs()
+    : com_position(ComZmpModelData::default_com_position),
+      com_velocity(kVec3DZero),
+      qx1(ComCtrlX::default_q1),
+      qx2(ComCtrlX::default_q2),
+      qy1(ComCtrlY::default_q1),
+      qy2(ComCtrlY::default_q2),
+      qz1(ComCtrlZ::default_q1),
+      qz2(ComCtrlZ::default_q2),
+      rho(ComCtrlY::default_rho),
+      dist(ComCtrlY::default_dist),
+      kr(ComCtrlY::default_kr),
+      vhp(0) {}
+
+ComCtrlInputs::ComCtrlInputs(const ComZmpModelData& t_data)
+    : com_position(t_data.com_position),
+      com_velocity(kVec3DZero),
+      qx1(ComCtrlX::default_q1),
+      qx2(ComCtrlX::default_q2),
+      qy1(ComCtrlY::default_q1),
+      qy2(ComCtrlY::default_q2),
+      qz1(ComCtrlZ::default_q1),
+      qz2(ComCtrlZ::default_q2),
+      rho(ComCtrlY::default_rho),
+      dist(ComCtrlY::default_dist),
+      kr(ComCtrlY::default_kr),
+      vhp(0) {}
+
+ComCtrlInputs::ComCtrlInputs(const ComZmpModel& t_model)
+    : ComCtrlInputs(t_model.data()) {}
+
 std::shared_ptr<ComCtrlCommands> ComCtrlCommandsFactory() {
   return std::make_shared<ComCtrlCommands>();
 }

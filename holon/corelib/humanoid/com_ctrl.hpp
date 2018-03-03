@@ -55,6 +55,10 @@ struct ComCtrlInputs {
   double qz1, qz2;
   double rho, dist, kr;
   double vhp;
+
+  ComCtrlInputs();
+  explicit ComCtrlInputs(const ComZmpModelData& t_data);
+  explicit ComCtrlInputs(const ComZmpModel& t_model);
 };
 
 struct ComCtrlOutputs {

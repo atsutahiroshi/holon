@@ -27,11 +27,9 @@
 namespace holon {
 
 struct ComZmpModelData {
- private:
   static const double default_mass;
   static const Vec3D default_com_position;
 
- public:
   double mass;
   Vec3D nu;
   Vec3D com_position;

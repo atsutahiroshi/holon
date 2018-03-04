@@ -195,8 +195,8 @@ Vec3D ComCtrl::computeDesZmpPos(const Vec3D& t_com_position,
   auto zeta =
       formula::computeZeta(t_com_position.z(), refs().vhp, fz, model().mass());
   auto xz = ctrl_x::computeDesZmpPos(t_com_position, t_com_velocity,
-                                     refs().com_position, refs().qx1,
-                                     refs().qx2, zeta);
+                                     refs().com_position, refs().com_velocity,
+                                     refs().qx1, refs().qx2, zeta);
   auto yz = ctrl_y::computeDesZmpPos(
       t_com_position, t_com_velocity, refs().com_position, refs().qy1,
       refs().qy2, refs().rho, refs().dist, refs().kr, zeta);

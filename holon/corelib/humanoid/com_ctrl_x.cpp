@@ -25,29 +25,33 @@
 namespace holon {
 namespace com_ctrl_x {
 
-double computeDesZmpPos(double t_x, double t_v, double t_xd, double t_q1,
-                        double t_q2, double t_zeta) {
+double computeDesZmpPos(double t_x, double t_v, double t_xd, double t_vd,
+                        double t_q1, double t_q2, double t_zeta) {
   if (zIsTiny(t_zeta) || t_zeta < 0) {
     ZRUNERROR("ZETA should be positive. (given: %f)", t_zeta);
     return 0;
   }
-  return t_x + (t_q1 * t_q2) * (t_x - t_xd) + (t_q1 + t_q2) * t_v / t_zeta;
+  double x = t_x - t_xd;
+  double v = t_v - t_vd;
+  return t_x + (t_q1 * t_q2) * x + (t_q1 + t_q2) * v / t_zeta;
 }
 
 double computeDesZmpPos(const Vec3D& t_com_position,
                         const Vec3D& t_com_velocity,
-                        const Vec3D& t_ref_com_position, double t_q1,
+                        const Vec3D& t_ref_com_position,
+                        const Vec3D& t_ref_com_velocity, double t_q1,
                         double t_q2, double t_zeta) {
   return computeDesZmpPos(t_com_position.x(), t_com_velocity.x(),
-                          t_ref_com_position.x(), t_q1, t_q2, t_zeta);
+                          t_ref_com_position.x(), t_ref_com_velocity.x(), t_q1,
+                          t_q2, t_zeta);
 }
 
 double computeDesZmpPos(const Vec3D& t_com_position,
                         const Vec3D& t_com_velocity,
                         const Parameters& t_parameters) {
   return computeDesZmpPos(t_com_position.x(), t_com_velocity.x(),
-                          t_parameters.xd, t_parameters.q1, t_parameters.q2,
-                          t_parameters.zeta);
+                          t_parameters.xd, t_parameters.vd, t_parameters.q1,
+                          t_parameters.q2, t_parameters.zeta);
 }
 
 }  // namespace com_ctrl_x

@@ -33,6 +33,7 @@ namespace data_xz {
 template <typename params>
 struct testcase_t {
   static constexpr typename params::type xd = params::xd;
+  static constexpr typename params::type vd = params::vd;
   static constexpr typename params::type q1 = params::q1;
   static constexpr typename params::type q2 = params::q2;
   static constexpr typename params::type zeta = params::zeta;
@@ -45,6 +46,7 @@ template <typename T = double>
 struct params1 {
   using type = T;
   static constexpr type xd = 0;
+  static constexpr type vd = 0;
   static constexpr type q1 = 1;
   static constexpr type q2 = 1;
   static constexpr type zeta = 1;
@@ -57,6 +59,7 @@ template <typename T = double>
 struct params2 {
   using type = T;
   static constexpr type xd = 0;
+  static constexpr type vd = 0;
   static constexpr type q1 = 1;
   static constexpr type q2 = 0.5;
   static constexpr type zeta = 1;
@@ -69,6 +72,7 @@ template <typename T = double>
 struct params3 {
   using type = T;
   static constexpr type xd = 0;
+  static constexpr type vd = 0;
   static constexpr type q1 = 1.2;
   static constexpr type q2 = 0.8;
   static constexpr type zeta = 1;
@@ -81,6 +85,7 @@ template <typename T = double>
 struct params4 {
   using type = T;
   static constexpr type xd = 1;
+  static constexpr type vd = 0;
   static constexpr type q1 = 1;
   static constexpr type q2 = 1;
   static constexpr type zeta = 1;
@@ -93,6 +98,7 @@ template <typename T = double>
 struct params5 {
   using type = T;
   static constexpr type xd = 1;
+  static constexpr type vd = 0;
   static constexpr type q1 = 1;
   static constexpr type q2 = 1.5;
   static constexpr type zeta = 1;
@@ -105,6 +111,7 @@ template <typename T = double>
 struct params6 {
   using type = T;
   static constexpr type xd = 0;
+  static constexpr type vd = 0;
   static constexpr type q1 = 1;
   static constexpr type q2 = 1.5;
   static constexpr type zeta = 1.41421356237;  // sqrt(2)
@@ -118,6 +125,7 @@ testcase_t<params6<>> testcases6[] = {{0, 0, 0},
 // case 7: xd = 0, q1 = 1, q2 = 1, x = 0, v = 0
 struct testcase7_t {
   static constexpr double xd = 0;
+  static constexpr double vd = 0;
   static constexpr double q1 = 1;
   static constexpr double q2 = 1;
   static constexpr double x = 0;
@@ -127,6 +135,46 @@ struct testcase7_t {
 };
 testcase7_t testcases7[] = {{0, 0}, {-1, 0}};
 
+// case 8: xd = 0, vd = 0.1, q1 = 1, q2 = 0, zeta = 1
+template <typename T = double>
+struct params8 {
+  using type = T;
+  static constexpr type xd = 0;
+  static constexpr type vd = 0.1;
+  static constexpr type q1 = 1;
+  static constexpr type q2 = 0;
+  static constexpr type zeta = 1;
+};
+testcase_t<params8<>> testcases8[] = {
+    {0, 0, -0.1}, {0.3, 0, 0.2}, {-0.1, 0.1, -0.1}, {0, 0.5, 0.4}};
+
+// case 9: xd = 0, vd = -0.1, q1 = 1, q2 = 0, zeta = 2
+template <typename T = double>
+struct params9 {
+  using type = T;
+  static constexpr type xd = 0;
+  static constexpr type vd = -0.1;
+  static constexpr type q1 = 1;
+  static constexpr type q2 = 0;
+  static constexpr type zeta = 2;
+};
+testcase_t<params9<>> testcases9[] = {
+    {0, 0, 0.05}, {0.1, -0.1, 0.1}, {-0.5, -0.5, -0.7}, {0, 0.3, 0.2}};
+
+#if 0
+// case __:
+template <typename T = double>
+struct params__ {
+  using type = T;
+  static constexpr type xd = ;
+  static constexpr type vd = ;
+  static constexpr type q1 = ;
+  static constexpr type q2 = ;
+  static constexpr type zeta = ;
+};
+testcase_t<params__<>> testcases__[] = {};
+#endif
+
 }  // namespace data_xz
 
 using com_ctrl_x::Parameters;
@@ -135,7 +183,7 @@ using com_ctrl_x::computeDesZmpPos;
 template <typename testcase>
 void check_for_oveloaded_func1(const testcase& testcases) {
   for (const auto& tc : testcases) {
-    auto xz = computeDesZmpPos(tc.x, tc.v, tc.xd, tc.q1, tc.q2, tc.zeta);
+    auto xz = computeDesZmpPos(tc.x, tc.v, tc.xd, tc.vd, tc.q1, tc.q2, tc.zeta);
     CHECK(xz == Approx(tc.expected_xz));
   }
 }
@@ -146,7 +194,8 @@ void check_for_oveloaded_func2(const testcase& testcases) {
     Vec3D p = {tc.x, 0, 0};
     Vec3D v = {tc.v, 0, 0};
     Vec3D pd = {tc.xd, 0, 0};
-    auto xz = computeDesZmpPos(p, v, pd, tc.q1, tc.q2, tc.zeta);
+    Vec3D vd = {tc.vd, 0, 0};
+    auto xz = computeDesZmpPos(p, v, pd, vd, tc.q1, tc.q2, tc.zeta);
     CHECK(xz == Approx(tc.expected_xz));
   }
 }
@@ -156,7 +205,7 @@ void check_for_oveloaded_func3(const testcase& testcases) {
   for (const auto& tc : testcases) {
     Vec3D p = {tc.x, 0, 0};
     Vec3D v = {tc.v, 0, 0};
-    Parameters params = {tc.xd, tc.q1, tc.q2, tc.zeta};
+    Parameters params = {tc.xd, tc.vd, tc.q1, tc.q2, tc.zeta};
     auto xz = computeDesZmpPos(p, v, params);
     CHECK(xz == Approx(tc.expected_xz));
   }
@@ -253,6 +302,32 @@ TEST_CASE("Case 7: x-axis: warn if zeta is given as non-negative value",
     check_for_oveloaded_func3(data_xz::testcases7);
   }
   zEchoOn();
+}
+
+TEST_CASE("Case 8: desired ZMP for logitudinal moving alog x-axis",
+          "[ComCtrlX][case8]") {
+  SECTION("overloaded function 1") {
+    check_for_oveloaded_func1(data_xz::testcases8);
+  }
+  SECTION("overloaded function 2") {
+    check_for_oveloaded_func2(data_xz::testcases8);
+  }
+  SECTION("overloaded function 3") {
+    check_for_oveloaded_func3(data_xz::testcases8);
+  }
+}
+
+TEST_CASE("Case 9: desired ZMP for logitudinal moving alog x-axis",
+          "[ComCtrlX][case9]") {
+  SECTION("overloaded function 1") {
+    check_for_oveloaded_func1(data_xz::testcases9);
+  }
+  SECTION("overloaded function 2") {
+    check_for_oveloaded_func2(data_xz::testcases9);
+  }
+  SECTION("overloaded function 3") {
+    check_for_oveloaded_func3(data_xz::testcases9);
+  }
 }
 
 }  // namespace

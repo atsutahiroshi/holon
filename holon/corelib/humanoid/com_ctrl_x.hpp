@@ -28,6 +28,7 @@ namespace com_ctrl_x {
 
 struct Parameters {
   double xd;
+  double vd;
   double q1, q2;
   double zeta;
 };
@@ -35,11 +36,12 @@ struct Parameters {
 static const double default_q1 = 1;
 static const double default_q2 = 1;
 
-double computeDesZmpPos(double t_x, double t_v, double t_xd, double t_q1,
-                        double t_q2, double t_zeta);
+double computeDesZmpPos(double t_x, double t_v, double t_xd, double t_vd,
+                        double t_q1, double t_q2, double t_zeta);
 double computeDesZmpPos(const Vec3D& t_com_position,
                         const Vec3D& t_com_velocity,
-                        const Vec3D& t_ref_com_position, double t_q1,
+                        const Vec3D& t_ref_com_position,
+                        const Vec3D& t_ref_com_velocity, double t_q1,
                         double t_q2, double t_zeta);
 double computeDesZmpPos(const Vec3D& t_com_position,
                         const Vec3D& t_com_velocity,

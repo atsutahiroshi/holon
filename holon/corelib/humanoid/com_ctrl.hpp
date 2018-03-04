@@ -152,7 +152,7 @@ class ComCtrl {
   CommandsPtr m_commands_ptr;
   double m_canonical_foot_dist;
 
-  void remapCommandsToRefs();
+  void updateRefs();
   void updateOutputs();
 };
 

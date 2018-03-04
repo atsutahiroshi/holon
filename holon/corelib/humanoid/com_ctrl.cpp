@@ -214,7 +214,7 @@ ComCtrl::CallbackFunc ComCtrl::getZmpPositionCallback() {
   return std::bind(&ComCtrl::computeDesZmpPos, this, pl::_1, pl::_2, pl::_3);
 }
 
-void ComCtrl::remapCommandsToRefs() {
+void ComCtrl::updateRefs() {
   m_refs_ptr->com_position[0] =
       commands().xd.value_or(model().initial_com_position().x());
   m_refs_ptr->com_position[1] =
@@ -245,7 +245,7 @@ void ComCtrl::updateOutputs() {
 }
 
 bool ComCtrl::update() {
-  remapCommandsToRefs();
+  updateRefs();
   if (!m_model.update()) return false;
   updateOutputs();
   return true;

@@ -32,10 +32,10 @@ namespace holon {
 namespace {
 
 using Catch::Matchers::Equals;
-using ComZmpModelFormula::computeSqrZeta;
-using ComZmpModelFormula::computeZeta;
-using ComZmpModelFormula::computeReactForce;
-using ComZmpModelFormula::computeComAcc;
+using com_zmp_model_formula::computeSqrZeta;
+using com_zmp_model_formula::computeZeta;
+using com_zmp_model_formula::computeReactForce;
+using com_zmp_model_formula::computeComAcc;
 
 const double G = RK_G;
 

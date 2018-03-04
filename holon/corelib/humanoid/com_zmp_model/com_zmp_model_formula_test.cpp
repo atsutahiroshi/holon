@@ -29,19 +29,19 @@
 namespace holon {
 namespace {
 
-using ComZmpModelFormula::computeSqrZeta;
-using ComZmpModelFormula::computeZeta;
-using ComZmpModelFormula::computeReactForce;
-using ComZmpModelFormula::computeComAcc;
-using ComZmpModelFormula::isMassValid;
-using ComZmpModelFormula::isComZmpDiffValid;
-using ComZmpModelFormula::isReactionForceValid;
-using ComZmpModelFormula::isComAccelerationValid;
+using com_zmp_model_formula::computeSqrZeta;
+using com_zmp_model_formula::computeZeta;
+using com_zmp_model_formula::computeReactForce;
+using com_zmp_model_formula::computeComAcc;
+using com_zmp_model_formula::isMassValid;
+using com_zmp_model_formula::isComZmpDiffValid;
+using com_zmp_model_formula::isReactionForceValid;
+using com_zmp_model_formula::isComAccelerationValid;
 
 const double G = RK_G;
 
-TEST_CASE("ComZmpModelFormula::computeSqrZeta(double,double,double)",
-          "[corelib][humanoid][ComZmpModelFormula]") {
+TEST_CASE("computeSqrZeta(double,double,double)",
+          "[corelib][humanoid][com_zmp_model_formula]") {
   SECTION("various COM height, ZMP height and COM acc fixed to 0") {
     double zz = 0;
     double az = 0;
@@ -119,8 +119,8 @@ TEST_CASE("ComZmpModelFormula::computeSqrZeta(double,double,double)",
   }
 }
 
-TEST_CASE("ComZmpModelFormula::computeSqrZeta(double,double,double,double)",
-          "[corelib][humanoid][ComZmpModelFormula]") {
+TEST_CASE("computeSqrZeta(double,double,double,double)",
+          "[corelib][humanoid][com_zmp_model_formula]") {
   SECTION("various COM height, fixed ZMP = 0, Fz = G, m = 1") {
     double zz = 0;
     double fz = G;
@@ -234,8 +234,8 @@ TEST_CASE("ComZmpModelFormula::computeSqrZeta(double,double,double,double)",
   }
 }
 
-TEST_CASE("ComZmpModelFormula::computeSqrZeta(Vec3D&,Vec3D&,Vec3D&)",
-          "[corelib][humanoid][ComZmpModelFormula]") {
+TEST_CASE("computeSqrZeta(Vec3D&,Vec3D&,Vec3D&)",
+          "[corelib][humanoid][com_zmp_model_formula]") {
   SECTION("various COM height, ZMP height and COM acc fixed to 0") {
     double zz = 0;
     double az = 0;
@@ -328,8 +328,8 @@ TEST_CASE("ComZmpModelFormula::computeSqrZeta(Vec3D&,Vec3D&,Vec3D&)",
   }
 }
 
-TEST_CASE("ComZmpModelFormula::computeSqrZeta(Vec3D&,Vec3D&,Vec3D&,Vec3D&)",
-          "[corelib][humanoid][ComZmpModelFormula]") {
+TEST_CASE("computeSqrZeta(Vec3D&,Vec3D&,Vec3D&,Vec3D&)",
+          "[corelib][humanoid][com_zmp_model_formula]") {
   SECTION("various COM height, fixed ZMP = 0, Fz = G, m = 1") {
     double zz = 0;
     double fz = G;
@@ -464,8 +464,8 @@ TEST_CASE("ComZmpModelFormula::computeSqrZeta(Vec3D&,Vec3D&,Vec3D&,Vec3D&)",
   }
 }
 
-TEST_CASE("ComZmpModelFormula::computeReactForce(Vec3D&,double)",
-          "[corelib][humanoid][ComZmpModelFormula]") {
+TEST_CASE("computeReactForce(Vec3D&,double)",
+          "[corelib][humanoid][com_zmp_model_formula]") {
   SECTION("case: various COM acceleration with fixed mass = 1") {
     double mass = 1;
     struct testcase_t {
@@ -494,8 +494,8 @@ TEST_CASE("ComZmpModelFormula::computeReactForce(Vec3D&,double)",
   }
 }
 
-TEST_CASE("ComZmpModelFormula::computeReactForce(Vec3D&,Vec3D&,double,double)",
-          "[corelib][humanoid][ComZmpModelFormula]") {
+TEST_CASE("computeReactForce(Vec3D&,Vec3D&,double,double)",
+          "[corelib][humanoid][com_zmp_model_formula]") {
   SECTION("mass = 1, zeta2 = G, various COM / ZMP position") {
     double mass = 1;
     double zeta2 = G;
@@ -531,8 +531,8 @@ TEST_CASE("ComZmpModelFormula::computeReactForce(Vec3D&,Vec3D&,double,double)",
   }
 }
 
-TEST_CASE("ComZmpModelFormula::computeReactForce(Vec3D&,Vec3D&,Vec3D&,double)",
-          "[corelib][humanoid][ComZmpModelFormula]") {
+TEST_CASE("computeReactForce(Vec3D&,Vec3D&,Vec3D&,double)",
+          "[corelib][humanoid][com_zmp_model_formula]") {
   struct testcase_t {
     Vec3D com_p;
     Vec3D zmp_p;
@@ -554,8 +554,8 @@ TEST_CASE("ComZmpModelFormula::computeReactForce(Vec3D&,Vec3D&,Vec3D&,double)",
   }
 }
 
-TEST_CASE("ComZmpModelFormula::computeReactForce(Vec3D&,Vec3D&,double)",
-          "[corelib][humanoid][ComZmpModelFormula]") {
+TEST_CASE("computeReactForce(Vec3D&,Vec3D&,double)",
+          "[corelib][humanoid][com_zmp_model_formula]") {
   struct testcase_t {
     Vec3D com_p;
     Vec3D zmp_p;
@@ -573,8 +573,8 @@ TEST_CASE("ComZmpModelFormula::computeReactForce(Vec3D&,Vec3D&,double)",
   }
 }
 
-TEST_CASE("ComZmpModelFormula::computeComAcc(Vec3D&,double)",
-          "[corelib][humanoid][ComZmpModelFormula]") {
+TEST_CASE("computeComAcc(Vec3D&,double)",
+          "[corelib][humanoid][com_zmp_model_formula]") {
   SECTION("without additional force") {
     struct testcase_t {
       Vec3D f;
@@ -605,8 +605,8 @@ TEST_CASE("ComZmpModelFormula::computeComAcc(Vec3D&,double)",
   }
 }
 
-TEST_CASE("ComZmpModelFormula::computeComAcc(Vec3D&,Vec3D&,double)",
-          "[corelib][humanoid][ComZmpModelFormula]") {
+TEST_CASE("computeComAcc(Vec3D&,Vec3D&,double)",
+          "[corelib][humanoid][com_zmp_model_formula]") {
   SECTION("without additional force") {
     struct testcase_t {
       Vec3D com;
@@ -641,8 +641,8 @@ TEST_CASE("ComZmpModelFormula::computeComAcc(Vec3D&,Vec3D&,double)",
   }
 }
 
-TEST_CASE("ComZmpModelFormula::computeComAcc(Vec3D&,Vec3D&,Vec3D&,double)",
-          "[corelib][humanoid][ComZmpModelFormula]") {
+TEST_CASE("computeComAcc(Vec3D&,Vec3D&,Vec3D&,double)",
+          "[corelib][humanoid][com_zmp_model_formula]") {
   SECTION("without additional force") {
     struct testcase_t {
       Vec3D com;
@@ -693,8 +693,8 @@ TEST_CASE("ComZmpModelFormula::computeComAcc(Vec3D&,Vec3D&,Vec3D&,double)",
   }
 }
 
-TEST_CASE("ComZmpModelFormula::computeComAcc(Vec3D&,Vec3D&,Vec3D&,double) 2",
-          "[corelib][humanoid][ComZmpModelFormula]") {
+TEST_CASE("computeComAcc(Vec3D&,Vec3D&,Vec3D&,double) 2",
+          "[corelib][humanoid][com_zmp_model_formula]") {
   Vec3D force = Vec3D(0, 0, G);
   double mass = 1;
 

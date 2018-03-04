@@ -23,7 +23,7 @@
 #include <roki/rk_g.h>
 
 namespace holon {
-namespace ComZmpModelFormula {
+namespace com_zmp_model_formula {
 
 namespace {
 const Vec3D kG = {0, 0, RK_G};
@@ -222,5 +222,5 @@ bool isComAccelerationValid(const Vec3D& t_com_acceleration,
   return true;
 }
 
-}  // namespace ComZmpModelFormula
+}  // namespace com_zmp_model_formula
 }  // namespace holon

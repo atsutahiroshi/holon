@@ -24,7 +24,6 @@
 #include "holon/corelib/humanoid/com_ctrl_x.hpp"
 #include "holon/corelib/humanoid/com_ctrl_y.hpp"
 #include "holon/corelib/humanoid/com_ctrl_z.hpp"
-#include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_formula.hpp"
 
 #include "catch.hpp"
 #include "holon/test/util/catch/custom_matchers.hpp"

@@ -26,14 +26,14 @@
 
 namespace holon {
 
-using ComZmpModelFormula::computeSqrZeta;
-using ComZmpModelFormula::computeZeta;
-using ComZmpModelFormula::computeReactForce;
-using ComZmpModelFormula::computeComAcc;
-using ComZmpModelFormula::isMassValid;
-using ComZmpModelFormula::isComZmpDiffValid;
-using ComZmpModelFormula::isReactionForceValid;
-using ComZmpModelFormula::isComAccelerationValid;
+using com_zmp_model_formula::computeSqrZeta;
+using com_zmp_model_formula::computeZeta;
+using com_zmp_model_formula::computeReactForce;
+using com_zmp_model_formula::computeComAcc;
+using com_zmp_model_formula::isMassValid;
+using com_zmp_model_formula::isComZmpDiffValid;
+using com_zmp_model_formula::isReactionForceValid;
+using com_zmp_model_formula::isComAccelerationValid;
 
 ComZmpModelSystem::ComZmpModelSystem(ComZmpModelDataPtr t_data_ptr)
     : m_data_ptr(t_data_ptr),

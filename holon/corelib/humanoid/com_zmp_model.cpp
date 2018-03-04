@@ -25,12 +25,12 @@
 
 namespace holon {
 
-using ComZmpModelFormula::computeSqrZeta;
-using ComZmpModelFormula::computeZeta;
-using ComZmpModelFormula::computeReactForce;
-using ComZmpModelFormula::isMassValid;
-using ComZmpModelFormula::isComZmpDiffValid;
-using ComZmpModelFormula::isReactionForceValid;
+using com_zmp_model_formula::computeSqrZeta;
+using com_zmp_model_formula::computeZeta;
+using com_zmp_model_formula::computeReactForce;
+using com_zmp_model_formula::isMassValid;
+using com_zmp_model_formula::isComZmpDiffValid;
+using com_zmp_model_formula::isReactionForceValid;
 
 namespace integrator {
 

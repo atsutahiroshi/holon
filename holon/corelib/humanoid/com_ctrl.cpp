@@ -32,7 +32,7 @@ namespace holon {
 namespace ctrl_x = com_ctrl_x;
 namespace ctrl_y = com_ctrl_y;
 namespace ctrl_z = com_ctrl_z;
-namespace formula = ComZmpModelFormula;
+namespace formula = com_zmp_model_formula;
 
 void ComCtrlCommands::clear() {
   xd = nullopt;

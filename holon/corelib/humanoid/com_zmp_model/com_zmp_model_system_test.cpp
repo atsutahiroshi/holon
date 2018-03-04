@@ -29,7 +29,7 @@
 namespace holon {
 namespace {
 
-using ComZmpModelFormula::computeComAcc;
+using com_zmp_model_formula::computeComAcc;
 
 const double G = RK_G;
 

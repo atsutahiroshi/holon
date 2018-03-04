@@ -24,7 +24,7 @@
 #include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
-namespace ComZmpModelFormula {
+namespace com_zmp_model_formula {
 
 // functions to compute squared zeta
 double computeSqrZeta(double t_com_position_z, double t_zmp_position_z,
@@ -85,7 +85,7 @@ bool isComAccelerationValid(double t_com_acceleration_z);
 bool isComAccelerationValid(const Vec3D& t_com_acceleration,
                             const Vec3D& t_nu = kVec3DZ);
 
-}  // namespace ComZmpModelFormula
+}  // namespace com_zmp_model_formula
 }  // namespace holon
 
 #endif  // HOLON_HUMANOID_COM_ZMP_MODEL_FORMULA_HPP_

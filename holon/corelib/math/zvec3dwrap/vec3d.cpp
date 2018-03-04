@@ -25,7 +25,7 @@
 #include <string>
 
 namespace holon {
-namespace zVec3DWrap {
+namespace zvec3d {
 
 Vec3D::Vec3D() { zVec3DClear(&m_v); }
 Vec3D::Vec3D(double t_x, double t_y, double t_z) {
@@ -156,5 +156,5 @@ std::ostream& operator<<(std::ostream& os, const Vec3D& v) {
   return os;
 }
 
-}  // namespace zVec3DWrap
+}  // namespace zvec3d
 }  // namespace holon

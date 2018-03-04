@@ -36,11 +36,11 @@ class AdditionBenchmark : public ::hayai::Fixture {
   virtual void TearDown() {}
 
   zVec3D a1, a2, a;
-  zVec3DWrap::Vec3D b1, b2, b;
+  zvec3d::Vec3D b1, b2, b;
 };
 
 BENCHMARK_F(AdditionBenchmark, zVec3D, 100, 1000) { zVec3DAdd(&a1, &a2, &a); }
-BENCHMARK_F(AdditionBenchmark, zVec3DWrap_Vec3D, 100, 1000) { b = b1 + b2; }
+BENCHMARK_F(AdditionBenchmark, zvec3d_Vec3D, 100, 1000) { b = b1 + b2; }
 
 class TripleAdditionBenchmark : public ::hayai::Fixture {
  public:
@@ -55,14 +55,14 @@ class TripleAdditionBenchmark : public ::hayai::Fixture {
   virtual void TearDown() {}
 
   zVec3D a1, a2, a3, a;
-  zVec3DWrap::Vec3D b1, b2, b3, b;
+  zvec3d::Vec3D b1, b2, b3, b;
 };
 
 BENCHMARK_F(TripleAdditionBenchmark, zVec3D, 100, 1000) {
   zVec3DAdd(&a1, &a2, &a);
   zVec3DAdd(&a, &a3, &a);
 }
-BENCHMARK_F(TripleAdditionBenchmark, zVec3DWrap_Vec3D, 100, 1000) {
+BENCHMARK_F(TripleAdditionBenchmark, zvec3d_Vec3D, 100, 1000) {
   b = b1 + b2 + b3;
 }
 
@@ -79,15 +79,13 @@ class ConcatenateBenchmark : public ::hayai::Fixture {
 
   double k;
   zVec3D a1, a2, a;
-  zVec3DWrap::Vec3D b1, b2, b;
+  zvec3d::Vec3D b1, b2, b;
 };
 
 BENCHMARK_F(ConcatenateBenchmark, zVec3D, 100, 1000) {
   zVec3DCat(&a1, k, &a2, &a);
 }
-BENCHMARK_F(ConcatenateBenchmark, zVec3DWrap_Vec3D, 100, 1000) {
-  b = b1 + k * b2;
-}
+BENCHMARK_F(ConcatenateBenchmark, zvec3d_Vec3D, 100, 1000) { b = b1 + k * b2; }
 
 }  // namespace
 }  // namespace holon

@@ -25,7 +25,7 @@
 
 namespace holon {
 
-using zVec3DWrap::Vec3D;
+using zvec3d::Vec3D;
 
 extern const Vec3D kVec3DZero;
 extern const Vec3D kVec3DX;

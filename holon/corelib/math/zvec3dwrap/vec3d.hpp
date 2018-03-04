@@ -28,7 +28,7 @@
 #include <string>
 
 namespace holon {
-namespace zVec3DWrap {
+namespace zvec3d {
 
 template <typename T>
 class Vec3DIterator;

@@ -29,166 +29,178 @@
 namespace holon {
 namespace {
 
+namespace data_fz {
+
 const double G = RK_G;
 const double SQRT_G = sqrt(G);
 
-TEST_CASE("ComCtrlZ(): constructor", "[corelib][humanoid][ComCtrlZ]") {
-  SECTION("default constructor") {
-    ComCtrlZ ctrl;
-    CHECK(ctrl.q1() == 1.0);
-    CHECK(ctrl.q2() == 1.0);
-  }
+template <typename params>
+struct testcase_t {
+  static constexpr typename params::type zd = params::zd;
+  static constexpr typename params::type q1 = params::q1;
+  static constexpr typename params::type q2 = params::q2;
+  static constexpr typename params::type mass = params::mass;
+  double z, v;
+  double expected_fz;
+};
 
-  SECTION("with arguments") {
-    Fuzzer fuzz(0, 1);
-    double q1 = fuzz();
-    double q2 = fuzz();
-    ComCtrlZ ctrl(q1, q2);
-    CHECK(ctrl.q1() == q1);
-    CHECK(ctrl.q2() == q2);
-  }
-}
-
-TEST_CASE("accessors/mutators", "[corelib][humanoid][ComCtrlZ]") {
-  Fuzzer fuzz(0, 1);
-  ComCtrlZ ctrl;
-
-  SECTION("q1") {
-    double q1 = fuzz();
-    REQUIRE(ctrl.q1() != q1);
-    ctrl.set_q1(q1);
-    CHECK(ctrl.q1() == q1);
-  }
-
-  SECTION("q2") {
-    double q2 = fuzz();
-    REQUIRE(ctrl.q2() != q2);
-    ctrl.set_q2(q2);
-    CHECK(ctrl.q2() == q2);
-  }
-}
-
-TEST_CASE("ComCtrlZ::computeDesReactForce(double,double,double,double)",
-          "[corelib][humanoid][ComCtrlZ]") {
-  ComCtrlZ ctrl;
-
-  SECTION("case: zd = 1, q1 = 1, q2 = 1, m = 1") {
-    double zd = 1;
-    double m = 1;
-    REQUIRE(ctrl.q1() == 1);
-    REQUIRE(ctrl.q2() == 1);
-
-    struct testcase_t {
-      double z, vz;
-      double expected_fz;
-    } testcases[] = {{1, 0, G},
-                     {0.5, 0.5, 1.5 * G - SQRT_G},
-                     {1.5, -1, 0.5 * G + 2. * SQRT_G},
-                     {0.8, -0.5, 1.2 * G + SQRT_G}};
-
-    for (const auto& c : testcases) {
-      INFO("z = " << c.z << ", vz = " << c.vz);
-      CHECK(ctrl.computeDesReactForce(zd, c.z, c.vz, m) ==
-            Approx(c.expected_fz));
-    }
-  }
+// case 1: zd = 1, q1 = 1, q2 = 1, m = 1
+template <typename T = double>
+struct params1 {
+  using type = T;
+  static constexpr type zd = 1;
+  static constexpr type q1 = 1;
+  static constexpr type q2 = 1;
+  static constexpr type mass = 1;
+};
+testcase_t<params1<>> testcases1[] = {{1, 0, G},
+                                      {0.5, 0.5, 1.5 * G - SQRT_G},
+                                      {1.5, -1, 0.5 * G + 2. * SQRT_G},
+                                      {0.8, -0.5, 1.2 * G + SQRT_G}};
 
 #define XI2(zd) (RK_G / zd)
 #define XI(zd) sqrt(XI2(zd))
-  SECTION("case: zd = 0.42, q1 = 0.5, q2 = 1, m = 1") {
-    double zd = 0.42;
-    double m = 1;
-    ctrl.set_q1(0.5);
-    REQUIRE(ctrl.q1() == 0.5);
-    REQUIRE(ctrl.q2() == 1);
+// case 2: zd = 0.42, q1 = 0.5, q2 = 1, m = 1
+template <typename T = double>
+struct params2 {
+  using type = T;
+  static constexpr type zd = 0.42;
+  static constexpr type q1 = 0.5;
+  static constexpr type q2 = 1;
+  static constexpr type mass = 1;
+};
+testcase_t<params2<>> testcases2[] = {
+    {0.46, 0, 20. * G / 21},
+    {0.42, -0.5, 0.75 * XI(0.42) + G},
+    {0.4, 0.1, 0.01 * XI2(0.42) - 0.15 * XI(0.42) + G},
+    {0.4, -0.1, 0.01 * XI2(0.42) + 0.15 * XI(0.42) + G}};
 
-    struct testcase_t {
-      double z, vz;
-      double expected_fz;
-    } testcases[] = {{0.46, 0, 20. * G / 21},
-                     {0.42, -0.5, 0.75 * XI(zd) + G},
-                     {0.4, 0.1, 0.01 * XI2(zd) - 0.15 * XI(zd) + G},
-                     {0.4, -0.1, 0.01 * XI2(zd) + 0.15 * XI(zd) + G}};
+// case 3: zd = 0.42, q1 = 1, q2 = 0.5, m = 1.5
+template <typename T = double>
+struct params3 {
+  using type = T;
+  static constexpr type zd = 0.42;
+  static constexpr type q1 = 1;
+  static constexpr type q2 = 0.5;
+  static constexpr type mass = 1.5;
+};
+testcase_t<params3<>> testcases3[] = {
+    {0.46, 0, 30. * G / 21},
+    {0.42, -0.5, 1.125 * XI(0.42) + 1.5 * G},
+    {0.4, 0.1, 0.015 * XI2(0.42) - 0.225 * XI(0.42) + 1.5 * G},
+    {0.4, -0.1, 0.015 * XI2(0.42) + 0.225 * XI(0.42) + 1.5 * G}};
 
-    for (const auto& c : testcases) {
-      INFO("z = " << c.z << ", vz = " << c.vz);
-      CHECK(ctrl.computeDesReactForce(zd, c.z, c.vz, m) ==
-            Approx(c.expected_fz));
-    }
-  }
+// case 4: zd = 0.42, q1 = 1, q2 = 1, m = 1
+template <typename T = double>
+struct params4 {
+  using type = T;
+  static constexpr type zd = 0.42;
+  static constexpr type q1 = 1;
+  static constexpr type q2 = 1;
+  static constexpr type mass = 1;
+};
+testcase_t<params4<>> testcases4[] = {{0.46, 1, 0}};
 
-  SECTION("case: zd = 0.42, q1 = 1, q2 = 0.5, m = 1.5") {
-    double zd = 0.42;
-    double m = 1.5;
-    ctrl.set_q2(0.5);
-    REQUIRE(ctrl.q1() == 1);
-    REQUIRE(ctrl.q2() == 0.5);
+#if 0
+// case __:
+template <typename T = double>
+struct params__ {
+  using type = T;
+  static constexpr type zd = ;
+  static constexpr type q1 = ;
+  static constexpr type q2 = ;
+  static constexpr type mass = ;
+};
+testcase_t<params__<>> testcases__[] = {};
+#endif
 
-    struct testcase_t {
-      double z, vz;
-      double expected_fz;
-    } testcases[] = {{0.46, 0, 30. * G / 21},
-                     {0.42, -0.5, 1.125 * XI(zd) + 1.5 * G},
-                     {0.4, 0.1, 0.015 * XI2(zd) - 0.225 * XI(zd) + 1.5 * G},
-                     {0.4, -0.1, 0.015 * XI2(zd) + 0.225 * XI(zd) + 1.5 * G}};
+}  // namespace data_fz
 
-    for (const auto& c : testcases) {
-      INFO("z = " << c.z << ", vz = " << c.vz);
-      CHECK(ctrl.computeDesReactForce(zd, c.z, c.vz, m) ==
-            Approx(c.expected_fz));
-    }
-  }
+using com_ctrl_z::Parameters;
+using com_ctrl_z::computeDesReactForce;
 
-  SECTION("case: zd = 0.42, q1 = 1, q2 = 1, m = 1") {
-    double zd = 0.42;
-    double m = 1;
-    REQUIRE(ctrl.q1() == 1);
-    REQUIRE(ctrl.q2() == 1);
-
-    struct testcase_t {
-      double z, vz;
-      double expected_fz;
-    } testcases[] = {{0.46, 1, 0}};
-
-    for (const auto& c : testcases) {
-      INFO("If negative reaction force is needed it should be 0")
-      INFO("z = " << c.z << ", vz = " << c.vz);
-      CHECK(ctrl.computeDesReactForce(zd, c.z, c.vz, m) ==
-            Approx(c.expected_fz));
-    }
+template <typename testcase>
+void check_for_oveloaded_func1(const testcase& testcases) {
+  for (const auto& tc : testcases) {
+    auto fz = computeDesReactForce(tc.z, tc.v, tc.zd, tc.q1, tc.q2, tc.mass);
+    CHECK(fz == Approx(tc.expected_fz));
   }
 }
 
-TEST_CASE(
-    "ComCtrlZ::computeDesReactForce"
-    "(const Vec3D&,const Vec3D&,const Vec3D&,double)",
-    "[corelib][humanoid][ComCtrlZ]") {
-  ComCtrlZ ctrl;
-
-  SECTION("case: zd = 0.42, q1 = 1, q2 = 0.5, m = 1.5") {
-    double zd = 0.42;
-    double m = 1.5;
-    ctrl.set_q2(0.5);
-    REQUIRE(ctrl.q1() == 1);
-    REQUIRE(ctrl.q2() == 0.5);
-
-    struct testcase_t {
-      double z, vz;
-      double expected_fz;
-    } testcases[] = {{0.46, 0, 30. * G / 21},
-                     {0.42, -0.5, 1.125 * XI(zd) + 1.5 * G},
-                     {0.4, 0.1, 0.015 * XI2(zd) - 0.225 * XI(zd) + 1.5 * G},
-                     {0.4, -0.1, 0.015 * XI2(zd) + 0.225 * XI(zd) + 1.5 * G}};
-
-    for (const auto& c : testcases) {
-      Vec3D ref_com_pos = {0, 0, zd};
-      Vec3D com_pos = {0, 0, c.z};
-      Vec3D com_vel = {0, 0, c.vz};
-      INFO("z = " << c.z << ", vz = " << c.vz);
-      CHECK(ctrl.computeDesReactForce(ref_com_pos, com_pos, com_vel, m) ==
-            Approx(c.expected_fz));
-    }
+template <typename testcase>
+void check_for_oveloaded_func2(const testcase& testcases) {
+  for (const auto& tc : testcases) {
+    Vec3D p = {0, 0, tc.z};
+    Vec3D v = {0, 0, tc.v};
+    Vec3D pd = {0, 0, tc.zd};
+    auto fz = computeDesReactForce(p, v, pd, tc.q1, tc.q2, tc.mass);
+    CHECK(fz == Approx(tc.expected_fz));
   }
+}
+
+template <typename testcase>
+void check_for_oveloaded_func3(const testcase& testcases) {
+  for (const auto& tc : testcases) {
+    Vec3D p = {0, 0, tc.z};
+    Vec3D v = {0, 0, tc.v};
+    Parameters params = {tc.zd, tc.q1, tc.q2, tc.mass};
+    auto fz = computeDesReactForce(p, v, params);
+    CHECK(fz == Approx(tc.expected_fz));
+  }
+}
+
+TEST_CASE("Case 1: compute desired reaction force along z-axis",
+          "[ComCtrlZ][case1]") {
+  SECTION("overloaded function 1") {
+    check_for_oveloaded_func1(data_fz::testcases1);
+  }
+  SECTION("overloaded function 2") {
+    check_for_oveloaded_func2(data_fz::testcases1);
+  }
+  SECTION("overloaded function 3") {
+    check_for_oveloaded_func3(data_fz::testcases1);
+  }
+}
+
+TEST_CASE("Case 2: compute desired reaction force along z-axis",
+          "[ComCtrlZ][case2]") {
+  SECTION("overloaded function 1") {
+    check_for_oveloaded_func1(data_fz::testcases2);
+  }
+  SECTION("overloaded function 2") {
+    check_for_oveloaded_func2(data_fz::testcases2);
+  }
+  SECTION("overloaded function 3") {
+    check_for_oveloaded_func3(data_fz::testcases2);
+  }
+}
+
+TEST_CASE("Case 3: compute desired reaction force along z-axis",
+          "[ComCtrlZ][case3]") {
+  SECTION("overloaded function 1") {
+    check_for_oveloaded_func1(data_fz::testcases3);
+  }
+  SECTION("overloaded function 2") {
+    check_for_oveloaded_func2(data_fz::testcases3);
+  }
+  SECTION("overloaded function 3") {
+    check_for_oveloaded_func3(data_fz::testcases3);
+  }
+}
+
+TEST_CASE("Case 4: compute desired reaction force along z-axis",
+          "[ComCtrlZ][case4][exception]") {
+  zEchoOff();
+  SECTION("overloaded function 1") {
+    check_for_oveloaded_func1(data_fz::testcases4);
+  }
+  SECTION("overloaded function 2") {
+    check_for_oveloaded_func2(data_fz::testcases4);
+  }
+  SECTION("overloaded function 3") {
+    check_for_oveloaded_func3(data_fz::testcases4);
+  }
+  zEchoOn();
 }
 
 }  // namespace

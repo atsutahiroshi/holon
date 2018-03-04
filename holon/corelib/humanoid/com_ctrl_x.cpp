@@ -23,46 +23,32 @@
 #include <zm/zm_misc.h>
 
 namespace holon {
+namespace com_ctrl_x {
 
-const double ComCtrlX::default_q1 = 1.0;
-const double ComCtrlX::default_q2 = 1.0;
-const double ComCtrlX::default_vd = 0.0;
-
-ComCtrlX::ComCtrlX(double t_q1, double t_q2)
-    : m_q1(t_q1), m_q2(t_q2), m_vd(default_vd) {}
-
-ComCtrlX::ComCtrlX() : ComCtrlX(default_q1, default_q2) {}
-
-ComCtrlX& ComCtrlX::set_q1(double t_q1) {
-  m_q1 = t_q1;
-  return *this;
-}
-
-ComCtrlX& ComCtrlX::set_q2(double t_q2) {
-  m_q2 = t_q2;
-  return *this;
-}
-
-ComCtrlX& ComCtrlX::set_vd(double t_vd) {
-  m_vd = t_vd;
-  return *this;
-}
-
-double ComCtrlX::computeDesZmpPos(double t_xd, double t_x, double t_v,
-                                  double t_zeta) const noexcept {
+double computeDesZmpPos(double t_x, double t_v, double t_xd, double t_q1,
+                        double t_q2, double t_zeta) {
   if (zIsTiny(t_zeta) || t_zeta < 0) {
     ZRUNERROR("ZETA should be positive. (given: %f)", t_zeta);
     return 0;
   }
-  return t_x + (m_q1 * m_q2) * (t_x - t_xd) + (m_q1 + m_q2) * t_v / t_zeta;
+  return t_x + (t_q1 * t_q2) * (t_x - t_xd) + (t_q1 + t_q2) * t_v / t_zeta;
 }
 
-double ComCtrlX::computeDesZmpPos(const Vec3D& t_ref_com_position,
-                                  const Vec3D& t_com_position,
-                                  const Vec3D& t_com_velocity,
-                                  double t_zeta) const noexcept {
-  return computeDesZmpPos(t_ref_com_position.x(), t_com_position.x(),
-                          t_com_velocity.x(), t_zeta);
+double computeDesZmpPos(const Vec3D& t_com_position,
+                        const Vec3D& t_com_velocity,
+                        const Vec3D& t_ref_com_position, double t_q1,
+                        double t_q2, double t_zeta) {
+  return computeDesZmpPos(t_com_position.x(), t_com_velocity.x(),
+                          t_ref_com_position.x(), t_q1, t_q2, t_zeta);
 }
 
+double computeDesZmpPos(const Vec3D& t_com_position,
+                        const Vec3D& t_com_velocity,
+                        const Parameters& t_parameters) {
+  return computeDesZmpPos(t_com_position.x(), t_com_velocity.x(),
+                          t_parameters.xd, t_parameters.q1, t_parameters.q2,
+                          t_parameters.zeta);
+}
+
+}  // namespace com_ctrl_x
 }  // namespace holon

@@ -22,9 +22,17 @@
 
 #include <roki/rk_g.h>
 #include <memory>
+#include "holon/corelib/humanoid/com_ctrl_x.hpp"
+#include "holon/corelib/humanoid/com_ctrl_y.hpp"
+#include "holon/corelib/humanoid/com_ctrl_z.hpp"
 #include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_formula.hpp"
 
 namespace holon {
+
+namespace ctrl_x = com_ctrl_x;
+namespace ctrl_y = com_ctrl_y;
+namespace ctrl_z = com_ctrl_z;
+namespace formula = ComZmpModelFormula;
 
 void ComCtrlCommands::clear() {
   xd = nullopt;
@@ -67,29 +75,29 @@ void ComCtrlCommands::set_com_velocity(optional<double> t_vxd,
 ComCtrlInputs::ComCtrlInputs()
     : com_position(ComZmpModelData::default_com_position),
       com_velocity(kVec3DZero),
-      qx1(ComCtrlX::default_q1),
-      qx2(ComCtrlX::default_q2),
-      qy1(ComCtrlY::default_q1),
-      qy2(ComCtrlY::default_q2),
-      qz1(ComCtrlZ::default_q1),
-      qz2(ComCtrlZ::default_q2),
-      rho(ComCtrlY::default_rho),
-      dist(ComCtrlY::default_dist),
-      kr(ComCtrlY::default_kr),
+      qx1(ctrl_x::default_q1),
+      qx2(ctrl_x::default_q2),
+      qy1(ctrl_y::default_q1),
+      qy2(ctrl_y::default_q2),
+      qz1(ctrl_z::default_q1),
+      qz2(ctrl_z::default_q2),
+      rho(ctrl_y::default_rho),
+      dist(ctrl_y::default_dist),
+      kr(ctrl_y::default_kr),
       vhp(0) {}
 
 ComCtrlInputs::ComCtrlInputs(const ComZmpModelData& t_data)
     : com_position(t_data.com_position),
       com_velocity(kVec3DZero),
-      qx1(ComCtrlX::default_q1),
-      qx2(ComCtrlX::default_q2),
-      qy1(ComCtrlY::default_q1),
-      qy2(ComCtrlY::default_q2),
-      qz1(ComCtrlZ::default_q1),
-      qz2(ComCtrlZ::default_q2),
-      rho(ComCtrlY::default_rho),
-      dist(ComCtrlY::default_dist),
-      kr(ComCtrlY::default_kr),
+      qx1(ctrl_x::default_q1),
+      qx2(ctrl_x::default_q2),
+      qy1(ctrl_y::default_q1),
+      qy2(ctrl_y::default_q2),
+      qz1(ctrl_z::default_q1),
+      qz2(ctrl_z::default_q2),
+      rho(ctrl_y::default_rho),
+      dist(ctrl_y::default_dist),
+      kr(ctrl_y::default_kr),
       vhp(0) {}
 
 ComCtrlInputs::ComCtrlInputs(const ComZmpModel& t_model)
@@ -108,15 +116,12 @@ std::shared_ptr<ComCtrlOutputs> ComCtrlOutputsFactory() {
 }
 
 ComCtrl::ComCtrl()
-    : m_x(),
-      m_y(),
-      m_z(),
-      m_model(),
+    : m_model(),
       m_states_ptr(m_model.data_ptr()),
       m_inputs_ptr(ComCtrlInputsFactory()),
       m_outputs_ptr(ComCtrlOutputsFactory()),
       m_commands_ptr(ComCtrlCommandsFactory()),
-      m_canonical_foot_dist(m_y.dist()) {
+      m_canonical_foot_dist(ctrl_y::default_dist) {
   m_model.setReactionForceCallback(getReactionForceCallback());
   m_model.setZmpPositionCallback(getZmpPositionCallback());
 }
@@ -177,22 +182,26 @@ void ComCtrl::feedback(const Vec3D& t_com_position,
 Vec3D ComCtrl::computeDesReactForce(const Vec3D& t_com_position,
                                     const Vec3D& t_com_velocity,
                                     const double /* t */) {
-  auto fz = m_z.computeDesReactForce(inputs().com_position, t_com_position,
-                                     t_com_velocity, model().mass());
+  auto fz = ctrl_z::computeDesReactForce(t_com_position, t_com_velocity,
+                                         inputs().com_position, inputs().qz1,
+                                         inputs().qz2, model().mass());
   return Vec3D(0, 0, fz);
 }
 
 Vec3D ComCtrl::computeDesZmpPos(const Vec3D& t_com_position,
                                 const Vec3D& t_com_velocity,
                                 const double /* t */) {
-  auto fz = m_z.computeDesReactForce(inputs().com_position, t_com_position,
-                                     t_com_velocity, model().mass());
-  auto zeta = ComZmpModelFormula::computeZeta(t_com_position.z(), inputs().vhp,
-                                              fz, model().mass());
-  auto xz = m_x.computeDesZmpPos(inputs().com_position, t_com_position,
-                                 t_com_velocity, zeta);
-  auto yz = m_y.computeDesZmpPos(inputs().com_position, t_com_position,
-                                 t_com_velocity, zeta);
+  auto fz = ctrl_z::computeDesReactForce(t_com_position, t_com_velocity,
+                                         inputs().com_position, inputs().qz1,
+                                         inputs().qz2, model().mass());
+  auto zeta = formula::computeZeta(t_com_position.z(), inputs().vhp, fz,
+                                   model().mass());
+  auto xz = ctrl_x::computeDesZmpPos(t_com_position, t_com_velocity,
+                                     inputs().com_position, inputs().qx1,
+                                     inputs().qx2, zeta);
+  auto yz = ctrl_y::computeDesZmpPos(
+      t_com_position, t_com_velocity, inputs().com_position, inputs().qy1,
+      inputs().qy2, inputs().rho, inputs().dist, inputs().kr, zeta);
   return Vec3D(xz, yz, inputs().vhp);
 }
 
@@ -217,28 +226,16 @@ void ComCtrl::remapCommandsToInputs() {
   m_inputs_ptr->com_velocity[0] = commands().vxd.value_or(0);
   m_inputs_ptr->com_velocity[1] = commands().vyd.value_or(0);
   m_inputs_ptr->com_velocity[2] = 0;
-  m_inputs_ptr->qx1 = commands().qx1.value_or(ComCtrlX::default_q1);
-  m_inputs_ptr->qx2 = commands().qx2.value_or(ComCtrlX::default_q2);
-  m_inputs_ptr->qy1 = commands().qy1.value_or(ComCtrlY::default_q1);
-  m_inputs_ptr->qy2 = commands().qy2.value_or(ComCtrlY::default_q2);
-  m_inputs_ptr->rho = commands().rho.value_or(ComCtrlY::default_rho);
+  m_inputs_ptr->qx1 = commands().qx1.value_or(ctrl_x::default_q1);
+  m_inputs_ptr->qx2 = commands().qx2.value_or(ctrl_x::default_q2);
+  m_inputs_ptr->qy1 = commands().qy1.value_or(ctrl_y::default_q1);
+  m_inputs_ptr->qy2 = commands().qy2.value_or(ctrl_y::default_q2);
+  m_inputs_ptr->rho = commands().rho.value_or(ctrl_y::default_rho);
   m_inputs_ptr->dist = commands().dist.value_or(m_canonical_foot_dist);
-  m_inputs_ptr->kr = commands().kr.value_or(ComCtrlY::default_kr);
-  m_inputs_ptr->qz1 = commands().qz1.value_or(ComCtrlZ::default_q1);
-  m_inputs_ptr->qz2 = commands().qz2.value_or(ComCtrlZ::default_q2);
+  m_inputs_ptr->kr = commands().kr.value_or(ctrl_y::default_kr);
+  m_inputs_ptr->qz1 = commands().qz1.value_or(ctrl_z::default_q1);
+  m_inputs_ptr->qz2 = commands().qz2.value_or(ctrl_z::default_q2);
   m_inputs_ptr->vhp = commands().vhp.value_or(0);
-}
-
-void ComCtrl::updateCtrlParam() {
-  x().set_q1(inputs().qx1);
-  x().set_q2(inputs().qx2);
-  y().set_q1(inputs().qy1);
-  y().set_q2(inputs().qy2);
-  y().set_rho(inputs().rho);
-  y().set_dist(inputs().dist);
-  y().set_kr(inputs().kr);
-  z().set_q1(inputs().qz1);
-  z().set_q2(inputs().qz2);
 }
 
 void ComCtrl::updateOutputs() {
@@ -251,7 +248,6 @@ void ComCtrl::updateOutputs() {
 
 bool ComCtrl::update() {
   remapCommandsToInputs();
-  updateCtrlParam();
   if (!m_model.update()) return false;
   updateOutputs();
   return true;

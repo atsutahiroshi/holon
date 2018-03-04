@@ -28,320 +28,301 @@
 namespace holon {
 namespace {
 
-TEST_CASE("ComCtrlY(): constructor", "[corelib][humanoid][ComCtrlY]") {
-  Fuzzer fuzz;
+namespace data_yz {
 
-  SECTION("default constructor") {
-    ComCtrlY ctrl;
-    CHECK(ctrl.q1() == ComCtrlY::default_q1);
-    CHECK(ctrl.q2() == ComCtrlY::default_q2);
-    CHECK(ctrl.rho() == ComCtrlY::default_rho);
-    CHECK(ctrl.dist() == ComCtrlY::default_dist);
-    CHECK(ctrl.kr() == ComCtrlY::default_kr);
-  }
+template <typename params>
+struct testcase_t {
+  static constexpr typename params::type yd = params::yd;
+  static constexpr typename params::type q1 = params::q1;
+  static constexpr typename params::type q2 = params::q2;
+  static constexpr typename params::type rho = params::rho;
+  static constexpr typename params::type dist = params::dist;
+  static constexpr typename params::type kr = params::kr;
+  static constexpr typename params::type zeta = params::zeta;
+  double y, v;
+  double expected_yz;
+};
 
-  SECTION("with arguments") {
-    ComCtrlY ctrl(0.5, 1.5);
-    CHECK(ctrl.q1() == 0.5);
-    CHECK(ctrl.q2() == 1.5);
-    CHECK(ctrl.rho() == ComCtrlY::default_rho);
-    CHECK(ctrl.dist() == 0.0);
-    CHECK(ctrl.kr() == ComCtrlY::default_kr);
-  }
+// case 1: yd = 0, q1 = 1, q2 = 1, zeta = 1
+template <typename T = double>
+struct params1 {
+  using type = T;
+  static constexpr type yd = 0;
+  static constexpr type q1 = 1;
+  static constexpr type q2 = 1;
+  static constexpr type rho = 0;
+  static constexpr type dist = 0;
+  static constexpr type kr = 1;
+  static constexpr type zeta = 1;
+};
+testcase_t<params1<>> testcases1[] = {
+    {0, 0, 0}, {1, 0, 2}, {3, -1, 4}, {0, -2, -4}, {-2, 2, 0}};
 
-  SECTION("with arguments") {
-    ComCtrlY ctrl(0.8, 1.2, 0.42);
-    CHECK(ctrl.q1() == 0.8);
-    CHECK(ctrl.q2() == 1.2);
-    CHECK(ctrl.rho() == ComCtrlY::default_rho);
-    CHECK(ctrl.dist() == 0.42);
-    CHECK(ctrl.kr() == ComCtrlY::default_kr);
-  }
-}
+// case 2: yd = 0, q1 = 1, q2 = 0.5, zeta = 1
+template <typename T = double>
+struct params2 {
+  using type = T;
+  static constexpr type yd = 0;
+  static constexpr type q1 = 1;
+  static constexpr type q2 = 0.5;
+  static constexpr type rho = 0;
+  static constexpr type dist = 0;
+  static constexpr type kr = 1;
+  static constexpr type zeta = 1;
+};
+testcase_t<params2<>> testcases2[] = {
+    {0, 0, 0}, {1, 0, 1.5}, {3, -1, 3}, {0, -2, -3}, {-2, 2, 0}};
 
-TEST_CASE("ComCtrlY: accessors / mutators", "[corelib][humanoid][ComCtrlY]") {
-  ComCtrlY ctrl;
-  Fuzzer fuzz(0, 1);
+// case 3: yd = 0, q1 = 1.2, q2 = 0.8, zeta = 1
+template <typename T = double>
+struct params3 {
+  using type = T;
+  static constexpr type yd = 0;
+  static constexpr type q1 = 1.2;
+  static constexpr type q2 = 0.8;
+  static constexpr type rho = 0;
+  static constexpr type dist = 0;
+  static constexpr type kr = 1;
+  static constexpr type zeta = 1;
+};
+testcase_t<params3<>> testcases3[] = {
+    {0, 0, 0}, {1, 0, 1.96}, {3, -1, 3.88}, {0, -2, -4}, {-2, 2, 0.08}};
 
-  SECTION("q1 and q2") {
-    double q1 = fuzz();
-    double q2 = fuzz();
-    REQUIRE(ctrl.q1() != q1);
-    REQUIRE(ctrl.q2() != q2);
-    ctrl.set_q1(q1);
-    ctrl.set_q2(q2);
-    CHECK(ctrl.q1() == q1);
-    CHECK(ctrl.q2() == q2);
-  }
+// case 4: yd = 0.5, q1 = 1, q2 = 1, zeta = 1
+template <typename T = double>
+struct params4 {
+  using type = T;
+  static constexpr type yd = 0.5;
+  static constexpr type q1 = 1;
+  static constexpr type q2 = 1;
+  static constexpr type rho = 0;
+  static constexpr type dist = 0;
+  static constexpr type kr = 1;
+  static constexpr type zeta = 1;
+};
+testcase_t<params4<>> testcases4[] = {
+    {0, 0, -0.5}, {1, 0, 1.5}, {3, -1, 3.5}, {0, -2, -4.5}, {-2, 3, 1.5}};
 
-  SECTION("rho") {
-    double rho = fuzz();
-    REQUIRE(ctrl.rho() != rho);
-    ctrl.set_rho(rho);
-    CHECK(ctrl.rho() == rho);
-  }
+// case 5: yd = -1, q1 = 1, q2 = 1.5, zeta = 1
+template <typename T = double>
+struct params5 {
+  using type = T;
+  static constexpr type yd = -1;
+  static constexpr type q1 = 1;
+  static constexpr type q2 = 1.5;
+  static constexpr type rho = 0;
+  static constexpr type dist = 0;
+  static constexpr type kr = 1;
+  static constexpr type zeta = 1;
+};
+testcase_t<params5<>> testcases5[] = {
+    {0, 0, 1.5}, {1, 0, 4}, {3, -1, 6.5}, {0, -2, -3.5}, {-2, 3, 4}};
 
-  SECTION("dist") {
-    double dist = fuzz();
-    REQUIRE(ctrl.dist() != dist);
-    ctrl.set_dist(dist);
-    CHECK(ctrl.dist() == dist);
-  }
+// case 6: yd = 0.5, q1 = 1, q2 = 1.5, zeta = sqrt(2)
+template <typename T = double>
+struct params6 {
+  using type = T;
+  static constexpr type yd = 0.5;
+  static constexpr type q1 = 1;
+  static constexpr type q2 = 1.5;
+  static constexpr type rho = 0;
+  static constexpr type dist = 0;
+  static constexpr type kr = 1;
+  static constexpr type zeta = 1.41421356237;  // sqrt(2)
+};
+testcase_t<params6<>> testcases6[] = {
+    {0, 0, -0.75},
+    {1, 0, 1.75},
+    {3, -2, 2.5 * (3 - sqrt(2)) - 0.75},
+    {0, -1, -1.25 * sqrt(2) - 0.75},
+    {-2, 3, 2.5 * (-2 + 1.5 * sqrt(2)) - 0.75}};
 
-  SECTION("kr") {
-    double kr = fuzz();
-    REQUIRE(ctrl.kr() != kr);
-    ctrl.set_kr(kr);
-    CHECK(ctrl.kr() == kr);
-  }
-}
+// case 7: yd = 1, q1 = 1, q2 = 1, y = 0, v = 0
+struct testcase7_t {
+  static constexpr double yd = 1;
+  static constexpr double q1 = 1;
+  static constexpr double q2 = 1;
+  static constexpr double rho = 0;
+  static constexpr double dist = 0;
+  static constexpr double kr = 1;
+  static constexpr double y = 0;
+  static constexpr double v = 0;
+  double zeta;
+  double expected_yz;
+};
+testcase7_t testcases7[] = {{0, 0}, {-1, 0}};
 
-TEST_CASE("control poles along y-axis can be assigned", "[corelib][humanoid]") {
-  Fuzzer fuzz;
+// case 8: yd = 0.5, q1 = 1, q2 = 1, zeta = 1, rho =1, dist = 0
+template <typename T = double>
+struct params8 {
+  using type = T;
+  static constexpr type yd = 0.5;
+  static constexpr type q1 = 1;
+  static constexpr type q2 = 1;
+  static constexpr type rho = 1;
+  static constexpr type dist = 0;
+  static constexpr type kr = 1;
+  static constexpr type zeta = 1;
+};
+testcase_t<params8<>> testcases8[] = {
+    {0, 0, -0.5}, {1, 0, 1.5}, {3, -1, 3.5}, {0, -2, -4.5}, {-2, 3, 1.5}};
 
-  SECTION("instantiate with no paramters") {
-    ComCtrlY ctrl;
+#if 0
+// case __:
+template <typename T = double>
+struct params__ {
+  using type = T;
+  static constexpr type yd = ;
+  static constexpr type q1 = ;
+  static constexpr type q2 = ;
+  static constexpr type rho = 0;
+  static constexpr type dist = 0;
+  static constexpr type kr = 1;
+  static constexpr type zeta = ;
+};
+testcase_t<params__<>> testcases__[] = {};
+#endif
 
-    SECTION("default values of q1 and q2 are 1") {
-      CHECK(ctrl.q1() == 1.0);
-      CHECK(ctrl.q2() == 1.0);
-    }
+}  // namespace data_yz
 
-    SECTION("q1, q2 can be assigned") {
-      for (auto i = 0; i < 3; ++i) {
-        double q1 = fuzz.get();
-        double q2 = fuzz.get();
-        ctrl.set_q1(q1);
-        ctrl.set_q2(q2);
-        CHECK(ctrl.q1() == q1);
-        CHECK(ctrl.q2() == q2);
-      }
-    }
+using com_ctrl_y::Parameters;
+using com_ctrl_y::computeDesZmpPos;
 
-    SECTION("q1, q2 can be assigned with chaining method") {
-      for (auto i = 0; i < 3; ++i) {
-        double q1 = fuzz.get();
-        double q2 = fuzz.get();
-        ctrl.set_q1(q1).set_q2(q2);
-        CHECK(ctrl.q1() == q1);
-        CHECK(ctrl.q2() == q2);
-      }
-    }
-  }
-
-  SECTION("instantiate with paramters") {
-    for (auto i = 0; i < 3; ++i) {
-      double q1 = fuzz.get();
-      double q2 = fuzz.get();
-
-      ComCtrlY ctrl(q1, q2);
-      CHECK(ctrl.q1() == q1);
-      CHECK(ctrl.q2() == q2);
-    }
-  }
-
-  SECTION("instantiate with paramters then set arbitrary value") {
-    for (auto i = 0; i < 3; ++i) {
-      double q1 = fuzz.get();
-      double q2 = fuzz.get();
-
-      ComCtrlY ctrl(q1, q2);
-      CHECK(ctrl.q1() == q1);
-      CHECK(ctrl.q2() == q2);
-
-      q1 = fuzz.get();
-      q2 = fuzz.get();
-      ctrl.set_q1(q1);
-      ctrl.set_q2(q2);
-      CHECK(ctrl.q1() == q1);
-      CHECK(ctrl.q2() == q2);
-    }
-  }
-}
-
-TEST_CASE("compute desired ZMP position along y-axis to regulate at 0",
-          "[corelib][humanoid]") {
-  ComCtrlY ctrl;
-
-  SECTION("case: yd = 0, q1 = 1, q2 = 1, zeta = 1") {
-    double zeta = 1;
-    double yd = 0;
-    REQUIRE(ctrl.q1() == 1);
-    REQUIRE(ctrl.q2() == 1);
-
-    struct testcase_t {
-      double y, vy;
-      double expected_yz;
-    } testcases[] = {{0, 0, 0}, {1, 0, 2}, {3, -1, 4}, {0, -2, -4}, {-2, 2, 0}};
-
-    for (auto& c : testcases) {
-      CHECK(ctrl.computeDesZmpPos(yd, c.y, c.vy, zeta) ==
-            Approx(c.expected_yz));
-    }
-  }
-
-  SECTION("case: yd = 0, q1 = 1, q2 = 0.5, zeta = 1") {
-    double zeta = 1;
-    double yd = 0;
-    ctrl.set_q2(0.5);
-    REQUIRE(ctrl.q1() == 1);
-    REQUIRE(ctrl.q2() == 0.5);
-
-    struct testcase_t {
-      double y, vy;
-      double expected_yz;
-    } testcases[] = {
-        {0, 0, 0}, {1, 0, 1.5}, {3, -1, 3}, {0, -2, -3}, {-2, 2, 0}};
-
-    for (auto& c : testcases) {
-      CHECK(ctrl.computeDesZmpPos(yd, c.y, c.vy, zeta) ==
-            Approx(c.expected_yz));
-    }
-  }
-
-  SECTION("case: yd = 0, q1 = 1.2, q2 = 0.8, zeta = 1") {
-    double zeta = 1;
-    double yd = 0;
-    ctrl.set_q1(1.2);
-    ctrl.set_q2(0.8);
-    REQUIRE(ctrl.q1() == 1.2);
-    REQUIRE(ctrl.q2() == 0.8);
-
-    struct testcase_t {
-      double y, vy;
-      double expected_yz;
-    } testcases[] = {
-        {0, 0, 0}, {1, 0, 1.96}, {3, -1, 3.88}, {0, -2, -4}, {-2, 2, 0.08}};
-
-    for (auto& c : testcases) {
-      CHECK(ctrl.computeDesZmpPos(yd, c.y, c.vy, zeta) ==
-            Approx(c.expected_yz));
-    }
-  }
-
-  SECTION("case: yd = 0.5, q1 = 1, q2 = 1, zeta = 1") {
-    double zeta = 1;
-    double yd = 0.5;
-    REQUIRE(ctrl.q1() == 1.0);
-    REQUIRE(ctrl.q2() == 1.0);
-
-    struct testcase_t {
-      double y, vy;
-      double expected_yz;
-    } testcases[] = {
-        {0, 0, -0.5}, {1, 0, 1.5}, {3, -1, 3.5}, {0, -2, -4.5}, {-2, 3, 1.5}};
-
-    for (auto& c : testcases) {
-      CHECK(ctrl.computeDesZmpPos(yd, c.y, c.vy, zeta) ==
-            Approx(c.expected_yz));
-    }
-  }
-
-  SECTION("case: yd = 1, q1 = 1, q2 = 1.5, zeta = 1") {
-    double zeta = 1;
-    double yd = -1;
-    ctrl.set_q2(1.5);
-    REQUIRE(ctrl.q1() == 1.0);
-    REQUIRE(ctrl.q2() == 1.5);
-
-    struct testcase_t {
-      double y, vy;
-      double expected_yz;
-    } testcases[] = {
-        {0, 0, 1.5}, {1, 0, 4}, {3, -1, 6.5}, {0, -2, -3.5}, {-2, 3, 4}};
-
-    for (auto& c : testcases) {
-      CHECK(ctrl.computeDesZmpPos(yd, c.y, c.vy, zeta) ==
-            Approx(c.expected_yz));
-    }
-  }
-
-  SECTION("case: yd = 0.5, q1 = 1, q2 = 1.5, zeta = sqrt(2)") {
-    double zeta = sqrt(2);
-    double yd = 0.5;
-    ctrl.set_q2(1.5);
-    REQUIRE(ctrl.q1() == 1.0);
-    REQUIRE(ctrl.q2() == 1.5);
-
-    struct testcase_t {
-      double y, vy;
-      double expected_yz;
-    } testcases[] = {{0, 0, -0.75},
-                     {1, 0, 1.75},
-                     {3, -2, 2.5 * (3 - sqrt(2)) - 0.75},
-                     {0, -1, -1.25 * sqrt(2) - 0.75},
-                     {-2, 3, 2.5 * (-2 + 1.5 * sqrt(2)) - 0.75}};
-
-    for (auto& c : testcases) {
-      CHECK(ctrl.computeDesZmpPos(yd, c.y, c.vy, zeta) ==
-            Approx(c.expected_yz));
-    }
+template <typename testcase>
+void check_for_overloaded_func1(const testcase& testcases) {
+  for (const auto& tc : testcases) {
+    auto yz = computeDesZmpPos(tc.y, tc.v, tc.yd, tc.q1, tc.q2, tc.rho, tc.dist,
+                               tc.kr, tc.zeta);
+    CHECK(yz == Approx(tc.expected_yz));
   }
 }
 
-TEST_CASE("handle the case where zeta is non-positive on y-axis",
-          "[corelib][humanoid]") {
-  ComCtrlY ctrl;
+template <typename testcase>
+void check_for_overloaded_func2(const testcase& testcases) {
+  for (const auto& tc : testcases) {
+    Vec3D p = {0, tc.y, 0};
+    Vec3D v = {0, tc.v, 0};
+    Vec3D pd = {0, tc.yd, 0};
+    auto yz = computeDesZmpPos(p, v, pd, tc.q1, tc.q2, tc.rho, tc.dist, tc.kr,
+                               tc.zeta);
+    CHECK(yz == Approx(tc.expected_yz));
+  }
+}
+
+template <typename testcase>
+void check_for_overloaded_func3(const testcase& testcases) {
+  for (const auto& tc : testcases) {
+    Vec3D p = {0, tc.y, 0};
+    Vec3D v = {0, tc.v, 0};
+    Parameters params = {tc.yd, tc.q1, tc.q2, tc.rho, tc.dist, tc.kr, tc.zeta};
+    auto yz = computeDesZmpPos(p, v, params);
+    CHECK(yz == Approx(tc.expected_yz));
+  }
+}
+
+TEST_CASE("Case 1: compute desired ZMP position along y-axis",
+          "[ComCtrlY][case1]") {
+  SECTION("overloaded function 1") {
+    check_for_overloaded_func1(data_yz::testcases1);
+  }
+  SECTION("overloaded function 2") {
+    check_for_overloaded_func2(data_yz::testcases1);
+  }
+  SECTION("overloaded function 3") {
+    check_for_overloaded_func3(data_yz::testcases1);
+  }
+}
+
+TEST_CASE("Case 2: compute desired ZMP position along y-axis",
+          "[ComCtrlY][case2]") {
+  SECTION("overloaded function 1") {
+    check_for_overloaded_func1(data_yz::testcases2);
+  }
+  SECTION("overloaded function 2") {
+    check_for_overloaded_func2(data_yz::testcases2);
+  }
+  SECTION("overloaded function 3") {
+    check_for_overloaded_func3(data_yz::testcases2);
+  }
+}
+
+TEST_CASE("Case 3: compute desired ZMP position along y-axis",
+          "[ComCtrlY][case3]") {
+  SECTION("overloaded function 1") {
+    check_for_overloaded_func1(data_yz::testcases3);
+  }
+  SECTION("overloaded function 2") {
+    check_for_overloaded_func2(data_yz::testcases3);
+  }
+  SECTION("overloaded function 3") {
+    check_for_overloaded_func3(data_yz::testcases3);
+  }
+}
+
+TEST_CASE("Case 4: compute desired ZMP position along y-axis",
+          "[ComCtrlY][case4]") {
+  SECTION("overloaded function 1") {
+    check_for_overloaded_func1(data_yz::testcases4);
+  }
+  SECTION("overloaded function 2") {
+    check_for_overloaded_func2(data_yz::testcases4);
+  }
+  SECTION("overloaded function 3") {
+    check_for_overloaded_func3(data_yz::testcases4);
+  }
+}
+
+TEST_CASE("Case 5: compute desired ZMP position along y-axis",
+          "[ComCtrlY][case5]") {
+  SECTION("overloaded function 1") {
+    check_for_overloaded_func1(data_yz::testcases5);
+  }
+  SECTION("overloaded function 2") {
+    check_for_overloaded_func2(data_yz::testcases5);
+  }
+  SECTION("overloaded function 3") {
+    check_for_overloaded_func3(data_yz::testcases5);
+  }
+}
+
+TEST_CASE("Case 6: compute desired ZMP position along y-axis",
+          "[ComCtrlY][case6]") {
+  SECTION("overloaded function 1") {
+    check_for_overloaded_func1(data_yz::testcases6);
+  }
+  SECTION("overloaded function 2") {
+    check_for_overloaded_func2(data_yz::testcases6);
+  }
+  SECTION("overloaded function 3") {
+    check_for_overloaded_func3(data_yz::testcases6);
+  }
+}
+
+TEST_CASE("Case 7: y-axis: warn if zeta is given as non-negative value",
+          "[ComCtrlY][case7][exception]") {
   zEchoOff();
-  SECTION("call with `double` type") {
-    REQUIRE(ctrl.computeDesZmpPos(1, 0, 0, 0) == 0);
-    REQUIRE(ctrl.computeDesZmpPos(1, 0, 0, -1) == 0);
+  SECTION("overloaded function 1") {
+    check_for_overloaded_func1(data_yz::testcases7);
   }
-  SECTION("call with `Vec3D*` type") {
-    Vec3D ref_com_pos = {1, 1, 9.8};
-    Vec3D com_pos = {0, 0, 9.8};
-    Vec3D com_vel = {0, 0, 0};
-    REQUIRE(ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, 0) == 0);
-    REQUIRE(ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, -1) == 0);
+  SECTION("overloaded function 2") {
+    check_for_overloaded_func2(data_yz::testcases7);
+  }
+  SECTION("overloaded function 3") {
+    check_for_overloaded_func3(data_yz::testcases7);
   }
   zEchoOn();
 }
 
-TEST_CASE("compute desired ZMP position along y-axis when vectors are given",
-          "[corelib][humanoid]") {
-  ComCtrlY ctrl;
-
-  SECTION("case: yd = -1, q1 = 1, q2 = 1.5, zeta = 1") {
-    double zeta = 1;
-    double yd = -1;
-    ctrl.set_q2(1.5);
-    REQUIRE(ctrl.q1() == 1.0);
-    REQUIRE(ctrl.q2() == 1.5);
-
-    struct testcase_t {
-      double y, vy;
-      double expected_yz;
-    } testcases[] = {
-        {0, 0, 1.5}, {1, 0, 4}, {3, -1, 6.5}, {0, -2, -3.5}, {-2, 3, 4}};
-
-    for (auto& c : testcases) {
-      Vec3D ref_com_pos = {0, yd, 1};
-      Vec3D com_pos = {0, c.y, 1};
-      Vec3D com_vel = {0, c.vy, 0};
-      CHECK(ctrl.computeDesZmpPos(ref_com_pos, com_pos, com_vel, zeta) ==
-            Approx(c.expected_yz));
-    }
+TEST_CASE("Case 8: dumping term should 1 when dist = 0, even if rho =1",
+          "[ComCtrlY][case7]") {
+  SECTION("overloaded function 1") {
+    check_for_overloaded_func1(data_yz::testcases8);
   }
-}
-
-TEST_CASE(
-    "When foot distance is not given, nonlinear dumping term should always 1",
-    "[corelib][humanoid][ComCtrlY]") {
-  ComCtrlY ctrl;
-  double zeta = 1;
-  double yd = 0.5;
-  ctrl.set_rho(1.0);
-  REQUIRE(ctrl.dist() == 0.0);
-  REQUIRE(ctrl.rho() == 1.0);
-
-  struct testcase_t {
-    double y, vy;
-    double expected_yz;
-  } testcases[] = {
-      {0, 0, -0.5}, {1, 0, 1.5}, {3, -1, 3.5}, {0, -2, -4.5}, {-2, 3, 1.5}};
-
-  for (auto& c : testcases) {
-    CHECK(ctrl.computeDesZmpPos(yd, c.y, c.vy, zeta) == Approx(c.expected_yz));
+  SECTION("overloaded function 2") {
+    check_for_overloaded_func2(data_yz::testcases8);
+  }
+  SECTION("overloaded function 3") {
+    check_for_overloaded_func3(data_yz::testcases8);
   }
 }
 

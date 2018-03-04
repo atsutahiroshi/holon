@@ -21,10 +21,8 @@
 #ifndef HOLON_HUMANOID_COM_CTRL_HPP_
 #define HOLON_HUMANOID_COM_CTRL_HPP_
 
+#include <memory>
 #include "holon/corelib/common/optional.hpp"
-#include "holon/corelib/humanoid/com_ctrl_x.hpp"
-#include "holon/corelib/humanoid/com_ctrl_y.hpp"
-#include "holon/corelib/humanoid/com_ctrl_z.hpp"
 #include "holon/corelib/humanoid/com_zmp_model.hpp"
 #include "holon/corelib/math/vec3d.hpp"
 
@@ -84,7 +82,6 @@ class ComCtrl {
   using InputsPtr = std::shared_ptr<Inputs>;
   using OutputsPtr = std::shared_ptr<Outputs>;
   using CommandsPtr = std::shared_ptr<Commands>;
-  using HrzPos = std::tuple<double, double>;
 
   // constructors
   ComCtrl();
@@ -98,15 +95,8 @@ class ComCtrl {
   ComCtrl& operator=(ComCtrl&&) = delete;
 
   // accessors
-  inline ComCtrlX& x() noexcept { return m_x; }
-  inline ComCtrlY& y() noexcept { return m_y; }
-  inline ComCtrlZ& z() noexcept { return m_z; }
   inline States& states() noexcept { return *m_states_ptr; }
   // const accessors
-  inline const ComCtrlX& x() const noexcept { return m_x; }
-  inline const ComCtrlY& y() const noexcept { return m_y; }
-  inline const ComCtrlZ& z() const noexcept { return m_z; }
-
   inline const Model& model() const noexcept { return m_model; }
   inline const States& states() const noexcept { return *m_states_ptr; }
   inline const Inputs& inputs() const noexcept { return *m_inputs_ptr; }
@@ -152,9 +142,6 @@ class ComCtrl {
   CallbackFunc getZmpPositionCallback();
 
  private:
-  ComCtrlX m_x;
-  ComCtrlY m_y;
-  ComCtrlZ m_z;
   Model m_model;
   StatesPtr m_states_ptr;
   InputsPtr m_inputs_ptr;
@@ -163,7 +150,6 @@ class ComCtrl {
   double m_canonical_foot_dist;
 
   void remapCommandsToInputs();
-  void updateCtrlParam();
   void updateOutputs();
 };
 

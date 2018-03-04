@@ -21,6 +21,9 @@
 #include "holon/corelib/humanoid/com_ctrl.hpp"
 
 #include <roki/rk_g.h>
+#include "holon/corelib/humanoid/com_ctrl_x.hpp"
+#include "holon/corelib/humanoid/com_ctrl_y.hpp"
+#include "holon/corelib/humanoid/com_ctrl_z.hpp"
 #include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_formula.hpp"
 
 #include "catch.hpp"
@@ -31,7 +34,10 @@ namespace holon {
 namespace {
 
 using Catch::Matchers::Equals;
-using ComZmpModelFormula::computeZeta;
+
+namespace ctrl_x = com_ctrl_x;
+namespace ctrl_y = com_ctrl_y;
+namespace ctrl_z = com_ctrl_z;
 
 const double G = RK_G;
 
@@ -82,15 +88,15 @@ TEST_CASE("ComCtrlInputs: constructor", "[ComCtrlInputs]") {
     ComCtrlInputs inputs;
     CHECK(inputs.com_position == ComZmpModelData::default_com_position);
     CHECK(inputs.com_velocity == kVec3DZero);
-    CHECK(inputs.qx1 == ComCtrlX::default_q1);
-    CHECK(inputs.qx2 == ComCtrlX::default_q2);
-    CHECK(inputs.qy1 == ComCtrlY::default_q1);
-    CHECK(inputs.qy2 == ComCtrlY::default_q2);
-    CHECK(inputs.rho == ComCtrlY::default_rho);
-    CHECK(inputs.dist == ComCtrlY::default_dist);
-    CHECK(inputs.kr == ComCtrlY::default_kr);
-    CHECK(inputs.qz1 == ComCtrlZ::default_q1);
-    CHECK(inputs.qz2 == ComCtrlZ::default_q2);
+    CHECK(inputs.qx1 == ctrl_x::default_q1);
+    CHECK(inputs.qx2 == ctrl_x::default_q2);
+    CHECK(inputs.qy1 == ctrl_y::default_q1);
+    CHECK(inputs.qy2 == ctrl_y::default_q2);
+    CHECK(inputs.rho == ctrl_y::default_rho);
+    CHECK(inputs.dist == ctrl_y::default_dist);
+    CHECK(inputs.kr == ctrl_y::default_kr);
+    CHECK(inputs.qz1 == ctrl_z::default_q1);
+    CHECK(inputs.qz2 == ctrl_z::default_q2);
     CHECK(inputs.vhp == 0);
   }
 
@@ -101,15 +107,15 @@ TEST_CASE("ComCtrlInputs: constructor", "[ComCtrlInputs]") {
     ComCtrlInputs inputs(*data);
     CHECK(inputs.com_position == p0);
     CHECK(inputs.com_velocity == kVec3DZero);
-    CHECK(inputs.qx1 == ComCtrlX::default_q1);
-    CHECK(inputs.qx2 == ComCtrlX::default_q2);
-    CHECK(inputs.qy1 == ComCtrlY::default_q1);
-    CHECK(inputs.qy2 == ComCtrlY::default_q2);
-    CHECK(inputs.rho == ComCtrlY::default_rho);
-    CHECK(inputs.dist == ComCtrlY::default_dist);
-    CHECK(inputs.kr == ComCtrlY::default_kr);
-    CHECK(inputs.qz1 == ComCtrlZ::default_q1);
-    CHECK(inputs.qz2 == ComCtrlZ::default_q2);
+    CHECK(inputs.qx1 == ctrl_x::default_q1);
+    CHECK(inputs.qx2 == ctrl_x::default_q2);
+    CHECK(inputs.qy1 == ctrl_y::default_q1);
+    CHECK(inputs.qy2 == ctrl_y::default_q2);
+    CHECK(inputs.rho == ctrl_y::default_rho);
+    CHECK(inputs.dist == ctrl_y::default_dist);
+    CHECK(inputs.kr == ctrl_y::default_kr);
+    CHECK(inputs.qz1 == ctrl_z::default_q1);
+    CHECK(inputs.qz2 == ctrl_z::default_q2);
     CHECK(inputs.vhp == 0);
   }
 
@@ -120,15 +126,15 @@ TEST_CASE("ComCtrlInputs: constructor", "[ComCtrlInputs]") {
     ComCtrlInputs inputs(model);
     CHECK(inputs.com_position == p0);
     CHECK(inputs.com_velocity == kVec3DZero);
-    CHECK(inputs.qx1 == ComCtrlX::default_q1);
-    CHECK(inputs.qx2 == ComCtrlX::default_q2);
-    CHECK(inputs.qy1 == ComCtrlY::default_q1);
-    CHECK(inputs.qy2 == ComCtrlY::default_q2);
-    CHECK(inputs.rho == ComCtrlY::default_rho);
-    CHECK(inputs.dist == ComCtrlY::default_dist);
-    CHECK(inputs.kr == ComCtrlY::default_kr);
-    CHECK(inputs.qz1 == ComCtrlZ::default_q1);
-    CHECK(inputs.qz2 == ComCtrlZ::default_q2);
+    CHECK(inputs.qx1 == ctrl_x::default_q1);
+    CHECK(inputs.qx2 == ctrl_x::default_q2);
+    CHECK(inputs.qy1 == ctrl_y::default_q1);
+    CHECK(inputs.qy2 == ctrl_y::default_q2);
+    CHECK(inputs.rho == ctrl_y::default_rho);
+    CHECK(inputs.dist == ctrl_y::default_dist);
+    CHECK(inputs.kr == ctrl_y::default_kr);
+    CHECK(inputs.qz1 == ctrl_z::default_q1);
+    CHECK(inputs.qz2 == ctrl_z::default_q2);
     CHECK(inputs.vhp == 0);
   }
 }
@@ -144,7 +150,7 @@ TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
   }
 
   SECTION("check if canonical foot distance be initialized") {
-    CHECK(ctrl.canonical_foot_dist() == ComCtrlY::default_dist);
+    CHECK(ctrl.canonical_foot_dist() == ctrl_y::default_dist);
   }
 }
 
@@ -225,7 +231,6 @@ TEST_CASE("ComCtrl::set_canonical_foot_dist sets canonical foot distance",
 
   ctrl.set_canonical_foot_dist(dist);
   CHECK(ctrl.canonical_foot_dist() == dist);
-  CHECK(ctrl.y().dist() != dist);
 }
 
 TEST_CASE("ComCtrl::reset(const Vec3D&) should reset initial COM position",
@@ -417,8 +422,6 @@ TEST_CASE("ComCtrl::update() updates control paramters",
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qx1 == 1.0);
       CHECK(ctrl.inputs().qx2 == 1.0);
-      CHECK(ctrl.x().q1() == 1.0);
-      CHECK(ctrl.x().q2() == 1.0);
     }
     SECTION("set user command") {
       cmd->qx1 = 0.8;
@@ -426,16 +429,12 @@ TEST_CASE("ComCtrl::update() updates control paramters",
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qx1 == 0.8);
       CHECK(ctrl.inputs().qx2 == 0.5);
-      CHECK(ctrl.x().q1() == 0.8);
-      CHECK(ctrl.x().q2() == 0.5);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qx1 == 1.0);
       CHECK(ctrl.inputs().qx2 == 1.0);
-      CHECK(ctrl.x().q1() == 1.0);
-      CHECK(ctrl.x().q2() == 1.0);
     }
   }
 
@@ -446,8 +445,6 @@ TEST_CASE("ComCtrl::update() updates control paramters",
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qy1 == 1.0);
       CHECK(ctrl.inputs().qy2 == 1.0);
-      CHECK(ctrl.y().q1() == 1.0);
-      CHECK(ctrl.y().q2() == 1.0);
     }
     SECTION("set user command") {
       cmd->qy1 = 0.8;
@@ -455,16 +452,12 @@ TEST_CASE("ComCtrl::update() updates control paramters",
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qy1 == 0.8);
       CHECK(ctrl.inputs().qy2 == 0.5);
-      CHECK(ctrl.y().q1() == 0.8);
-      CHECK(ctrl.y().q2() == 0.5);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qy1 == 1.0);
       CHECK(ctrl.inputs().qy2 == 1.0);
-      CHECK(ctrl.y().q1() == 1.0);
-      CHECK(ctrl.y().q2() == 1.0);
     }
   }
 
@@ -475,8 +468,6 @@ TEST_CASE("ComCtrl::update() updates control paramters",
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qz1 == 1.0);
       CHECK(ctrl.inputs().qz2 == 1.0);
-      CHECK(ctrl.z().q1() == 1.0);
-      CHECK(ctrl.z().q2() == 1.0);
     }
     SECTION("set user command") {
       cmd->qz1 = 0.8;
@@ -484,16 +475,12 @@ TEST_CASE("ComCtrl::update() updates control paramters",
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qz1 == 0.8);
       CHECK(ctrl.inputs().qz2 == 0.5);
-      CHECK(ctrl.z().q1() == 0.8);
-      CHECK(ctrl.z().q2() == 0.5);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().qz1 == 1.0);
       CHECK(ctrl.inputs().qz2 == 1.0);
-      CHECK(ctrl.z().q1() == 1.0);
-      CHECK(ctrl.z().q2() == 1.0);
     }
   }
 
@@ -517,67 +504,55 @@ TEST_CASE("ComCtrl::update() updates control paramters",
 
   SECTION("Stepping activation parameter") {
     inputs->rho = fuzz();
-    ctrl.y().set_rho(fuzz());
     SECTION("default") {
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().rho == 0.0);
-      CHECK(ctrl.y().rho() == 0.0);
     }
     SECTION("set user command") {
       cmd->rho = 1.0;
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().rho == 1.0);
-      CHECK(ctrl.y().rho() == 1.0);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().rho == 0.0);
-      CHECK(ctrl.y().rho() == 0.0);
     }
   }
 
   SECTION("Canonical foot distance") {
     inputs->dist = fuzz();
-    ctrl.y().set_dist(fuzz());
     SECTION("default") {
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().dist == dist);
-      CHECK(ctrl.y().dist() == dist);
     }
     SECTION("set user command") {
       cmd->dist = 1.0;
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().dist == 1.0);
-      CHECK(ctrl.y().dist() == 1.0);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().dist == dist);
-      CHECK(ctrl.y().dist() == dist);
     }
   }
 
   SECTION("initial energy exersion") {
     inputs->kr = fuzz();
-    ctrl.y().set_kr(fuzz());
     SECTION("default") {
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().kr == 1.0);
-      CHECK(ctrl.y().kr() == 1.0);
     }
     SECTION("set user command") {
       cmd->kr = 0.5;
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().kr == 0.5);
-      CHECK(ctrl.y().kr() == 0.5);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
       CHECK(ctrl.inputs().kr == 1.0);
-      CHECK(ctrl.y().kr() == 1.0);
     }
   }
 
@@ -743,11 +718,10 @@ SCENARIO("ComCtrl::computeDesZmpPos computes desired ZMP position",
     Vec3D pd = {0, 0, G};
     ctrl.inputs_ptr()->com_position = pd;
 
-    // REQUIRE(desired_zeta == Approx(1.0));
-    REQUIRE(ctrl.x().q1() == 1);
-    REQUIRE(ctrl.x().q2() == 1);
-    REQUIRE(ctrl.y().q1() == 1);
-    REQUIRE(ctrl.y().q2() == 1);
+    REQUIRE(ctrl.inputs().qx1 == 1);
+    REQUIRE(ctrl.inputs().qx2 == 1);
+    REQUIRE(ctrl.inputs().qy1 == 1);
+    REQUIRE(ctrl.inputs().qy2 == 1);
 
     WHEN("p = (0, 0, G), v = (0, 0, 0)") {
       Vec3D p = {0, 0, G};
@@ -782,13 +756,15 @@ SCENARIO("ComCtrl::computeDesZmpPos computes desired ZMP position",
     ComCtrl ctrl;
     Vec3D pd = {0, 0, G};
     ctrl.inputs_ptr()->com_position = pd;
-    ctrl.x().set_q1(1.0).set_q2(0.5);
-    ctrl.y().set_q1(1.2).set_q2(0.8);
+    ctrl.inputs_ptr()->qx1 = 1.0;
+    ctrl.inputs_ptr()->qx2 = 0.5;
+    ctrl.inputs_ptr()->qy1 = 1.2;
+    ctrl.inputs_ptr()->qy2 = 0.8;
 
-    REQUIRE(ctrl.x().q1() == 1.0);
-    REQUIRE(ctrl.x().q2() == 0.5);
-    REQUIRE(ctrl.y().q1() == 1.2);
-    REQUIRE(ctrl.y().q2() == 0.8);
+    REQUIRE(ctrl.inputs().qx1 == 1.0);
+    REQUIRE(ctrl.inputs().qx2 == 0.5);
+    REQUIRE(ctrl.inputs().qy1 == 1.2);
+    REQUIRE(ctrl.inputs().qy2 == 0.8);
 
     WHEN("p = (1, 1, G), v = (0, 0, 0)") {
       Vec3D p = {1, 1, G};
@@ -815,12 +791,12 @@ SCENARIO("ComCtrl::computeDesZmpPos computes desired ZMP position",
     ComCtrl ctrl;
     Vec3D pd = {1, 0.5, G};
     ctrl.inputs_ptr()->com_position = pd;
-    ctrl.x().set_q2(1.5);
+    ctrl.inputs_ptr()->qx2 = 1.5;
 
-    REQUIRE(ctrl.x().q1() == 1);
-    REQUIRE(ctrl.x().q2() == 1.5);
-    REQUIRE(ctrl.y().q1() == 1);
-    REQUIRE(ctrl.y().q2() == 1);
+    REQUIRE(ctrl.inputs().qx1 == 1);
+    REQUIRE(ctrl.inputs().qx2 == 1.5);
+    REQUIRE(ctrl.inputs().qy1 == 1);
+    REQUIRE(ctrl.inputs().qy2 == 1);
 
     WHEN("p = (1, 0, G), v = (0, 0, 0)") {
       Vec3D p = {1, 0, G};
@@ -857,13 +833,13 @@ SCENARIO("ComCtrl::computeDesZmpPos computes desired ZMP position",
     ComCtrl ctrl;
     Vec3D pd = {0, 0.5, 0.5 * G};
     ctrl.inputs_ptr()->com_position = pd;
-    ctrl.x().set_q2(1.5);
-    ctrl.y().set_q2(1.5);
+    ctrl.inputs_ptr()->qx2 = 1.5;
+    ctrl.inputs_ptr()->qy2 = 1.5;
 
-    REQUIRE(ctrl.x().q1() == 1);
-    REQUIRE(ctrl.x().q2() == 1.5);
-    REQUIRE(ctrl.y().q1() == 1);
-    REQUIRE(ctrl.y().q2() == 1.5);
+    REQUIRE(ctrl.inputs().qx1 == 1);
+    REQUIRE(ctrl.inputs().qx2 == 1.5);
+    REQUIRE(ctrl.inputs().qy1 == 1);
+    REQUIRE(ctrl.inputs().qy2 == 1.5);
 
     WHEN("p = (0, 0, 0.5*G), v = (0, 0, 0)") {
       Vec3D p = {0, 0, 0.5 * G};

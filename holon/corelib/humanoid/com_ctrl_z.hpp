@@ -24,46 +24,28 @@
 #include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
+namespace com_ctrl_z {
 
-class ComCtrlZ {
- public:
-  static const double default_q1;
-  static const double default_q2;
-
- public:
-  // constructors
-  ComCtrlZ();
-  ComCtrlZ(double t_q1, double t_q2);
-
-  // special member functions
-  virtual ~ComCtrlZ() = default;
-  ComCtrlZ(const ComCtrlZ&) = delete;
-  ComCtrlZ(ComCtrlZ&&) = delete;
-  ComCtrlZ& operator=(const ComCtrlZ&) = delete;
-  ComCtrlZ& operator=(ComCtrlZ&&) = delete;
-
-  // accessors
-  inline double q1() const noexcept { return m_q1; }
-  inline double q2() const noexcept { return m_q2; }
-
-  // mutators
-  ComCtrlZ& set_q1(double t_q1);
-  ComCtrlZ& set_q2(double t_q2);
-
-  // functions
-  double computeDesSqrXi(double t_zd) const;
-  double computeDesXi(double t_zd) const;
-  double computeDesReactForce(double t_zd, double t_z, double t_v,
-                              double t_mass) const noexcept;
-  double computeDesReactForce(const Vec3D& t_ref_com_position,
-                              const Vec3D& t_com_position,
-                              const Vec3D& t_com_velocity, double t_mass) const
-      noexcept;
-
- private:
-  double m_q1;
-  double m_q2;
+struct Parameters {
+  double zd;
+  double q1, q2;
+  double mass;
 };
-}
+
+static const double default_q1 = 1;
+static const double default_q2 = 1;
+
+double computeDesReactForce(double t_z, double t_v, double t_zd, double t_q1,
+                            double t_q2, double t_mass);
+double computeDesReactForce(const Vec3D& t_com_position,
+                            const Vec3D& t_com_velocity,
+                            const Vec3D& t_ref_com_position, double t_q1,
+                            double t_q2, double t_mass);
+double computeDesReactForce(const Vec3D& t_com_position,
+                            const Vec3D& t_com_velocity,
+                            const Parameters& t_parameters);
+
+}  // namespace com_ctrl_z
+}  // namespace holon
 
 #endif  // HOLON_HUMANOID_COM_CTRL_Z_HPP_

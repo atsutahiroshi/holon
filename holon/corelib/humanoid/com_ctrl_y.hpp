@@ -24,61 +24,34 @@
 #include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
+namespace com_ctrl_y {
 
-class ComCtrlY {
- public:
-  static const double default_q1;
-  static const double default_q2;
-  static const double default_rho;
-  static const double default_dist;
-  static const double default_kr;
-
- public:
-  // constructors
-  ComCtrlY();
-  ComCtrlY(double t_q1, double t_q2);
-  ComCtrlY(double t_q1, double t_q2, double t_dist);
-
-  // special member functions
-  virtual ~ComCtrlY() = default;
-  ComCtrlY(const ComCtrlY&) = delete;
-  ComCtrlY(ComCtrlY&&) = delete;
-  ComCtrlY& operator=(const ComCtrlY&) = delete;
-  ComCtrlY& operator=(ComCtrlY&&) = delete;
-
-  // accessors
-  inline double q1() const noexcept { return m_q1; }
-  inline double q2() const noexcept { return m_q2; }
-  inline double rho() const noexcept { return m_rho; }
-  inline double dist() const noexcept { return m_dist; }
-  inline double kr() const noexcept { return m_kr; }
-
-  // mutators
-  ComCtrlY& set_q1(double t_q1);
-  ComCtrlY& set_q2(double t_q2);
-  ComCtrlY& set_rho(double t_rho);
-  ComCtrlY& set_dist(double t_dist);
-  ComCtrlY& set_kr(double t_kr);
-
-  // functions
-  double computeDesZmpPos(double t_yd, double t_y, double t_v,
-                          double t_zeta) const noexcept;
-  double computeDesZmpPos(const Vec3D& t_ref_com_position,
-                          const Vec3D& t_com_position,
-                          const Vec3D& t_com_velocity, double t_zeta) const
-      noexcept;
-
- private:
-  double m_q1;
-  double m_q2;
-  double m_rho;
-  double m_dist;
-  double m_kr;
-
-  double computeNonlinearDumping(double t_yd, double t_y, double t_v,
-                                 double t_zeta) const noexcept;
+struct Parameters {
+  double yd;
+  double q1, q2;
+  double rho, dist, kr;
+  double zeta;
 };
 
+static const double default_q1 = 1;
+static const double default_q2 = 1;
+static const double default_rho = 0;
+static const double default_dist = 0;
+static const double default_kr = 1;
+
+double computeDesZmpPos(double t_y, double t_v, double t_yd, double t_q1,
+                        double t_q2, double t_rho, double t_dist, double t_kr,
+                        double t_zeta);
+double computeDesZmpPos(const Vec3D& t_com_position,
+                        const Vec3D& t_com_velocity,
+                        const Vec3D& t_ref_com_position, double t_q1,
+                        double t_q2, double t_rho, double t_dist, double t_kr,
+                        double t_zeta);
+double computeDesZmpPos(const Vec3D& t_com_position,
+                        const Vec3D& t_com_velocity,
+                        const Parameters& t_parameters);
+
+}  // namespace com_ctrl_y
 }  // namespace holon
 
 #endif  // HOLON_HUMANOID_COM_CTRL_Y_HPP_

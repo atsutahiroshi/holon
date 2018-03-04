@@ -41,13 +41,6 @@ class ComCtrlBenchmark : public ::hayai::Fixture {
   Vec3D com_vel;
 };
 
-BENCHMARK_F(ComCtrlBenchmark, GetQ1, 100, 1000) {
-  double q1 = ctrl.x().q1();
-  (void)q1;
-}
-
-BENCHMARK_F(ComCtrlBenchmark, SetQ1, 100, 1000) { ctrl.x().set_q1(1); }
-
 BENCHMARK_F(ComCtrlBenchmark, computeDesZmpPos, 100, 1000) {
   ctrl.inputs_ptr()->com_position = ref_com_pos;
   auto desired_zmp_pos = ctrl.computeDesZmpPos(com_pos, com_vel, 0);

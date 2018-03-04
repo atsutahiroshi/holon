@@ -24,24 +24,11 @@
 #include <algorithm>
 
 namespace holon {
+namespace com_ctrl_z {
 
-const double ComCtrlZ::default_q1 = 1.0;
-const double ComCtrlZ::default_q2 = 1.0;
+namespace {
 
-ComCtrlZ::ComCtrlZ() : m_q1(default_q1), m_q2(default_q2) {}
-ComCtrlZ::ComCtrlZ(double t_q1, double t_q2) : m_q1(t_q1), m_q2(t_q2) {}
-
-ComCtrlZ& ComCtrlZ::set_q1(double t_q1) {
-  m_q1 = t_q1;
-  return *this;
-}
-
-ComCtrlZ& ComCtrlZ::set_q2(double t_q2) {
-  m_q2 = t_q2;
-  return *this;
-}
-
-double ComCtrlZ::computeDesSqrXi(double t_zd) const {
+double computeSqrXi(double t_zd) {
   if (zIsTiny(t_zd) || t_zd < 0) {
     ZRUNERROR("Desired COM height should be positive. (given: %f)", t_zd);
     return 0;
@@ -49,26 +36,32 @@ double ComCtrlZ::computeDesSqrXi(double t_zd) const {
   return RK_G / t_zd;
 }
 
-double ComCtrlZ::computeDesXi(double t_zd) const {
-  return sqrt(computeDesSqrXi(t_zd));
-}
+}  // namespace
 
-double ComCtrlZ::computeDesReactForce(double t_zd, double t_z, double t_v,
-                                      double t_mass) const noexcept {
-  double xi2 = computeDesSqrXi(t_zd);
+double computeDesReactForce(double t_z, double t_v, double t_zd, double t_q1,
+                            double t_q2, double t_mass) {
+  double xi2 = computeSqrXi(t_zd);
   double xi = sqrt(xi2);
   double fz =
-      -xi2 * m_q1 * m_q2 * (t_z - t_zd) - xi * (m_q1 + m_q2) * t_v + RK_G;
+      -xi2 * t_q1 * t_q2 * (t_z - t_zd) - xi * (t_q1 + t_q2) * t_v + RK_G;
   fz *= t_mass;
   return std::max<double>(fz, 0);
 }
 
-double ComCtrlZ::computeDesReactForce(const Vec3D& t_ref_com_position,
-                                      const Vec3D& t_com_position,
-                                      const Vec3D& t_com_velocity,
-                                      double t_mass) const noexcept {
-  return computeDesReactForce(t_ref_com_position.z(), t_com_position.z(),
-                              t_com_velocity.z(), t_mass);
+double computeDesReactForce(const Vec3D& t_com_position,
+                            const Vec3D& t_com_velocity,
+                            const Vec3D& t_ref_com_position, double t_q1,
+                            double t_q2, double t_mass) {
+  return computeDesReactForce(t_com_position.z(), t_com_velocity.z(),
+                              t_ref_com_position.z(), t_q1, t_q2, t_mass);
+}
+double computeDesReactForce(const Vec3D& t_com_position,
+                            const Vec3D& t_com_velocity,
+                            const Parameters& t_parameters) {
+  return computeDesReactForce(t_com_position.z(), t_com_velocity.z(),
+                              t_parameters.zd, t_parameters.q1, t_parameters.q2,
+                              t_parameters.mass);
 }
 
+}  // namespace com_ctrl_z
 }  // namespace holon

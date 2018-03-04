@@ -24,49 +24,28 @@
 #include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
+namespace com_ctrl_x {
 
-class ComCtrlX {
- public:
-  static const double default_q1;
-  static const double default_q2;
-  static const double default_vd;
-
- public:
-  // constructors
-  ComCtrlX();
-  ComCtrlX(double t_q1, double t_q2);
-
-  // special member functions
-  virtual ~ComCtrlX() = default;
-  ComCtrlX(const ComCtrlX&) = delete;
-  ComCtrlX(ComCtrlX&&) = delete;
-  ComCtrlX& operator=(const ComCtrlX&) = delete;
-  ComCtrlX& operator=(ComCtrlX&&) = delete;
-
-  // accessors
-  inline double q1() const noexcept { return m_q1; }
-  inline double q2() const noexcept { return m_q2; }
-  inline double vd() const noexcept { return m_vd; }
-
-  // mutators
-  ComCtrlX& set_q1(double t_q1);
-  ComCtrlX& set_q2(double t_q2);
-  ComCtrlX& set_vd(double t_vd);
-
-  // functions
-  double computeDesZmpPos(double t_xd, double t_x, double t_v,
-                          double t_zeta) const noexcept;
-  double computeDesZmpPos(const Vec3D& t_ref_com_position,
-                          const Vec3D& t_com_position,
-                          const Vec3D& t_com_velocity, double t_zeta) const
-      noexcept;
-
- private:
-  double m_q1;
-  double m_q2;
-  double m_vd;
+struct Parameters {
+  double xd;
+  double q1, q2;
+  double zeta;
 };
 
+static const double default_q1 = 1;
+static const double default_q2 = 1;
+
+double computeDesZmpPos(double t_x, double t_v, double t_xd, double t_q1,
+                        double t_q2, double t_zeta);
+double computeDesZmpPos(const Vec3D& t_com_position,
+                        const Vec3D& t_com_velocity,
+                        const Vec3D& t_ref_com_position, double t_q1,
+                        double t_q2, double t_zeta);
+double computeDesZmpPos(const Vec3D& t_com_position,
+                        const Vec3D& t_com_velocity,
+                        const Parameters& t_parameters);
+
+}  // namespace com_ctrl_x
 }  // namespace holon
 
 #endif  // HOLON_HUMANOID_COM_CTRL_X_HPP_

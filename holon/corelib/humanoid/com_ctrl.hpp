@@ -45,7 +45,7 @@ struct ComCtrlCommands {
   void set_com_velocity(opt_double t_vxd, opt_double t_vyd);
 };
 
-struct ComCtrlInputs {
+struct ComCtrlRefs {
   Vec3D com_position;
   Vec3D com_velocity;
   double qx1, qx2;
@@ -54,9 +54,9 @@ struct ComCtrlInputs {
   double rho, dist, kr;
   double vhp;
 
-  ComCtrlInputs();
-  explicit ComCtrlInputs(const ComZmpModelData& t_data);
-  explicit ComCtrlInputs(const ComZmpModel& t_model);
+  ComCtrlRefs();
+  explicit ComCtrlRefs(const ComZmpModelData& t_data);
+  explicit ComCtrlRefs(const ComZmpModel& t_model);
 };
 
 struct ComCtrlOutputs {
@@ -68,21 +68,21 @@ struct ComCtrlOutputs {
 };
 
 using ComCtrlCommandsPtr = std::shared_ptr<ComCtrlCommands>;
-using ComCtrlInputsPtr = std::shared_ptr<ComCtrlInputs>;
+using ComCtrlRefsPtr = std::shared_ptr<ComCtrlRefs>;
 using ComCtrlOutputsPtr = std::shared_ptr<ComCtrlOutputs>;
 ComCtrlCommandsPtr createComCtrlCommands();
-ComCtrlInputsPtr createComCtrlInputs();
+ComCtrlRefsPtr createComCtrlRefs();
 ComCtrlOutputsPtr createComCtrlOutputs();
 
 class ComCtrl {
  public:
   using Model = ComZmpModel;
   using States = ComZmpModelData;
-  using Inputs = ComCtrlInputs;
+  using Refs = ComCtrlRefs;
   using Outputs = ComCtrlOutputs;
   using Commands = ComCtrlCommands;
   using StatesPtr = std::shared_ptr<States>;
-  using InputsPtr = std::shared_ptr<Inputs>;
+  using RefsPtr = std::shared_ptr<Refs>;
   using OutputsPtr = std::shared_ptr<Outputs>;
   using CommandsPtr = std::shared_ptr<Commands>;
 
@@ -102,11 +102,11 @@ class ComCtrl {
   // const accessors
   inline const Model& model() const noexcept { return m_model; }
   inline const States& states() const noexcept { return *m_states_ptr; }
-  inline const Inputs& inputs() const noexcept { return *m_inputs_ptr; }
+  inline const Refs& refs() const noexcept { return *m_refs_ptr; }
   inline const Outputs& outputs() const noexcept { return *m_outputs_ptr; }
   inline const Commands& commands() const noexcept { return *m_commands_ptr; }
   inline const StatesPtr& states_ptr() const noexcept { return m_states_ptr; }
-  inline const InputsPtr& inputs_ptr() const noexcept { return m_inputs_ptr; }
+  inline const RefsPtr& refs_ptr() const noexcept { return m_refs_ptr; }
   inline const OutputsPtr& outputs_ptr() const noexcept {
     return m_outputs_ptr;
   }
@@ -119,7 +119,7 @@ class ComCtrl {
 
   // mutators
   ComCtrl& set_states_ptr(StatesPtr t_states_ptr);
-  ComCtrl& set_inputs_ptr(InputsPtr t_inputs_ptr);
+  ComCtrl& set_refs_ptr(RefsPtr t_refs_ptr);
   ComCtrl& set_outputs_ptr(OutputsPtr t_outputs_ptr);
   ComCtrl& set_canonical_foot_dist(double t_canonical_foot_dist);
   ComCtrl& set_time_step(double t_time_step);
@@ -147,12 +147,12 @@ class ComCtrl {
  private:
   Model m_model;
   StatesPtr m_states_ptr;
-  InputsPtr m_inputs_ptr;
+  RefsPtr m_refs_ptr;
   OutputsPtr m_outputs_ptr;
   CommandsPtr m_commands_ptr;
   double m_canonical_foot_dist;
 
-  void remapCommandsToInputs();
+  void remapCommandsToRefs();
   void updateOutputs();
 };
 

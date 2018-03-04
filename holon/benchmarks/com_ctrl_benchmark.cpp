@@ -42,7 +42,7 @@ class ComCtrlBenchmark : public ::hayai::Fixture {
 };
 
 BENCHMARK_F(ComCtrlBenchmark, computeDesZmpPos, 100, 1000) {
-  ctrl.inputs_ptr()->com_position = ref_com_pos;
+  ctrl.refs_ptr()->com_position = ref_com_pos;
   auto desired_zmp_pos = ctrl.computeDesZmpPos(com_pos, com_vel, 0);
 }
 

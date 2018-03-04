@@ -83,59 +83,59 @@ TEST_CASE("ComCtrlCommands::clear() should clear all the values") {
   CHECK(cmd.vhp == nullopt);
 }
 
-TEST_CASE("ComCtrlInputs: constructor", "[ComCtrlInputs]") {
+TEST_CASE("ComCtrlRefs: constructor", "[ComCtrlRefs]") {
   SECTION("default constructor") {
-    ComCtrlInputs inputs;
-    CHECK(inputs.com_position == ComZmpModelData::default_com_position);
-    CHECK(inputs.com_velocity == kVec3DZero);
-    CHECK(inputs.qx1 == ctrl_x::default_q1);
-    CHECK(inputs.qx2 == ctrl_x::default_q2);
-    CHECK(inputs.qy1 == ctrl_y::default_q1);
-    CHECK(inputs.qy2 == ctrl_y::default_q2);
-    CHECK(inputs.rho == ctrl_y::default_rho);
-    CHECK(inputs.dist == ctrl_y::default_dist);
-    CHECK(inputs.kr == ctrl_y::default_kr);
-    CHECK(inputs.qz1 == ctrl_z::default_q1);
-    CHECK(inputs.qz2 == ctrl_z::default_q2);
-    CHECK(inputs.vhp == 0);
+    ComCtrlRefs refs;
+    CHECK(refs.com_position == ComZmpModelData::default_com_position);
+    CHECK(refs.com_velocity == kVec3DZero);
+    CHECK(refs.qx1 == ctrl_x::default_q1);
+    CHECK(refs.qx2 == ctrl_x::default_q2);
+    CHECK(refs.qy1 == ctrl_y::default_q1);
+    CHECK(refs.qy2 == ctrl_y::default_q2);
+    CHECK(refs.rho == ctrl_y::default_rho);
+    CHECK(refs.dist == ctrl_y::default_dist);
+    CHECK(refs.kr == ctrl_y::default_kr);
+    CHECK(refs.qz1 == ctrl_z::default_q1);
+    CHECK(refs.qz2 == ctrl_z::default_q2);
+    CHECK(refs.vhp == 0);
   }
 
   SECTION("const ComZmpModelData&") {
     Fuzzer fuzz(0, 5);
     auto p0 = fuzz.get<Vec3D>();
     auto data = createComZmpModelData(p0);
-    ComCtrlInputs inputs(*data);
-    CHECK(inputs.com_position == p0);
-    CHECK(inputs.com_velocity == kVec3DZero);
-    CHECK(inputs.qx1 == ctrl_x::default_q1);
-    CHECK(inputs.qx2 == ctrl_x::default_q2);
-    CHECK(inputs.qy1 == ctrl_y::default_q1);
-    CHECK(inputs.qy2 == ctrl_y::default_q2);
-    CHECK(inputs.rho == ctrl_y::default_rho);
-    CHECK(inputs.dist == ctrl_y::default_dist);
-    CHECK(inputs.kr == ctrl_y::default_kr);
-    CHECK(inputs.qz1 == ctrl_z::default_q1);
-    CHECK(inputs.qz2 == ctrl_z::default_q2);
-    CHECK(inputs.vhp == 0);
+    ComCtrlRefs refs(*data);
+    CHECK(refs.com_position == p0);
+    CHECK(refs.com_velocity == kVec3DZero);
+    CHECK(refs.qx1 == ctrl_x::default_q1);
+    CHECK(refs.qx2 == ctrl_x::default_q2);
+    CHECK(refs.qy1 == ctrl_y::default_q1);
+    CHECK(refs.qy2 == ctrl_y::default_q2);
+    CHECK(refs.rho == ctrl_y::default_rho);
+    CHECK(refs.dist == ctrl_y::default_dist);
+    CHECK(refs.kr == ctrl_y::default_kr);
+    CHECK(refs.qz1 == ctrl_z::default_q1);
+    CHECK(refs.qz2 == ctrl_z::default_q2);
+    CHECK(refs.vhp == 0);
   }
 
   SECTION("const ComZmpModel&") {
     Fuzzer fuzz(0, 5);
     auto p0 = fuzz.get<Vec3D>();
     ComZmpModel model(p0);
-    ComCtrlInputs inputs(model);
-    CHECK(inputs.com_position == p0);
-    CHECK(inputs.com_velocity == kVec3DZero);
-    CHECK(inputs.qx1 == ctrl_x::default_q1);
-    CHECK(inputs.qx2 == ctrl_x::default_q2);
-    CHECK(inputs.qy1 == ctrl_y::default_q1);
-    CHECK(inputs.qy2 == ctrl_y::default_q2);
-    CHECK(inputs.rho == ctrl_y::default_rho);
-    CHECK(inputs.dist == ctrl_y::default_dist);
-    CHECK(inputs.kr == ctrl_y::default_kr);
-    CHECK(inputs.qz1 == ctrl_z::default_q1);
-    CHECK(inputs.qz2 == ctrl_z::default_q2);
-    CHECK(inputs.vhp == 0);
+    ComCtrlRefs refs(model);
+    CHECK(refs.com_position == p0);
+    CHECK(refs.com_velocity == kVec3DZero);
+    CHECK(refs.qx1 == ctrl_x::default_q1);
+    CHECK(refs.qx2 == ctrl_x::default_q2);
+    CHECK(refs.qy1 == ctrl_y::default_q1);
+    CHECK(refs.qy2 == ctrl_y::default_q2);
+    CHECK(refs.rho == ctrl_y::default_rho);
+    CHECK(refs.dist == ctrl_y::default_dist);
+    CHECK(refs.kr == ctrl_y::default_kr);
+    CHECK(refs.qz1 == ctrl_z::default_q1);
+    CHECK(refs.qz2 == ctrl_z::default_q2);
+    CHECK(refs.vhp == 0);
   }
 }
 
@@ -143,7 +143,7 @@ TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
   SECTION("check if member pointers are preserved") {
     REQUIRE(&ctrl.states());
-    REQUIRE(&ctrl.inputs());
+    REQUIRE(&ctrl.refs());
     REQUIRE(&ctrl.outputs());
     REQUIRE(&ctrl.commands());
     REQUIRE(&ctrl.model().data() == &ctrl.states());
@@ -197,17 +197,17 @@ TEST_CASE("ComCtrl::set_states_ptr can set another pointer to states data",
   REQUIRE(ctrl.model().mass() == 5.0);
 }
 
-TEST_CASE("ComCtrl::set_inputs_ptr can set another pointer to inputs data",
+TEST_CASE("ComCtrl::set_refs_ptr can set another pointer to refs data",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
   {
-    auto inputs1 = createComCtrlInputs();
-    REQUIRE(ctrl.inputs_ptr().get() != inputs1.get());
-    ctrl.set_inputs_ptr(inputs1);
-    REQUIRE(ctrl.inputs_ptr().get() == inputs1.get());
-    REQUIRE(inputs1.use_count() == 2);
+    auto refs1 = createComCtrlRefs();
+    REQUIRE(ctrl.refs_ptr().get() != refs1.get());
+    ctrl.set_refs_ptr(refs1);
+    REQUIRE(ctrl.refs_ptr().get() == refs1.get());
+    REQUIRE(refs1.use_count() == 2);
   }
-  REQUIRE(ctrl.inputs_ptr().use_count() == 1);
+  REQUIRE(ctrl.refs_ptr().use_count() == 1);
 }
 
 TEST_CASE("ComCtrl::set_outputs_ptr can set another pointer to outputs data",
@@ -357,7 +357,7 @@ TEST_CASE("check if desired ZMP position is modified after update",
   } testcases[] = {{{0, 0, 1}}, {{0.1, 0, 1}}, {{0.1, -0.1, 1}}};
   for (auto& c : testcases) {
     Vec3D expected_pz;
-    ctrl.inputs_ptr()->com_position = c.pd;
+    ctrl.refs_ptr()->com_position = c.pd;
     expected_pz = ctrl.computeDesZmpPos(ctrl.states().com_position,
                                         ctrl.states().com_velocity, 0);
 
@@ -374,185 +374,185 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   double dist = 0.42;
   ctrl.reset(p0, dist);
   auto cmd = ctrl.getCommands();
-  auto inputs = ctrl.inputs_ptr();
+  auto refs = ctrl.refs_ptr();
 
   Fuzzer fuzz;
   SECTION("COM position") {
-    inputs->com_position = fuzz.get<Vec3D>();
+    refs->com_position = fuzz.get<Vec3D>();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().com_position == p0);
+      CHECK(ctrl.refs().com_position == p0);
     }
     SECTION("set user command") {
       Vec3D v = {1.2, -1.2, 1.5};
       cmd->set_com_position(v);
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().com_position == v);
+      CHECK(ctrl.refs().com_position == v);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().com_position == p0);
+      CHECK(ctrl.refs().com_position == p0);
     }
   }
 
   SECTION("COM velocity") {
-    inputs->com_velocity = fuzz.get<Vec3D>();
+    refs->com_velocity = fuzz.get<Vec3D>();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().com_velocity == kVec3DZero);
+      CHECK(ctrl.refs().com_velocity == kVec3DZero);
     }
     SECTION("set user command") {
       Vec3D v = {1.2, -1.2, 0};
       cmd->set_com_velocity(v.x(), v.y());
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().com_velocity == v);
+      CHECK(ctrl.refs().com_velocity == v);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().com_velocity == kVec3DZero);
+      CHECK(ctrl.refs().com_velocity == kVec3DZero);
     }
   }
 
   SECTION("qx1 and qx2") {
-    inputs->qx1 = fuzz.get<double>();
-    inputs->qx2 = fuzz.get<double>();
+    refs->qx1 = fuzz.get<double>();
+    refs->qx2 = fuzz.get<double>();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().qx1 == 1.0);
-      CHECK(ctrl.inputs().qx2 == 1.0);
+      CHECK(ctrl.refs().qx1 == 1.0);
+      CHECK(ctrl.refs().qx2 == 1.0);
     }
     SECTION("set user command") {
       cmd->qx1 = 0.8;
       cmd->qx2 = 0.5;
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().qx1 == 0.8);
-      CHECK(ctrl.inputs().qx2 == 0.5);
+      CHECK(ctrl.refs().qx1 == 0.8);
+      CHECK(ctrl.refs().qx2 == 0.5);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().qx1 == 1.0);
-      CHECK(ctrl.inputs().qx2 == 1.0);
+      CHECK(ctrl.refs().qx1 == 1.0);
+      CHECK(ctrl.refs().qx2 == 1.0);
     }
   }
 
   SECTION("qy1 and qy2") {
-    inputs->qy1 = fuzz.get<double>();
-    inputs->qy2 = fuzz.get<double>();
+    refs->qy1 = fuzz.get<double>();
+    refs->qy2 = fuzz.get<double>();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().qy1 == 1.0);
-      CHECK(ctrl.inputs().qy2 == 1.0);
+      CHECK(ctrl.refs().qy1 == 1.0);
+      CHECK(ctrl.refs().qy2 == 1.0);
     }
     SECTION("set user command") {
       cmd->qy1 = 0.8;
       cmd->qy2 = 0.5;
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().qy1 == 0.8);
-      CHECK(ctrl.inputs().qy2 == 0.5);
+      CHECK(ctrl.refs().qy1 == 0.8);
+      CHECK(ctrl.refs().qy2 == 0.5);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().qy1 == 1.0);
-      CHECK(ctrl.inputs().qy2 == 1.0);
+      CHECK(ctrl.refs().qy1 == 1.0);
+      CHECK(ctrl.refs().qy2 == 1.0);
     }
   }
 
   SECTION("qz1 and qz2") {
-    inputs->qz1 = fuzz.get<double>();
-    inputs->qz2 = fuzz.get<double>();
+    refs->qz1 = fuzz.get<double>();
+    refs->qz2 = fuzz.get<double>();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().qz1 == 1.0);
-      CHECK(ctrl.inputs().qz2 == 1.0);
+      CHECK(ctrl.refs().qz1 == 1.0);
+      CHECK(ctrl.refs().qz2 == 1.0);
     }
     SECTION("set user command") {
       cmd->qz1 = 0.8;
       cmd->qz2 = 0.5;
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().qz1 == 0.8);
-      CHECK(ctrl.inputs().qz2 == 0.5);
+      CHECK(ctrl.refs().qz1 == 0.8);
+      CHECK(ctrl.refs().qz2 == 0.5);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().qz1 == 1.0);
-      CHECK(ctrl.inputs().qz2 == 1.0);
+      CHECK(ctrl.refs().qz1 == 1.0);
+      CHECK(ctrl.refs().qz2 == 1.0);
     }
   }
 
   SECTION("Virtual horizontal plane") {
-    inputs->vhp = fuzz.get<double>();
+    refs->vhp = fuzz.get<double>();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().vhp == 0.0);
+      CHECK(ctrl.refs().vhp == 0.0);
     }
     SECTION("set user command") {
       cmd->vhp = 0.1;
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().vhp == 0.1);
+      CHECK(ctrl.refs().vhp == 0.1);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().vhp == 0.0);
+      CHECK(ctrl.refs().vhp == 0.0);
     }
   }
 
   SECTION("Stepping activation parameter") {
-    inputs->rho = fuzz();
+    refs->rho = fuzz();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().rho == 0.0);
+      CHECK(ctrl.refs().rho == 0.0);
     }
     SECTION("set user command") {
       cmd->rho = 1.0;
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().rho == 1.0);
+      CHECK(ctrl.refs().rho == 1.0);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().rho == 0.0);
+      CHECK(ctrl.refs().rho == 0.0);
     }
   }
 
   SECTION("Canonical foot distance") {
-    inputs->dist = fuzz();
+    refs->dist = fuzz();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().dist == dist);
+      CHECK(ctrl.refs().dist == dist);
     }
     SECTION("set user command") {
       cmd->dist = 1.0;
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().dist == 1.0);
+      CHECK(ctrl.refs().dist == 1.0);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().dist == dist);
+      CHECK(ctrl.refs().dist == dist);
     }
   }
 
   SECTION("initial energy exersion") {
-    inputs->kr = fuzz();
+    refs->kr = fuzz();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().kr == 1.0);
+      CHECK(ctrl.refs().kr == 1.0);
     }
     SECTION("set user command") {
       cmd->kr = 0.5;
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().kr == 0.5);
+      CHECK(ctrl.refs().kr == 0.5);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.inputs().kr == 1.0);
+      CHECK(ctrl.refs().kr == 1.0);
     }
   }
 
@@ -716,12 +716,12 @@ SCENARIO("ComCtrl::computeDesZmpPos computes desired ZMP position",
   GIVEN("qx1 = 1.0, qx2 = 1.0, qy1 = 1.0, qy2 = 1.0, ref_com_pos = (0, 0, G)") {
     ComCtrl ctrl;
     Vec3D pd = {0, 0, G};
-    ctrl.inputs_ptr()->com_position = pd;
+    ctrl.refs_ptr()->com_position = pd;
 
-    REQUIRE(ctrl.inputs().qx1 == 1);
-    REQUIRE(ctrl.inputs().qx2 == 1);
-    REQUIRE(ctrl.inputs().qy1 == 1);
-    REQUIRE(ctrl.inputs().qy2 == 1);
+    REQUIRE(ctrl.refs().qx1 == 1);
+    REQUIRE(ctrl.refs().qx2 == 1);
+    REQUIRE(ctrl.refs().qy1 == 1);
+    REQUIRE(ctrl.refs().qy2 == 1);
 
     WHEN("p = (0, 0, G), v = (0, 0, 0)") {
       Vec3D p = {0, 0, G};
@@ -755,16 +755,16 @@ SCENARIO("ComCtrl::computeDesZmpPos computes desired ZMP position",
   GIVEN("qx1 = 1, qx2 = 0.5, qy1 = 1.2, qy2 = 0.8, pd = (0, 0, G)") {
     ComCtrl ctrl;
     Vec3D pd = {0, 0, G};
-    ctrl.inputs_ptr()->com_position = pd;
-    ctrl.inputs_ptr()->qx1 = 1.0;
-    ctrl.inputs_ptr()->qx2 = 0.5;
-    ctrl.inputs_ptr()->qy1 = 1.2;
-    ctrl.inputs_ptr()->qy2 = 0.8;
+    ctrl.refs_ptr()->com_position = pd;
+    ctrl.refs_ptr()->qx1 = 1.0;
+    ctrl.refs_ptr()->qx2 = 0.5;
+    ctrl.refs_ptr()->qy1 = 1.2;
+    ctrl.refs_ptr()->qy2 = 0.8;
 
-    REQUIRE(ctrl.inputs().qx1 == 1.0);
-    REQUIRE(ctrl.inputs().qx2 == 0.5);
-    REQUIRE(ctrl.inputs().qy1 == 1.2);
-    REQUIRE(ctrl.inputs().qy2 == 0.8);
+    REQUIRE(ctrl.refs().qx1 == 1.0);
+    REQUIRE(ctrl.refs().qx2 == 0.5);
+    REQUIRE(ctrl.refs().qy1 == 1.2);
+    REQUIRE(ctrl.refs().qy2 == 0.8);
 
     WHEN("p = (1, 1, G), v = (0, 0, 0)") {
       Vec3D p = {1, 1, G};
@@ -790,13 +790,13 @@ SCENARIO("ComCtrl::computeDesZmpPos computes desired ZMP position",
       "pd = (1, 0.5, G)") {
     ComCtrl ctrl;
     Vec3D pd = {1, 0.5, G};
-    ctrl.inputs_ptr()->com_position = pd;
-    ctrl.inputs_ptr()->qx2 = 1.5;
+    ctrl.refs_ptr()->com_position = pd;
+    ctrl.refs_ptr()->qx2 = 1.5;
 
-    REQUIRE(ctrl.inputs().qx1 == 1);
-    REQUIRE(ctrl.inputs().qx2 == 1.5);
-    REQUIRE(ctrl.inputs().qy1 == 1);
-    REQUIRE(ctrl.inputs().qy2 == 1);
+    REQUIRE(ctrl.refs().qx1 == 1);
+    REQUIRE(ctrl.refs().qx2 == 1.5);
+    REQUIRE(ctrl.refs().qy1 == 1);
+    REQUIRE(ctrl.refs().qy2 == 1);
 
     WHEN("p = (1, 0, G), v = (0, 0, 0)") {
       Vec3D p = {1, 0, G};
@@ -832,14 +832,14 @@ SCENARIO("ComCtrl::computeDesZmpPos computes desired ZMP position",
       "pd = (0, 0.5, 0.5*G)") {
     ComCtrl ctrl;
     Vec3D pd = {0, 0.5, 0.5 * G};
-    ctrl.inputs_ptr()->com_position = pd;
-    ctrl.inputs_ptr()->qx2 = 1.5;
-    ctrl.inputs_ptr()->qy2 = 1.5;
+    ctrl.refs_ptr()->com_position = pd;
+    ctrl.refs_ptr()->qx2 = 1.5;
+    ctrl.refs_ptr()->qy2 = 1.5;
 
-    REQUIRE(ctrl.inputs().qx1 == 1);
-    REQUIRE(ctrl.inputs().qx2 == 1.5);
-    REQUIRE(ctrl.inputs().qy1 == 1);
-    REQUIRE(ctrl.inputs().qy2 == 1.5);
+    REQUIRE(ctrl.refs().qx1 == 1);
+    REQUIRE(ctrl.refs().qx2 == 1.5);
+    REQUIRE(ctrl.refs().qy1 == 1);
+    REQUIRE(ctrl.refs().qy2 == 1.5);
 
     WHEN("p = (0, 0, 0.5*G), v = (0, 0, 0)") {
       Vec3D p = {0, 0, 0.5 * G};

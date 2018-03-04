@@ -72,7 +72,7 @@ void ComCtrlCommands::set_com_velocity(optional<double> t_vxd,
   vyd = t_vyd;
 }
 
-ComCtrlInputs::ComCtrlInputs()
+ComCtrlRefs::ComCtrlRefs()
     : com_position(ComZmpModelData::default_com_position),
       com_velocity(kVec3DZero),
       qx1(ctrl_x::default_q1),
@@ -86,7 +86,7 @@ ComCtrlInputs::ComCtrlInputs()
       kr(ctrl_y::default_kr),
       vhp(0) {}
 
-ComCtrlInputs::ComCtrlInputs(const ComZmpModelData& t_data)
+ComCtrlRefs::ComCtrlRefs(const ComZmpModelData& t_data)
     : com_position(t_data.com_position),
       com_velocity(kVec3DZero),
       qx1(ctrl_x::default_q1),
@@ -100,16 +100,14 @@ ComCtrlInputs::ComCtrlInputs(const ComZmpModelData& t_data)
       kr(ctrl_y::default_kr),
       vhp(0) {}
 
-ComCtrlInputs::ComCtrlInputs(const ComZmpModel& t_model)
-    : ComCtrlInputs(t_model.data()) {}
+ComCtrlRefs::ComCtrlRefs(const ComZmpModel& t_model)
+    : ComCtrlRefs(t_model.data()) {}
 
 ComCtrlCommandsPtr createComCtrlCommands() {
   return std::make_shared<ComCtrlCommands>();
 }
 
-ComCtrlInputsPtr createComCtrlInputs() {
-  return std::make_shared<ComCtrlInputs>();
-}
+ComCtrlRefsPtr createComCtrlRefs() { return std::make_shared<ComCtrlRefs>(); }
 
 ComCtrlOutputsPtr createComCtrlOutputs() {
   return std::make_shared<ComCtrlOutputs>();
@@ -118,7 +116,7 @@ ComCtrlOutputsPtr createComCtrlOutputs() {
 ComCtrl::ComCtrl()
     : m_model(),
       m_states_ptr(m_model.data_ptr()),
-      m_inputs_ptr(createComCtrlInputs()),
+      m_refs_ptr(createComCtrlRefs()),
       m_outputs_ptr(createComCtrlOutputs()),
       m_commands_ptr(createComCtrlCommands()),
       m_canonical_foot_dist(ctrl_y::default_dist) {
@@ -137,8 +135,8 @@ ComCtrl& ComCtrl::set_states_ptr(StatesPtr t_states_ptr) {
   return *this;
 }
 
-ComCtrl& ComCtrl::set_inputs_ptr(InputsPtr t_inputs_ptr) {
-  m_inputs_ptr = t_inputs_ptr;
+ComCtrl& ComCtrl::set_refs_ptr(RefsPtr t_refs_ptr) {
+  m_refs_ptr = t_refs_ptr;
   return *this;
 }
 
@@ -183,8 +181,8 @@ Vec3D ComCtrl::computeDesReactForce(const Vec3D& t_com_position,
                                     const Vec3D& t_com_velocity,
                                     const double /* t */) {
   auto fz = ctrl_z::computeDesReactForce(t_com_position, t_com_velocity,
-                                         inputs().com_position, inputs().qz1,
-                                         inputs().qz2, model().mass());
+                                         refs().com_position, refs().qz1,
+                                         refs().qz2, model().mass());
   return Vec3D(0, 0, fz);
 }
 
@@ -192,17 +190,17 @@ Vec3D ComCtrl::computeDesZmpPos(const Vec3D& t_com_position,
                                 const Vec3D& t_com_velocity,
                                 const double /* t */) {
   auto fz = ctrl_z::computeDesReactForce(t_com_position, t_com_velocity,
-                                         inputs().com_position, inputs().qz1,
-                                         inputs().qz2, model().mass());
-  auto zeta = formula::computeZeta(t_com_position.z(), inputs().vhp, fz,
-                                   model().mass());
+                                         refs().com_position, refs().qz1,
+                                         refs().qz2, model().mass());
+  auto zeta =
+      formula::computeZeta(t_com_position.z(), refs().vhp, fz, model().mass());
   auto xz = ctrl_x::computeDesZmpPos(t_com_position, t_com_velocity,
-                                     inputs().com_position, inputs().qx1,
-                                     inputs().qx2, zeta);
+                                     refs().com_position, refs().qx1,
+                                     refs().qx2, zeta);
   auto yz = ctrl_y::computeDesZmpPos(
-      t_com_position, t_com_velocity, inputs().com_position, inputs().qy1,
-      inputs().qy2, inputs().rho, inputs().dist, inputs().kr, zeta);
-  return Vec3D(xz, yz, inputs().vhp);
+      t_com_position, t_com_velocity, refs().com_position, refs().qy1,
+      refs().qy2, refs().rho, refs().dist, refs().kr, zeta);
+  return Vec3D(xz, yz, refs().vhp);
 }
 
 ComCtrl::CallbackFunc ComCtrl::getReactionForceCallback() {
@@ -216,26 +214,26 @@ ComCtrl::CallbackFunc ComCtrl::getZmpPositionCallback() {
   return std::bind(&ComCtrl::computeDesZmpPos, this, pl::_1, pl::_2, pl::_3);
 }
 
-void ComCtrl::remapCommandsToInputs() {
-  m_inputs_ptr->com_position[0] =
+void ComCtrl::remapCommandsToRefs() {
+  m_refs_ptr->com_position[0] =
       commands().xd.value_or(model().initial_com_position().x());
-  m_inputs_ptr->com_position[1] =
+  m_refs_ptr->com_position[1] =
       commands().yd.value_or(model().initial_com_position().y());
-  m_inputs_ptr->com_position[2] =
+  m_refs_ptr->com_position[2] =
       commands().zd.value_or(model().initial_com_position().z());
-  m_inputs_ptr->com_velocity[0] = commands().vxd.value_or(0);
-  m_inputs_ptr->com_velocity[1] = commands().vyd.value_or(0);
-  m_inputs_ptr->com_velocity[2] = 0;
-  m_inputs_ptr->qx1 = commands().qx1.value_or(ctrl_x::default_q1);
-  m_inputs_ptr->qx2 = commands().qx2.value_or(ctrl_x::default_q2);
-  m_inputs_ptr->qy1 = commands().qy1.value_or(ctrl_y::default_q1);
-  m_inputs_ptr->qy2 = commands().qy2.value_or(ctrl_y::default_q2);
-  m_inputs_ptr->rho = commands().rho.value_or(ctrl_y::default_rho);
-  m_inputs_ptr->dist = commands().dist.value_or(m_canonical_foot_dist);
-  m_inputs_ptr->kr = commands().kr.value_or(ctrl_y::default_kr);
-  m_inputs_ptr->qz1 = commands().qz1.value_or(ctrl_z::default_q1);
-  m_inputs_ptr->qz2 = commands().qz2.value_or(ctrl_z::default_q2);
-  m_inputs_ptr->vhp = commands().vhp.value_or(0);
+  m_refs_ptr->com_velocity[0] = commands().vxd.value_or(0);
+  m_refs_ptr->com_velocity[1] = commands().vyd.value_or(0);
+  m_refs_ptr->com_velocity[2] = 0;
+  m_refs_ptr->qx1 = commands().qx1.value_or(ctrl_x::default_q1);
+  m_refs_ptr->qx2 = commands().qx2.value_or(ctrl_x::default_q2);
+  m_refs_ptr->qy1 = commands().qy1.value_or(ctrl_y::default_q1);
+  m_refs_ptr->qy2 = commands().qy2.value_or(ctrl_y::default_q2);
+  m_refs_ptr->rho = commands().rho.value_or(ctrl_y::default_rho);
+  m_refs_ptr->dist = commands().dist.value_or(m_canonical_foot_dist);
+  m_refs_ptr->kr = commands().kr.value_or(ctrl_y::default_kr);
+  m_refs_ptr->qz1 = commands().qz1.value_or(ctrl_z::default_q1);
+  m_refs_ptr->qz2 = commands().qz2.value_or(ctrl_z::default_q2);
+  m_refs_ptr->vhp = commands().vhp.value_or(0);
 }
 
 void ComCtrl::updateOutputs() {
@@ -247,7 +245,7 @@ void ComCtrl::updateOutputs() {
 }
 
 bool ComCtrl::update() {
-  remapCommandsToInputs();
+  remapCommandsToRefs();
   if (!m_model.update()) return false;
   updateOutputs();
   return true;

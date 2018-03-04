@@ -67,9 +67,12 @@ struct ComCtrlOutputs {
   Vec3D reaction_force;
 };
 
-std::shared_ptr<ComCtrlCommands> ComCtrlCommandsFactory();
-std::shared_ptr<ComCtrlInputs> ComCtrlInputsFactory();
-std::shared_ptr<ComCtrlOutputs> ComCtrlOutputsFactory();
+using ComCtrlCommandsPtr = std::shared_ptr<ComCtrlCommands>;
+using ComCtrlInputsPtr = std::shared_ptr<ComCtrlInputs>;
+using ComCtrlOutputsPtr = std::shared_ptr<ComCtrlOutputs>;
+ComCtrlCommandsPtr createComCtrlCommands();
+ComCtrlInputsPtr createComCtrlInputs();
+ComCtrlOutputsPtr createComCtrlOutputs();
 
 class ComCtrl {
  public:

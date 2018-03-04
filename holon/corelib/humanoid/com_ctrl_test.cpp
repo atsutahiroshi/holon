@@ -201,7 +201,7 @@ TEST_CASE("ComCtrl::set_inputs_ptr can set another pointer to inputs data",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
   {
-    auto inputs1 = ComCtrlInputsFactory();
+    auto inputs1 = createComCtrlInputs();
     REQUIRE(ctrl.inputs_ptr().get() != inputs1.get());
     ctrl.set_inputs_ptr(inputs1);
     REQUIRE(ctrl.inputs_ptr().get() == inputs1.get());
@@ -214,7 +214,7 @@ TEST_CASE("ComCtrl::set_outputs_ptr can set another pointer to outputs data",
           "[corelib][humanoid][ComCtrl]") {
   ComCtrl ctrl;
   {
-    auto outputs1 = ComCtrlOutputsFactory();
+    auto outputs1 = createComCtrlOutputs();
     REQUIRE(ctrl.outputs_ptr().get() != outputs1.get());
     ctrl.set_outputs_ptr(outputs1);
     REQUIRE(ctrl.outputs_ptr().get() == outputs1.get());

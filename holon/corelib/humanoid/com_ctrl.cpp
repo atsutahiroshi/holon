@@ -103,24 +103,24 @@ ComCtrlInputs::ComCtrlInputs(const ComZmpModelData& t_data)
 ComCtrlInputs::ComCtrlInputs(const ComZmpModel& t_model)
     : ComCtrlInputs(t_model.data()) {}
 
-std::shared_ptr<ComCtrlCommands> ComCtrlCommandsFactory() {
+ComCtrlCommandsPtr createComCtrlCommands() {
   return std::make_shared<ComCtrlCommands>();
 }
 
-std::shared_ptr<ComCtrlInputs> ComCtrlInputsFactory() {
+ComCtrlInputsPtr createComCtrlInputs() {
   return std::make_shared<ComCtrlInputs>();
 }
 
-std::shared_ptr<ComCtrlOutputs> ComCtrlOutputsFactory() {
+ComCtrlOutputsPtr createComCtrlOutputs() {
   return std::make_shared<ComCtrlOutputs>();
 }
 
 ComCtrl::ComCtrl()
     : m_model(),
       m_states_ptr(m_model.data_ptr()),
-      m_inputs_ptr(ComCtrlInputsFactory()),
-      m_outputs_ptr(ComCtrlOutputsFactory()),
-      m_commands_ptr(ComCtrlCommandsFactory()),
+      m_inputs_ptr(createComCtrlInputs()),
+      m_outputs_ptr(createComCtrlOutputs()),
+      m_commands_ptr(createComCtrlCommands()),
       m_canonical_foot_dist(ctrl_y::default_dist) {
   m_model.setReactionForceCallback(getReactionForceCallback());
   m_model.setZmpPositionCallback(getZmpPositionCallback());

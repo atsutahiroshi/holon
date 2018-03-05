@@ -138,8 +138,7 @@ TEST_CASE("ComCtrlRefs: constructor", "[ComCtrlRefs]") {
   }
 }
 
-TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
-  ComCtrl ctrl;
+void checkConstructor(const ComCtrl& ctrl) {
   SECTION("check if member pointers are preserved") {
     REQUIRE(&ctrl.states());
     REQUIRE(&ctrl.refs());
@@ -148,12 +147,35 @@ TEST_CASE("ComCtrl: constructor", "[corelib][humanoid][ComCtrl]") {
     REQUIRE(&ctrl.model().data() == &ctrl.states());
   }
 
-  SECTION("check if canonical foot distance be initialized") {
+  SECTION("check callback functions") {
+    CHECK(ctrl.model().system().isZmpPositionSet());
+  }
+
+  SECTION("check canonical foot distance") {
     CHECK(ctrl.canonical_foot_dist() == ctrl_y::default_dist);
+  }
+
+  SECTION("check default COM position") {
+    CHECK(ctrl.default_com_position() == ctrl.initial_com_position());
   }
 }
 
+TEST_CASE("ComCtrl() constructor", "[corelib][humanoid][ComCtrl]") {
+  ComCtrl ctrl;
+  checkConstructor(ctrl);
+}
+
 TEST_CASE("ComCtrl(const Model&) constructor", "[corelib][humanoid][ComCtrl]") {
+  ComCtrl::Model model;
+  Fuzzer fuzz;
+  model.data_ptr()->com_position = fuzz.get<Vec3D>();
+  model.data_ptr()->com_velocity = fuzz.get<Vec3D>();
+  ComCtrl ctrl(model);
+  checkConstructor(ctrl);
+}
+
+TEST_CASE("Check data constructed by ComCtrl(const Model&)",
+          "[corelib][humanoid][ComCtrl]") {
   ComCtrl::Model model;
   Fuzzer fuzz;
   auto p = fuzz.get<Vec3D>();
@@ -230,6 +252,23 @@ TEST_CASE("ComCtrl::set_canonical_foot_dist sets canonical foot distance",
 
   ctrl.set_canonical_foot_dist(dist);
   CHECK(ctrl.canonical_foot_dist() == dist);
+}
+
+TEST_CASE("Check default COM position defined in ComCtrl", "[ComCtrl]") {
+  Vec3D p0 = {0.1, 0.5, 0.42};
+  ComZmpModel model;
+  model.reset(p0);
+  ComCtrl ctrl(model);
+  SECTION("it should be initialized as the initial COM position") {
+    CHECK(ctrl.default_com_position() == p0);
+    CHECK(ctrl.default_com_position() == ctrl.initial_com_position());
+  }
+  SECTION("it should be equal to the COM position when resetting") {
+    Vec3D p1 = {-0.1, 0.3, 0.4};
+    ctrl.reset(p1);
+    CHECK(ctrl.default_com_position() == p1);
+    CHECK(ctrl.default_com_position() == ctrl.initial_com_position());
+  }
 }
 
 TEST_CASE("ComCtrl::reset(const Vec3D&) should reset initial COM position",

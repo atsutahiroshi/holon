@@ -119,6 +119,7 @@ ComCtrl::ComCtrl()
       m_refs_ptr(createComCtrlRefs()),
       m_outputs_ptr(createComCtrlOutputs()),
       m_commands_ptr(createComCtrlCommands()),
+      m_default_com_position(model().initial_com_position()),
       m_canonical_foot_dist(ctrl_y::default_dist) {
   m_model.setReactionForceCallback(getReactionForceCallback());
   m_model.setZmpPositionCallback(getZmpPositionCallback());
@@ -127,6 +128,7 @@ ComCtrl::ComCtrl()
 ComCtrl::ComCtrl(const Model& t_model) : ComCtrl() {
   m_model.copy_data(t_model);
   m_model.set_initial_com_position(states().com_position);
+  m_default_com_position = m_model.initial_com_position();
 }
 
 ComCtrl& ComCtrl::set_states_ptr(StatesPtr t_states_ptr) {
@@ -157,6 +159,7 @@ ComCtrl& ComCtrl::set_time_step(double t_time_step) {
 
 ComCtrl& ComCtrl::reset(const Vec3D& t_com_position) {
   m_model.reset(t_com_position);
+  m_default_com_position = m_model.initial_com_position();
   return *this;
 }
 

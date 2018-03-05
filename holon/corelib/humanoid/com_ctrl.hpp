@@ -113,6 +113,12 @@ class ComCtrl {
 
   inline double time() const noexcept { return model().time(); }
   inline double time_step() const noexcept { return model().time_step(); }
+  inline Vec3D initial_com_position() const noexcept {
+    return model().initial_com_position();
+  }
+  inline Vec3D default_com_position() const noexcept {
+    return m_default_com_position;
+  }
   inline double canonical_foot_dist() const noexcept {
     return m_canonical_foot_dist;
   }
@@ -150,6 +156,7 @@ class ComCtrl {
   RefsPtr m_refs_ptr;
   OutputsPtr m_outputs_ptr;
   CommandsPtr m_commands_ptr;
+  Vec3D m_default_com_position;
   double m_canonical_foot_dist;
 
   void updateRefs();

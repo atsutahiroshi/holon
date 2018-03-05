@@ -761,5 +761,59 @@ SCENARIO("Controller makes COM oscillate sideward",
   }
 }
 
+SCENARIO("Controller enables logitudinal moving", "[ComCtrl]") {
+  GIVEN("Referential velocity is 0.1") {
+    ComCtrl ctrl;
+    Vec3D pd = {0, 0, 0.42};
+    double dist = 0.3;
+    double vxd = 0.1;
+    ctrl.reset(pd, dist);
+    auto cmd = ctrl.getCommands();
+    cmd->vxd = vxd;
+    cmd->rho = 1;
+    REQUIRE(ctrl.states().com_position.x() == 0);
+    REQUIRE(ctrl.states().com_velocity.x() == 0);
+    WHEN("Update until 0.1 sec") {
+      while (ctrl.time() < 0.1) {
+        ctrl.update();
+      }
+      THEN("Start moving forward") {
+        CAPTURE(ctrl.refs().com_position.x());
+        CAPTURE(ctrl.states().com_position.x());
+        REQUIRE(ctrl.refs().com_position.x() > 0.0);
+        CHECK(ctrl.states().com_position.x() > 0.0);
+        CHECK(ctrl.states().com_velocity.x() > 0.0);
+        CHECK(ctrl.states().com_velocity.x() < vxd);
+      }
+    }
+    WHEN("Update until 5 sec") {
+      while (ctrl.time() < 5) {
+        ctrl.update();
+      }
+      THEN("Follow referential velocity") {
+        REQUIRE(ctrl.refs().com_position.x() > 0.0);
+        CHECK(ctrl.states().com_position.x() > 0.0);
+        CHECK(ctrl.states().com_velocity.x() == Approx(vxd));
+      }
+    }
+    WHEN("After update until 5 sec, issue stop command") {
+      while (ctrl.time() < 5) {
+        ctrl.update();
+      }
+      cmd->vxd = 0;
+      cmd->rho = 0;
+      double x = ctrl.states().com_position.x();
+      while (ctrl.time() < 8) {
+        ctrl.update();
+      }
+      THEN("Stop") {
+        REQUIRE(ctrl.refs().com_position.x() == x);
+        CHECK(ctrl.states().com_position.x() == Approx(x));
+        CHECK(ctrl.states().com_velocity.x() == Approx(0).margin(1e-6));
+      }
+    }
+  }
+}
+
 }  // namespace
 }  // namespace holon

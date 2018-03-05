@@ -219,19 +219,24 @@ ComCtrl::CallbackFunc ComCtrl::getZmpPositionCallback() {
 
 void ComCtrl::updateRefs() {
   m_refs_ptr->com_position[0] =
-      commands().xd.value_or(model().initial_com_position().x());
+      commands().xd.value_or(default_com_position().x());
   m_refs_ptr->com_position[1] =
-      commands().yd.value_or(model().initial_com_position().y());
+      commands().yd.value_or(default_com_position().y());
   m_refs_ptr->com_position[2] =
-      commands().zd.value_or(model().initial_com_position().z());
+      commands().zd.value_or(default_com_position().z());
   m_refs_ptr->com_velocity[0] = commands().vxd.value_or(0);
   m_refs_ptr->com_velocity[1] = commands().vyd.value_or(0);
   m_refs_ptr->com_velocity[2] = 0;
-  m_refs_ptr->qx1 = commands().qx1.value_or(ctrl_x::default_q1);
+  if (zIsTiny(refs().com_velocity[0])) {
+    m_refs_ptr->qx1 = commands().qx1.value_or(ctrl_x::default_q1);
+    m_refs_ptr->rho = commands().rho.value_or(ctrl_y::default_rho);
+  } else {
+    m_refs_ptr->qx1 = 0;
+    m_refs_ptr->rho = 1;
+  }
   m_refs_ptr->qx2 = commands().qx2.value_or(ctrl_x::default_q2);
   m_refs_ptr->qy1 = commands().qy1.value_or(ctrl_y::default_q1);
   m_refs_ptr->qy2 = commands().qy2.value_or(ctrl_y::default_q2);
-  m_refs_ptr->rho = commands().rho.value_or(ctrl_y::default_rho);
   m_refs_ptr->dist = commands().dist.value_or(m_canonical_foot_dist);
   m_refs_ptr->kr = commands().kr.value_or(ctrl_y::default_kr);
   m_refs_ptr->qz1 = commands().qz1.value_or(ctrl_z::default_q1);

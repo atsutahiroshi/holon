@@ -259,6 +259,7 @@ TEST_CASE("Check default COM position defined in ComCtrl", "[ComCtrl]") {
   ComZmpModel model;
   model.reset(p0);
   ComCtrl ctrl(model);
+  auto cmd = ctrl.getCommands();
   SECTION("it should be initialized as the initial COM position") {
     CHECK(ctrl.default_com_position() == p0);
     CHECK(ctrl.default_com_position() == ctrl.initial_com_position());
@@ -268,6 +269,18 @@ TEST_CASE("Check default COM position defined in ComCtrl", "[ComCtrl]") {
     ctrl.reset(p1);
     CHECK(ctrl.default_com_position() == p1);
     CHECK(ctrl.default_com_position() == ctrl.initial_com_position());
+  }
+  SECTION("element x should be updated during moving") {
+    cmd->vxd = 0.1;
+    for (int i = 0; i < 10; ++i) ctrl.update();
+    CHECK(ctrl.default_com_position().x() != ctrl.initial_com_position().x());
+    CHECK(ctrl.default_com_position().x() == ctrl.states().com_position.x());
+  }
+  SECTION("element z should be updated when zd is given") {
+    cmd->zd = 0.4;
+    REQUIRE(ctrl.default_com_position().z() != 0.4);
+    ctrl.update();
+    CHECK(ctrl.default_com_position().z() == 0.4);
   }
 }
 

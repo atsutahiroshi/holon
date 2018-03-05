@@ -161,6 +161,7 @@ class ComCtrl {
 
   void updateRefs();
   void updateOutputs();
+  void updateDefaultComPosition();
 };
 
 }  // namespace holon

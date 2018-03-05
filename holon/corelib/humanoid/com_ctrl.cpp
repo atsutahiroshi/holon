@@ -247,10 +247,20 @@ void ComCtrl::updateOutputs() {
   m_outputs_ptr->reaction_force = states().reaction_force;
 }
 
+void ComCtrl::updateDefaultComPosition() {
+  if (commands().vxd && !zIsTiny(commands().vxd.value())) {
+    m_default_com_position[0] = states().com_position.x();
+  }
+  if (commands().zd) {
+    m_default_com_position[2] = commands().zd.value();
+  }
+}
+
 bool ComCtrl::update() {
   updateRefs();
   if (!m_model.update()) return false;
   updateOutputs();
+  updateDefaultComPosition();
   return true;
 }
 

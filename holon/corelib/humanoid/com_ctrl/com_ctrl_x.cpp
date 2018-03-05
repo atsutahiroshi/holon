@@ -18,7 +18,7 @@
  * along with the holon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "holon/corelib/humanoid/com_ctrl_x.hpp"
+#include "holon/corelib/humanoid/com_ctrl/com_ctrl_x.hpp"
 
 #include <zm/zm_misc.h>
 

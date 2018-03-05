@@ -22,9 +22,9 @@
 
 #include <roki/rk_g.h>
 #include <memory>
-#include "holon/corelib/humanoid/com_ctrl_x.hpp"
-#include "holon/corelib/humanoid/com_ctrl_y.hpp"
-#include "holon/corelib/humanoid/com_ctrl_z.hpp"
+#include "holon/corelib/humanoid/com_ctrl/com_ctrl_x.hpp"
+#include "holon/corelib/humanoid/com_ctrl/com_ctrl_y.hpp"
+#include "holon/corelib/humanoid/com_ctrl/com_ctrl_z.hpp"
 #include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_formula.hpp"
 
 namespace holon {

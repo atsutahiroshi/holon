@@ -22,6 +22,7 @@
 #define HOLON_HUMANOID_PHASE_Y_HPP_
 
 #include <complex>
+#include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
 namespace phase_y {
@@ -29,11 +30,29 @@ namespace phase_y {
 using Complex = std::complex<double>;
 
 double computeFrequency(double t_q1, double t_q2, double t_zeta);
+
 Complex computeComplexZmp(double t_yz, double t_vy, double t_yd, double t_q1,
                           double t_q2, double t_zeta);
-Complex computeComplexInnerEdge(double t_yin, double t_yd, const Complex& t_pz);
-double computePhase(const Complex& t_pz, const Complex& t_p0, int t_is_left);
+Complex computeComplexZmp(const Vec3D& t_zmp_position,
+                          const Vec3D& t_com_velocity,
+                          const Vec3D& t_ref_com_position, double t_q1,
+                          double t_q2, double t_zeta);
+
+Complex computeComplexInnerEdge(double t_yin, double t_yd, const Complex& t_pz,
+                                int t_is_left);
+Complex computeComplexInnerEdge(const Vec3D& t_inner_edge,
+                                const Vec3D& t_ref_com_position,
+                                const Complex& t_pz, int t_is_left);
+
+double computePhase(double t_yz, double t_vy, double t_yd, double t_yin,
+                    double t_q1, double t_q2, double t_zeta, int t_is_left);
+double computePhase(const Vec3D& t_zmp_position, const Vec3D& t_com_velocity,
+                    const Vec3D& t_ref_com_position, const Vec3D& t_inner_edge,
+                    double t_q1, double t_q2, double t_zeta, int t_is_left);
+double computePhase(const Complex& t_pz, const Complex& t_p0);
+
 double computePeriod(double t_q1, double t_q2, double t_zeta);
+
 double computeTimeSpan(const Complex& t_p0, double t_q1, double t_q2,
                        double t_zeta);
 double computeElapsedTime(const Complex& t_pz, const Complex& t_p0, double t_q1,

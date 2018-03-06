@@ -21,6 +21,8 @@
 #include "holon/corelib/humanoid/com_ctrl/phase_y.hpp"
 
 #include <zm/zm_misc.h>
+#include <cmath>
+#include <utility>
 
 namespace holon {
 namespace phase_y {
@@ -31,7 +33,76 @@ double computeFrequency(double t_q1, double t_q2, double t_zeta) {
               t_q1, t_q2);
     return 0;
   }
-  return t_zeta * sqrt(t_q1 * t_q2);
+  return t_zeta * std::sqrt(t_q1 * t_q2);
+}
+
+Complex computeComplexZmp(double t_yz, double t_vy, double t_yd, double t_q1,
+                          double t_q2, double t_zeta) {
+  double omega = computeFrequency(t_q1, t_q2, t_zeta);
+  return Complex(t_yz - t_yd, -(t_q1 * t_q2 + 1.0) * t_vy / omega);
+}
+
+Complex computeComplexZmp(const Vec3D& t_zmp_position,
+                          const Vec3D& t_com_velocity,
+                          const Vec3D& t_ref_com_position, double t_q1,
+                          double t_q2, double t_zeta) {
+  return computeComplexZmp(t_zmp_position.y(), t_com_velocity.y(),
+                           t_ref_com_position.y(), t_q1, t_q2, t_zeta);
+}
+
+template <typename T>
+int sgn(const T& x) {
+  return (T(0) < x) - (x < T(0));
+}
+
+Complex computeComplexInnerEdge(double t_yin, double t_yd, const Complex& t_pz,
+                                int t_is_left) {
+  double y = t_yin - t_yd;
+  return Complex(y, -std::sqrt(std::norm(t_pz) - y * y) * sgn(t_is_left));
+}
+
+Complex computeComplexInnerEdge(const Vec3D& t_inner_edge,
+                                const Vec3D& t_ref_com_position,
+                                const Complex& t_pz, int t_is_left) {
+  return computeComplexInnerEdge(t_inner_edge.y(), t_ref_com_position.y(), t_pz,
+                                 t_is_left);
+}
+
+double computePhase(double t_yz, double t_vy, double t_yd, double t_yin,
+                    double t_q1, double t_q2, double t_zeta, int t_is_left) {
+  auto pz = computeComplexZmp(t_yz, t_vy, t_yd, t_q1, t_q2, t_zeta);
+  return computePhase(pz, computeComplexInnerEdge(t_yin, t_yd, pz, t_is_left));
+}
+double computePhase(const Vec3D& t_zmp_position, const Vec3D& t_com_velocity,
+                    const Vec3D& t_ref_com_position, const Vec3D& t_inner_edge,
+                    double t_q1, double t_q2, double t_zeta, int t_is_left) {
+  auto pz = computeComplexZmp(t_zmp_position, t_com_velocity,
+                              t_ref_com_position, t_q1, t_q2, t_zeta);
+  return computePhase(pz, computeComplexInnerEdge(
+                              t_inner_edge, t_ref_com_position, pz, t_is_left));
+}
+
+template <typename T>
+T limit(const T& x, const T& lower, const T& upper) {
+  return x <= lower ? lower : ((x >= upper) ? upper : x);
+}
+
+double computePhase(const Complex& t_pz, const Complex& t_p0) {
+  auto t_p1 = std::conj(t_p0);
+  auto denom = std::arg(t_p1 / t_p0);
+  if (denom < 0) denom += 2.0 * M_PI;
+  auto numer = std::arg(t_pz / t_p0);
+  if (zIsTiny(denom - std::fabs(numer))) return 1.0;
+  return limit(numer / denom, 0.0, 1.0);
+}
+
+double computePeriod(double t_q1, double t_q2, double t_zeta) {
+  auto omega = computeFrequency(t_q1, t_q2, t_zeta);
+  if (zIsTiny(omega)) {
+    ZRUNERROR("Frequency of oscillation must be positive. (given: %f)", omega);
+    return 0;
+  }
+  return zPIx2 / omega;
 }
 
 }  // namespace phase_y

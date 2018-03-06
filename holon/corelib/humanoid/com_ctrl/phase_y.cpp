@@ -23,6 +23,7 @@
 #include <zm/zm_misc.h>
 #include <cmath>
 #include <utility>
+#include "holon/corelib/math/misc.hpp"
 
 namespace holon {
 namespace phase_y {
@@ -50,20 +51,10 @@ Complex computeComplexZmp(const Vec3D& t_zmp_position,
                            t_ref_com_position.y(), t_q1, t_q2, t_zeta);
 }
 
-namespace internal {
-
-template <typename T>
-int sgn(const T& x) {
-  return (T(0) < x) - (x < T(0));
-}
-
-}  // namespace internal
-
 Complex computeComplexInnerEdge(double t_yin, double t_yd, const Complex& t_pz,
                                 int t_is_left) {
   double y = t_yin - t_yd;
-  return Complex(
-      y, -std::sqrt(std::norm(t_pz) - y * y) * internal::sgn(t_is_left));
+  return Complex(y, -std::sqrt(std::norm(t_pz) - y * y) * sgn(t_is_left));
 }
 
 Complex computeComplexInnerEdge(const Vec3D& t_inner_edge,
@@ -87,22 +78,13 @@ double computePhase(const Vec3D& t_zmp_position, const Vec3D& t_com_velocity,
                               t_inner_edge, t_ref_com_position, pz, t_is_left));
 }
 
-namespace internal {
-
-template <typename T>
-T limit(const T& x, const T& lower, const T& upper) {
-  return x <= lower ? lower : ((x >= upper) ? upper : x);
-}
-
-}  // namespace internal
-
 double computePhase(const Complex& t_pz, const Complex& t_p0) {
   auto t_p1 = std::conj(t_p0);
   auto denom = std::arg(t_p1 / t_p0);
   if (denom < 0) denom += 2.0 * M_PI;
   auto numer = std::arg(t_pz / t_p0);
   if (zIsTiny(denom - std::fabs(numer))) return 1.0;
-  return internal::limit(numer / denom, 0.0, 1.0);
+  return limit(numer / denom, 0.0, 1.0);
 }
 
 namespace internal {

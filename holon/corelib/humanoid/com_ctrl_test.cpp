@@ -761,6 +761,60 @@ SCENARIO("Controller makes COM oscillate sideward",
   }
 }
 
+SCENARIO("Check relations among rho, qx1 and vxd", "[ComCtrl]") {
+  GIVEN("COM controller is given") {
+    ComCtrl ctrl;
+    Vec3D p0 = {0, 0, 0.42};
+    double dist = 0.1;
+    ctrl.reset(p0, dist);
+    auto cmd = ctrl.getCommands();
+    REQUIRE(ctrl.refs().rho == 0);
+    REQUIRE(ctrl.refs().qx1 == 1);
+    WHEN("Referential velocity is 0.0 and update") {
+      cmd->vxd = 0;
+      ctrl.update();
+      THEN("Should be rho = 0, qx1 = 1") {
+        CHECK(ctrl.refs().rho == 0);
+        CHECK(ctrl.refs().qx1 == 1);
+      }
+    }
+    WHEN("Referential velocity is 0.1 and update") {
+      cmd->vxd = 0.1;
+      cmd->qx1 = 0.8;
+      ctrl.update();
+      THEN("Should be rho = 1, qx1 = 0") {
+        CHECK(ctrl.refs().rho == 1);
+        CHECK(ctrl.refs().qx1 == 0);
+        WHEN("Referential velocity get back to 0 and update") {
+          cmd->vxd = 0;
+          ctrl.update();
+          THEN("Should be rho = 0, qx1 = 0.8") {
+            CHECK(ctrl.refs().rho == 0);
+            CHECK(ctrl.refs().qx1 == 0.8);
+          }
+        }
+      }
+    }
+    WHEN("Referential velocity is -0.1 and update") {
+      cmd->vxd = -0.1;
+      cmd->qx1 = 0.8;
+      ctrl.update();
+      THEN("Should be rho = 1, qx1 = 0") {
+        CHECK(ctrl.refs().rho == 1);
+        CHECK(ctrl.refs().qx1 == 0);
+        WHEN("Referential velocity get back to 0 and update") {
+          cmd->vxd = 0;
+          ctrl.update();
+          THEN("Should be rho = 0, qx1 = 0.8") {
+            CHECK(ctrl.refs().rho == 0);
+            CHECK(ctrl.refs().qx1 == 0.8);
+          }
+        }
+      }
+    }
+  }
+}
+
 SCENARIO("Controller enables logitudinal moving", "[ComCtrl]") {
   GIVEN("Referential velocity is 0.1") {
     ComCtrl ctrl;

@@ -50,15 +50,20 @@ Complex computeComplexZmp(const Vec3D& t_zmp_position,
                            t_ref_com_position.y(), t_q1, t_q2, t_zeta);
 }
 
+namespace internal {
+
 template <typename T>
 int sgn(const T& x) {
   return (T(0) < x) - (x < T(0));
 }
 
+}  // namespace internal
+
 Complex computeComplexInnerEdge(double t_yin, double t_yd, const Complex& t_pz,
                                 int t_is_left) {
   double y = t_yin - t_yd;
-  return Complex(y, -std::sqrt(std::norm(t_pz) - y * y) * sgn(t_is_left));
+  return Complex(
+      y, -std::sqrt(std::norm(t_pz) - y * y) * internal::sgn(t_is_left));
 }
 
 Complex computeComplexInnerEdge(const Vec3D& t_inner_edge,
@@ -82,10 +87,14 @@ double computePhase(const Vec3D& t_zmp_position, const Vec3D& t_com_velocity,
                               t_inner_edge, t_ref_com_position, pz, t_is_left));
 }
 
+namespace internal {
+
 template <typename T>
 T limit(const T& x, const T& lower, const T& upper) {
   return x <= lower ? lower : ((x >= upper) ? upper : x);
 }
+
+}  // namespace internal
 
 double computePhase(const Complex& t_pz, const Complex& t_p0) {
   auto t_p1 = std::conj(t_p0);
@@ -93,16 +102,51 @@ double computePhase(const Complex& t_pz, const Complex& t_p0) {
   if (denom < 0) denom += 2.0 * M_PI;
   auto numer = std::arg(t_pz / t_p0);
   if (zIsTiny(denom - std::fabs(numer))) return 1.0;
-  return limit(numer / denom, 0.0, 1.0);
+  return internal::limit(numer / denom, 0.0, 1.0);
 }
+
+namespace internal {
+
+bool isOmegaValid(const double t_omega) {
+  if (zIsTiny(t_omega)) {
+    ZRUNERROR("Frequency of oscillation must be positive. (given: %f)",
+              t_omega);
+    return false;
+  }
+  return true;
+}
+
+bool isOmegaValid(const double t_q1, const double t_q2, const double t_zeta) {
+  return isOmegaValid(computeFrequency(t_q1, t_q2, t_zeta));
+}
+
+}  // namespace internal
 
 double computePeriod(double t_q1, double t_q2, double t_zeta) {
   auto omega = computeFrequency(t_q1, t_q2, t_zeta);
-  if (zIsTiny(omega)) {
-    ZRUNERROR("Frequency of oscillation must be positive. (given: %f)", omega);
-    return 0;
-  }
+  if (!internal::isOmegaValid(omega)) return 0;
   return zPIx2 / omega;
+}
+
+double computeTimeSpan(const Complex& t_p0, double t_q1, double t_q2,
+                       double t_zeta) {
+  auto omega = computeFrequency(t_q1, t_q2, t_zeta);
+  if (!internal::isOmegaValid(omega)) return 0;
+  return std::arg(std::conj(t_p0) / t_p0) / omega;
+}
+
+double computeElapsedTime(const Complex& t_pz, const Complex& t_p0, double t_q1,
+                          double t_q2, double t_zeta) {
+  auto omega = computeFrequency(t_q1, t_q2, t_zeta);
+  if (!internal::isOmegaValid(omega)) return 0;
+  return std::arg(t_pz / t_p0) / omega;
+}
+
+double computeRemainingTime(const Complex& t_pz, const Complex& t_p0,
+                            double t_q1, double t_q2, double t_zeta) {
+  auto omega = computeFrequency(t_q1, t_q2, t_zeta);
+  if (!internal::isOmegaValid(omega)) return 0;
+  return std::arg(std::conj(t_p0) / t_pz) / omega;
 }
 
 }  // namespace phase_y

@@ -310,6 +310,7 @@ TEST_CASE(
   CHECK_THAT(ctrl.states().com_position, Equals(p0));
   CHECK_THAT(ctrl.states().com_velocity, Equals(kVec3DZero));
   CHECK(ctrl.canonical_foot_dist() == dist);
+  CHECK(ctrl.refs().dist == dist);
 }
 
 TEST_CASE("ComCtrl::getCommands() provides a pointer to user commands",
@@ -864,6 +865,102 @@ SCENARIO("Controller enables logitudinal moving", "[ComCtrl]") {
         REQUIRE(ctrl.refs().com_position.x() == x);
         CHECK(ctrl.states().com_position.x() == Approx(x));
         CHECK(ctrl.states().com_velocity.x() == Approx(0).margin(1e-6));
+      }
+    }
+  }
+}
+
+TEST_CASE("Check phases of both feet", "[ComCtrl]") {
+  ComCtrl ctrl;
+  Vec3D p0 = {0, 0, 0.42};
+  double dist = 0.1;
+  ctrl.reset(p0, dist);
+  auto cmd = ctrl.getCommands();
+  cmd->rho = 1;
+  ctrl.states().com_velocity[1] += 0.000001;
+  while (ctrl.time() < 3) {
+    // update until producing a stable oscillation
+    ctrl.update();
+  }
+  while (ctrl.states().zmp_position.y() < 0.025) {
+    // update until ZMP comes onto left foot sole
+    ctrl.update();
+    if (ctrl.time() > 10) FAIL("oscillation not produced");
+  }
+  REQUIRE(ctrl.phaseLF() > 0);
+  REQUIRE(ctrl.phaseLF() < 1);
+  REQUIRE(ctrl.phaseRF() == 0);
+  REQUIRE(ctrl.phaseRF() == 0);
+  while (ctrl.states().zmp_position.y() > -0.025) {
+    // update until ZMP comes onto right foot sole
+    ctrl.update();
+    if (ctrl.time() > 10) FAIL("oscillation not produced");
+  }
+  REQUIRE(ctrl.phaseLF() == 0);
+  REQUIRE(ctrl.phaseLF() == 0);
+  REQUIRE(ctrl.phaseRF() > 0);
+  REQUIRE(ctrl.phaseRF() < 1);
+}
+
+TEST_CASE(
+    "When command dist is given, canonical foot distance should be updated",
+    "[ComCtrl][this]") {
+  ComCtrl ctrl;
+  double dist = 0.1;
+  REQUIRE(ctrl.canonical_foot_dist() != dist);
+  auto cmd = ctrl.getCommands();
+  cmd->dist = dist;
+  ctrl.update();
+  CHECK(ctrl.canonical_foot_dist() == dist);
+}
+
+SCENARIO("Check relations among rho, yd, dist and vyd", "[ComCtrl]") {
+  GIVEN("COM is at (0, 0, 0.42) and foot distance is 0.1") {
+    ComCtrl ctrl;
+    Vec3D p0 = {0, 0, 0.42};
+    double dist = 0.1;
+    ctrl.reset(p0, dist);
+    auto cmd = ctrl.getCommands();
+    ctrl.states().com_velocity[1] += 0.000001;
+    REQUIRE(ctrl.refs().rho == 0);
+    REQUIRE(ctrl.refs().com_position[1] == 0);
+    REQUIRE(ctrl.refs().dist == dist);
+    WHEN("referential velocity is 0.1 and update") {
+      cmd->vyd = 0.1;
+      while (ctrl.time() < 1) ctrl.update();
+      THEN("start moving leftwards") {
+        CHECK(ctrl.refs().rho == 1);
+        CHECK(ctrl.refs().com_position[1] > 0);
+        CHECK(ctrl.refs().dist > dist);
+        WHEN("referential velocity get back to 0 and update") {
+          cmd->vyd = 0;
+          double yd = ctrl.refs().com_position[1];
+          ctrl.update();
+          THEN("stop at that position") {
+            CHECK(ctrl.refs().rho == 0);
+            CHECK(ctrl.refs().com_position[1] == yd);
+            CHECK(ctrl.refs().dist == dist);
+          }
+        }
+      }
+    }
+    WHEN("referential velocity is -0.1 and update") {
+      cmd->vyd = -0.1;
+      while (ctrl.time() < 1) ctrl.update();
+      THEN("start moving rightwards") {
+        CHECK(ctrl.refs().rho == 1);
+        CHECK(ctrl.refs().com_position[1] < 0);
+        CHECK(ctrl.refs().dist > dist);
+        WHEN("referential velocity get back to 0 and update") {
+          cmd->vyd = 0;
+          double yd = ctrl.refs().com_position[1];
+          ctrl.update();
+          THEN("stop at that position") {
+            CHECK(ctrl.refs().rho == 0);
+            CHECK(ctrl.refs().com_position[1] == yd);
+            CHECK(ctrl.refs().dist == dist);
+          }
+        }
       }
     }
   }

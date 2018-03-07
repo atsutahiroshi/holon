@@ -150,6 +150,9 @@ class ComCtrl {
   CallbackFunc getReactionForceCallback();
   CallbackFunc getZmpPositionCallback();
 
+  double phaseLF() const;
+  double phaseRF() const;
+
  private:
   Model m_model;
   StatesPtr m_states_ptr;
@@ -158,7 +161,10 @@ class ComCtrl {
   CommandsPtr m_commands_ptr;
   Vec3D m_default_com_position;
   double m_canonical_foot_dist;
+  double m_max_foot_dist;
+  double m_current_foot_dist;
 
+  void updateSideward();
   void updateRefs();
   void updateOutputs();
   void updateDefaultComPosition();

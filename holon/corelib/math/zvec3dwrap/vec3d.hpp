@@ -37,6 +37,7 @@ class Vec3D {
  public:
   // constructors
   Vec3D();
+  explicit Vec3D(double t_v);
   Vec3D(double t_x, double t_y, double t_z);
 
   // special member functions

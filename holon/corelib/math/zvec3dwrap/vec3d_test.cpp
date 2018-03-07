@@ -44,6 +44,14 @@ TEST_CASE("zvec3d::Vec3D: constructors", "[corelib][math][Vec3D]") {
     CHECK(v[2] == 0.0);
   }
 
+  SECTION("with one argument") {
+    double x = fuzz.get();
+    Vec3D v(x);
+    CHECK(v[0] == x);
+    CHECK(v[1] == x);
+    CHECK(v[2] == x);
+  }
+
   SECTION("constructor with three arguments") {
     double x = fuzz.get();
     double y = fuzz.get();

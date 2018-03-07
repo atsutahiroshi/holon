@@ -28,6 +28,7 @@ namespace holon {
 namespace zvec3d {
 
 Vec3D::Vec3D() { zVec3DClear(&m_v); }
+Vec3D::Vec3D(double t_v) : Vec3D(t_v, t_v, t_v) {}
 Vec3D::Vec3D(double t_x, double t_y, double t_z) {
   zVec3DCreate(&m_v, t_x, t_y, t_z);
 }

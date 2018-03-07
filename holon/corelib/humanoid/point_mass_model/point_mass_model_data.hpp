@@ -21,6 +21,8 @@
 #ifndef HOLON_HUMANOID_POINT_MASS_MODEL_DATA_HPP_
 #define HOLON_HUMANOID_POINT_MASS_MODEL_DATA_HPP_
 
+#include <memory>
+
 namespace holon {
 
 template <typename State>
@@ -45,6 +47,29 @@ struct PointMassModelData {
 
 template <typename State>
 constexpr double PointMassModelData<State>::default_mass;
+
+// non-member functions
+template <typename State>
+using PointMassModelDataPtr = std::shared_ptr<PointMassModelData<State>>;
+
+template <typename State>
+PointMassModelDataPtr<State> createPointMassModelData() {
+  using Data = PointMassModelData<State>;
+  return std::make_shared<Data>();
+}
+
+template <typename State>
+PointMassModelDataPtr<State> createPointMassModelData(double t_mass) {
+  using Data = PointMassModelData<State>;
+  return std::make_shared<Data>(t_mass);
+}
+
+template <typename State>
+PointMassModelDataPtr<State> createPointMassModelData(
+    double t_mass, const State& t_initial_position) {
+  using Data = PointMassModelData<State>;
+  return std::make_shared<Data>(t_mass, t_initial_position);
+}
 
 }  // namespace holon
 

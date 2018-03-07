@@ -29,45 +29,38 @@ namespace holon {
 namespace {
 
 template <typename T>
-void CheckConstructor_1() {
-  using Data = PointMassModelData<T>;
-  Data data;
-  T zero(0.0);
+using Data = PointMassModelData<T>;
 
-  CHECK(data.mass == Data::default_mass);
-  CHECK(data.position == zero);
+template <typename T>
+void CheckMembers(const PointMassModelData<T>& data, const double expected_mass,
+                  const T& expected_p0) {
+  T zero(0.0);
+  CHECK(data.mass == expected_mass);
+  CHECK(data.position == expected_p0);
   CHECK(data.velocity == zero);
   CHECK(data.acceleration == zero);
   CHECK(data.force == zero);
+}
+
+template <typename T>
+void CheckConstructor_1() {
+  Data<T> data;
+  CheckMembers(data, Data<T>::default_mass, T(0));
 }
 
 template <typename T>
 void CheckConstructor_2() {
-  using Data = PointMassModelData<T>;
   double mass = Fuzzer(0, 10).get();
-  Data data(mass);
-  T zero(0.0);
-
-  CHECK(data.mass == mass);
-  CHECK(data.position == zero);
-  CHECK(data.velocity == zero);
-  CHECK(data.acceleration == zero);
-  CHECK(data.force == zero);
+  Data<T> data(mass);
+  CheckMembers(data, mass, T(0));
 }
 
 template <typename T>
 void CheckConstructor_3() {
-  using Data = PointMassModelData<T>;
   double mass = Fuzzer(0, 10).get();
   T v(Fuzzer().get<T>());
-  Data data(mass, v);
-  T zero(0.0);
-
-  CHECK(data.mass == mass);
-  CHECK(data.position == v);
-  CHECK(data.velocity == zero);
-  CHECK(data.acceleration == zero);
-  CHECK(data.force == zero);
+  Data<T> data(mass, v);
+  CheckMembers(data, mass, v);
 }
 
 TEST_CASE("Constructor of PointMassModelData", "[PointMassModelData][ctor]") {
@@ -75,13 +68,50 @@ TEST_CASE("Constructor of PointMassModelData", "[PointMassModelData][ctor]") {
     CheckConstructor_1<double>();
     CheckConstructor_1<Vec3D>();
   }
-  SECTION("With one argument") {
+  SECTION("Overloaded constructor 1") {
     CheckConstructor_2<double>();
     CheckConstructor_2<Vec3D>();
   }
-  SECTION("With two arguments") {
+  SECTION("Overloaded constructor 2") {
     CheckConstructor_3<double>();
     CheckConstructor_3<Vec3D>();
+  }
+}
+
+template <typename T>
+void CheckFactory_1() {
+  auto data = createPointMassModelData<T>();
+  CheckMembers(*data, Data<T>::default_mass, T(0));
+}
+
+template <typename T>
+void CheckFactory_2() {
+  double mass = Fuzzer(0, 10).get();
+  auto data = createPointMassModelData<T>(mass);
+  CheckMembers(*data, mass, T(0));
+}
+
+template <typename T>
+void CheckFactory_3() {
+  double mass = Fuzzer(0, 10).get();
+  auto v = Fuzzer().get<T>();
+  auto data = createPointMassModelData<T>(mass, v);
+  CheckMembers(*data, mass, v);
+}
+
+TEST_CASE("Check factory functions of PointMassModelData",
+          "[PointMassModelData]") {
+  SECTION("Overloaded function 1") {
+    CheckFactory_1<double>();
+    CheckFactory_1<Vec3D>();
+  }
+  SECTION("Overloaded function 2") {
+    CheckFactory_2<double>();
+    CheckFactory_2<Vec3D>();
+  }
+  SECTION("Overloaded function 3") {
+    CheckFactory_3<double>();
+    CheckFactory_3<Vec3D>();
   }
 }
 

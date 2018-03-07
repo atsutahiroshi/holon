@@ -117,8 +117,23 @@ void CheckForce() {
 }
 
 TEST_CASE("PointMassModelSystem::force", "[PointMassModelSystem]") {
-  SECTION("State type is double") { CheckForce<double>(); }
-  SECTION("State type is Vec3D") { CheckForce<Vec3D>(); }
+  SECTION("Case where state type is double") { CheckForce<double>(); }
+  SECTION("Case where state type is Vec3D") { CheckForce<Vec3D>(); }
+}
+
+template <typename T>
+void CheckSetConstForce() {
+  auto sys = prepareSystem(1.0, T(0.0));
+  auto force = Fuzzer().get<T>();
+  sys.setConstForce(force);
+  T p, v;
+  double t;
+  CHECK(sys.force(p, v, t) == force);
+}
+
+TEST_CASE("PointMassModelSytem::setConstForce", "[PointMassModelSystem]") {
+  SECTION("Case where state type is double") { CheckSetConstForce<double>(); }
+  SECTION("Case where state type is Vec3D") { CheckSetConstForce<Vec3D>(); }
 }
 
 }  // namespace

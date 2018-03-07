@@ -100,6 +100,12 @@ class PointMassModelSystem
     return *this;
   }
 
+  Self& setConstForce(const State& t_force) {
+    return set_force([t_force](const State&, const State&, const double) {
+      return t_force;
+    });
+  }
+
  private:
   Function f_acceleration = nullptr;
   Function f_force = nullptr;

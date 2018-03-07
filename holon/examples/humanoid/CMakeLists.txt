@@ -4,6 +4,7 @@ set(HOLON_HUMANOID_EXAMPLE_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/com_regulation_example.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/com_regulation_vertical_example.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/com_regulation_with_disturbance_example.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/com_sideward_moving_example.cpp
   )
 
 foreach(src ${HOLON_HUMANOID_EXAMPLE_SOURCES})

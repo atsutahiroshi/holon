@@ -31,6 +31,11 @@ int sgn(const T& x) {
 }
 
 template <typename T>
+T square(const T& x) {
+  return x * x;
+}
+
+template <typename T>
 T limit(const T& x, const T& lower, const T& upper) {
   return x <= lower ? lower : ((x >= upper) ? upper : x);
 }

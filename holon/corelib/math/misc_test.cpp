@@ -32,6 +32,12 @@ TEST_CASE("sign function", "[math][misc][sgn]") {
   CHECK(sgn(0) == 0);
 }
 
+TEST_CASE("square value", "[math][misc][square]") {
+  CHECK(square(5) == 25);
+  CHECK(square(1.1) == Approx(1.21));
+  CHECK(square(-1) == 1);
+}
+
 TEST_CASE("limit returns saturated value with lower and upper boundaries",
           "[math][misc][limit]") {
   CHECK(limit(0, -1, 1) == 0);

@@ -88,14 +88,50 @@ TEST_CASE("Constructor of PointMassModel", "[PointMassModel][ctor]") {
 }
 
 template <typename T>
+void CheckTimeStep() {
+  double dt = Fuzzer(0, 0.01).get();
+  auto model = makePointMassModel<T>();
+  REQUIRE(model.time_step() != dt);
+  model.set_time_step(dt);
+  CHECK(model.time_step() == Approx(dt));
+}
+
+template <typename T>
+void CheckDataPtr() {
+  auto data = createPointMassModelData<T>();
+  auto model = makePointMassModel<T>();
+  REQUIRE(model.data_ptr() != data);
+  model.set_data_ptr(data);
+  CHECK(model.data_ptr() == data);
+}
+
+TEST_CASE("Check accssors / mutators in PointMassModel",
+          "[PointMassModel][accessor][mutator]") {
+  SECTION("time step") {
+    CheckTimeStep<double>();
+    CheckTimeStep<Vec3D>();
+  }
+  SECTION("data pointer") {
+    CheckDataPtr<double>();
+    CheckDataPtr<Vec3D>();
+  }
+}
+
+template <typename T>
 void CheckFactroy_1() {
+  auto model = makePointMassModel<T>();
+  CheckInitializedMembers(model, T(0), 1.0);
+}
+
+template <typename T>
+void CheckFactroy_2() {
   auto v = Fuzzer().get<T>();
   auto model = makePointMassModel(v);
   CheckInitializedMembers(model, v, 1.0);
 }
 
 template <typename T>
-void CheckFactroy_2() {
+void CheckFactroy_3() {
   auto v = Fuzzer().get<T>();
   auto mass = Fuzzer(0, 10).get();
   auto model = makePointMassModel(v, mass);
@@ -111,6 +147,10 @@ TEST_CASE("Check factory functions of PointMassModel",
   SECTION("Overloaded function 2") {
     CheckFactroy_2<double>();
     CheckFactroy_2<Vec3D>();
+  }
+  SECTION("Overloaded function 3") {
+    CheckFactroy_3<double>();
+    CheckFactroy_3<Vec3D>();
   }
 }
 

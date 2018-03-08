@@ -47,6 +47,16 @@ class ModelBase {
   Data data() const noexcept { return *m_data_ptr; }
   DataPtr data_ptr() const noexcept { return m_data_ptr; }
 
+  // mutators
+  Self& set_time_step(double t_time_step) {
+    m_time_step = t_time_step;
+    return *this;
+  }
+  Self& set_data_ptr(DataPtr t_data_ptr) {
+    m_data_ptr = t_data_ptr;
+    return *this;
+  }
+
  private:
   double m_time;
   double m_time_step;
@@ -92,6 +102,11 @@ PointMassModel<State, Data, System>::PointMassModel(DataPtr t_data_ptr)
     : ModelBase<State, Data, System>(t_data_ptr) {}
 
 // non-member functions
+template <typename State>
+PointMassModel<State> makePointMassModel() {
+  return PointMassModel<State>();
+}
+
 template <typename State>
 PointMassModel<State> makePointMassModel(const State& t_initial_position) {
   return PointMassModel<State>(t_initial_position);

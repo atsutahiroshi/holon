@@ -100,6 +100,7 @@ class PointMassModel : public ModelBase<State, Data, System> {
   explicit PointMassModel(DataPtr t_data_ptr);
 
   // accessors
+  double mass() const noexcept { return this->data().mass; }
   State initial_position() const noexcept { return m_initial_position; }
 
   // mutators

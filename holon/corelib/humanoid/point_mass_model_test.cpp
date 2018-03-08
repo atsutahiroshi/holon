@@ -36,6 +36,7 @@ void CheckInitializedMembers(const Model<T>& model, const T& expected_position,
   CHECK(model.time_step() == Model<T>::default_time_step);
   CHECK(model.data().position == expected_position);
   CHECK(model.data().mass == expected_mass);
+  CHECK(model.mass() == expected_mass);
   CHECK(model.system().data_ptr() == model.data_ptr());
   CHECK(model.initial_position() == expected_position);
 }

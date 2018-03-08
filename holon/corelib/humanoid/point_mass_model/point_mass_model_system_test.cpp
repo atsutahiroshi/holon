@@ -61,7 +61,7 @@ TEST_CASE("Accessors / mutators of PointMassModelSystem",
   }
 }
 
-TEST_CASE("operator() of PointMassModelSystem", "[PointMassModelSystem][.]") {}
+TEST_CASE("operator() of PointMassModelSystem", "[PointMassModelSystem]") {}
 
 template <typename T>
 void CheckAcceleration() {

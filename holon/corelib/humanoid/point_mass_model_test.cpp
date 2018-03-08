@@ -138,6 +138,51 @@ TEST_CASE("Check accssors / mutators in PointMassModel",
 }
 
 template <typename T>
+void CheckReset_1() {
+  Fuzzer fuzz;
+  auto model = makePointMassModel<T>();
+  model.data_ptr()->position = fuzz.get<T>();
+  model.data_ptr()->velocity = fuzz.get<T>();
+  model.update();
+  REQUIRE(model.data().position != model.initial_position());
+  REQUIRE(model.data().velocity != T{0});
+  REQUIRE(model.time() != 0);
+  model.reset();
+  CHECK(model.data().position == model.initial_position());
+  CHECK(model.data().velocity == T{0});
+  CHECK(model.time() == 0);
+}
+
+template <typename T>
+void CheckReset_2() {
+  Fuzzer fuzz;
+  auto model = makePointMassModel<T>();
+  model.data_ptr()->position = fuzz.get<T>();
+  model.data_ptr()->velocity = fuzz.get<T>();
+  model.update();
+  REQUIRE(model.data().position != model.initial_position());
+  REQUIRE(model.data().velocity != T{0});
+  REQUIRE(model.time() != 0);
+  auto v = fuzz.get<T>();
+  model.reset(v);
+  CHECK(model.initial_position() == v);
+  CHECK(model.data().position == model.initial_position());
+  CHECK(model.data().velocity == T{0});
+  CHECK(model.time() == 0);
+}
+
+TEST_CASE("Check reset function in PointMassModel", "[PointMassModel][reset]") {
+  SECTION("Overloaded function 1") {
+    CheckReset_1<double>();
+    CheckReset_1<Vec3D>();
+  }
+  SECTION("Overloaded function 2") {
+    CheckReset_2<double>();
+    CheckReset_2<Vec3D>();
+  }
+}
+
+template <typename T>
 void CheckFactroy_1() {
   auto model = makePointMassModel<T>();
   CheckInitializedMembers(model, T(0), 1.0);

@@ -52,13 +52,27 @@ class ModelBase {
   System system() const noexcept { return m_system; }
 
   // mutators
-  Self& set_time_step(double t_time_step) {
+  virtual Self& set_time_step(double t_time_step) {
     m_time_step = t_time_step;
     return *this;
   }
-  Self& set_data_ptr(DataPtr t_data_ptr) {
+  virtual Self& set_data_ptr(DataPtr t_data_ptr) {
     m_data_ptr = t_data_ptr;
     return *this;
+  }
+  virtual Self& reset() {
+    m_time = 0;
+    return *this;
+  }
+
+  virtual bool update() {
+    m_time += m_time_step;
+    return true;
+  }
+
+  virtual bool update(double dt) {
+    set_time_step(dt);
+    return update();
   }
 
  private:
@@ -89,10 +103,9 @@ class PointMassModel : public ModelBase<State, Data, System> {
   State initial_position() const noexcept { return m_initial_position; }
 
   // mutators
-  Self& set_initial_position(const State& t_initial_position) {
-    m_initial_position = t_initial_position;
-    return *this;
-  }
+  Self& set_initial_position(const State& t_initial_position);
+  virtual Self& reset() override;
+  virtual Self& reset(const State& t_initial_position);
 
  private:
   State m_initial_position;
@@ -116,6 +129,30 @@ template <typename State, typename Data, typename System>
 PointMassModel<State, Data, System>::PointMassModel(DataPtr t_data_ptr)
     : ModelBase<State, Data, System>(t_data_ptr),
       m_initial_position(Base::data().position) {}
+
+template <typename State, typename Data, typename System>
+PointMassModel<State, Data, System>&
+PointMassModel<State, Data, System>::set_initial_position(
+    const State& t_initial_position) {
+  m_initial_position = t_initial_position;
+  return *this;
+}
+
+template <typename State, typename Data, typename System>
+PointMassModel<State, Data, System>&
+PointMassModel<State, Data, System>::reset() {
+  Base::reset();
+  this->data_ptr()->position = m_initial_position;
+  this->data_ptr()->velocity = State{0};
+  return *this;
+}
+
+template <typename State, typename Data, typename System>
+PointMassModel<State, Data, System>& PointMassModel<State, Data, System>::reset(
+    const State& t_initial_position) {
+  set_initial_position(t_initial_position);
+  return reset();
+}
 
 // non-member functions
 template <typename State>

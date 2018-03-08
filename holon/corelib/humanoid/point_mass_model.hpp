@@ -39,13 +39,17 @@ class ModelBase {
 
  public:
   explicit ModelBase(DataPtr t_data_ptr)
-      : m_time(0.0), m_time_step(default_time_step), m_data_ptr(t_data_ptr) {}
+      : m_time(0.0),
+        m_time_step(default_time_step),
+        m_data_ptr(t_data_ptr),
+        m_system(t_data_ptr) {}
 
   // accessors
   double time() const noexcept { return m_time; }
   double time_step() const noexcept { return m_time_step; }
   Data data() const noexcept { return *m_data_ptr; }
   DataPtr data_ptr() const noexcept { return m_data_ptr; }
+  System system() const noexcept { return m_system; }
 
   // mutators
   Self& set_time_step(double t_time_step) {
@@ -61,6 +65,7 @@ class ModelBase {
   double m_time;
   double m_time_step;
   DataPtr m_data_ptr;
+  System m_system;
 };
 
 template <typename State, typename Data, typename System>

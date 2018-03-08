@@ -36,6 +36,7 @@ void CheckInitializedMembers(const Model<T>& model, const T& expected_position,
   CHECK(model.time_step() == Model<T>::default_time_step);
   CHECK(model.data().position == expected_position);
   CHECK(model.data().mass == expected_mass);
+  CHECK(model.system().data_ptr() == model.data_ptr());
 }
 
 template <typename T>
@@ -66,6 +67,8 @@ void CheckConstructor_4() {
   auto data = createPointMassModelData(v, mass);
   Model<T> model(data);
   CheckInitializedMembers(model, v, mass);
+  CHECK(model.data_ptr() == data);
+  CHECK(model.system().data_ptr() == data);
 }
 
 TEST_CASE("Constructor of PointMassModel", "[PointMassModel][ctor]") {

@@ -27,25 +27,19 @@
 
 namespace holon {
 
-template <typename StateType, typename DataType, typename SystemType>
-class ModelBase {};
-
-template <typename State>
-class PointMassModel {
-  using Self = PointMassModel;
-  using Data = PointMassModelData<State>;
+template <typename State, typename Data, typename System>
+class ModelBase {
+ protected:
+  using Self = ModelBase;
   using DataPtr = std::shared_ptr<Data>;
-  using System = PointMassModelSystem<State>;
   using Function = typename System::Function;
 
  public:
   static constexpr double default_time_step = 0.001;
 
  public:
-  PointMassModel();
-  explicit PointMassModel(const State& t_initial_poisition);
-  PointMassModel(const State& t_initial_poisition, double t_mass);
-  explicit PointMassModel(DataPtr t_data_ptr);
+  explicit ModelBase(DataPtr t_data_ptr)
+      : m_time(0.0), m_time_step(default_time_step), m_data_ptr(t_data_ptr) {}
 
   // accessors
   double time() const noexcept { return m_time; }
@@ -59,27 +53,43 @@ class PointMassModel {
   DataPtr m_data_ptr;
 };
 
-template <typename State>
-constexpr double PointMassModel<State>::default_time_step;
+template <typename State, typename Data, typename System>
+constexpr double ModelBase<State, Data, System>::default_time_step;
 
-template <typename State>
-PointMassModel<State>::PointMassModel()
+template <typename State, typename Data = PointMassModelData<State>,
+          typename System = PointMassModelSystem<State>>
+class PointMassModel : public ModelBase<State, Data, System> {
+  using Self = PointMassModel;
+  using DataPtr = std::shared_ptr<Data>;
+  using Function = typename System::Function;
+
+ public:
+  PointMassModel();
+  explicit PointMassModel(const State& t_initial_poisition);
+  PointMassModel(const State& t_initial_poisition, double t_mass);
+  explicit PointMassModel(DataPtr t_data_ptr);
+
+ private:
+};
+
+template <typename State, typename Data, typename System>
+PointMassModel<State, Data, System>::PointMassModel()
     : PointMassModel(State(0), Data::default_mass) {}
 
-template <typename State>
-PointMassModel<State>::PointMassModel(const State& t_initial_position)
+template <typename State, typename Data, typename System>
+PointMassModel<State, Data, System>::PointMassModel(
+    const State& t_initial_position)
     : PointMassModel(t_initial_position, Data::default_mass) {}
 
-template <typename State>
-PointMassModel<State>::PointMassModel(const State& t_initial_position,
-                                      double t_mass)
-    : m_time(0.0),
-      m_time_step(default_time_step),
-      m_data_ptr(createPointMassModelData<State>(t_initial_position, t_mass)) {}
+template <typename State, typename Data, typename System>
+PointMassModel<State, Data, System>::PointMassModel(
+    const State& t_initial_position, double t_mass)
+    : ModelBase<State, Data, System>(
+          createPointMassModelData(t_initial_position, t_mass)) {}
 
-template <typename State>
-PointMassModel<State>::PointMassModel(DataPtr t_data_ptr)
-    : m_time(0.0), m_time_step(default_time_step), m_data_ptr(t_data_ptr) {}
+template <typename State, typename Data, typename System>
+PointMassModel<State, Data, System>::PointMassModel(DataPtr t_data_ptr)
+    : ModelBase<State, Data, System>(t_data_ptr) {}
 
 // non-member functions
 template <typename State>

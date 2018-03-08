@@ -21,9 +21,72 @@
 #ifndef HOLON_HUMANOID_POINT_MASS_MODEL_HPP_
 #define HOLON_HUMANOID_POINT_MASS_MODEL_HPP_
 
+#include <memory>
+#include "holon/corelib/humanoid/point_mass_model/point_mass_model_data.hpp"
+#include "holon/corelib/humanoid/point_mass_model/point_mass_model_system.hpp"
+
 namespace holon {
 
-class PointMassModel {};
+template <typename StateType, typename DataType, typename SystemType>
+class ModelBase {};
+
+template <typename State>
+class PointMassModel {
+  using Self = PointMassModel;
+  using Data = PointMassModelData<State>;
+  using DataPtr = std::shared_ptr<Data>;
+  using System = PointMassModelSystem<State>;
+  using Function = typename System::Function;
+
+ public:
+  static constexpr double default_time_step = 0.001;
+
+ public:
+  PointMassModel();
+  explicit PointMassModel(const State& t_initial_poisition);
+  PointMassModel(const State& t_initial_poisition, double t_mass);
+
+  // accessors
+  double time() const noexcept { return m_time; }
+  double time_step() const noexcept { return m_time_step; }
+  Data data() const noexcept { return *m_data_ptr; }
+  DataPtr data_ptr() const noexcept { return m_data_ptr; }
+
+ private:
+  double m_time;
+  double m_time_step;
+  DataPtr m_data_ptr;
+};
+
+template <typename State>
+constexpr double PointMassModel<State>::default_time_step;
+
+template <typename State>
+PointMassModel<State>::PointMassModel()
+    : PointMassModel(State(0), Data::default_mass) {}
+
+template <typename State>
+PointMassModel<State>::PointMassModel(const State& t_initial_position)
+    : PointMassModel(t_initial_position, Data::default_mass) {}
+
+template <typename State>
+PointMassModel<State>::PointMassModel(const State& t_initial_position,
+                                      double t_mass)
+    : m_time(0.0),
+      m_time_step(default_time_step),
+      m_data_ptr(createPointMassModelData<State>(t_initial_position, t_mass)) {}
+
+// non-member functions
+template <typename State>
+PointMassModel<State> makePointMassModel(const State& t_initial_position) {
+  return PointMassModel<State>(t_initial_position);
+}
+
+template <typename State>
+PointMassModel<State> makePointMassModel(const State& t_initial_position,
+                                         double t_mass) {
+  return PointMassModel<State>(t_initial_position, t_mass);
+}
 
 }  // namespace holon
 

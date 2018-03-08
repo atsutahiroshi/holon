@@ -35,18 +35,30 @@ struct PointMassModelData {
   State acceleration;
   State force;
 
-  PointMassModelData() : PointMassModelData(default_mass) {}
-  PointMassModelData(double t_mass) : PointMassModelData(t_mass, State(0)) {}
-  PointMassModelData(double t_mass, const State& t_initial_position)
-      : mass(t_mass),
-        position(t_initial_position),
-        velocity(0),
-        acceleration(0),
-        force(0) {}
+  PointMassModelData();
+  PointMassModelData(double t_mass);
+  PointMassModelData(double t_mass, const State& t_initial_position);
 };
 
 template <typename State>
 constexpr double PointMassModelData<State>::default_mass;
+
+template <typename State>
+PointMassModelData<State>::PointMassModelData()
+    : PointMassModelData(default_mass) {}
+
+template <typename State>
+PointMassModelData<State>::PointMassModelData(double t_mass)
+    : PointMassModelData(t_mass, State(0)) {}
+
+template <typename State>
+PointMassModelData<State>::PointMassModelData(double t_mass,
+                                              const State& t_initial_position)
+    : mass(t_mass),
+      position(t_initial_position),
+      velocity(0),
+      acceleration(0),
+      force(0) {}
 
 // non-member functions
 template <typename State>

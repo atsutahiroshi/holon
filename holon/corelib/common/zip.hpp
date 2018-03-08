@@ -35,6 +35,15 @@ auto zip(const std::array<T, N>&... arrays) -> std::array<std::tuple<T...>, N> {
   return iter;
 }
 
+template <size_t N, typename... T>
+auto zip_ptr(std::array<T, N>&... arrays) -> std::array<std::tuple<T*...>, N> {
+  std::array<std::tuple<T*...>, N> iter;
+  for (std::size_t i = 0; i < N; ++i) {
+    iter[i] = std::make_tuple(&arrays[i]...);
+  }
+  return iter;
+}
+
 }  // namespace holon
 
 #endif  // HOLON_COMMON_ZIP_HPP_

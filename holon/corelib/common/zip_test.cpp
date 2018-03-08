@@ -49,4 +49,18 @@ TEST_CASE("Check zip function", "[zip]") {
   }
 }
 
+TEST_CASE("Check zip_ptr function", "[zip_ptr]") {
+  SECTION("Assignment") {
+    std::array<int, 3> a = {{1, 2, 3}};
+    std::array<int, 3> b = {{4, 5, 6}};
+    std::array<int, 3> c;
+    for (auto&& i : zip_ptr(a, b, c)) {
+      *std::get<2>(i) = *std::get<0>(i) + *std::get<1>(i);
+    }
+    CHECK(c[0] == 5);
+    CHECK(c[1] == 7);
+    CHECK(c[2] == 9);
+  }
+}
+
 }  // namespace holon

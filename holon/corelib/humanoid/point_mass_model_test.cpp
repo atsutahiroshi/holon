@@ -37,6 +37,7 @@ void CheckInitializedMembers(const Model<T>& model, const T& expected_position,
   CHECK(model.data().position == expected_position);
   CHECK(model.data().mass == expected_mass);
   CHECK(model.system().data_ptr() == model.data_ptr());
+  CHECK(model.initial_position() == expected_position);
 }
 
 template <typename T>
@@ -108,6 +109,18 @@ void CheckDataPtr() {
   CHECK(model.data_ptr() == data);
 }
 
+template <typename T>
+void CheckInitialPosition() {
+  Fuzzer fuzz;
+  auto p0 = fuzz.get<T>();
+  auto p1 = fuzz.get<T>();
+  auto model = makePointMassModel<T>(p0);
+  REQUIRE(model.initial_position() == p0);
+  REQUIRE(model.initial_position() != p1);
+  model.set_initial_position(p1);
+  CHECK(model.initial_position() == p1);
+}
+
 TEST_CASE("Check accssors / mutators in PointMassModel",
           "[PointMassModel][accessor][mutator]") {
   SECTION("time step") {
@@ -117,6 +130,10 @@ TEST_CASE("Check accssors / mutators in PointMassModel",
   SECTION("data pointer") {
     CheckDataPtr<double>();
     CheckDataPtr<Vec3D>();
+  }
+  SECTION("initial position") {
+    CheckInitialPosition<double>();
+    CheckInitialPosition<Vec3D>();
   }
 }
 

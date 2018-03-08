@@ -75,6 +75,7 @@ template <typename State, typename Data = PointMassModelData<State>,
           typename System = PointMassModelSystem<State, Data>>
 class PointMassModel : public ModelBase<State, Data, System> {
   using Self = PointMassModel;
+  using Base = ModelBase<State, Data, System>;
   using DataPtr = std::shared_ptr<Data>;
   using Function = typename System::Function;
 
@@ -84,7 +85,17 @@ class PointMassModel : public ModelBase<State, Data, System> {
   PointMassModel(const State& t_initial_poisition, double t_mass);
   explicit PointMassModel(DataPtr t_data_ptr);
 
+  // accessors
+  State initial_position() const noexcept { return m_initial_position; }
+
+  // mutators
+  Self& set_initial_position(const State& t_initial_position) {
+    m_initial_position = t_initial_position;
+    return *this;
+  }
+
  private:
+  State m_initial_position;
 };
 
 template <typename State, typename Data, typename System>
@@ -99,12 +110,12 @@ PointMassModel<State, Data, System>::PointMassModel(
 template <typename State, typename Data, typename System>
 PointMassModel<State, Data, System>::PointMassModel(
     const State& t_initial_position, double t_mass)
-    : ModelBase<State, Data, System>(
-          createPointMassModelData(t_initial_position, t_mass)) {}
+    : PointMassModel(createPointMassModelData(t_initial_position, t_mass)) {}
 
 template <typename State, typename Data, typename System>
 PointMassModel<State, Data, System>::PointMassModel(DataPtr t_data_ptr)
-    : ModelBase<State, Data, System>(t_data_ptr) {}
+    : ModelBase<State, Data, System>(t_data_ptr),
+      m_initial_position(Base::data().position) {}
 
 // non-member functions
 template <typename State>

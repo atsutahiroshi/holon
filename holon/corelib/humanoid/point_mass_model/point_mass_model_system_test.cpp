@@ -30,22 +30,22 @@ template <typename T>
 using System = PointMassModelSystem<T>;
 
 template <typename T>
-System<T> prepareSystem(double mass, const T& v) {
-  auto data = createPointMassModelData(mass, v);
+System<T> prepareSystem(const T& v, double mass) {
+  auto data = createPointMassModelData(v, mass);
   auto sys = makePointMassModelSystem(data);
   return sys;
 }
 
 TEST_CASE("Constructors of PointMassModelSystem",
           "[PointMassModelSystem][ctor]") {
-  auto data = createPointMassModelData(1.0, kVec3DZ);
+  auto data = createPointMassModelData(kVec3DZ, 1.0);
   auto sys = makePointMassModelSystem(data);
   REQUIRE(sys.data_ptr() == data);
 }
 
 TEST_CASE("Accessors / mutators of PointMassModelSystem",
           "[PointMassModelSystem][accessor][mutator]") {
-  auto data = createPointMassModelData(1.0, kVec3DZ);
+  auto data = createPointMassModelData(kVec3DZ, 1.0);
   auto sys = makePointMassModelSystem(data);
 
   SECTION("data reference") {
@@ -55,7 +55,7 @@ TEST_CASE("Accessors / mutators of PointMassModelSystem",
   }
 
   SECTION("data pointer") {
-    auto data2 = createPointMassModelData(2.0, kVec3DZero);
+    auto data2 = createPointMassModelData(kVec3DZero, 2.0);
     sys.set_data_ptr(data2);
     REQUIRE(sys.data_ptr() == data2);
   }
@@ -66,7 +66,7 @@ TEST_CASE("operator() of PointMassModelSystem", "[PointMassModelSystem][.]") {}
 template <typename T>
 void CheckAcceleration() {
   Fuzzer fuzz(0, 10);
-  auto data = createPointMassModelData<T>(fuzz(), fuzz.get<T>());
+  auto data = createPointMassModelData<T>(fuzz.get<T>(), fuzz());
   auto sys = makePointMassModelSystem(data);
   T p, v;
   double t;
@@ -99,7 +99,7 @@ template <typename T>
 void CheckForce() {
   Fuzzer fuzz(0, 10);
   auto mass = 2.0;
-  auto data = createPointMassModelData<T>(mass, fuzz.get<T>());
+  auto data = createPointMassModelData<T>(fuzz.get<T>(), mass);
   auto sys = makePointMassModelSystem(data);
   T p, v;
   double t;
@@ -123,7 +123,7 @@ TEST_CASE("PointMassModelSystem::force", "[PointMassModelSystem]") {
 
 template <typename T>
 void CheckSetConstForce() {
-  auto sys = prepareSystem(1.0, T(0.0));
+  auto sys = prepareSystem(T(0.0), 1.0);
   auto force = Fuzzer().get<T>();
   sys.setConstForce(force);
   T p, v;

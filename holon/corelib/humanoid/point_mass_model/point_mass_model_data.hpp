@@ -36,8 +36,8 @@ struct PointMassModelData {
   State force;
 
   PointMassModelData();
-  PointMassModelData(double t_mass);
-  PointMassModelData(double t_mass, const State& t_initial_position);
+  PointMassModelData(const State& t_initial_position);
+  PointMassModelData(const State& t_initial_position, double t_mass);
 };
 
 template <typename State>
@@ -45,15 +45,15 @@ constexpr double PointMassModelData<State>::default_mass;
 
 template <typename State>
 PointMassModelData<State>::PointMassModelData()
-    : PointMassModelData(default_mass) {}
+    : PointMassModelData(State(0), default_mass) {}
 
 template <typename State>
-PointMassModelData<State>::PointMassModelData(double t_mass)
-    : PointMassModelData(t_mass, State(0)) {}
+PointMassModelData<State>::PointMassModelData(const State& t_initial_position)
+    : PointMassModelData(t_initial_position, default_mass) {}
 
 template <typename State>
-PointMassModelData<State>::PointMassModelData(double t_mass,
-                                              const State& t_initial_position)
+PointMassModelData<State>::PointMassModelData(const State& t_initial_position,
+                                              double t_mass)
     : mass(t_mass),
       position(t_initial_position),
       velocity(0),
@@ -71,16 +71,17 @@ PointMassModelDataPtr<State> createPointMassModelData() {
 }
 
 template <typename State>
-PointMassModelDataPtr<State> createPointMassModelData(double t_mass) {
+PointMassModelDataPtr<State> createPointMassModelData(
+    const State& t_initial_position) {
   using Data = PointMassModelData<State>;
-  return std::make_shared<Data>(t_mass);
+  return std::make_shared<Data>(t_initial_position);
 }
 
 template <typename State>
 PointMassModelDataPtr<State> createPointMassModelData(
-    double t_mass, const State& t_initial_position) {
+    const State& t_initial_position, double t_mass) {
   using Data = PointMassModelData<State>;
-  return std::make_shared<Data>(t_mass, t_initial_position);
+  return std::make_shared<Data>(t_initial_position, t_mass);
 }
 
 }  // namespace holon

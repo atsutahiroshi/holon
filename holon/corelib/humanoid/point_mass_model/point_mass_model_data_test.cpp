@@ -32,8 +32,8 @@ template <typename T>
 using Data = PointMassModelData<T>;
 
 template <typename T>
-void CheckMembers(const PointMassModelData<T>& data, const double expected_mass,
-                  const T& expected_p0) {
+void CheckMembers(const PointMassModelData<T>& data, const T& expected_p0,
+                  const double expected_mass) {
   T zero(0.0);
   CHECK(data.mass == expected_mass);
   CHECK(data.position == expected_p0);
@@ -45,22 +45,22 @@ void CheckMembers(const PointMassModelData<T>& data, const double expected_mass,
 template <typename T>
 void CheckConstructor_1() {
   Data<T> data;
-  CheckMembers(data, Data<T>::default_mass, T(0));
+  CheckMembers(data, T(0), Data<T>::default_mass);
 }
 
 template <typename T>
 void CheckConstructor_2() {
-  double mass = Fuzzer(0, 10).get();
-  Data<T> data(mass);
-  CheckMembers(data, mass, T(0));
+  auto v = Fuzzer().get<T>();
+  Data<T> data(v);
+  CheckMembers(data, v, Data<T>::default_mass);
 }
 
 template <typename T>
 void CheckConstructor_3() {
   double mass = Fuzzer(0, 10).get();
-  T v(Fuzzer().get<T>());
-  Data<T> data(mass, v);
-  CheckMembers(data, mass, v);
+  auto v = Fuzzer().get<T>();
+  Data<T> data(v, mass);
+  CheckMembers(data, v, mass);
 }
 
 TEST_CASE("Constructor of PointMassModelData", "[PointMassModelData][ctor]") {
@@ -81,22 +81,22 @@ TEST_CASE("Constructor of PointMassModelData", "[PointMassModelData][ctor]") {
 template <typename T>
 void CheckFactory_1() {
   auto data = createPointMassModelData<T>();
-  CheckMembers(*data, Data<T>::default_mass, T(0));
+  CheckMembers(*data, T(0), Data<T>::default_mass);
 }
 
 template <typename T>
 void CheckFactory_2() {
-  double mass = Fuzzer(0, 10).get();
-  auto data = createPointMassModelData<T>(mass);
-  CheckMembers(*data, mass, T(0));
+  auto v = Fuzzer().get<T>();
+  auto data = createPointMassModelData<T>(v);
+  CheckMembers(*data, v, Data<T>::default_mass);
 }
 
 template <typename T>
 void CheckFactory_3() {
   double mass = Fuzzer(0, 10).get();
   auto v = Fuzzer().get<T>();
-  auto data = createPointMassModelData<T>(mass, v);
-  CheckMembers(*data, mass, v);
+  auto data = createPointMassModelData<T>(v, mass);
+  CheckMembers(*data, v, mass);
 }
 
 TEST_CASE("Check factory functions of PointMassModelData",

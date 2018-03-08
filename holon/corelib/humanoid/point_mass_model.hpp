@@ -45,6 +45,7 @@ class PointMassModel {
   PointMassModel();
   explicit PointMassModel(const State& t_initial_poisition);
   PointMassModel(const State& t_initial_poisition, double t_mass);
+  explicit PointMassModel(DataPtr t_data_ptr);
 
   // accessors
   double time() const noexcept { return m_time; }
@@ -75,6 +76,10 @@ PointMassModel<State>::PointMassModel(const State& t_initial_position,
     : m_time(0.0),
       m_time_step(default_time_step),
       m_data_ptr(createPointMassModelData<State>(t_initial_position, t_mass)) {}
+
+template <typename State>
+PointMassModel<State>::PointMassModel(DataPtr t_data_ptr)
+    : m_time(0.0), m_time_step(default_time_step), m_data_ptr(t_data_ptr) {}
 
 // non-member functions
 template <typename State>

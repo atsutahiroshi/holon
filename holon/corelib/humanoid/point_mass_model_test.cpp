@@ -59,18 +59,31 @@ void CheckConstructor_3() {
   CheckInitializedMembers(model, v, mass);
 }
 
+template <typename T>
+void CheckConstructor_4() {
+  auto v = Fuzzer().get<T>();
+  double mass = Fuzzer(0, 10).get();
+  auto data = createPointMassModelData(v, mass);
+  Model<T> model(data);
+  CheckInitializedMembers(model, v, mass);
+}
+
 TEST_CASE("Constructor of PointMassModel", "[PointMassModel][ctor]") {
   SECTION("Default constructor") {
     CheckConstructor_1<double>();
     CheckConstructor_1<Vec3D>();
   }
-  SECTION("Overloaded constructor 1") {
+  SECTION("Overloaded constructor with State") {
     CheckConstructor_2<double>();
     CheckConstructor_2<Vec3D>();
   }
-  SECTION("Overloaded constructor 2") {
+  SECTION("Overloaded constructor with State, double") {
     CheckConstructor_3<double>();
     CheckConstructor_3<Vec3D>();
+  }
+  SECTION("Overloaded constructor with DataPtr") {
+    CheckConstructor_4<double>();
+    CheckConstructor_4<Vec3D>();
   }
 }
 

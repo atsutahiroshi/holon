@@ -27,14 +27,12 @@
 
 namespace holon {
 
-template <typename StateType, typename DataType>
+template <typename State, typename Data>
 class SystemBase {
  protected:
-  using Self = SystemBase<StateType, DataType>;
-  using State = StateType;
+  using Self = SystemBase<State, Data>;
   using StateArray = std::array<State, 2>;
-  using Data = DataType;
-  using DataPtr = std::shared_ptr<DataType>;
+  using DataPtr = std::shared_ptr<Data>;
 
  public:
   SystemBase(DataPtr t_data_ptr) : m_data_ptr(t_data_ptr) {}
@@ -57,14 +55,12 @@ class SystemBase {
   DataPtr m_data_ptr;
 };
 
-template <typename State>
-class PointMassModelSystem
-    : public SystemBase<State, PointMassModelData<State>> {
-  using Base = SystemBase<State, PointMassModelData<State>>;
+template <typename State, typename Data = PointMassModelData<State>>
+class PointMassModelSystem : public SystemBase<State, Data> {
+  using Self = PointMassModelSystem<State, Data>;
+  using Base = SystemBase<State, Data>;
   using StateArray = typename Base::StateArray;
-  using Data = typename Base::Data;
   using DataPtr = typename Base::DataPtr;
-  using Self = PointMassModelSystem<State>;
 
  public:
   using Function =

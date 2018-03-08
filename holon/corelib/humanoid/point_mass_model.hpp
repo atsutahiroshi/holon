@@ -57,7 +57,7 @@ template <typename State, typename Data, typename System>
 constexpr double ModelBase<State, Data, System>::default_time_step;
 
 template <typename State, typename Data = PointMassModelData<State>,
-          typename System = PointMassModelSystem<State>>
+          typename System = PointMassModelSystem<State, Data>>
 class PointMassModel : public ModelBase<State, Data, System> {
   using Self = PointMassModel;
   using DataPtr = std::shared_ptr<Data>;

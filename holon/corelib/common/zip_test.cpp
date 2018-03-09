@@ -61,6 +61,18 @@ TEST_CASE("Check zip_ptr function", "[zip_ptr]") {
     CHECK(c[1] == 7);
     CHECK(c[2] == 9);
   }
+
+  SECTION("Assignment with double") {
+    std::array<double, 3> a = {{1.0, 2.0, 3.0}};
+    std::array<double, 3> b = {{4.0, 5.0, 6.0}};
+    std::array<double, 3> c;
+    for (auto&& i : zip_ptr(a, b, c)) {
+      *std::get<2>(i) = *std::get<0>(i) + *std::get<1>(i);
+    }
+    CHECK(c[0] == Approx(5.0));
+    CHECK(c[1] == Approx(7.0));
+    CHECK(c[2] == Approx(9.0));
+  }
 }
 
 }  // namespace holon

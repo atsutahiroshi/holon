@@ -24,7 +24,7 @@
 #include <memory>
 #include "holon/corelib/humanoid/point_mass_model/point_mass_model_data.hpp"
 #include "holon/corelib/humanoid/point_mass_model/point_mass_model_system.hpp"
-#include "holon/corelib/math/ode_euler.hpp"
+#include "holon/corelib/math/ode_runge_kutta4.hpp"
 
 namespace holon {
 
@@ -92,7 +92,7 @@ template <typename State, typename Solver, typename Data, typename System>
 constexpr double ModelBase<State, Solver, Data, System>::default_time_step;
 
 template <typename State, typename StateArray = std::array<State, 2>,
-          typename Solver = Euler<StateArray>,
+          typename Solver = RungeKutta4<StateArray>,
           typename Data = PointMassModelData<State>,
           typename System = PointMassModelSystem<State, Data>>
 class PointMassModel : public ModelBase<State, Solver, Data, System> {

@@ -184,6 +184,84 @@ TEST_CASE("Check reset function in PointMassModel", "[PointMassModel][reset]") {
 }
 
 template <typename T>
+void CheckSetForceCallback() {
+  auto model = makePointMassModel<T>();
+  auto force = Fuzzer().get<T>();
+  auto func = [force](const T&, const T&, const double&) { return force; };
+  model.setForceCallback(func);
+  CHECK(model.system().force(T{0}, T{0}, 0) == force);
+}
+
+TEST_CASE("Check setForceCallback in PointMassModel",
+          "[PointMassModel][setForceCallback]") {
+  CheckSetForceCallback<double>();
+  CheckSetForceCallback<Vec3D>();
+}
+
+template <typename T>
+void CheckUpdateTime() {
+  auto model = makePointMassModel<T>();
+  auto dt = Model<T>::default_time_step;
+  REQUIRE(model.time() == 0);
+  REQUIRE(model.time_step() == Approx(dt));
+  model.update();
+  CHECK(model.time() == Approx(dt));
+  model.update();
+  CHECK(model.time() == Approx(dt + dt));
+  auto dt2 = Fuzzer(0, 0.001).get();
+  model.update(dt2);
+  CHECK(model.time() == Approx(dt + dt + dt2));
+}
+
+TEST_CASE("Check if time is updated by update in PointMassModel",
+          "[PointMassModel][update]") {
+  CheckUpdateTime<double>();
+  CheckUpdateTime<Vec3D>();
+}
+
+template <typename T>
+void CheckUpdateWithoutForce() {
+  auto model = makePointMassModel<T>();
+  while (model.time() < 1) model.update();
+  CHECK(model.data().position == T{0.0});
+}
+
+TEST_CASE("Check if point mass is still without adding force",
+          "[PointMassModel][update]") {
+  CheckUpdateWithoutForce<double>();
+  CheckUpdateWithoutForce<Vec3D>();
+}
+
+TEST_CASE("Check if point mass is moving with adding force, one dimentinal",
+          "[PointMassModel][update]") {
+  auto model = makePointMassModel<double>();
+  auto f = [](const double&, const double&, const double) { return 1.0; };
+  model.setForceCallback(f);
+  REQUIRE(model.data().position == 0);
+  REQUIRE(model.time() == 0);
+  while (model.time() < 0.1) model.update();
+  CHECK(model.data().position > 0);
+  CHECK(model.time() == Approx(0.1));
+}
+
+TEST_CASE("Check if point mass is moving with adding force",
+          "[PointMassModel][update]") {
+  Vec3D force = {1, -1, 0};
+  auto model = makePointMassModel<Vec3D>();
+  auto f = [force](const Vec3D&, const Vec3D&, const double) { return force; };
+  model.setForceCallback(f);
+  REQUIRE(model.data().position.x() == 0);
+  REQUIRE(model.data().position.y() == 0);
+  REQUIRE(model.data().position.z() == 0);
+  REQUIRE(model.time() == 0);
+  while (model.time() < 0.1) model.update();
+  CHECK(model.data().position.x() > 0);
+  CHECK(model.data().position.y() < 0);
+  CHECK(model.data().position.z() == 0);
+  CHECK(model.time() == Approx(0.1));
+}
+
+template <typename T>
 void CheckFactroy_1() {
   auto model = makePointMassModel<T>();
   CheckInitializedMembers(model, T(0), 1.0);

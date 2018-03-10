@@ -34,10 +34,8 @@ using Time = double;
 struct sys {
   State operator()(const State& x, const Time t) const {
     State dxdt;
-    std::cout << "sys start\n";
     dxdt[0] = x[0] + 2.0 * x[1];
     dxdt[1] = x[1];
-    std::cout << "sys end\n";
     return dxdt;
   }
 };

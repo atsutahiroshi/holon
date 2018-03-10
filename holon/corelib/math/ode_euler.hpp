@@ -21,47 +21,17 @@
 #ifndef HOLON_MATH_ODE_EULER_HPP_
 #define HOLON_MATH_ODE_EULER_HPP_
 
-#include "holon/corelib/common/zip.hpp"
+#include "holon/corelib/math/ode_solver.hpp"
 
 namespace holon {
-
-template <typename Solver>
-class OdeSolver {
- public:
-  OdeSolver() = default;
-  virtual ~OdeSolver() = default;
-
-  template <typename System, typename State, typename Time>
-  State update(const System& system, const State& x, const Time t,
-               const Time dt) {
-    return this->solver().update_impl(system, x, t, dt);
-  }
-
- private:
-  Solver& solver() { return *static_cast<Solver*>(this); }
-};
-
-namespace operations {
-
-template <typename State, typename Time>
-State cat(const State& state, const Time dt, const State& deriv) {
-  State state_out;
-  auto x = state.begin();
-  auto dxdt = deriv.begin();
-  auto x_out = state_out.begin();
-  for (; x_out != state_out.end(); ++x, ++dxdt, ++x_out) {
-    *x_out = *x + *dxdt * dt;
-  }
-  return state_out;
-}
-
-}  // namespace operations
 
 template <typename State>
 class RungeKutta4 : public OdeSolver<RungeKutta4<State>> {};
 
 template <typename State>
 class Euler : public OdeSolver<Euler<State>> {
+  using Base = OdeSolver<Euler<State>>;
+
  public:
   Euler() = default;
   virtual ~Euler() = default;
@@ -69,7 +39,7 @@ class Euler : public OdeSolver<Euler<State>> {
   template <typename System, typename Time>
   State update_impl(const System& system, const State& x, const Time t,
                     const Time dt) {
-    return operations::cat(x, dt, system(x, t));
+    return Base::cat(x, dt, system(x, t));
   }
 };
 

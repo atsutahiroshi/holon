@@ -28,6 +28,9 @@ namespace holon {
 template <typename Solver>
 class OdeSolver {
  public:
+  OdeSolver() = default;
+  virtual ~OdeSolver() = default;
+
   template <typename System, typename State, typename Time>
   State update(const System& system, const State& x, const Time t,
                const Time dt) {
@@ -60,7 +63,8 @@ class RungeKutta4 : public OdeSolver<RungeKutta4<State>> {};
 template <typename State>
 class Euler : public OdeSolver<Euler<State>> {
  public:
-  Euler() {}
+  Euler() = default;
+  virtual ~Euler() = default;
 
   template <typename System, typename Time>
   State update_impl(const System& system, const State& x, const Time t,

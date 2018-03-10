@@ -43,7 +43,7 @@ struct sys {
 TEST_CASE("Check ODE quadrapture with Euler method", "[ode][Euler]") {
   Euler<State> solver;
   State x = {{0, 1}};
-  double dt = 0.001;
+  Time dt = 0.001;
   x = solver.update(sys(), x, 0.0, dt);
   CHECK(x[0] == Approx(0.0 + (0.0 + 2.0 * 1.0) * dt));
   CHECK(x[1] == Approx(1.0 + (1.0) * dt));

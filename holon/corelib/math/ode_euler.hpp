@@ -26,9 +26,6 @@
 namespace holon {
 
 template <typename State>
-class RungeKutta4 : public OdeSolver<RungeKutta4<State>> {};
-
-template <typename State>
 class Euler : public OdeSolver<Euler<State>> {
   using Base = OdeSolver<Euler<State>>;
 

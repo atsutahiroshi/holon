@@ -1,4 +1,4 @@
-/* ode_euler - ordinary differential equation quadrature: Euler method
+/* ode_runge_kutta4 - ODE quadrapture: classical Runge-Kutta method
  *
  * Copyright (c) 2018 Hiroshi Atsuta <atsuta.hiroshi@gmail.com>
  *
@@ -18,7 +18,7 @@
  * along with the holon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "holon/corelib/math/ode_euler.hpp"
+#include "holon/corelib/math/ode_runge_kutta4.hpp"
 
 #include <array>
 
@@ -27,25 +27,25 @@
 namespace holon {
 namespace {
 
-using State = std::array<double, 2>;
+using State = std::array<double, 1>;
 using Time = double;
 
 struct sys {
-  State operator()(const State& x, const Time t) const {
+  State dxdt;
+  State operator()(const State&, const Time) const {
     State dxdt;
-    dxdt[0] = x[0] + 2.0 * x[1];
-    dxdt[1] = x[1];
+    dxdt[0] = 1.0;
     return dxdt;
   }
 };
 
-TEST_CASE("Check ODE quadrapture with Euler method", "[ode][Euler]") {
-  Euler<State> solver;
-  State x = {{0, 1}};
-  Time dt = 0.001;
+TEST_CASE("Check ODE quadrapture with classical Runge-Kutta method",
+          "[ode][RungeKutta4]") {
+  RungeKutta4<State> solver;
+  State x = {{10.0}};
+  Time dt = 0.1;
   x = solver.update(sys(), x, 0.0, dt);
-  CHECK(x[0] == Approx(0.0 + (0.0 + 2.0 * 1.0) * dt));
-  CHECK(x[1] == Approx(1.0 + (1.0) * dt));
+  CHECK(x[0] == Approx(10.1));
 }
 
 }  // namespace

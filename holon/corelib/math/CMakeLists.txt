@@ -5,6 +5,7 @@ set(HOLON_CORELIB_MATH_TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/misc_test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/vec3d_test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ode_euler_test.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ode_runge_kutta4_test.cpp
   )
 
 add_subdirectory(zvec3d)

@@ -7,7 +7,7 @@ set(HOLON_CORELIB_MATH_TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/ode_euler_test.cpp
   )
 
-add_subdirectory(zvec3dwrap)
+add_subdirectory(zvec3d)
 
 set(HOLON_CORELIB_SOURCE_FILES
   ${HOLON_CORELIB_SOURCE_FILES}

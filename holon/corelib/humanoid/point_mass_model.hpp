@@ -49,11 +49,11 @@ class ModelBase {
   // accessors
   double time() const noexcept { return m_time; }
   double time_step() const noexcept { return m_time_step; }
-  Data data() const noexcept { return *m_data_ptr; }
+  const Data& data() const noexcept { return *m_data_ptr; }
   DataPtr data_ptr() const noexcept { return m_data_ptr; }
   System& system() noexcept { return m_system; }
   const System& system() const noexcept { return m_system; }
-  Solver solver() noexcept { return m_solver; }
+  Solver& solver() noexcept { return m_solver; }
   const Solver& solver() const noexcept { return m_solver; }
 
   // mutators

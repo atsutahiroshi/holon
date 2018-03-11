@@ -1,22 +1,14 @@
-set(HOLON_HUMANOID_EXAMPLE_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_longitudinal_moving_example.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_oscillation_example.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_regulation_example.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_regulation_vertical_example.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_regulation_with_disturbance_example.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_sideward_moving_example.cpp
+set(example_sources
+  com_longitudinal_moving_example.cpp
+  com_oscillation_example.cpp
+  com_regulation_example.cpp
+  com_regulation_vertical_example.cpp
+  com_regulation_with_disturbance_example.cpp
+  com_sideward_moving_example.cpp
   )
 
-foreach(src ${HOLON_HUMANOID_EXAMPLE_SOURCES})
-  get_filename_component(target ${src} NAME_WE)
-  add_executable(${target} ${src})
-  target_compile_options(${target}
-    PRIVATE
-    $<$<CXX_COMPILER_ID:Clang>:-Wall -Weverything $<$<CONFIG:Debug>:-g3 -O0> $<$<CONFIG:Release>:-O3>>
-    $<$<CXX_COMPILER_ID:GNU>:-pedantic -Wall -Wextra -Wshadow -Wnon-virtual-dtor $<$<CONFIG:Debug>:-g3 -O0> $<$<CONFIG:Release>:-O3>>
-    $<$<CXX_COMPILER_ID:MSVC>:/W4 $<$<CONFIG:Debug>:/Od> $<$<CONFIG:Release>:/O2>>
-    )
-  target_link_libraries(${target} PUBLIC holon)
+foreach(src ${example_sources})
+  holon_add_example(${src})
 endforeach()
 
 add_subdirectory(tests)

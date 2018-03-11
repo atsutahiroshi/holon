@@ -1,24 +1,20 @@
-set(HOLON_CORELIB_HUMANOID_SOURCE_FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_ctrl.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_zmp_model.cpp
+set(sources
+  com_ctrl.cpp
+  com_zmp_model.cpp
   )
-set(HOLON_CORELIB_HUMANOID_TEST_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_ctrl_test.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_zmp_model_test.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/point_mass_model_test.cpp
+set(test_sources
+  com_ctrl_test.cpp
+  com_zmp_model_test.cpp
+  )
+
+holon_add_corelib_module(
+  humanoid
+  SOURCES ${sources}
+  )
+holon_add_module_test(
+  humanoid
+  SOURCES ${test_sources}
   )
 
 add_subdirectory(com_ctrl)
 add_subdirectory(com_zmp_model)
-add_subdirectory(point_mass_model)
-
-set(HOLON_CORELIB_SOURCE_FILES
-  ${HOLON_CORELIB_SOURCE_FILES}
-  ${HOLON_CORELIB_HUMANOID_SOURCE_FILES}
-  PARENT_SCOPE
-  )
-set(HOLON_CORELIB_TEST_SOURCES
-  ${HOLON_CORELIB_TEST_SOURCES}
-  ${HOLON_CORELIB_HUMANOID_TEST_SOURCES}
-  PARENT_SCOPE
-  )

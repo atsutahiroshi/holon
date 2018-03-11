@@ -1,6 +1,6 @@
-set(HOLON_BENCHMARK_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_ctrl_benchmark.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/vec3d_computation_benchmark.cpp
+set(benchmark_sources
+  com_ctrl_benchmark.cpp
+  vec3d_computation_benchmark.cpp
   )
 
 cmake_policy(PUSH)
@@ -10,9 +10,12 @@ endif()
 find_package(hayai REQUIRED)
 cmake_policy(POP)
 
-function(add_benchmark src)
-  get_filename_component(target ${src} NAME_WE)
-  add_executable(${target} ${src})
+function(add_benchmark source)
+  if(NOT IS_ABSOLUTE ${source})
+    set(source ${CMAKE_CURRENT_SOURCE_DIR}/${source})
+  endif()
+  get_filename_component(target ${source} NAME_WE)
+  add_executable(${target} ${source})
   target_include_directories(${target} PRIVATE ${HAYAI_INCLUDE_DIRS})
   target_compile_options(${target}
     PRIVATE
@@ -23,6 +26,6 @@ function(add_benchmark src)
   target_link_libraries(${target} PUBLIC holon hayai_main)
 endfunction()
 
-foreach(src ${HOLON_BENCHMARK_SOURCES})
+foreach(src ${benchmark_sources})
   add_benchmark(${src})
 endforeach()

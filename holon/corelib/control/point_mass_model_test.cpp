@@ -18,7 +18,7 @@
  * along with the holon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "holon/corelib/humanoid/point_mass_model.hpp"
+#include "holon/corelib/control/point_mass_model.hpp"
 
 #include "catch.hpp"
 #include "holon/test/util/fuzzer/fuzzer.hpp"

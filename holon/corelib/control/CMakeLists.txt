@@ -1,13 +1,15 @@
 set(sources)
 set(test_sources
-  zip_test.cpp
+  point_mass_model_test.cpp
   )
 
 holon_add_corelib_module(
-  common
+  control
   SOURCES ${sources}
   )
 holon_add_module_test(
-  common
+  control
   SOURCES ${test_sources}
   )
+
+add_subdirectory(point_mass_model)

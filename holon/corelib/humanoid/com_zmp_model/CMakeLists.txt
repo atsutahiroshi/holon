@@ -1,14 +1,19 @@
-set(HOLON_CORELIB_HUMANOID_SOURCE_FILES
-  ${HOLON_CORELIB_HUMANOID_SOURCE_FILES}
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_zmp_model_data.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_zmp_model_formula.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_zmp_model_system.cpp
-  PARENT_SCOPE
+set(sources
+  com_zmp_model_data.cpp
+  com_zmp_model_formula.cpp
+  com_zmp_model_system.cpp
   )
-set(HOLON_CORELIB_HUMANOID_TEST_SOURCES
-  ${HOLON_CORELIB_HUMANOID_TEST_SOURCES}
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_zmp_model_data_test.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_zmp_model_formula_test.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/com_zmp_model_system_test.cpp
-  PARENT_SCOPE
+set(test_sources
+  com_zmp_model_data_test.cpp
+  com_zmp_model_formula_test.cpp
+  com_zmp_model_system_test.cpp
+  )
+
+holon_add_corelib_module_source(humanoid
+  PREPEND
+  SOURCES ${sources}
+  )
+holon_add_module_test_source(humanoid
+  PREPEND
+  SOURCES ${test_sources}
   )

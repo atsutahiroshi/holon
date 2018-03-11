@@ -18,12 +18,12 @@
  * along with the holon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef HOLON_HUMANOID_POINT_MASS_MODEL_SYSTEM_HPP_
-#define HOLON_HUMANOID_POINT_MASS_MODEL_SYSTEM_HPP_
+#ifndef HOLON_CONTROL_POINT_MASS_MODEL_SYSTEM_HPP_
+#define HOLON_CONTROL_POINT_MASS_MODEL_SYSTEM_HPP_
 
 #include <array>
 #include <functional>
-#include "holon/corelib/humanoid/point_mass_model/point_mass_model_data.hpp"
+#include "holon/corelib/control/point_mass_model/point_mass_model_data.hpp"
 
 namespace holon {
 
@@ -115,4 +115,4 @@ PointMassModelSystem<State> makePointMassModelSystem(
 
 }  // namespace holon
 
-#endif  // HOLON_HUMANOID_POINT_MASS_MODEL_SYSTEM_HPP_
+#endif  // HOLON_CONTROL_POINT_MASS_MODEL_SYSTEM_HPP_

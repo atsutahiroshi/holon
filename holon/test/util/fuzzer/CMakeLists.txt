@@ -1,10 +1,12 @@
-set(HOLON_TEST_UTIL_FUZZER_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/fuzzer.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/fuzzer_test.cpp
+set(sources
+  fuzzer.cpp
+  )
+set(test_sources
+  fuzzer_test.cpp
   )
 
-set(HOLON_TEST_UTIL_SOURCES
-  ${HOLON_TEST_UTIL_SOURCES}
-  ${HOLON_TEST_UTIL_FUZZER_SOURCES}
-  PARENT_SCOPE
+holon_add_test_source(SOURCES ${sources})
+holon_add_module_test_source(
+  test_util
+  SOURCES ${test_sources}
   )

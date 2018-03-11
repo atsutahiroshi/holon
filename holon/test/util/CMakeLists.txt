@@ -1,10 +1,4 @@
-set(HOLON_TEST_UTIL_SOURCES "")
+holon_add_module_test(test_util)
 
 add_subdirectory(catch)
 add_subdirectory(fuzzer)
-
-set(HOLON_TEST_SOURCES
-  ${HOLON_TEST_SOURCES}
-  ${HOLON_TEST_UTIL_SOURCES}
-  PARENT_SCOPE
-  )

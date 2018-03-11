@@ -1,9 +1,7 @@
-set(HOLON_TEST_UTIL_CATCH_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/custom_matchers_test.cpp
+set(test_sources
+  custom_matchers_test.cpp
   )
-
-set(HOLON_TEST_UTIL_SOURCES
-  ${HOLON_TEST_UTIL_SOURCES}
-  ${HOLON_TEST_UTIL_CATCH_SOURCES}
-  PARENT_SCOPE
+holon_add_module_test_source(
+  test_util
+  SOURCES ${test_sources}
   )

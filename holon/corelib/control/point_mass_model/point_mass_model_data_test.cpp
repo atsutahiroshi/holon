@@ -18,7 +18,7 @@
  * along with the holon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "holon/corelib/humanoid/point_mass_model/point_mass_model_data.hpp"
+#include "holon/corelib/control/point_mass_model/point_mass_model_data.hpp"
 
 #include "holon/corelib/math/vec3d.hpp"
 

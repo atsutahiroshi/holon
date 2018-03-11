@@ -18,8 +18,8 @@
  * along with the holon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef HOLON_HUMANOID_POINT_MASS_MODEL_DATA_HPP_
-#define HOLON_HUMANOID_POINT_MASS_MODEL_DATA_HPP_
+#ifndef HOLON_CONTROL_POINT_MASS_MODEL_DATA_HPP_
+#define HOLON_CONTROL_POINT_MASS_MODEL_DATA_HPP_
 
 #include <memory>
 
@@ -86,4 +86,4 @@ PointMassModelDataPtr<State> createPointMassModelData(
 
 }  // namespace holon
 
-#endif  // HOLON_HUMANOID_POINT_MASS_MODEL_DATA_HPP_
+#endif  // HOLON_CONTROL_POINT_MASS_MODEL_DATA_HPP_

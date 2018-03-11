@@ -1,17 +1,15 @@
-set(HOLON_CORELIB_MATH_ZVEC3D_SOURCE_FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/vec3d.cpp
+set(sources
+  vec3d.cpp
   )
-set(HOLON_CORELIB_MATH_ZVEC3D_TEST_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/vec3d_test.cpp
+set(test_sources
+  vec3d_test.cpp
   )
 
-set(HOLON_CORELIB_MATH_SOURCE_FILES
-  ${HOLON_CORELIB_MATH_SOURCE_FILES}
-  ${HOLON_CORELIB_MATH_ZVEC3D_SOURCE_FILES}
-  PARENT_SCOPE
+holon_add_corelib_module_source(math
+  PREPEND
+  SOURCES ${sources}
   )
-set(HOLON_CORELIB_MATH_TEST_SOURCES
-  ${HOLON_CORELIB_MATH_TEST_SOURCES}
-  ${HOLON_CORELIB_MATH_ZVEC3D_TEST_SOURCES}
-  PARENT_SCOPE
+holon_add_module_test_source(math
+  PREPEND
+  SOURCES ${test_sources}
   )

@@ -18,78 +18,16 @@
  * along with the holon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef HOLON_HUMANOID_POINT_MASS_MODEL_HPP_
-#define HOLON_HUMANOID_POINT_MASS_MODEL_HPP_
+#ifndef HOLON_CONTROL_POINT_MASS_MODEL_HPP_
+#define HOLON_CONTROL_POINT_MASS_MODEL_HPP_
 
 #include <memory>
-#include "holon/corelib/humanoid/point_mass_model/point_mass_model_data.hpp"
-#include "holon/corelib/humanoid/point_mass_model/point_mass_model_system.hpp"
+#include "holon/corelib/control/model_base.hpp"
+#include "holon/corelib/control/point_mass_model/point_mass_model_data.hpp"
+#include "holon/corelib/control/point_mass_model/point_mass_model_system.hpp"
 #include "holon/corelib/math/ode_runge_kutta4.hpp"
 
 namespace holon {
-
-template <typename State, typename Solver, typename Data, typename System>
-class ModelBase {
- protected:
-  using Self = ModelBase;
-  using DataPtr = std::shared_ptr<Data>;
-  using Function = typename System::Function;
-
- public:
-  static constexpr double default_time_step = 0.001;
-
- public:
-  explicit ModelBase(DataPtr t_data_ptr)
-      : m_time(0.0),
-        m_time_step(default_time_step),
-        m_data_ptr(t_data_ptr),
-        m_system(t_data_ptr),
-        m_solver() {}
-
-  // accessors
-  double time() const noexcept { return m_time; }
-  double time_step() const noexcept { return m_time_step; }
-  const Data& data() const noexcept { return *m_data_ptr; }
-  DataPtr data_ptr() const noexcept { return m_data_ptr; }
-  System& system() noexcept { return m_system; }
-  const System& system() const noexcept { return m_system; }
-  Solver& solver() noexcept { return m_solver; }
-  const Solver& solver() const noexcept { return m_solver; }
-
-  // mutators
-  virtual Self& set_time_step(double t_time_step) {
-    m_time_step = t_time_step;
-    return *this;
-  }
-  virtual Self& set_data_ptr(DataPtr t_data_ptr) {
-    m_data_ptr = t_data_ptr;
-    return *this;
-  }
-  virtual Self& reset() {
-    m_time = 0;
-    return *this;
-  }
-
-  virtual bool update() {
-    m_time += m_time_step;
-    return true;
-  }
-
-  virtual bool update(double dt) {
-    set_time_step(dt);
-    return update();
-  }
-
- private:
-  double m_time;
-  double m_time_step;
-  DataPtr m_data_ptr;
-  System m_system;
-  Solver m_solver;
-};
-
-template <typename State, typename Solver, typename Data, typename System>
-constexpr double ModelBase<State, Solver, Data, System>::default_time_step;
 
 template <typename State, typename StateArray = std::array<State, 2>,
           typename Solver = RungeKutta4<StateArray>,
@@ -237,4 +175,4 @@ PointMassModel<State> makePointMassModel(const State& t_initial_position,
 
 }  // namespace holon
 
-#endif  // HOLON_HUMANOID_POINT_MASS_MODEL_HPP_
+#endif  // HOLON_CONTROL_POINT_MASS_MODEL_HPP_

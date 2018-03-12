@@ -28,7 +28,7 @@ namespace holon {
 template <typename State, typename Solver, typename Data, typename System>
 class ModelBase {
  protected:
-  using Self = ModelBase;
+  using Self = ModelBase<State, Solver, Data, System>;
   using DataPtr = std::shared_ptr<Data>;
   using Function = typename System::Function;
 

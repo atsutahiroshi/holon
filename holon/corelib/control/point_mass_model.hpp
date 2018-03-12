@@ -34,7 +34,7 @@ template <typename State, typename StateArray = std::array<State, 2>,
           typename Data = PointMassModelData<State>,
           typename System = PointMassModelSystem<State, Data>>
 class PointMassModel : public ModelBase<State, Solver, Data, System> {
-  using Self = PointMassModel;
+  using Self = PointMassModel<State, StateArray, Solver, Data, System>;
   using Base = ModelBase<State, Solver, Data, System>;
   using DataPtr = std::shared_ptr<Data>;
   using Function = typename System::Function;

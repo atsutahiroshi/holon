@@ -1,5 +1,6 @@
 set(sources)
 set(test_sources
+  pd_ctrl_test.cpp
   point_mass_model_test.cpp
   )
 
@@ -12,4 +13,5 @@ holon_add_module_test(
   SOURCES ${test_sources}
   )
 
+add_subdirectory(pd_ctrl)
 add_subdirectory(point_mass_model)

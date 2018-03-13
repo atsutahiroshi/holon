@@ -46,7 +46,7 @@ class ComZmpModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
  public:
   ComZmpModel();
   explicit ComZmpModel(const Vec3D& t_com_position);
-  ComZmpModel(const Vec3D& t_com_position, double mass);
+  ComZmpModel(const Vec3D& t_com_position, double t_mass);
   explicit ComZmpModel(DataPtr t_data_ptr);
   virtual ~ComZmpModel() = default;
 

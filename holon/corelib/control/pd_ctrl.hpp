@@ -96,6 +96,8 @@ class PdCtrl : public CtrlBase<State, Solver, Data, Model, Refs, Outputs> {
     return true;
   }
 
+  virtual bool update(double dt) override { return Base::update(dt); }
+
  private:
   Self& resetRefs() {
     this->refs_ptr()->position = this->states().position;
@@ -107,6 +109,7 @@ class PdCtrl : public CtrlBase<State, Solver, Data, Model, Refs, Outputs> {
     this->outputs_ptr()->velocity = this->states().velocity;
     this->outputs_ptr()->acceleration = this->states().acceleration;
     this->outputs_ptr()->force = this->states().force;
+    return *this;
   }
 };
 

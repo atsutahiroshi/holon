@@ -31,9 +31,11 @@
 
 namespace holon {
 
-class ComZmpModel {
-  static constexpr double default_time_step = 0.001;
+class ComZmpModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
+                                     ComZmpModelData, ComZmpModelSystem> {
   using Self = ComZmpModel;
+  using Base = ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
+                         ComZmpModelData, ComZmpModelSystem>;
 
  public:
   using Data = ComZmpModelData;
@@ -41,38 +43,23 @@ class ComZmpModel {
   using System = ComZmpModelSystem;
   using CallbackFunc = ComZmpModelSystem::Function;
 
+ public:
   ComZmpModel();
   explicit ComZmpModel(const Vec3D& t_com_position);
   ComZmpModel(const Vec3D& t_com_position, double mass);
   explicit ComZmpModel(DataPtr t_data_ptr);
-
-  // special member functions
   virtual ~ComZmpModel() = default;
-  ComZmpModel(const ComZmpModel&) = delete;
-  ComZmpModel(ComZmpModel&&) = delete;
-  Self& operator=(const ComZmpModel&) = delete;
-  Self& operator=(ComZmpModel&&) = delete;
 
   // accessors
-  inline double time() const noexcept { return m_time; }
-  inline double time_step() const noexcept { return m_time_step; }
-  inline const Data& data() const noexcept { return *m_data_ptr; }
-  inline const DataPtr& data_ptr() const noexcept { return m_data_ptr; }
   inline Vec3D initial_com_position() const noexcept {
     return m_initial_com_position;
   }
   inline double mass() const noexcept { return data().mass; }
-  inline const System& system() const noexcept { return m_system; }
 
   // mutators
-  Self& set_time_step(double t_time_step);
-  Self& set_data_ptr(DataPtr t_data_ptr);
   Self& set_initial_com_position(const Vec3D& t_initial_com_position);
+  virtual Self& reset() override;
   Self& reset(const Vec3D& t_com_position);
-
-  // copy data
-  void copy_data(const ComZmpModel& t_model);
-  void copy_data(const Data& t_data);
 
   // callback functions
   Self& setExternalForceCallback(CallbackFunc t_f);
@@ -88,17 +75,12 @@ class ComZmpModel {
   Self& removeReactionForce();
   Self& removeExternalForce();
 
-  bool update();
-  bool update(double t_time_step);
+  virtual bool update() override;
+  virtual bool update(double t_time_step) override;
 
  private:
-  double m_time;
-  double m_time_step;
-  DataPtr m_data_ptr;
   Vec3D m_initial_com_position;
-  System m_system;
 
-  bool isTimeStepValid(double t_time_step) const;
   bool isUpdatable(const Vec3D& p, const Vec3D& v);
   void updateData(const Vec3D& p, const Vec3D& v);
 };

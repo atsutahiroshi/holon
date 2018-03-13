@@ -82,48 +82,19 @@ State update_euler(const System& system, const State& initial_state, Time t,
 }  // namespace integrator
 
 ComZmpModel::ComZmpModel()
-    : m_time(0),
-      m_time_step(default_time_step),
-      m_data_ptr(createComZmpModelData()),
-      m_initial_com_position(m_data_ptr->com_position),
-      m_system(m_data_ptr) {}
+    : ComZmpModel(Data::default_com_position, Data::default_mass) {}
 
 ComZmpModel::ComZmpModel(const Vec3D& t_com_position)
-    : m_time(0),
-      m_time_step(default_time_step),
-      m_data_ptr(createComZmpModelData(t_com_position)),
-      m_initial_com_position(m_data_ptr->com_position),
-      m_system(m_data_ptr) {}
+    : ComZmpModel(t_com_position, Data::default_mass) {}
 
 ComZmpModel::ComZmpModel(const Vec3D& t_com_position, double t_mass)
-    : m_time(0),
-      m_time_step(default_time_step),
-      m_data_ptr(isMassValid(t_mass)
-                     ? createComZmpModelData(t_com_position, t_mass)
-                     : createComZmpModelData(t_com_position)),
-      m_initial_com_position(m_data_ptr->com_position),
-      m_system(m_data_ptr) {}
+    : ComZmpModel(isMassValid(t_mass)
+                      ? createComZmpModelData(t_com_position, t_mass)
+                      : createComZmpModelData(t_com_position)) {}
 
-ComZmpModel::ComZmpModel(DataPtr t_data)
-    : m_time(0),
-      m_time_step(default_time_step),
-      m_data_ptr(t_data),
-      m_initial_com_position(m_data_ptr->com_position),
-      m_system(m_data_ptr) {}
-
-ComZmpModel& ComZmpModel::set_data_ptr(DataPtr t_data_ptr) {
-  m_data_ptr = t_data_ptr;
-  return *this;
-}
-
-ComZmpModel& ComZmpModel::set_time_step(double t_time_step) {
-  if (!isTimeStepValid(t_time_step)) {
-    m_time_step = default_time_step;
-  } else {
-    m_time_step = t_time_step;
-  }
-  return *this;
-}
+ComZmpModel::ComZmpModel(DataPtr t_data_ptr)
+    : ModelBase(t_data_ptr),
+      m_initial_com_position(this->data().com_position) {}
 
 ComZmpModel& ComZmpModel::set_initial_com_position(
     const Vec3D& t_initial_com_position) {
@@ -131,37 +102,33 @@ ComZmpModel& ComZmpModel::set_initial_com_position(
   return *this;
 }
 
+ComZmpModel& ComZmpModel::reset() { return *this; }
+
 ComZmpModel& ComZmpModel::reset(const Vec3D& t_com_position) {
-  m_data_ptr->com_position = t_com_position;
-  m_data_ptr->com_velocity.clear();
+  data_ptr()->com_position = t_com_position;
+  data_ptr()->com_velocity.clear();
   set_initial_com_position(t_com_position);
-  m_time = 0;
+  Base::reset();
   return *this;
 }
 
-void ComZmpModel::copy_data(const ComZmpModel& t_model) {
-  copy_data(t_model.data());
-}
-
-void ComZmpModel::copy_data(const Data& t_data) { *m_data_ptr = t_data; }
-
 ComZmpModel& ComZmpModel::setExternalForceCallback(CallbackFunc t_f) {
-  m_system.set_external_force_f(t_f);
+  system().set_external_force_f(t_f);
   return *this;
 }
 
 ComZmpModel& ComZmpModel::setReactionForceCallback(CallbackFunc t_f) {
-  m_system.set_reaction_force_f(t_f);
+  system().set_reaction_force_f(t_f);
   return *this;
 }
 
 ComZmpModel& ComZmpModel::setZmpPositionCallback(CallbackFunc t_f) {
-  m_system.set_zmp_position_f(t_f);
+  system().set_zmp_position_f(t_f);
   return *this;
 }
 
 ComZmpModel& ComZmpModel::setComAccelerationCallback(CallbackFunc t_f) {
-  m_system.set_com_acceleration_f(t_f);
+  system().set_com_acceleration_f(t_f);
   return *this;
 }
 
@@ -171,49 +138,49 @@ ComZmpModel& ComZmpModel::setZmpPosition(const Vec3D& t_zmp_position,
   auto fz_f = [fz](const Vec3D&, const Vec3D&, const double) {
     return Vec3D(0, 0, fz);
   };
-  m_system.set_reaction_force_f(fz_f);
+  system().set_reaction_force_f(fz_f);
   auto zmp_f = [t_zmp_position](const Vec3D&, const Vec3D&, const double) {
     return t_zmp_position;
   };
-  m_system.set_zmp_position_f(zmp_f);
+  system().set_zmp_position_f(zmp_f);
   return *this;
 }
 
 ComZmpModel& ComZmpModel::setReactionForce(const Vec3D& t_reaction_force) {
-  m_system.set_reaction_force_f([t_reaction_force](
+  system().set_reaction_force_f([t_reaction_force](
       const Vec3D&, const Vec3D&, const double) { return t_reaction_force; });
   return *this;
 }
 
 ComZmpModel& ComZmpModel::setExternalForce(const Vec3D& t_external_force) {
-  m_system.set_external_force_f([t_external_force](
+  system().set_external_force_f([t_external_force](
       const Vec3D&, const Vec3D&, const double) { return t_external_force; });
   return *this;
 }
 
 ComZmpModel& ComZmpModel::removeZmpPosition() {
-  m_system.set_reaction_force_f(m_system.getDefaultReactForceFunc());
-  m_system.set_zmp_position_f(m_system.getDefaultZmpPosFunc());
+  system().set_reaction_force_f(system().getDefaultReactForceFunc());
+  system().set_zmp_position_f(system().getDefaultZmpPosFunc());
   return *this;
 }
 
 ComZmpModel& ComZmpModel::removeReactionForce() {
-  m_system.set_reaction_force_f(m_system.getDefaultReactForceFunc());
+  system().set_reaction_force_f(system().getDefaultReactForceFunc());
   return *this;
 }
 
 ComZmpModel& ComZmpModel::removeExternalForce() {
-  m_system.set_external_force_f(m_system.getDefaultExtForceFunc());
+  system().set_external_force_f(system().getDefaultExtForceFunc());
   return *this;
 }
 
 bool ComZmpModel::isUpdatable(const Vec3D& p, const Vec3D& v) {
   if (!isMassValid(data().mass)) return false;
-  if (m_system.isZmpPositionSet()) {
-    auto pz = m_system.zmp_position(p, v, time());
+  if (system().isZmpPositionSet()) {
+    auto pz = system().zmp_position(p, v, time());
     if (!isComZmpDiffValid(p, pz)) return false;
   } else {
-    auto f = m_system.reaction_force(p, v, time());
+    auto f = system().reaction_force(p, v, time());
     if (!isReactionForceValid(f)) return false;
   }
   return true;
@@ -221,20 +188,20 @@ bool ComZmpModel::isUpdatable(const Vec3D& p, const Vec3D& v) {
 
 void ComZmpModel::updateData(const Vec3D& p, const Vec3D& v) {
   std::array<Vec3D, 2> state{{p, v}};
-  state = integrator::update(m_system, state, time(), time_step());
-  // state = integrator::update_euler(m_system, state, time(), time_step());
-  m_data_ptr->com_position = state[0];
-  m_data_ptr->com_velocity = state[1];
-  m_data_ptr->com_acceleration = m_system.com_acceleration(p, v, time());
-  if (m_system.isZmpPositionSet()) {
-    m_data_ptr->zmp_position = m_system.zmp_position(p, v, time());
-    auto fz = m_system.reaction_force(p, v, time()).z();
-    m_data_ptr->reaction_force = computeReactForce(p, data().zmp_position, fz);
+  state = integrator::update(system(), state, time(), time_step());
+  // state = integrator::update_euler(system(), state, time(), time_step());
+  data_ptr()->com_position = state[0];
+  data_ptr()->com_velocity = state[1];
+  data_ptr()->com_acceleration = system().com_acceleration(p, v, time());
+  if (system().isZmpPositionSet()) {
+    data_ptr()->zmp_position = system().zmp_position(p, v, time());
+    auto fz = system().reaction_force(p, v, time()).z();
+    data_ptr()->reaction_force = computeReactForce(p, data().zmp_position, fz);
   } else {
-    m_data_ptr->reaction_force = m_system.reaction_force(p, v, time());
+    data_ptr()->reaction_force = system().reaction_force(p, v, time());
   }
-  m_data_ptr->external_force = m_system.external_force(p, v, time());
-  m_data_ptr->total_force = data().reaction_force + data().external_force;
+  data_ptr()->external_force = system().external_force(p, v, time());
+  data_ptr()->total_force = data().reaction_force + data().external_force;
 }
 
 bool ComZmpModel::update() {
@@ -242,21 +209,12 @@ bool ComZmpModel::update() {
   auto v = data().com_velocity;
   if (!isUpdatable(p, v)) return false;
   updateData(p, v);
-  m_time += time_step();
-  return true;
+  return Base::update();
 }
 
 bool ComZmpModel::update(double t_time_step) {
   set_time_step(t_time_step);
   return update();
-}
-
-bool ComZmpModel::isTimeStepValid(double t_time_step) const {
-  if (zIsTiny(t_time_step) || t_time_step < 0) {
-    ZRUNWARN("Time step must be positive (given: %g)", t_time_step);
-    return false;
-  }
-  return true;
 }
 
 }  // namespace holon

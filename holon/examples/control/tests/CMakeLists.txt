@@ -1,5 +1,5 @@
 set(test_scripts
-  # pd_ctrl_example_test.py
+  pd_ctrl_example_test.py
   )
 
 find_package(PythonInterp 3.4)

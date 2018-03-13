@@ -21,40 +21,11 @@
 #ifndef HOLON_CONTROL_POINT_MASS_MODEL_SYSTEM_HPP_
 #define HOLON_CONTROL_POINT_MASS_MODEL_SYSTEM_HPP_
 
-#include <array>
 #include <functional>
 #include "holon/corelib/control/point_mass_model/point_mass_model_data.hpp"
+#include "holon/corelib/control/system_base.hpp"
 
 namespace holon {
-
-template <typename State, typename Data>
-class SystemBase {
- protected:
-  using Self = SystemBase<State, Data>;
-  using StateArray = std::array<State, 2>;
-  using DataPtr = std::shared_ptr<Data>;
-
- public:
-  SystemBase(DataPtr t_data_ptr) : m_data_ptr(t_data_ptr) {}
-  virtual ~SystemBase() = default;
-
-  // virtual function
-  virtual StateArray operator()(const StateArray& state,
-                                const double t) const = 0;
-
-  // accessors
-  DataPtr data_ptr() const noexcept { return m_data_ptr; }
-  Data data() const noexcept { return *m_data_ptr; }
-
-  // mutators
-  Self& set_data_ptr(DataPtr t_data_ptr) {
-    m_data_ptr = t_data_ptr;
-    return *this;
-  }
-
- private:
-  DataPtr m_data_ptr;
-};
 
 template <typename State, typename Data = PointMassModelData<State>>
 class PointMassModelSystem : public SystemBase<State, Data> {

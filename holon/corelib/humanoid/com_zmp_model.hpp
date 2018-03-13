@@ -21,16 +21,19 @@
 #ifndef HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
 #define HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
 
+#include <array>
 #include "holon/corelib/common/optional.hpp"
+#include "holon/corelib/control/model_base.hpp"
 #include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_data.hpp"
 #include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_system.hpp"
+#include "holon/corelib/math/ode_runge_kutta4.hpp"
 #include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
 
 class ComZmpModel {
   static constexpr double default_time_step = 0.001;
-  using self_ref = ComZmpModel&;
+  using Self = ComZmpModel;
 
  public:
   using Data = ComZmpModelData;
@@ -47,8 +50,8 @@ class ComZmpModel {
   virtual ~ComZmpModel() = default;
   ComZmpModel(const ComZmpModel&) = delete;
   ComZmpModel(ComZmpModel&&) = delete;
-  self_ref operator=(const ComZmpModel&) = delete;
-  self_ref operator=(ComZmpModel&&) = delete;
+  Self& operator=(const ComZmpModel&) = delete;
+  Self& operator=(ComZmpModel&&) = delete;
 
   // accessors
   inline double time() const noexcept { return m_time; }
@@ -62,28 +65,28 @@ class ComZmpModel {
   inline const System& system() const noexcept { return m_system; }
 
   // mutators
-  self_ref set_time_step(double t_time_step);
-  self_ref set_data_ptr(DataPtr t_data_ptr);
-  self_ref set_initial_com_position(const Vec3D& t_initial_com_position);
-  self_ref reset(const Vec3D& t_com_position);
+  Self& set_time_step(double t_time_step);
+  Self& set_data_ptr(DataPtr t_data_ptr);
+  Self& set_initial_com_position(const Vec3D& t_initial_com_position);
+  Self& reset(const Vec3D& t_com_position);
 
   // copy data
   void copy_data(const ComZmpModel& t_model);
   void copy_data(const Data& t_data);
 
   // callback functions
-  self_ref setExternalForceCallback(CallbackFunc t_f);
-  self_ref setReactionForceCallback(CallbackFunc t_f);
-  self_ref setZmpPositionCallback(CallbackFunc t_f);
-  self_ref setComAccelerationCallback(CallbackFunc t_f);
+  Self& setExternalForceCallback(CallbackFunc t_f);
+  Self& setReactionForceCallback(CallbackFunc t_f);
+  Self& setZmpPositionCallback(CallbackFunc t_f);
+  Self& setComAccelerationCallback(CallbackFunc t_f);
 
-  self_ref setZmpPosition(const Vec3D& t_zmp_position,
-                          optional<double> t_reaction_force_z = nullopt);
-  self_ref setReactionForce(const Vec3D& t_reaction_force);
-  self_ref setExternalForce(const Vec3D& t_external_force);
-  self_ref removeZmpPosition();
-  self_ref removeReactionForce();
-  self_ref removeExternalForce();
+  Self& setZmpPosition(const Vec3D& t_zmp_position,
+                       optional<double> t_reaction_force_z = nullopt);
+  Self& setReactionForce(const Vec3D& t_reaction_force);
+  Self& setExternalForce(const Vec3D& t_external_force);
+  Self& removeZmpPosition();
+  Self& removeReactionForce();
+  Self& removeExternalForce();
 
   bool update();
   bool update(double t_time_step);

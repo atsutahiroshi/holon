@@ -73,6 +73,15 @@ class ModelBase {
     return *this;
   }
 
+  // copy data
+  Self& copy_data(const Data& t_data) {
+    *m_data_ptr = t_data;
+    return *this;
+  }
+  Self& copy_data(DataPtr t_data_ptr) { return copy_data(*t_data_ptr); }
+  Self& copy_data(const Self& t_model) { return copy_data(t_model.data()); }
+
+  // update
   virtual bool update() {
     m_time += m_time_step;
     return true;

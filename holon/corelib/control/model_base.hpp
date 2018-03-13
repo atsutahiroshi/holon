@@ -42,6 +42,7 @@ class ModelBase {
         m_data_ptr(t_data_ptr),
         m_system(t_data_ptr),
         m_solver() {}
+  virtual ~ModelBase() = default;
 
   // accessors
   double time() const noexcept { return m_time; }

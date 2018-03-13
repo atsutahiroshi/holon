@@ -36,6 +36,7 @@ class SystemBase {
 
  public:
   SystemBase(DataPtr t_data_ptr) : m_data_ptr(t_data_ptr) {}
+  virtual ~SystemBase() = default;
 
   // virtual function
   virtual StateArray operator()(const StateArray& state,

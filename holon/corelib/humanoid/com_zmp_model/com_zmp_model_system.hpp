@@ -21,35 +21,31 @@
 #ifndef HOLON_HUMANOID_COM_ZMP_MODEL_SYSTEM_HPP_
 #define HOLON_HUMANOID_COM_ZMP_MODEL_SYSTEM_HPP_
 
+#include "holon/corelib/control/system_base.hpp"
 #include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_data.hpp"
+#include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
 
-class ComZmpModelSystem {
+class ComZmpModelSystem : public SystemBase<Vec3D, ComZmpModelData> {
   using Data = ComZmpModelData;
   using DataPtr = ComZmpModelDataPtr;
-  using self_ref = ComZmpModelSystem&;
+  using Self = ComZmpModelSystem;
 
  public:
-  using State = std::array<Vec3D, 2>;
+  using StateArray = std::array<Vec3D, 2>;
   using Function =
       std::function<Vec3D(const Vec3D&, const Vec3D&, const double)>;
 
  public:
   explicit ComZmpModelSystem(DataPtr t_data_ptr);
-
-  // special member functions
   virtual ~ComZmpModelSystem() noexcept = default;
-  ComZmpModelSystem(const ComZmpModelSystem&) = default;
-  ComZmpModelSystem(ComZmpModelSystem&&) noexcept = delete;
-  ComZmpModelSystem& operator=(const ComZmpModelSystem&) = delete;
-  ComZmpModelSystem& operator=(ComZmpModelSystem&&) noexcept = delete;
 
   // operator()
-  void operator()(const State& x, State& dxdt, const double t) const;
+  virtual StateArray operator()(const StateArray& state,
+                                const double t) const override;
 
   // accessors
-  inline DataPtr data_ptr() const { return m_data_ptr; }
   inline Vec3D com_acceleration(const Vec3D& p, const Vec3D& v,
                                 const double t) const {
     return m_com_acceleration_f(p, v, t);
@@ -71,11 +67,10 @@ class ComZmpModelSystem {
   }
 
   // mutators
-  self_ref set_data_ptr(DataPtr t_data_ptr);
-  self_ref set_com_acceleration_f(Function t_com_acceleration_f);
-  self_ref set_reaction_force_f(Function t_reaction_force_f);
-  self_ref set_external_force_f(Function t_external_force_f);
-  self_ref set_zmp_position_f(Function t_zmp_position_f);
+  Self& set_com_acceleration_f(Function t_com_acceleration_f);
+  Self& set_reaction_force_f(Function t_reaction_force_f);
+  Self& set_external_force_f(Function t_external_force_f);
+  Self& set_zmp_position_f(Function t_zmp_position_f);
 
   Function getDefaultComAccFunc() const;
   Function getComAccFuncWithReactForce() const;
@@ -85,7 +80,6 @@ class ComZmpModelSystem {
   Function getDefaultZmpPosFunc() const;
 
  private:
-  DataPtr m_data_ptr;
   Function m_com_acceleration_f;
   Function m_reaction_force_f;
   Function m_external_force_f;

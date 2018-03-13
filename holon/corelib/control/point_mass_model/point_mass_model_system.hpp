@@ -41,7 +41,8 @@ class PointMassModelSystem : public SystemBase<State, Data> {
  public:
   explicit PointMassModelSystem(DataPtr t_data_ptr) : Base(t_data_ptr) {}
 
-  StateArray operator()(const StateArray& state, const double t) const {
+  virtual StateArray operator()(const StateArray& state,
+                                const double t) const override {
     StateArray dxdt;
     dxdt[0] = state[1];
     dxdt[1] = acceleration(state[0], state[1], t);
@@ -79,6 +80,7 @@ class PointMassModelSystem : public SystemBase<State, Data> {
   Function f_force = nullptr;
 };
 
+// non-member function
 template <typename State>
 PointMassModelSystem<State> makePointMassModelSystem(
     PointMassModelDataPtr<State> t_data_ptr) {

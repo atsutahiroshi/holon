@@ -190,9 +190,7 @@ bool ComZmpModel::isUpdatable(const Vec3D& p, const Vec3D& v) {
 
 void ComZmpModel::updateData(const Vec3D& p, const Vec3D& v) {
   std::array<Vec3D, 2> state{{p, v}};
-  state = integrator::update(system(), state, time(), time_step());
-  // state = integrator::update_euler(system(), state, time(), time_step());
-  // state = solver().update(system(), state, time(), time_step());
+  state = solver().update(system(), state, time(), time_step());
   data_ptr()->com_position = state[0];
   data_ptr()->com_velocity = state[1];
   data_ptr()->com_acceleration = system().com_acceleration(p, v, time());

@@ -261,16 +261,42 @@ TEST_CASE("Check if point mass is moving with adding force",
   CHECK(model.time() == Approx(0.1));
 }
 
-TEST_CASE("Check if data is updated after update of PointMassModel",
-          "[PointMassModel][update]") {
-  auto model = makePointMassModel<double>(0, 2);
-  auto f = [](const double&, const double&, const double) { return 1.0; };
-  model.setForceCallback(f);
-  REQUIRE(model.update());
+template <typename T>
+void CheckDataAfterUpdate_checker(const Model<T>& model);
+
+template <>
+void CheckDataAfterUpdate_checker(const Model<double>& model) {
   CHECK(model.data().position > 0);
   CHECK(model.data().velocity > 0);
   CHECK(model.data().acceleration == Approx(0.5));
   CHECK(model.data().force == Approx(1.0));
+}
+
+template <>
+void CheckDataAfterUpdate_checker(const Model<Vec3D>& model) {
+  for (const auto& elem : model.data().position) {
+    CHECK(elem > 0);
+  }
+  for (const auto& elem : model.data().velocity) {
+    CHECK(elem > 0);
+  }
+  CHECK(model.data().acceleration == Vec3D(0.5));
+  CHECK(model.data().force == Vec3D(1.0));
+}
+
+template <typename T>
+void CheckDataAfterUpdate() {
+  auto model = makePointMassModel<T>(T{0}, 2);
+  auto func = [](const T&, const T&, const double) { return T{1}; };
+  model.setForceCallback(func);
+  REQUIRE(model.update());
+  CheckDataAfterUpdate_checker(model);
+}
+
+TEST_CASE("Check if data is updated after update of PointMassModel",
+          "[PointMassModel][update]") {
+  CheckDataAfterUpdate<double>();
+  CheckDataAfterUpdate<Vec3D>();
 }
 
 template <typename T>

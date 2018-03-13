@@ -44,6 +44,7 @@ class PointMassModel : public ModelBase<State, Solver, Data, System> {
   explicit PointMassModel(const State& t_initial_poisition);
   PointMassModel(const State& t_initial_poisition, double t_mass);
   explicit PointMassModel(DataPtr t_data_ptr);
+  virtual ~PointMassModel() = default;
 
   // accessors
   double mass() const noexcept { return this->data().mass; }

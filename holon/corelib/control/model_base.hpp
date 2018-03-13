@@ -21,6 +21,7 @@
 #ifndef HOLON_CONTROL_MODEL_BASE_HPP_
 #define HOLON_CONTROL_MODEL_BASE_HPP_
 
+#include <limits>
 #include <memory>
 
 namespace holon {
@@ -56,7 +57,11 @@ class ModelBase {
 
   // mutators
   virtual Self& set_time_step(double t_time_step) {
-    m_time_step = t_time_step;
+    if (isTimeStepValid(t_time_step)) {
+      m_time_step = t_time_step;
+    } else {
+      m_time_step = default_time_step;
+    }
     return *this;
   }
   virtual Self& set_data_ptr(DataPtr t_data_ptr) {
@@ -84,6 +89,13 @@ class ModelBase {
   DataPtr m_data_ptr;
   System m_system;
   Solver m_solver;
+
+  bool isTimeStepValid(double t_time_step) const {
+    if (t_time_step < std::numeric_limits<float>::epsilon()) {
+      return false;
+    }
+    return true;
+  }
 };
 
 template <typename State, typename Solver, typename Data, typename System>

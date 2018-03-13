@@ -142,6 +142,10 @@ bool PointMassModel<State, StateArray, Solver, Data, System>::update() {
   StateArray state{{this->data().position, this->data().velocity}};
   state = this->solver().update(this->system(), state, this->time(),
                                 this->time_step());
+  this->data_ptr()->force = this->system().force(
+      this->data().position, this->data().velocity, this->time());
+  this->data_ptr()->acceleration = this->system().acceleration(
+      this->data().position, this->data().velocity, this->time());
   this->data_ptr()->position = state[0];
   this->data_ptr()->velocity = state[1];
   if (!Base::update()) return false;

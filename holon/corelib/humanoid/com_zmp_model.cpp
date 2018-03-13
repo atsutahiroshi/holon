@@ -102,14 +102,16 @@ ComZmpModel& ComZmpModel::set_initial_com_position(
   return *this;
 }
 
-ComZmpModel& ComZmpModel::reset() { return *this; }
-
-ComZmpModel& ComZmpModel::reset(const Vec3D& t_com_position) {
-  data_ptr()->com_position = t_com_position;
+ComZmpModel& ComZmpModel::reset() {
+  data_ptr()->com_position = m_initial_com_position;
   data_ptr()->com_velocity.clear();
-  set_initial_com_position(t_com_position);
   Base::reset();
   return *this;
+}
+
+ComZmpModel& ComZmpModel::reset(const Vec3D& t_com_position) {
+  set_initial_com_position(t_com_position);
+  return reset();
 }
 
 ComZmpModel& ComZmpModel::setExternalForceCallback(CallbackFunc t_f) {

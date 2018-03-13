@@ -228,7 +228,7 @@ TEST_CASE("ComZmpModel::reset() resets time to zero",
   model.update();
   model.update();
   REQUIRE(model.time() != 0);
-  model.reset(kVec3DZ);
+  model.reset();
   CHECK(model.time() == 0.0);
 }
 

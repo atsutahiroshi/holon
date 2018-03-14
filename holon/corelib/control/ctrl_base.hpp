@@ -50,6 +50,7 @@ class CtrlBase {
   const Model& model() const { return m_model; }
   Model& model() { return m_model; }
   const States& states() const { return *m_states_ptr; }
+  States& states() { return *m_states_ptr; }
   const Refs& refs() const { return *m_refs_ptr; }
   const Outputs& outputs() const { return *m_outputs_ptr; }
   const StatesPtr& states_ptr() const { return m_states_ptr; }
@@ -62,6 +63,7 @@ class CtrlBase {
   // mutators
   Self& set_states_ptr(StatesPtr t_states_ptr) {
     m_states_ptr = t_states_ptr;
+    m_model.set_data_ptr(t_states_ptr);
     return *this;
   }
   Self& set_refs_ptr(RefsPtr t_refs_ptr) {

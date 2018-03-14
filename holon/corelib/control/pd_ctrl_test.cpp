@@ -90,6 +90,17 @@ void CheckStatesPtr() {
 }
 
 template <typename T>
+void CheckStatesPtr2() {
+  auto data = createPointMassModelData<T>();
+  Ctrl<T> ctrl;
+  REQUIRE(ctrl.states_ptr() != data);
+  REQUIRE(ctrl.model().data_ptr() != data);
+  ctrl.set_states_ptr(data);
+  CHECK(ctrl.states_ptr() == data);
+  CHECK(ctrl.model().data_ptr() == data);
+}
+
+template <typename T>
 void CheckRefsPtr() {
   auto refs = std::make_shared<Refs<T>>();
   Ctrl<T> ctrl;
@@ -120,6 +131,10 @@ TEST_CASE("Accessors / mutators in PdCtrl", "[PdCtrl][accessor][mutator]") {
   SECTION("states pointer") {
     CheckStatesPtr<double>();
     CheckStatesPtr<Vec3D>();
+  }
+  SECTION("states pointer 2") {
+    CheckStatesPtr2<double>();
+    CheckStatesPtr2<Vec3D>();
   }
   SECTION("refs pointer") {
     CheckRefsPtr<double>();

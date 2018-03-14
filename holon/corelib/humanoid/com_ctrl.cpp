@@ -115,38 +115,18 @@ ComCtrlOutputsPtr createComCtrlOutputs() {
   return std::make_shared<ComCtrlOutputs>();
 }
 
-ComCtrl::ComCtrl()
-    : m_model(),
-      m_states_ptr(m_model.data_ptr()),
-      m_refs_ptr(createComCtrlRefs()),
-      m_outputs_ptr(createComCtrlOutputs()),
+ComCtrl::ComCtrl() : ComCtrl(Base::model()) {}
+
+ComCtrl::ComCtrl(const Model& t_model)
+    : CtrlBase(t_model),
       m_commands_ptr(createComCtrlCommands()),
       m_default_com_position(model().initial_com_position()),
       m_canonical_foot_dist(ctrl_y::default_dist) {
-  m_model.setReactionForceCallback(getReactionForceCallback());
-  m_model.setZmpPositionCallback(getZmpPositionCallback());
-}
-
-ComCtrl::ComCtrl(const Model& t_model) : ComCtrl() {
-  m_model.copy_data(t_model);
-  m_model.set_initial_com_position(states().com_position);
-  m_default_com_position = m_model.initial_com_position();
-}
-
-ComCtrl& ComCtrl::set_states_ptr(StatesPtr t_states_ptr) {
-  m_states_ptr = t_states_ptr;
-  m_model.set_data_ptr(t_states_ptr);
-  return *this;
-}
-
-ComCtrl& ComCtrl::set_refs_ptr(RefsPtr t_refs_ptr) {
-  m_refs_ptr = t_refs_ptr;
-  return *this;
-}
-
-ComCtrl& ComCtrl::set_outputs_ptr(OutputsPtr t_outputs_ptr) {
-  m_outputs_ptr = t_outputs_ptr;
-  return *this;
+  model().copy_data(t_model);
+  model().set_initial_com_position(states().com_position);
+  m_default_com_position = model().initial_com_position();
+  model().setReactionForceCallback(getReactionForceCallback());
+  model().setZmpPositionCallback(getZmpPositionCallback());
 }
 
 ComCtrl& ComCtrl::set_canonical_foot_dist(double t_canonical_foot_dist) {
@@ -154,21 +134,16 @@ ComCtrl& ComCtrl::set_canonical_foot_dist(double t_canonical_foot_dist) {
   return *this;
 }
 
-ComCtrl& ComCtrl::set_time_step(double t_time_step) {
-  m_model.set_time_step(t_time_step);
-  return *this;
-}
-
 ComCtrl& ComCtrl::reset(const Vec3D& t_com_position) {
-  m_model.reset(t_com_position);
-  m_default_com_position = m_model.initial_com_position();
+  model().reset(t_com_position);
+  m_default_com_position = model().initial_com_position();
   return *this;
 }
 
 ComCtrl& ComCtrl::reset(const Vec3D& t_com_position, double t_foot_dist) {
   m_canonical_foot_dist = t_foot_dist;
   m_current_foot_dist = t_foot_dist;
-  m_refs_ptr->dist = t_foot_dist;
+  refs_ptr()->dist = t_foot_dist;
   return reset(t_com_position);
 }
 
@@ -180,8 +155,8 @@ void ComCtrl::feedback(const Model::DataPtr& t_data_ptr) {
 
 void ComCtrl::feedback(const Vec3D& t_com_position,
                        const Vec3D& t_com_velocity) {
-  m_states_ptr->com_position = t_com_position;
-  m_states_ptr->com_velocity = t_com_velocity;
+  states_ptr()->com_position = t_com_position;
+  states_ptr()->com_velocity = t_com_velocity;
 }
 
 Vec3D ComCtrl::computeDesReactForce(const Vec3D& t_com_position,
@@ -272,9 +247,9 @@ void ComCtrl::updateSideward() {
       phase = phaseL;
     double d_new = d0 + T * phase * std::fabs(vyd);
     double yd_new = yd + 0.5 * (d_new - d) * sgn(vyd);
-    m_refs_ptr->com_position[1] = yd_new;
-    m_refs_ptr->dist = d_new;
-    m_max_foot_dist = m_refs_ptr->dist;
+    refs_ptr()->com_position[1] = yd_new;
+    refs_ptr()->dist = d_new;
+    m_max_foot_dist = refs_ptr()->dist;
   } else if ((vyd > 0 && phaseL > 0 && phaseL < 1) ||
              (vyd < 0 && phaseR > 0 && phaseR < 1)) {
     // braking phase
@@ -285,8 +260,8 @@ void ComCtrl::updateSideward() {
       phase = phaseR;
     double d_new = m_max_foot_dist + (d0 - m_max_foot_dist) * phase;
     double yd_new = yd + 0.5 * (d - d_new) * sgn(vyd);
-    m_refs_ptr->com_position[1] = yd_new;
-    m_refs_ptr->dist = d_new;
+    refs_ptr()->com_position[1] = yd_new;
+    refs_ptr()->dist = d_new;
   } else {
     // double-supporting
     // do nothing
@@ -294,43 +269,43 @@ void ComCtrl::updateSideward() {
 }
 
 void ComCtrl::updateRefs() {
-  m_refs_ptr->com_position[0] =
+  refs_ptr()->com_position[0] =
       commands().xd.value_or(default_com_position().x());
-  m_refs_ptr->com_position[1] =
+  refs_ptr()->com_position[1] =
       commands().yd.value_or(default_com_position().y());
-  m_refs_ptr->com_position[2] =
+  refs_ptr()->com_position[2] =
       commands().zd.value_or(default_com_position().z());
-  m_refs_ptr->com_velocity[0] = commands().vxd.value_or(0);
-  m_refs_ptr->com_velocity[1] = commands().vyd.value_or(0);
-  m_refs_ptr->com_velocity[2] = 0;
-  m_refs_ptr->rho = commands().rho.value_or(ctrl_y::default_rho);
-  m_refs_ptr->qx1 = commands().qx1.value_or(ctrl_x::default_q1);
+  refs_ptr()->com_velocity[0] = commands().vxd.value_or(0);
+  refs_ptr()->com_velocity[1] = commands().vyd.value_or(0);
+  refs_ptr()->com_velocity[2] = 0;
+  refs_ptr()->rho = commands().rho.value_or(ctrl_y::default_rho);
+  refs_ptr()->qx1 = commands().qx1.value_or(ctrl_x::default_q1);
   if (commands().dist) set_canonical_foot_dist(commands().dist.value());
-  m_refs_ptr->dist = commands().dist.value_or(m_canonical_foot_dist);
+  refs_ptr()->dist = commands().dist.value_or(m_canonical_foot_dist);
   if (!zIsTiny(refs().com_velocity[0]) || !zIsTiny(refs().com_velocity[1])) {
-    m_refs_ptr->rho = 1;
+    refs_ptr()->rho = 1;
     if (!zIsTiny(refs().com_velocity[0])) {
-      m_refs_ptr->qx1 = 0;
+      refs_ptr()->qx1 = 0;
     }
     if (!zIsTiny(refs().com_velocity[1])) {
       updateSideward();
     }
   }
-  m_refs_ptr->qx2 = commands().qx2.value_or(ctrl_x::default_q2);
-  m_refs_ptr->qy1 = commands().qy1.value_or(ctrl_y::default_q1);
-  m_refs_ptr->qy2 = commands().qy2.value_or(ctrl_y::default_q2);
-  m_refs_ptr->kr = commands().kr.value_or(ctrl_y::default_kr);
-  m_refs_ptr->qz1 = commands().qz1.value_or(ctrl_z::default_q1);
-  m_refs_ptr->qz2 = commands().qz2.value_or(ctrl_z::default_q2);
-  m_refs_ptr->vhp = commands().vhp.value_or(0);
+  refs_ptr()->qx2 = commands().qx2.value_or(ctrl_x::default_q2);
+  refs_ptr()->qy1 = commands().qy1.value_or(ctrl_y::default_q1);
+  refs_ptr()->qy2 = commands().qy2.value_or(ctrl_y::default_q2);
+  refs_ptr()->kr = commands().kr.value_or(ctrl_y::default_kr);
+  refs_ptr()->qz1 = commands().qz1.value_or(ctrl_z::default_q1);
+  refs_ptr()->qz2 = commands().qz2.value_or(ctrl_z::default_q2);
+  refs_ptr()->vhp = commands().vhp.value_or(0);
 }
 
 void ComCtrl::updateOutputs() {
-  m_outputs_ptr->com_position = states().com_position;
-  m_outputs_ptr->com_velocity = states().com_velocity;
-  m_outputs_ptr->com_acceleration = states().com_acceleration;
-  m_outputs_ptr->zmp_position = states().zmp_position;
-  m_outputs_ptr->reaction_force = states().reaction_force;
+  outputs_ptr()->com_position = states().com_position;
+  outputs_ptr()->com_velocity = states().com_velocity;
+  outputs_ptr()->com_acceleration = states().com_acceleration;
+  outputs_ptr()->zmp_position = states().zmp_position;
+  outputs_ptr()->reaction_force = states().reaction_force;
 }
 
 void ComCtrl::updateDefaultComPosition() {
@@ -348,7 +323,7 @@ void ComCtrl::updateDefaultComPosition() {
 
 bool ComCtrl::update() {
   updateRefs();
-  if (!m_model.update()) return false;
+  if (!model().update()) return false;
   updateOutputs();
   updateDefaultComPosition();
   return true;

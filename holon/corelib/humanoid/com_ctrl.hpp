@@ -23,6 +23,7 @@
 
 #include <memory>
 #include "holon/corelib/common/optional.hpp"
+#include "holon/corelib/control/ctrl_base.hpp"
 #include "holon/corelib/humanoid/com_zmp_model.hpp"
 #include "holon/corelib/math/vec3d.hpp"
 
@@ -74,45 +75,29 @@ ComCtrlCommandsPtr createComCtrlCommands();
 ComCtrlRefsPtr createComCtrlRefs();
 ComCtrlOutputsPtr createComCtrlOutputs();
 
-class ComCtrl {
+class ComCtrl
+    : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>, ComZmpModelData,
+                      ComZmpModel, ComCtrlRefs, ComCtrlOutputs> {
+  using Self = ComCtrl;
+  using Base =
+      CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>, ComZmpModelData,
+               ComZmpModel, ComCtrlRefs, ComCtrlOutputs>;
+
  public:
   using Model = ComZmpModel;
   using States = ComZmpModelData;
   using Refs = ComCtrlRefs;
   using Outputs = ComCtrlOutputs;
   using Commands = ComCtrlCommands;
-  using StatesPtr = std::shared_ptr<States>;
-  using RefsPtr = std::shared_ptr<Refs>;
-  using OutputsPtr = std::shared_ptr<Outputs>;
   using CommandsPtr = std::shared_ptr<Commands>;
 
   // constructors
   ComCtrl();
   explicit ComCtrl(const Model& t_model);
-
-  // special member functions
   virtual ~ComCtrl() = default;
-  ComCtrl(const ComCtrl&) = delete;
-  ComCtrl(ComCtrl&&) = delete;
-  ComCtrl& operator=(const ComCtrl&) = delete;
-  ComCtrl& operator=(ComCtrl&&) = delete;
 
   // accessors
-  inline States& states() noexcept { return *m_states_ptr; }
-  // const accessors
-  inline const Model& model() const noexcept { return m_model; }
-  inline const States& states() const noexcept { return *m_states_ptr; }
-  inline const Refs& refs() const noexcept { return *m_refs_ptr; }
-  inline const Outputs& outputs() const noexcept { return *m_outputs_ptr; }
   inline const Commands& commands() const noexcept { return *m_commands_ptr; }
-  inline const StatesPtr& states_ptr() const noexcept { return m_states_ptr; }
-  inline const RefsPtr& refs_ptr() const noexcept { return m_refs_ptr; }
-  inline const OutputsPtr& outputs_ptr() const noexcept {
-    return m_outputs_ptr;
-  }
-
-  inline double time() const noexcept { return model().time(); }
-  inline double time_step() const noexcept { return model().time_step(); }
   inline Vec3D initial_com_position() const noexcept {
     return model().initial_com_position();
   }
@@ -124,13 +109,9 @@ class ComCtrl {
   }
 
   // mutators
-  ComCtrl& set_states_ptr(StatesPtr t_states_ptr);
-  ComCtrl& set_refs_ptr(RefsPtr t_refs_ptr);
-  ComCtrl& set_outputs_ptr(OutputsPtr t_outputs_ptr);
   ComCtrl& set_canonical_foot_dist(double t_canonical_foot_dist);
-  ComCtrl& set_time_step(double t_time_step);
-  ComCtrl& reset(const Vec3D& t_com_position);
-  ComCtrl& reset(const Vec3D& t_com_position, double t_foot_dist);
+  virtual ComCtrl& reset(const Vec3D& t_com_position);
+  virtual ComCtrl& reset(const Vec3D& t_com_position, double t_foot_dist);
 
   //
   inline CommandsPtr getCommands() const noexcept { return m_commands_ptr; }
@@ -139,8 +120,8 @@ class ComCtrl {
   void feedback(const Model& t_model);
   void feedback(const Model::DataPtr& t_data_ptr);
   void feedback(const Vec3D& t_com_position, const Vec3D& t_com_velocity);
-  bool update();
-  bool update(double t_time_step);
+  virtual bool update() override;
+  virtual bool update(double t_time_step) override;
 
   using CallbackFunc = ComZmpModel::CallbackFunc;
   Vec3D computeDesReactForce(const Vec3D& t_com_position,
@@ -154,10 +135,6 @@ class ComCtrl {
   double phaseRF() const;
 
  private:
-  Model m_model;
-  StatesPtr m_states_ptr;
-  RefsPtr m_refs_ptr;
-  OutputsPtr m_outputs_ptr;
   CommandsPtr m_commands_ptr;
   Vec3D m_default_com_position;
   double m_canonical_foot_dist;

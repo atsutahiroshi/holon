@@ -49,6 +49,7 @@ class ModelBase {
   double time() const noexcept { return m_time; }
   double time_step() const noexcept { return m_time_step; }
   const Data& data() const noexcept { return *m_data_ptr; }
+  Data& data() noexcept { return *m_data_ptr; }
   DataPtr data_ptr() const noexcept { return m_data_ptr; }
   System& system() noexcept { return m_system; }
   const System& system() const noexcept { return m_system; }

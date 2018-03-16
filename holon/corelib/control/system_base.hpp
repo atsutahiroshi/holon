@@ -34,6 +34,7 @@ class SystemBase {
   using DataPtr = std::shared_ptr<Data>;
 
  public:
+  SystemBase() = delete;
   SystemBase(DataPtr t_data_ptr) : m_data_ptr(t_data_ptr) {}
   virtual ~SystemBase() = default;
 

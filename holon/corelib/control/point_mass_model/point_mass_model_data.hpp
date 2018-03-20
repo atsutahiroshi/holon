@@ -22,8 +22,20 @@
 #define HOLON_CONTROL_POINT_MASS_MODEL_DATA_HPP_
 
 #include <memory>
+#include "holon/corelib/data/data_set_base.hpp"
 
 namespace holon {
+
+namespace experimental {
+
+template <typename State>
+struct PointMassModelRawData : RawDataBase {};
+
+template <typename State>
+class PointMassModelData : public DataSetBase<PointMassModelData<State>,
+                                              PointMassModelRawData<State>> {};
+
+}  // namespace deprecated
 
 template <typename State>
 struct PointMassModelData {

@@ -97,6 +97,7 @@ class SharedData {
   Data& get() { return *m_ptr; }
   const Data& get() const { return *m_ptr; }
   DataPtr ptr() { return m_ptr; }
+  const DataPtr ptr() const { return m_ptr; }
   void copy(const Self& src) { *m_ptr = src.get(); }
   void share(const Self& target) { m_ptr = target.ptr(); }
 
@@ -110,27 +111,20 @@ class SharedData {
   DataPtr m_ptr;
 };
 
-class RawDataBase {};
-
-class DataBase {
-  using Self = DataBase;
-
- public:
-  virtual ~DataBase() = default;
-};
-
-class ComZmpModelData : public DataBase {
+class ComZmpModelData {
   using Self = ComZmpModelData;
-  using Base = DataBase;
+  using RawData = ComZmpModelRawData;
 
  public:
-  ComZmpModelData() : m_data(alloc_data<ComZmpModelRawData>()) {}
+  ComZmpModelData() : m_data(alloc_data<RawData>()) {}
   ComZmpModelData(const Vec3D& t_initial_com_position)
-      : m_data(alloc_data<ComZmpModelRawData>(t_initial_com_position)) {}
-  ComZmpModelRawData& operator()() { return m_data.get(); }
+      : m_data(alloc_data<RawData>(t_initial_com_position)) {}
+  ComZmpModelData(const Vec3D& t_initial_com_position, double t_mass)
+      : m_data(alloc_data<RawData>(t_initial_com_position, t_mass)) {}
+  RawData& operator()() { return m_data.get(); }
 
  private:
-  SharedData<ComZmpModelRawData> m_data;
+  SharedData<RawData> m_data;
 };
 
 class PointMassModelData {

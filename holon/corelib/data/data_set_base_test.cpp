@@ -286,6 +286,24 @@ TEST_CASE("Copy ctor of DataSetBase should share its data pointer",
   }
 }
 
+TEST_CASE("Copy assignment of DataSetBase should share its data pointer",
+          "[DataSetBase][ctor]") {
+  SECTION("Sample Data 1") {
+    DataSetSample1 data1;
+    data1().v = Fuzzer().get();
+    DataSetSample1 data2;
+    data2 = data1;
+    CheckIfSharePtr1(data1, data2);
+  }
+  SECTION("Sample Data 2") {
+    DataSetSample2 data1;
+    data1().get<0>().v = Fuzzer().get();
+    DataSetSample2 data2;
+    data2 = data1;
+    CheckIfSharePtr2(data1, data2);
+  }
+}
+
 TEST_CASE("Check copy method in DataSetBase", "[DataSetBase]") {
   SECTION("Sample DataSet 1") {
     DataSetSample1 data1;

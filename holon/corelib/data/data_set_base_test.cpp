@@ -304,6 +304,18 @@ TEST_CASE("Copy assignment of DataSetBase should share its data pointer",
   }
 }
 
+TEST_CASE("Check equality operator of DataSetBase", "[DataSetBase]") {
+  SECTION("Sample DataSet 1") {
+    DataSetSample1 data1;
+    DataSetSample1 data2(data1);
+    REQUIRE(data1 == data2);
+    DataSetSample1 data3(data1);
+    auto p = alloc_raw_data<RawDataSample1>();
+    data3.get_ptr<0>() = p;
+    REQUIRE(data1 != data3);
+  }
+}
+
 TEST_CASE("Check copy method in DataSetBase", "[DataSetBase]") {
   SECTION("Sample DataSet 1") {
     DataSetSample1 data1;

@@ -109,6 +109,11 @@ class DataSetBase {
     return tmp;
   }
 
+  bool operator==(const Self& rhs) const {
+    return m_data_ptr_tuple == rhs.get_data_ptr_tuple();
+  }
+  bool operator!=(const Self& rhs) const { return !(*this == rhs); }
+
  protected:
   template <std::size_t I = 0>
   void copy_index(const Self& other) {

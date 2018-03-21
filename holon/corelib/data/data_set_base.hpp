@@ -29,19 +29,13 @@
 
 namespace holon {
 
-struct RawDataBase {};
-
 template <typename RawData, typename... Args>
 std::shared_ptr<RawData> alloc_raw_data(Args&&... args) {
-  static_assert(std::is_base_of<RawDataBase, RawData>::value,
-                "RawData must inherit RawDataBase class.");
   return std::make_shared<RawData>(std::forward<Args>(args)...);
 }
 
 template <class Derived, class... RawDataTypes>
 class DataSetBase {
-  static_assert(all_are_base_of<RawDataBase, RawDataTypes...>::value,
-                "RawDataTypes must inherit RawDataBase class.");
   static_assert(sizeof...(RawDataTypes) > 0,
                 "DataSetBase must have at least one RawData class.");
 

@@ -28,17 +28,7 @@
 namespace holon {
 namespace {
 
-TEST_CASE("Check a sample DataSet class is compilable", "[DataSetBase]") {
-  struct NotInheritRawDataBase {};
-  struct InheritRawDataBase : RawDataBase {};
-
-  // raise assertion
-  // class BadDataSet : DataSetBase<BadDataSet, NotInheritRawDataBase> {};
-  // no aserrtion
-  class GoodDataSet : DataSetBase<GoodDataSet, InheritRawDataBase> {};
-}
-
-struct SampleRawData : RawDataBase {
+struct SampleRawData {
   static constexpr double default_v = 1.0;
   double v;
   double x;
@@ -46,7 +36,7 @@ struct SampleRawData : RawDataBase {
   SampleRawData() : v(default_v), x(0.0) {}
 };
 
-struct MoreSampleRawData : RawDataBase {
+struct MoreSampleRawData {
   static constexpr double default_in = 0.5;
   double in;
   double out;

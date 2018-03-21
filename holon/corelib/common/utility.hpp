@@ -22,8 +22,14 @@
 #define HOLON_COMMON_UTILITY_HPP_
 
 #include <type_traits>
+#include <utility>
 
 namespace holon {
+
+// compiler detection
+#define HOLON_CPP11_OR_GREATER (__cplusplus >= 201103L)
+#define HOLON_CPP14_OR_GREATER (__cplusplus >= 201402L)
+#define HOLON_CPP17_OR_GREATER (__cplusplus >= 201703L)
 
 template <bool...>
 struct bool_pack;
@@ -34,12 +40,23 @@ using all_true =
 
 template <class Base, class... Derived>
 struct all_are_base_of {
-  // this is valid for C++17
-  // static constexpr bool value =
-  //     (... && std::is_base_of<Base, Derived>::value);
+#if HOLON_CPP17_OR_GREATER
+  static constexpr bool value = (... && std::is_base_of<Base, Derived>::value);
+#else
   static constexpr bool value =
       all_true<std::is_base_of<Base, Derived>::value...>::value;
+#endif
 };
+
+#if HOLON_CPP17_OR_GREATER
+template <typename T>
+using as_const<T> = std::as_const<T>;
+#else
+template <typename T>
+constexpr typename std::add_const<T>::type& as_const(T& t) noexcept {
+  return t;
+}
+#endif
 
 }  // namespace holon
 

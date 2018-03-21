@@ -28,49 +28,48 @@
 namespace holon {
 namespace {
 
-struct SampleRawData {
+struct RawDataSample1 {
   static constexpr double default_v = 1.0;
   double v;
   double x;
 
-  SampleRawData() : v(default_v), x(0.0) {}
+  RawDataSample1() : v(default_v), x(0.0) {}
 };
 
-struct MoreSampleRawData {
+struct RawDataSample2 {
   static constexpr double default_in = 0.5;
   double in;
   double out;
 
-  MoreSampleRawData() : in(default_in), out(0.0) {}
+  RawDataSample2() : in(default_in), out(0.0) {}
 };
 
-class SampleDataSet : public DataSetBase<SampleDataSet, SampleRawData> {
+class SampleDataSet : public DataSetBase<SampleDataSet, RawDataSample1> {
  public:
   SampleDataSet() {}
-  explicit SampleDataSet(const SampleRawData& raw_data)
-      : DataSetBase<SampleDataSet, SampleRawData>(raw_data) {}
-  explicit SampleDataSet(std::shared_ptr<SampleRawData> raw_data)
-      : DataSetBase<SampleDataSet, SampleRawData>(raw_data) {}
+  explicit SampleDataSet(const RawDataSample1& raw_data)
+      : DataSetBase<SampleDataSet, RawDataSample1>(raw_data) {}
+  explicit SampleDataSet(std::shared_ptr<RawDataSample1> raw_data)
+      : DataSetBase<SampleDataSet, RawDataSample1>(raw_data) {}
 };
 
-class MoreSampleDataSet
-    : public DataSetBase<MoreSampleDataSet, SampleRawData, MoreSampleRawData,
-                         MoreSampleRawData> {
+class MoreSampleDataSet : public DataSetBase<MoreSampleDataSet, RawDataSample1,
+                                             RawDataSample2, RawDataSample2> {
  public:
   MoreSampleDataSet() {}
-  MoreSampleDataSet(const SampleRawData& raw_data1,
-                    const MoreSampleRawData& raw_data2,
-                    const MoreSampleRawData& raw_data3)
-      : DataSetBase<MoreSampleDataSet, SampleRawData, MoreSampleRawData,
-                    MoreSampleRawData>(raw_data1, raw_data2, raw_data3) {}
-  MoreSampleDataSet(std::shared_ptr<SampleRawData> raw_data1,
-                    std::shared_ptr<MoreSampleRawData> raw_data2,
-                    std::shared_ptr<MoreSampleRawData> raw_data3)
-      : DataSetBase<MoreSampleDataSet, SampleRawData, MoreSampleRawData,
-                    MoreSampleRawData>(raw_data1, raw_data2, raw_data3) {}
-  SampleRawData& data1() { return get<0>(); }
-  MoreSampleRawData& data2() { return get<1>(); }
-  MoreSampleRawData& data3() { return get<2>(); }
+  MoreSampleDataSet(const RawDataSample1& raw_data1,
+                    const RawDataSample2& raw_data2,
+                    const RawDataSample2& raw_data3)
+      : DataSetBase<MoreSampleDataSet, RawDataSample1, RawDataSample2,
+                    RawDataSample2>(raw_data1, raw_data2, raw_data3) {}
+  MoreSampleDataSet(std::shared_ptr<RawDataSample1> raw_data1,
+                    std::shared_ptr<RawDataSample2> raw_data2,
+                    std::shared_ptr<RawDataSample2> raw_data3)
+      : DataSetBase<MoreSampleDataSet, RawDataSample1, RawDataSample2,
+                    RawDataSample2>(raw_data1, raw_data2, raw_data3) {}
+  RawDataSample1& data1() { return get<0>(); }
+  RawDataSample2& data2() { return get<1>(); }
+  RawDataSample2& data3() { return get<2>(); }
 };
 
 TEST_CASE("Default constructor of DataSetBase", "[DataSetBase]") {
@@ -93,7 +92,7 @@ TEST_CASE("Default constructor of DataSetBase", "[DataSetBase]") {
 TEST_CASE("Constructor which takes RawData instance should copy its data",
           "[DataSetBase]") {
   SECTION("Sample DataSet 1") {
-    SampleRawData raw_data;
+    RawDataSample1 raw_data;
     raw_data.v = 3;
     SampleDataSet data(raw_data);
     REQUIRE(data.get_ptr<0>() != nullptr);
@@ -102,8 +101,8 @@ TEST_CASE("Constructor which takes RawData instance should copy its data",
     CHECK(data.get<0>().v == 3.0);
   }
   SECTION("Sample DataSet 2") {
-    SampleRawData raw_data1;
-    MoreSampleRawData raw_data2, raw_data3;
+    RawDataSample1 raw_data1;
+    RawDataSample2 raw_data2, raw_data3;
     raw_data1.v = 1.5;
     raw_data2.in = 2.0;
     raw_data3.in = 3.0;
@@ -120,14 +119,14 @@ TEST_CASE("Constructor which takes RawData instance should copy its data",
 TEST_CASE("Constructor which takes RawData pointer should share its data",
           "[DataSetBase]") {
   SECTION("Sample DataSet 1") {
-    auto raw_data_ptr = alloc_raw_data<SampleRawData>();
+    auto raw_data_ptr = alloc_raw_data<RawDataSample1>();
     SampleDataSet data(raw_data_ptr);
     REQUIRE(data.get_ptr<0>() == raw_data_ptr);
   }
   SECTION("Sample DataSet 2") {
-    auto raw_data_ptr1 = alloc_raw_data<SampleRawData>();
-    auto raw_data_ptr2 = alloc_raw_data<MoreSampleRawData>();
-    auto raw_data_ptr3 = alloc_raw_data<MoreSampleRawData>();
+    auto raw_data_ptr1 = alloc_raw_data<RawDataSample1>();
+    auto raw_data_ptr2 = alloc_raw_data<RawDataSample2>();
+    auto raw_data_ptr3 = alloc_raw_data<RawDataSample2>();
     MoreSampleDataSet data(raw_data_ptr1, raw_data_ptr2, raw_data_ptr3);
     REQUIRE(data.get_ptr<0>() == raw_data_ptr1);
     REQUIRE(data.get_ptr<1>() == raw_data_ptr2);
@@ -148,14 +147,23 @@ TEST_CASE("Calling operator() in DataSet", "[DataSetBase]") {
   }
 }
 
-TEST_CASE("Check behavior of copy constructor of DataSetBase",
-          "[DataSetBase]") {
-  SampleDataSet data1;
-  data1().v = Fuzzer().get();
-  SECTION("copy ctor should share its data pointer") {
+TEST_CASE("Copy ctor of DataSetBase should share its data pointer",
+          "[DataSetBase][ctor]") {
+  SECTION("Sample Data 1") {
+    SampleDataSet data1;
+    data1().v = Fuzzer().get();
     SampleDataSet data2(data1);
     REQUIRE(data1.get_ptr<0>() == data2.get_ptr<0>());
     CHECK(data1().v == data2().v);
+  }
+  SECTION("Sample Data 2") {
+    MoreSampleDataSet data1;
+    data1().get<0>().v = Fuzzer().get();
+    MoreSampleDataSet data2(data1);
+    REQUIRE(data1.get_ptr<0>() == data2.get_ptr<0>());
+    REQUIRE(data1.get_ptr<1>() == data2.get_ptr<1>());
+    REQUIRE(data1.get_ptr<2>() == data2.get_ptr<2>());
+    CHECK(data1().get<0>().v == data2().get<0>().v);
   }
 }
 
@@ -193,7 +201,7 @@ TEST_CASE("Check copy method in DataSetBase which takes RawData as arguments",
           "[DataSetBase]") {
   SECTION("Sample DataSet 1") {
     Fuzzer fuzz;
-    SampleRawData raw_data;
+    RawDataSample1 raw_data;
     raw_data.v = fuzz();
     SampleDataSet data;
     REQUIRE(data.get<0>().v != raw_data.v);
@@ -208,7 +216,7 @@ TEST_CASE(
     "[DataSetBase]") {
   SECTION("Sample DataSet 1") {
     Fuzzer fuzz;
-    auto raw_data = alloc_raw_data<SampleRawData>();
+    auto raw_data = alloc_raw_data<RawDataSample1>();
     raw_data->v = fuzz();
     SampleDataSet data;
     REQUIRE(data.get<0>().v != raw_data->v);

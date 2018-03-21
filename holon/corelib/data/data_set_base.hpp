@@ -66,26 +66,30 @@ class DataSetBase {
 
   const RawDataPtrTuple& get_data_ptr_tuple() const { return m_data_ptr_tuple; }
 
-  template <std::size_t I = 0>
-  RawDataPtr<I> get_ptr() {
-    return std::get<I>(m_data_ptr_tuple);
-  }
-  template <std::size_t I = 0>
+  template <std::size_t I>
   const RawDataPtr<I>& get_ptr() const {
     return std::get<I>(m_data_ptr_tuple);
   }
-
-  template <std::size_t I = 0>
-  RawData<I>& get() {
-    return *std::get<I>(m_data_ptr_tuple);
+  template <std::size_t I>
+  RawDataPtr<I> get_ptr() {
+    return std::get<I>(m_data_ptr_tuple);
   }
-  template <std::size_t I = 0>
+
+  template <std::size_t I>
   const RawData<I>& get() const {
     return *std::get<I>(m_data_ptr_tuple);
   }
+  template <std::size_t I>
+  RawData<I>& get() {
+    return *std::get<I>(m_data_ptr_tuple);
+  }
 
-  typename std::conditional<more_than_one, Derived, RawData<0>>::type&
-  operator()() {
+  using CallOpRetType =
+      typename std::conditional<more_than_one, Derived, RawData<0>>::type;
+  const CallOpRetType& operator()() const {
+    return this->call_op_impl(std::integral_constant<bool, more_than_one>());
+  }
+  CallOpRetType& operator()() {
     return this->call_op_impl(std::integral_constant<bool, more_than_one>());
   }
 
@@ -119,7 +123,14 @@ class DataSetBase {
  private:
   RawDataPtrTuple m_data_ptr_tuple;
 
-  Derived& call_op_impl(std::true_type) { return *static_cast<Derived*>(this); }
+  const Derived& call_op_impl(std::true_type) const {
+    return static_cast<Derived&>(*this);
+  }
+  Derived& call_op_impl(std::true_type) { return static_cast<Derived&>(*this); }
+
+  const RawData<0>& call_op_impl(std::false_type) const {
+    return this->get<0>();
+  }
   RawData<0>& call_op_impl(std::false_type) { return this->get<0>(); }
 
   template <std::size_t I = 0>

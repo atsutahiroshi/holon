@@ -29,9 +29,15 @@
 
 namespace holon {
 
+// non-member functions
 template <typename RawData, typename... Args>
 std::shared_ptr<RawData> alloc_raw_data(Args&&... args) {
   return std::make_shared<RawData>(std::forward<Args>(args)...);
+}
+
+template <typename Data, typename... Args>
+Data make_data(Args&&... args) {
+  return Data(std::forward<Args>(args)...);
 }
 
 template <class Derived, class... RawDataTypes>

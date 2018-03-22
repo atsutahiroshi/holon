@@ -29,13 +29,37 @@ namespace holon {
 namespace experimental {
 
 template <typename State>
-struct PointMassModelRawData : RawDataBase {};
+struct PointMassModelRawData {
+  double mass;
+  State position;
+  State velocity;
+  State acceleration;
+  State force;
+};
 
 template <typename State>
 class PointMassModelData : public DataSetBase<PointMassModelData<State>,
-                                              PointMassModelRawData<State>> {};
+                                              PointMassModelRawData<State>> {
+  using Self = PointMassModelData<State>;
+  using RawData = PointMassModelRawData<State>;
+  using Base = DataSetBase<Self, RawData>;
 
-}  // namespace deprecated
+ public:
+  static constexpr double default_mass = 1;
+
+ public:
+  PointMassModelData() : PointMassModelData(State{0}, default_mass) {}
+  PointMassModelData(const State& t_initial_position)
+      : PointMassModelData(t_initial_position, default_mass) {}
+  PointMassModelData(const State& t_initial_position, double t_mass)
+      : Base(RawData{t_mass, t_initial_position, State{0}, State{0},
+                     State{0}}) {}
+};
+
+template <typename State>
+constexpr double PointMassModelData<State>::default_mass;
+
+}  // namespace experimental
 
 template <typename State>
 struct PointMassModelData {

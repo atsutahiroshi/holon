@@ -20,60 +20,74 @@
 
 #include "holon/corelib/control/point_mass_model/point_mass_model_system.hpp"
 
+#include <utility>
+
 #include "catch.hpp"
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
 namespace holon {
 namespace {
 
+using experimental::PointMassModelRawData;
+using experimental::PointMassModelData;
+using experimental::PointMassModelSystem;
+using experimental::make_system;
+
 template <typename T>
 using System = PointMassModelSystem<T>;
 
 template <typename T>
 System<T> prepareSystem(const T& v, double mass) {
-  auto data = createPointMassModelData(v, mass);
-  auto sys = makePointMassModelSystem(data);
+  auto data = make_data<PointMassModelData<T>>(v, mass);
+  auto sys = make_system<PointMassModelSystem, T>(data);
   return sys;
 }
 
+template <typename T>
+struct get_element_type {
+  using type = typename std::remove_reference<T>::type::element_type;
+};
+template <typename T>
+using get_element_type_t = typename get_element_type<T>::type;
+
 TEST_CASE("Constructors of PointMassModelSystem",
           "[PointMassModelSystem][ctor]") {
-  auto data = createPointMassModelData(kVec3DZ, 1.0);
-  auto sys = makePointMassModelSystem(data);
-  REQUIRE(sys.data_ptr() == data);
+  auto data = make_data<PointMassModelData>(kVec3DZ, 1.0);
+  auto sys = make_system<PointMassModelSystem>(data);
+  REQUIRE(std::is_same<get_element_type_t<decltype(data.get_ptr<0>())>,
+                       PointMassModelRawData<Vec3D>>::value);
+  REQUIRE(std::is_same<get_element_type_t<decltype(sys.data().get_ptr<0>())>,
+                       PointMassModelRawData<Vec3D>>::value);
+  REQUIRE(sys.data() == data);
 }
 
 TEST_CASE("Accessors / mutators of PointMassModelSystem",
           "[PointMassModelSystem][accessor][mutator]") {
-  auto data = createPointMassModelData(kVec3DZ, 1.0);
-  auto sys = makePointMassModelSystem(data);
-
+  auto data = make_data<PointMassModelData>(kVec3DZ, 1.0);
+  auto sys = make_system<PointMassModelSystem>(data);
   SECTION("data reference") {
-    CHECK(sys.data().mass == 1.0);
-    // assignment via data() is not allowed
-    // sys.data().mass = 2.0;
+    CHECK(sys.data().get().mass == 1.0);
+    // assignmen via data() is not allowed
+    // sys.data().get().mass = 2.0;
   }
-
   SECTION("data pointer") {
-    auto data2 = createPointMassModelData(kVec3DZero, 2.0);
-    sys.set_data_ptr(data2);
-    REQUIRE(sys.data_ptr() == data2);
+    auto data2 = make_data<PointMassModelData>(kVec3DZero, 2.0);
+    sys.set_data(data2);
+    REQUIRE(sys.data() == data2);
   }
 }
-
-TEST_CASE("operator() of PointMassModelSystem", "[PointMassModelSystem]") {}
 
 template <typename T>
 void CheckAcceleration() {
   Fuzzer fuzz(0, 10);
-  auto data = createPointMassModelData<T>(fuzz.get<T>(), fuzz());
-  auto sys = makePointMassModelSystem(data);
+  auto data = make_data<PointMassModelData>(fuzz.get<T>(), fuzz());
+  auto sys = make_system<PointMassModelSystem, T>(data);
   T p, v;
   double t;
-  SECTION("if not set acceleration function, returns 0") {
+  SECTION("if acceleration function is not set, returns 0") {
     CHECK(sys.acceleration(p, v, t) == T(0.0));
   }
-  SECTION("if set acceleration function, returns computed acceleration") {
+  SECTION("if acceleration function is set, returns computed acceleration") {
     auto acc = fuzz.get<T>();
     auto f_acc = [acc](const T&, const T&, const double) { return acc; };
     sys.set_acceleration(f_acc);
@@ -81,11 +95,11 @@ void CheckAcceleration() {
   }
   SECTION("you can use data as well") {
     auto f_acc = [sys](const T&, const T&, const double) {
-      return sys.data().mass * T(1.0);
+      return sys.data().get().mass * T(1.0);
     };
     sys.set_acceleration(f_acc);
-    CHECK(sys.acceleration(p, v, t) == data->mass * T(1.0));
-    data->mass = 3.0;
+    CHECK(sys.acceleration(p, v, t) == data.get().mass * T(1.0));
+    data.get().mass = 3.0;
     CHECK(sys.acceleration(p, v, t) == 3.0 * T(1.0));
   }
 }
@@ -99,20 +113,20 @@ template <typename T>
 void CheckForce() {
   Fuzzer fuzz(0, 10);
   auto mass = 2.0;
-  auto data = createPointMassModelData<T>(fuzz.get<T>(), mass);
-  auto sys = makePointMassModelSystem(data);
+  auto data = make_data<PointMassModelData<T>>(fuzz.get<T>(), mass);
+  auto sys = make_system<PointMassModelSystem, T>(data);
   T p, v;
   double t;
-  SECTION("if not set force function, returns 0") {
-    CHECK(sys.force(p, v, t) == T(0.0));
-    CHECK(sys.acceleration(p, v, t) == T(0.0));
+  SECTION("if force function is not set, returns 0") {
+    CHECK(sys.force(p, v, t) == T{0.0});
+    CHECK(sys.acceleration(p, v, t) == T{0.0});
   }
-  SECTION("if set force function, returns computed force") {
+  SECTION("if force function is set, returns computed force") {
     auto force = fuzz.get<T>();
     auto f_force = [force](const T&, const T&, const double) { return force; };
     sys.set_force(f_force);
     CHECK(sys.force(p, v, t) == force);
-    CHECK(sys.acceleration(p, v, t) == force / data->mass);
+    CHECK(sys.acceleration(p, v, t) == force / data().mass);
   }
 }
 

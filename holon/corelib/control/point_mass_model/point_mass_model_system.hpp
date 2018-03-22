@@ -27,6 +27,62 @@
 
 namespace holon {
 
+namespace experimental {
+
+template <typename State, typename Data = PointMassModelData<State>>
+class PointMassModelSystem : public SystemBase<State, Data> {
+  using Self = PointMassModelSystem<State, Data>;
+  using Base = SystemBase<State, Data>;
+  using StateArray = typename Base::StateArray;
+
+ public:
+  using Function =
+      std::function<State(const State&, const State&, const double)>;
+
+ public:
+  explicit PointMassModelSystem(Data t_data) : Base(t_data) {}
+
+  virtual StateArray operator()(const StateArray& state,
+                                const double t) const override {
+    StateArray dxdt;
+    dxdt[0] = state[1];
+    dxdt[1] = acceleration(state[0], state[1], t);
+    return dxdt;
+  }
+
+  State acceleration(const State& p, const State& v, const double t) const {
+    if (f_acceleration) return f_acceleration(p, v, t);
+    return force(p, v, t) / this->data().template get<0>().mass;
+  }
+
+  State force(const State& p, const State& v, const double t) const {
+    if (!f_force) return State{0.0};
+    return f_force(p, v, t);
+  }
+
+  Self& set_acceleration(Function t_acceleration) {
+    f_acceleration = t_acceleration;
+    return *this;
+  }
+
+  Self& set_force(Function t_force) {
+    f_force = t_force;
+    return *this;
+  }
+
+  Self& setConstForce(const State& t_force) {
+    return set_force([t_force](const State&, const State&, const double) {
+      return t_force;
+    });
+  }
+
+ private:
+  Function f_acceleration = nullptr;
+  Function f_force = nullptr;
+};
+
+}  // namespace experimental
+
 template <typename State, typename Data = PointMassModelData<State>>
 class PointMassModelSystem : public SystemBase<State, Data> {
   using Self = PointMassModelSystem<State, Data>;

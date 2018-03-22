@@ -66,20 +66,20 @@ class DataSetBase {
 
   const RawDataPtrTuple& get_data_ptr_tuple() const { return m_data_ptr_tuple; }
 
-  template <std::size_t I>
+  template <std::size_t I = 0>
   const RawDataPtr<I>& get_ptr() const {
     return std::get<I>(m_data_ptr_tuple);
   }
-  template <std::size_t I>
+  template <std::size_t I = 0>
   RawDataPtr<I>& get_ptr() {
     return std::get<I>(m_data_ptr_tuple);
   }
 
-  template <std::size_t I>
+  template <std::size_t I = 0>
   const RawData<I>& get() const {
     return *std::get<I>(m_data_ptr_tuple);
   }
-  template <std::size_t I>
+  template <std::size_t I = 0>
   RawData<I>& get() {
     return *std::get<I>(m_data_ptr_tuple);
   }

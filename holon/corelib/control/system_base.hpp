@@ -23,8 +23,56 @@
 
 #include <array>
 #include <memory>
+#include <utility>
 
 namespace holon {
+
+namespace experimental {
+
+template <template <typename, typename> class System, typename State,
+          typename Data>
+System<State, Data> make_system(Data data) {
+  return System<State, Data>(data);
+}
+
+template <template <typename, typename> class System, typename State,
+          template <typename> class Data>
+System<State, Data<State>> make_system(Data<State> data) {
+  return System<State, Data<State>>(data);
+}
+
+template <typename State, typename Data>
+class SystemBase {
+ protected:
+  using Self = SystemBase<State, Data>;
+  // using StateArray = std::array<State, 2>;
+  using StateArray = std::array<typename std::decay<State>::type, 2>;
+
+ public:
+  SystemBase() = delete;
+  SystemBase(Data t_data) : m_data(t_data) {}
+  virtual ~SystemBase() = default;
+
+  // virtual function
+  virtual StateArray operator()(const StateArray& state,
+                                const double t) const = 0;
+
+  // accessors
+  // DataPtr data_ptr() const noexcept { return m_data_ptr; }
+  const Data data() const noexcept { return m_data; }
+  // Data data() noexcept { return m_data; }
+
+  // mutators
+  Self& set_data(Data t_data) {
+    m_data = t_data;
+    return *this;
+  }
+
+ private:
+  Data m_data;
+};
+
+}  // namespace experimental
 
 template <typename State, typename Data>
 class SystemBase {

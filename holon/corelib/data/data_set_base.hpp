@@ -40,6 +40,16 @@ Data make_data(Args&&... args) {
   return Data(std::forward<Args>(args)...);
 }
 
+template <template <typename> class Data, typename State, typename... Args>
+Data<State> make_data(Args&&... args) {
+  return Data<State>(std::forward<Args>(args)...);
+}
+
+template <template <typename> class Data, typename State, typename... Args>
+Data<State> make_data(const State& state, Args&&... args) {
+  return Data<State>(state, std::forward<Args>(args)...);
+}
+
 template <class Derived, class... RawDataTypes>
 class DataSetBase {
   static_assert(sizeof...(RawDataTypes) > 0,

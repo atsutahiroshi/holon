@@ -22,6 +22,7 @@
 #define HOLON_CONTROL_SYSTEM_BASE_HPP_
 
 #include <array>
+#include <functional>
 #include <memory>
 #include <utility>
 
@@ -45,8 +46,10 @@ template <typename State, typename Data>
 class SystemBase {
  protected:
   using Self = SystemBase<State, Data>;
-  // using StateArray = std::array<State, 2>;
+
+ public:
   using StateArray = std::array<typename std::decay<State>::type, 2>;
+  using Function = std::function<StateArray(const StateArray&, const double)>;
 
  public:
   SystemBase() = delete;
@@ -58,9 +61,7 @@ class SystemBase {
                                 const double t) const = 0;
 
   // accessors
-  // DataPtr data_ptr() const noexcept { return m_data_ptr; }
-  const Data data() const noexcept { return m_data; }
-  // Data data() noexcept { return m_data; }
+  const Data& data() const noexcept { return m_data; }
 
   // mutators
   Self& set_data(Data t_data) {

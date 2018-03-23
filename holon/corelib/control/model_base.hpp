@@ -23,6 +23,7 @@
 
 #include <limits>
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include "holon/corelib/math/misc.hpp"
 
@@ -30,18 +31,15 @@ namespace holon {
 
 namespace experimental {
 
-// non-member functions
-template <typename Model, typename... Args>
-Model make_model(Args&&... args) {
-  return Model(std::forward<Args>(args)...);
-}
-
 template <typename State, typename Solver, typename Data, typename System>
 class ModelBase {
   using Self = ModelBase<State, Solver, Data, System>;
+
+ protected:
   using Function = typename System::Function;
 
  public:
+  static constexpr bool is_model_type = true;
   static constexpr double default_time_step = 0.001;
 
  public:
@@ -98,6 +96,25 @@ class ModelBase {
 
 template <typename State, typename Solver, typename Data, typename System>
 constexpr double ModelBase<State, Solver, Data, System>::default_time_step;
+
+namespace detail {
+
+template <typename T, typename = int>
+struct is_model_type : std::false_type {};
+
+template <typename T>
+struct is_model_type<T, decltype((void)T::is_model_type, 0)> : std::true_type {
+};
+
+}  // namespace detail
+
+// non-member functions
+template <typename Model, typename... Args>
+Model make_model(Args&&... args) {
+  static_assert(detail::is_model_type<Model>::value,
+                "make_model is able to make type derived from ModelBase only.");
+  return Model(std::forward<Args>(args)...);
+}
 
 }  // namespace experimental
 

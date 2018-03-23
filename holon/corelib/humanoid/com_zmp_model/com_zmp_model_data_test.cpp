@@ -33,23 +33,26 @@ using Catch::Matchers::Equals;
 
 const double G = RK_G;
 
+using experimental::ComZmpModelData;
+
 void RandomizeData(ComZmpModelData* data) {
   Fuzzer fuzz;
   Fuzzer positive(0, 10);
 
-  data->mass = positive();
-  data->nu = fuzz.get<Vec3D>();
-  data->com_position = fuzz.get<Vec3D>();
-  data->com_position.set_z(positive());
-  data->com_velocity = fuzz.get<Vec3D>();
-  data->com_acceleration = fuzz.get<Vec3D>();
-  data->zmp_position = fuzz.get<Vec3D>();
-  data->reaction_force = fuzz.get<Vec3D>();
-  data->external_force = fuzz.get<Vec3D>();
-  data->total_force = fuzz.get<Vec3D>();
+  data->get<0>().mass = positive();
+  data->get<0>().nu = fuzz.get<Vec3D>();
+  data->get<0>().com_position = fuzz.get<Vec3D>();
+  data->get<0>().com_position.set_z(positive());
+  data->get<0>().com_velocity = fuzz.get<Vec3D>();
+  data->get<0>().com_acceleration = fuzz.get<Vec3D>();
+  data->get<0>().zmp_position = fuzz.get<Vec3D>();
+  data->get<0>().reaction_force = fuzz.get<Vec3D>();
+  data->get<0>().external_force = fuzz.get<Vec3D>();
+  data->get<0>().total_force = fuzz.get<Vec3D>();
 }
 
-#define CHECK_COMZMPMODELDATA_MEMBER(a, b, var) CHECK(a.var == b.var)
+#define CHECK_COMZMPMODELDATA_MEMBER(a, b, var) \
+  CHECK(a.get<0>().var == b.get<0>().var)
 void CheckData(const ComZmpModelData& a, const ComZmpModelData& b) {
   CHECK_COMZMPMODELDATA_MEMBER(a, b, mass);
   CHECK_COMZMPMODELDATA_MEMBER(a, b, nu);
@@ -69,30 +72,30 @@ TEST_CASE("ComZmpModelData: constructor",
 
   SECTION("default constructor (no parameters)") {
     ComZmpModelData data;
-    CHECK(data.mass == default_mass);
-    CHECK_THAT(data.nu, Equals(kVec3DZ));
-    CHECK_THAT(data.com_position, Equals(default_com_position));
-    CHECK_THAT(data.com_velocity, Equals(kVec3DZero));
-    CHECK_THAT(data.com_acceleration, Equals(kVec3DZero));
-    CHECK_THAT(data.zmp_position, Equals(kVec3DZero));
-    CHECK_THAT(data.reaction_force, Equals(Vec3D(0, 0, G)));
-    CHECK_THAT(data.external_force, Equals(kVec3DZero));
-    CHECK_THAT(data.total_force, Equals(Vec3D(0, 0, G)));
+    CHECK(data().mass == default_mass);
+    CHECK(data().nu == kVec3DZ);
+    CHECK(data().com_position == default_com_position);
+    CHECK(data().com_velocity == kVec3DZero);
+    CHECK(data().com_acceleration == kVec3DZero);
+    CHECK(data().zmp_position == kVec3DZero);
+    CHECK(data().reaction_force == Vec3D(0, 0, G));
+    CHECK(data().external_force == kVec3DZero);
+    CHECK(data().total_force == Vec3D(0, 0, G));
   }
 
   SECTION("with COM position") {
     Fuzzer fuzz(0, 10);
     auto p0 = fuzz.get<Vec3D>();
     ComZmpModelData data(p0);
-    CHECK(data.mass == default_mass);
-    CHECK_THAT(data.nu, Equals(kVec3DZ));
-    CHECK_THAT(data.com_position, Equals(p0));
-    CHECK_THAT(data.com_velocity, Equals(kVec3DZero));
-    CHECK_THAT(data.com_acceleration, Equals(kVec3DZero));
-    CHECK_THAT(data.zmp_position, Equals(kVec3DZero));
-    CHECK_THAT(data.reaction_force, Equals(Vec3D(0, 0, G)));
-    CHECK_THAT(data.external_force, Equals(kVec3DZero));
-    CHECK_THAT(data.total_force, Equals(Vec3D(0, 0, G)));
+    CHECK(data().mass == default_mass);
+    CHECK(data().nu == kVec3DZ);
+    CHECK(data().com_position == p0);
+    CHECK(data().com_velocity == kVec3DZero);
+    CHECK(data().com_acceleration == kVec3DZero);
+    CHECK(data().zmp_position == kVec3DZero);
+    CHECK(data().reaction_force == Vec3D(0, 0, G));
+    CHECK(data().external_force == kVec3DZero);
+    CHECK(data().total_force == Vec3D(0, 0, G));
   }
 
   SECTION("with COM position and mass") {
@@ -100,15 +103,15 @@ TEST_CASE("ComZmpModelData: constructor",
     double m = fuzz.get();
     auto p0 = fuzz.get<Vec3D>();
     ComZmpModelData data(p0, m);
-    CHECK(data.mass == m);
-    CHECK_THAT(data.nu, Equals(kVec3DZ));
-    CHECK_THAT(data.com_position, Equals(p0));
-    CHECK_THAT(data.com_velocity, Equals(kVec3DZero));
-    CHECK_THAT(data.com_acceleration, Equals(kVec3DZero));
-    CHECK_THAT(data.zmp_position, Equals(kVec3DZero));
-    CHECK_THAT(data.reaction_force, Equals(Vec3D(0, 0, m * G)));
-    CHECK_THAT(data.external_force, Equals(kVec3DZero));
-    CHECK_THAT(data.total_force, Equals(Vec3D(0, 0, m * G)));
+    CHECK(data().mass == m);
+    CHECK(data().nu == kVec3DZ);
+    CHECK(data().com_position == p0);
+    CHECK(data().com_velocity == kVec3DZero);
+    CHECK(data().com_acceleration == kVec3DZero);
+    CHECK(data().zmp_position == kVec3DZero);
+    CHECK(data().reaction_force == Vec3D(0, 0, m * G));
+    CHECK(data().external_force == kVec3DZero);
+    CHECK(data().total_force == Vec3D(0, 0, m * G));
   }
 }
 
@@ -117,6 +120,7 @@ TEST_CASE("ComZmpModelData: copy constructor") {
   RandomizeData(&a);
   ComZmpModelData b(a);
   CheckData(a, b);
+  REQUIRE(a.get_ptr<0>() == b.get_ptr<0>());
 }
 
 TEST_CASE("ComZmpModelData: copy assignment operator") {
@@ -124,38 +128,43 @@ TEST_CASE("ComZmpModelData: copy assignment operator") {
   RandomizeData(&a);
   b = a;
   CheckData(a, b);
+  REQUIRE(a.get_ptr<0>() == b.get_ptr<0>());
 }
 
 TEST_CASE("ComZmpModelData: move constructor") {
   double mass = 2.5;
   Vec3D com_pos = {2.0, 3.0, 4.0};
   ComZmpModelData a;
-  a.mass = mass;
-  a.com_position = com_pos;
+  auto ptr = a.get_ptr<0>();
+  a().mass = mass;
+  a().com_position = com_pos;
 
   ComZmpModelData b = std::move(a);
-  CHECK(b.mass == mass);
-  CHECK_THAT(b.com_position, Equals(com_pos));
+  CHECK(b().mass == mass);
+  CHECK(b().com_position == com_pos);
+  REQUIRE(b.get_ptr<0>() == ptr);
 
   auto f = [](ComZmpModelData arg) { return arg; };
   ComZmpModelData c = f(ComZmpModelData(com_pos, mass));
-  CHECK(c.mass == mass);
+  CHECK(c().mass == mass);
 }
 
 TEST_CASE("ComZmpModelData: move assignment operator") {
   double mass = 2.5;
   Vec3D com_pos = {2.0, 3.0, 4.0};
   ComZmpModelData a, b, c;
-  a.mass = mass;
-  a.com_position = com_pos;
+  auto ptr = a.get_ptr<0>();
+  a().mass = mass;
+  a().com_position = com_pos;
 
   b = std::move(a);
-  CHECK(b.mass == mass);
-  CHECK_THAT(b.com_position, Equals(com_pos));
+  CHECK(b().mass == mass);
+  CHECK(b().com_position == com_pos);
+  REQUIRE(b.get_ptr<0>() == ptr);
 
   auto f = [](ComZmpModelData arg) { return arg; };
   c = f(ComZmpModelData(com_pos, mass));
-  CHECK(c.mass == mass);
+  CHECK(c().mass == mass);
 }
 
 }  // namespace

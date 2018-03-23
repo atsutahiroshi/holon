@@ -25,6 +25,24 @@
 
 namespace holon {
 
+namespace experimental {
+
+const double ComZmpModelData::default_mass = 1.0;
+const Vec3D ComZmpModelData::default_com_position = {0.0, 0.0, 1.0};
+
+ComZmpModelData::ComZmpModelData(const Vec3D& t_com_position, double t_mass)
+    : Base(ComZmpModelRawData({t_mass,
+                               kVec3DZ,
+                               t_com_position,
+                               kVec3DZero,
+                               kVec3DZero,
+                               kVec3DZero,
+                               {0, 0, t_mass * RK_G},
+                               kVec3DZero,
+                               {0, 0, t_mass * RK_G}})) {}
+
+}  // namespace experimental
+
 const double ComZmpModelData::default_mass = 1.0;
 const Vec3D ComZmpModelData::default_com_position = {0.0, 0.0, 1.0};
 

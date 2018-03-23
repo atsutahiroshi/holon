@@ -22,9 +22,41 @@
 #define HOLON_HUMANOID_COM_ZMP_MODEL_DATA_HPP_
 
 #include <memory>
+#include "holon/corelib/data/data_set_base.hpp"
 #include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
+
+namespace experimental {
+
+struct ComZmpModelRawData {
+  double mass;
+  Vec3D nu;
+  Vec3D com_position;
+  Vec3D com_velocity;
+  Vec3D com_acceleration;
+  Vec3D zmp_position;
+  Vec3D reaction_force;
+  Vec3D external_force;
+  Vec3D total_force;
+};
+
+class ComZmpModelData
+    : public DataSetBase<ComZmpModelData, ComZmpModelRawData> {
+  using Self = ComZmpModelData;
+  using RawData = ComZmpModelRawData;
+  using Base = DataSetBase<Self, RawData>;
+
+ public:
+  static const double default_mass;
+  static const Vec3D default_com_position;
+
+ public:
+  ComZmpModelData(const Vec3D& t_com_position = default_com_position,
+                  double t_mass = default_mass);
+};
+
+}  // namespace experimental
 
 struct ComZmpModelData {
   static const double default_mass;

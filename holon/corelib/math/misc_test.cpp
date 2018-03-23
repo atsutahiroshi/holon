@@ -20,6 +20,8 @@
 
 #include "holon/corelib/math/misc.hpp"
 
+#include <limits>
+
 #include "catch.hpp"
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
@@ -53,6 +55,43 @@ TEST_CASE("bound returns saturated value with two boundaries",
 
   CHECK(bound(0.0, 1.0, 0.5) == 0.5);
   CHECK(bound(0.0, -0.5, -1.0) == -0.5);
+}
+
+TEST_CASE("is_tiny returns true if the given value is tiny enough",
+          "[math][misc][is_tiny]") {
+  INFO(std::numeric_limits<double>::min());
+  INFO(std::numeric_limits<double>::epsilon());
+  CHECK(is_tiny(0.0));
+  CHECK(is_tiny(std::numeric_limits<double>::min()));
+  // CHECK(is_tiny(0));
+}
+
+TEST_CASE("is_positive returns true if the given value is positive",
+          "[math][misc][is_positive]") {
+  SECTION("int type") {
+    CHECK(is_positive(1));
+    CHECK_FALSE(is_positive(-1));
+    CHECK_FALSE(is_positive(0));
+  }
+  SECTION("double type") {
+    CHECK(is_positive(1.0));
+    CHECK_FALSE(is_positive(-1.0));
+    CHECK_FALSE(is_positive(0.0));
+  }
+}
+
+TEST_CASE("is_negative returns true if the given value is negative",
+          "[math][misc][is_negative]") {
+  SECTION("int type") {
+    CHECK(is_negative(-1));
+    CHECK_FALSE(is_negative(1));
+    CHECK_FALSE(is_negative(0));
+  }
+  SECTION("double type") {
+    CHECK(is_negative(-1.0));
+    CHECK_FALSE(is_negative(1.0));
+    CHECK_FALSE(is_negative(0.0));
+  }
 }
 
 }  // namespace

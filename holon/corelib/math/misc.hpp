@@ -22,6 +22,8 @@
 #define HOLON_MATH_MISC_HPP_
 
 #include <algorithm>
+#include <limits>
+#include <type_traits>
 
 namespace holon {
 
@@ -44,6 +46,29 @@ template <typename T>
 T bound(const T& x, T b1, T b2) {
   if (b1 > b2) std::swap(b1, b2);
   return limit<T>(x, b1, b2);
+}
+
+template <typename T>
+struct is_float_type
+    : std::integral_constant<bool, std::is_same<T, float>::value ||
+                                       std::is_same<T, double>::value ||
+                                       std::is_same<T, long double>::value> {};
+
+template <typename T>
+bool is_tiny(const T& x) {
+  static_assert(is_float_type<T>::value,
+                "is_tiny must be used with floating point type");
+  return std::abs(x) < std::numeric_limits<T>::epsilon();
+}
+
+template <typename T>
+bool is_positive(const T& x) {
+  return x > T(0);
+}
+
+template <typename T>
+bool is_negative(const T& x) {
+  return x < T(0);
 }
 
 }  // namespace holon

@@ -23,8 +23,83 @@
 
 #include <limits>
 #include <memory>
+#include <utility>
+#include "holon/corelib/math/misc.hpp"
 
 namespace holon {
+
+namespace experimental {
+
+// non-member functions
+template <typename Model, typename... Args>
+Model make_model(Args&&... args) {
+  return Model(std::forward<Args>(args)...);
+}
+
+template <typename State, typename Solver, typename Data, typename System>
+class ModelBase {
+  using Self = ModelBase<State, Solver, Data, System>;
+  using Function = typename System::Function;
+
+ public:
+  static constexpr double default_time_step = 0.001;
+
+ public:
+  explicit ModelBase(Data t_data)
+      : m_time(0.0),
+        m_time_step(default_time_step),
+        m_data(t_data),
+        m_system(t_data),
+        m_solver() {}
+  virtual ~ModelBase() = default;
+
+  // accessors
+  double time() const noexcept { return m_time; }
+  double time_step() const noexcept { return m_time_step; }
+  const Data& data() const noexcept { return m_data; }
+  const System& system() const noexcept { return m_system; }
+  const Solver& solver() const noexcept { return m_solver; }
+
+  // mutators
+  Self& set_time_step(double t_time_step) {
+    m_time_step = is_positive(t_time_step) ? t_time_step : default_time_step;
+    return *this;
+  }
+  Self& set_data(const Data& t_data) {
+    m_data = t_data;
+    return *this;
+  }
+  virtual Self& reset() {
+    m_time = 0;
+    return *this;
+  }
+
+  // copy data
+  Self& copy_data(const Data& t_data) { m_data.copy(t_data); }
+  Self& copy_data(const Self& t_model) { this->copy_data(t_model.data()); }
+
+  // update
+  virtual bool update() {
+    m_time += m_time_step;
+    return true;
+  }
+  virtual bool update(double t_time_step) {
+    set_time_step(t_time_step);
+    return update();
+  }
+
+ private:
+  double m_time;
+  double m_time_step;
+  Data m_data;
+  System m_system;
+  Solver m_solver;
+};
+
+template <typename State, typename Solver, typename Data, typename System>
+constexpr double ModelBase<State, Solver, Data, System>::default_time_step;
+
+}  // namespace experimental
 
 template <typename State, typename Solver, typename Data, typename System>
 class ModelBase {

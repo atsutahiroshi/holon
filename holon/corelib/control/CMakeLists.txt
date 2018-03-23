@@ -1,5 +1,6 @@
 set(sources)
 set(test_sources
+  model_base_test.cpp
   pd_ctrl_test.cpp
   point_mass_model_test.cpp
   )

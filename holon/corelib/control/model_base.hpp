@@ -55,9 +55,12 @@ class ModelBase {
   double time() const noexcept { return m_time; }
   double time_step() const noexcept { return m_time_step; }
   const typename Data::CallOpRetType& data() const noexcept { return m_data(); }
+  typename Data::CallOpRetType& data() noexcept { return m_data(); }
   const Data& getDataInstance() const noexcept { return m_data; }
   const System& system() const noexcept { return m_system; }
+  System& system() noexcept { return m_system; }
   const Solver& solver() const noexcept { return m_solver; }
+  Solver& solver() noexcept { return m_solver; }
 
   // mutators
   Self& set_time_step(double t_time_step) {

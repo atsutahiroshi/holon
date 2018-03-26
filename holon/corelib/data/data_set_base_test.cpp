@@ -390,5 +390,30 @@ TEST_CASE("Check clone method in DataSetBase", "[DataSetBase]") {
   }
 }
 
+class DataSetSample3
+    : public DataSetBase<DataSetSample3, RawDataSample1, RawDataSample2> {
+ public:
+  DataSetSample3(std::shared_ptr<RawDataSample1> raw_data1,
+                 std::shared_ptr<RawDataSample2> raw_data2)
+      : DataSetBase<DataSetSample3, RawDataSample1, RawDataSample2>(
+            raw_data1, raw_data2) {}
+};
+
+TEST_CASE("Check extract method in DataSetBase", "[DataSetBase][extract]") {
+  // DataSetSample2 is consisted of RawDataSample1 and two RawDataSample2s
+  DataSetSample2 data_set2;
+  // data_set2.extract<0> creates Data instance which has RawDataSample1,
+  // which is equivalent to DataSetSample1.
+  auto data_set1 = data_set2.extract<DataSetSample1, 0>();
+  CHECK(data_set1.get_ptr<0>() == data_set2.get_ptr<0>());
+  // DataSetSample3 is consisted of RawDataSample1 and RawDataSample2
+  auto data_set3 = data_set2.extract<DataSetSample3, 0, 1>();
+  CHECK(data_set3.get_ptr<0>() == data_set2.get_ptr<0>());
+  CHECK(data_set3.get_ptr<1>() == data_set2.get_ptr<1>());
+  data_set3 = data_set2.extract<DataSetSample3, 0, 2>();
+  CHECK(data_set3.get_ptr<0>() == data_set2.get_ptr<0>());
+  CHECK(data_set3.get_ptr<1>() == data_set2.get_ptr<2>());
+}
+
 }  // namespace
 }  // namespace holon

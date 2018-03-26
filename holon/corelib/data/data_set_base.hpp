@@ -119,6 +119,11 @@ class DataSetBase {
     return tmp;
   }
 
+  template <typename DerivedType, std::size_t... I>
+  DerivedType extract() {
+    return DerivedType(std::get<I>(m_data_ptr_tuple)...);
+  }
+
   bool operator==(const Self& rhs) const {
     return m_data_ptr_tuple == rhs.get_data_ptr_tuple();
   }

@@ -88,6 +88,8 @@ class DataSetBase {
             std::make_tuple(alloc_raw_data<RawDataTypes>(args)...)) {}
   explicit DataSetBase(std::shared_ptr<RawDataTypes>... args)
       : m_data_ptr_tuple(std::make_tuple(args...)) {}
+  explicit DataSetBase(RawDataPtrTuple t_data_ptr_tuple)
+      : m_data_ptr_tuple(t_data_ptr_tuple) {}
 
   const RawDataPtrTuple& get_data_ptr_tuple() const { return m_data_ptr_tuple; }
 

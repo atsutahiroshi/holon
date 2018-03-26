@@ -68,16 +68,16 @@ class DataSetBase {
                 "DataSetBase must have at least one RawData class.");
 
   using Self = DataSetBase<Derived, RawDataTypes...>;
-  using RawDataTuple = std::tuple<RawDataTypes...>;
-  using RawDataPtrTuple = std::tuple<std::shared_ptr<RawDataTypes>...>;
-  template <std::size_t N>
-  using RawData = typename std::tuple_element<N, RawDataTuple>::type;
-  template <std::size_t N>
-  using RawDataPtr = typename std::tuple_element<N, RawDataPtrTuple>::type;
   static constexpr std::size_t raw_data_num = sizeof...(RawDataTypes);
   static constexpr bool more_than_one = raw_data_num - 1;
 
  public:
+  using RawDataTuple = std::tuple<RawDataTypes...>;
+  using RawDataPtrTuple = std::tuple<std::shared_ptr<RawDataTypes>...>;
+  template <std::size_t I>
+  using RawDataI = typename std::tuple_element<I, RawDataTuple>::type;
+  template <std::size_t I>
+  using RawDataPtrI = typename std::tuple_element<I, RawDataPtrTuple>::type;
   static constexpr bool is_data_type = true;
 
  public:
@@ -92,25 +92,25 @@ class DataSetBase {
   const RawDataPtrTuple& get_data_ptr_tuple() const { return m_data_ptr_tuple; }
 
   template <std::size_t I = 0>
-  const RawDataPtr<I>& get_ptr() const {
+  const RawDataPtrI<I>& get_ptr() const {
     return std::get<I>(m_data_ptr_tuple);
   }
   template <std::size_t I = 0>
-  RawDataPtr<I>& get_ptr() {
+  RawDataPtrI<I>& get_ptr() {
     return std::get<I>(m_data_ptr_tuple);
   }
 
   template <std::size_t I = 0>
-  const RawData<I>& get() const {
+  const RawDataI<I>& get() const {
     return *std::get<I>(m_data_ptr_tuple);
   }
   template <std::size_t I = 0>
-  RawData<I>& get() {
+  RawDataI<I>& get() {
     return *std::get<I>(m_data_ptr_tuple);
   }
 
   using CallOpRetType =
-      typename std::conditional<more_than_one, Derived, RawData<0>>::type;
+      typename std::conditional<more_than_one, Derived, RawDataI<0>>::type;
   const CallOpRetType& operator()() const {
     return this->call_op_impl(std::integral_constant<bool, more_than_one>());
   }
@@ -151,7 +151,7 @@ class DataSetBase {
   }
 
   template <std::size_t I = 0>
-  void copy_index(const RawData<I>& t_raw_data) {
+  void copy_index(const RawDataI<I>& t_raw_data) {
     this->get<I>() = t_raw_data;
   }
 
@@ -163,10 +163,10 @@ class DataSetBase {
   }
   Derived& call_op_impl(std::true_type) { return static_cast<Derived&>(*this); }
 
-  const RawData<0>& call_op_impl(std::false_type) const {
+  const RawDataI<0>& call_op_impl(std::false_type) const {
     return this->get<0>();
   }
-  RawData<0>& call_op_impl(std::false_type) { return this->get<0>(); }
+  RawDataI<0>& call_op_impl(std::false_type) { return this->get<0>(); }
 
   template <std::size_t I = 0>
   typename std::enable_if<(I == raw_data_num), void>::type copy_impl(

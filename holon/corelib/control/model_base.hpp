@@ -51,7 +51,9 @@ class ModelBase {
  public:
   static constexpr bool is_model_type = true;
   static constexpr double default_time_step = 0.001;
-  using RawData = typename Data::template RawDataI<0>;
+  using DataType = Data;
+  template <std::size_t I>
+  using RawDataType = typename Data::template RawDataI<I>;
 
  public:
   explicit ModelBase(Data t_data)
@@ -65,12 +67,22 @@ class ModelBase {
   // accessors
   double time() const noexcept { return m_time; }
   double time_step() const noexcept { return m_time_step; }
+
   const Data& data() const noexcept { return m_data; }
   Data& data() noexcept { return m_data; }
-  const RawData& states() const noexcept { return m_data.template get<0>(); }
-  RawData& states() noexcept { return m_data.template get<0>(); }
+
+  template <std::size_t I = 0>
+  const RawDataType<I>& states() const noexcept {
+    return m_data.template get<I>();
+  }
+  template <std::size_t I = 0>
+  RawDataType<I>& states() noexcept {
+    return m_data.template get<I>();
+  }
+
   const System& system() const noexcept { return m_system; }
   System& system() noexcept { return m_system; }
+
   const Solver& solver() const noexcept { return m_solver; }
   Solver& solver() noexcept { return m_solver; }
 

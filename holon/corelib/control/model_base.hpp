@@ -54,7 +54,8 @@ class ModelBase {
   // accessors
   double time() const noexcept { return m_time; }
   double time_step() const noexcept { return m_time_step; }
-  const Data& data() const noexcept { return m_data; }
+  const typename Data::CallOpRetType& data() const noexcept { return m_data(); }
+  const Data& getDataInstance() const noexcept { return m_data; }
   const System& system() const noexcept { return m_system; }
   const Solver& solver() const noexcept { return m_solver; }
 
@@ -74,7 +75,9 @@ class ModelBase {
 
   // copy data
   Self& copy_data(const Data& t_data) { m_data.copy(t_data); }
-  Self& copy_data(const Self& t_model) { this->copy_data(t_model.data()); }
+  Self& copy_data(const Self& t_model) {
+    this->copy_data(t_model.getDataInstance());
+  }
 
   // update
   virtual bool update() {

@@ -60,9 +60,9 @@ void CheckMembers(const TestModel& model, const double expected_p,
                   const double expected_v) {
   CHECK(model.time() == 0.0);
   CHECK(model.time_step() == TestModel::default_time_step);
-  CHECK(model.data().get().p == expected_p);
-  CHECK(model.data().get().v == expected_v);
-  CHECK(model.data() == model.system().data());
+  CHECK(model.data().p == expected_p);
+  CHECK(model.data().v == expected_v);
+  CHECK(model.getDataInstance() == model.system().data());
 }
 
 TEST_CASE("C'tors of ModelBase", "[ModelBase][ctor]") {
@@ -73,7 +73,7 @@ TEST_CASE("C'tors of ModelBase", "[ModelBase][ctor]") {
   SECTION("Overloaded c'tor") {
     auto data = make_data<TestData>(1, 2);
     auto model = make_model<TestModel>(data);
-    CHECK(model.data() == data);
+    CHECK(model.getDataInstance() == data);
     CheckMembers(model, 1, 2);
   }
 }
@@ -90,9 +90,9 @@ TEST_CASE("Check accssors / mutators in ModelBase",
   SECTION("data pointer") {
     auto data = make_data<TestData>();
     auto model = make_model<TestModel>();
-    REQUIRE(model.data() != data);
+    REQUIRE(model.getDataInstance() != data);
     model.set_data(data);
-    CHECK(model.data() == data);
+    CHECK(model.getDataInstance() == data);
   }
 }
 
@@ -142,24 +142,24 @@ void CheckCopyData_1() {
   Fuzzer fuzz;
   auto model = make_model<TestModel>();
   auto data = make_data<TestData>(fuzz(), fuzz());
-  REQUIRE(model.data().get().p != data.get().p);
-  REQUIRE(model.data().get().v != data.get().v);
+  REQUIRE(model.data().p != data.get().p);
+  REQUIRE(model.data().v != data.get().v);
   model.copy_data(data);
-  CHECK(model.data() != data);
-  CHECK(model.data().get().p == data.get().p);
-  CHECK(model.data().get().v == data.get().v);
+  CHECK(model.getDataInstance() != data);
+  CHECK(model.data().p == data.get().p);
+  CHECK(model.data().v == data.get().v);
 }
 
 void CheckCopyData_2() {
   Fuzzer fuzz;
   auto model1 = make_model<TestModel>();
   auto model2 = make_model<TestModel>(fuzz(), fuzz());
-  REQUIRE(model1.data().get().p != model2.data().get().p);
-  REQUIRE(model1.data().get().v != model2.data().get().v);
+  REQUIRE(model1.data().p != model2.data().p);
+  REQUIRE(model1.data().v != model2.data().v);
   model1.copy_data(model2);
-  CHECK(model1.data() != model2.data());
-  CHECK(model1.data().get().p == model2.data().get().p);
-  CHECK(model1.data().get().v == model2.data().get().v);
+  CHECK(model1.getDataInstance() != model2.getDataInstance());
+  CHECK(model1.data().p == model2.data().p);
+  CHECK(model1.data().v == model2.data().v);
 }
 
 TEST_CASE("Check copy_data in ModelBase", "[ModelBase][copy_data]") {

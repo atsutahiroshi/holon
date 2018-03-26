@@ -25,7 +25,10 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include "holon/corelib/control/system_base.hpp"
+#include "holon/corelib/data/data_set_base.hpp"
 #include "holon/corelib/math/misc.hpp"
+#include "holon/corelib/math/ode_solver.hpp"
 
 namespace holon {
 
@@ -33,6 +36,13 @@ namespace experimental {
 
 template <typename State, typename Solver, typename Data, typename System>
 class ModelBase {
+  static_assert(std::is_base_of<OdeSolver<Solver>, Solver>::value,
+                "Solver must be derived from OdeSolver class.");
+  static_assert(detail::is_data_type<Data>::value,
+                "Data must be derived from DataSetBase class.");
+  static_assert(std::is_base_of<SystemBase<State, Data>, System>::value,
+                "System must be derived from SystemBase class.");
+
   using Self = ModelBase<State, Solver, Data, System>;
 
  protected:

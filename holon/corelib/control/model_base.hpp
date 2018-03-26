@@ -51,6 +51,7 @@ class ModelBase {
  public:
   static constexpr bool is_model_type = true;
   static constexpr double default_time_step = 0.001;
+  using RawData = typename Data::template RawDataI<0>;
 
  public:
   explicit ModelBase(Data t_data)
@@ -64,9 +65,10 @@ class ModelBase {
   // accessors
   double time() const noexcept { return m_time; }
   double time_step() const noexcept { return m_time_step; }
-  const typename Data::CallOpRetType& data() const noexcept { return m_data(); }
-  typename Data::CallOpRetType& data() noexcept { return m_data(); }
-  const Data& getDataInstance() const noexcept { return m_data; }
+  const Data& data() const noexcept { return m_data; }
+  Data& data() noexcept { return m_data; }
+  const RawData& states() const noexcept { return m_data.template get<0>(); }
+  RawData& states() noexcept { return m_data.template get<0>(); }
   const System& system() const noexcept { return m_system; }
   System& system() noexcept { return m_system; }
   const Solver& solver() const noexcept { return m_solver; }
@@ -88,9 +90,7 @@ class ModelBase {
 
   // copy data
   Self& copy_data(const Data& t_data) { m_data.copy(t_data); }
-  Self& copy_data(const Self& t_model) {
-    this->copy_data(t_model.getDataInstance());
-  }
+  Self& copy_data(const Self& t_model) { this->copy_data(t_model.data()); }
 
   // update
   virtual bool update() {

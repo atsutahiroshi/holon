@@ -28,6 +28,8 @@ namespace experimental {
 namespace {
 
 template <typename State>
+using Data = PointMassModelData<State>;
+template <typename State>
 using Model = PointMassModel<State>;
 
 template <typename T>
@@ -35,10 +37,10 @@ void CheckInitializedMembers(const Model<T>& model, const T& expected_position,
                              const double expected_mass) {
   CHECK(model.time() == 0.0);
   CHECK(model.time_step() == Model<T>::default_time_step);
-  CHECK(model.data().position == expected_position);
-  CHECK(model.data().mass == expected_mass);
+  CHECK(model.states().position == expected_position);
+  CHECK(model.states().mass == expected_mass);
   CHECK(model.mass() == expected_mass);
-  CHECK(model.system().data() == model.getDataInstance());
+  CHECK(model.system().data() == model.data());
   CHECK(model.initial_position() == expected_position);
 }
 
@@ -67,10 +69,10 @@ template <typename T>
 void CheckConstructor_4() {
   auto v = Fuzzer().get<T>();
   double mass = Fuzzer(0, 10).get();
-  auto data = make_data<PointMassModelData>(v, mass);
+  auto data = make_data<Data>(v, mass);
   Model<T> model(data);
   CheckInitializedMembers(model, v, mass);
-  CHECK(model.getDataInstance() == data);
+  CHECK(model.data() == data);
   CHECK(model.system().data() == data);
 }
 
@@ -96,7 +98,7 @@ TEST_CASE("Constructor of PointMassModel", "[PointMassModel][ctor]") {
 template <typename T>
 void CheckTimeStep() {
   double dt = Fuzzer(0, 0.01).get();
-  auto model = make_model<PointMassModel<T>>();
+  auto model = make_model<Model<T>>();
   REQUIRE(model.time_step() != dt);
   model.set_time_step(dt);
   CHECK(model.time_step() == Approx(dt));
@@ -104,11 +106,11 @@ void CheckTimeStep() {
 
 template <typename T>
 void CheckDataPtr() {
-  auto data = make_data<PointMassModelData<T>>();
-  auto model = make_model<PointMassModel<T>>();
-  REQUIRE(model.getDataInstance() != data);
+  auto data = make_data<Data<T>>();
+  auto model = make_model<Model<T>>();
+  REQUIRE(model.data() != data);
   model.set_data(data);
-  CHECK(model.getDataInstance() == data);
+  CHECK(model.data() == data);
 }
 
 template <typename T>
@@ -116,7 +118,7 @@ void CheckInitialPosition() {
   Fuzzer fuzz;
   auto p0 = fuzz.get<T>();
   auto p1 = fuzz.get<T>();
-  auto model = make_model<PointMassModel<T>>(p0);
+  auto model = make_model<Model<T>>(p0);
   REQUIRE(model.initial_position() == p0);
   REQUIRE(model.initial_position() != p1);
   model.set_initial_position(p1);
@@ -142,34 +144,34 @@ TEST_CASE("Check accssors / mutators in PointMassModel",
 template <typename T>
 void CheckReset_1() {
   Fuzzer fuzz;
-  auto model = make_model<PointMassModel<T>>();
-  model.data().position = fuzz.get<T>();
-  model.data().velocity = fuzz.get<T>();
+  auto model = make_model<Model<T>>();
+  model.states().position = fuzz.get<T>();
+  model.states().velocity = fuzz.get<T>();
   model.update();
-  REQUIRE(model.data().position != model.initial_position());
-  REQUIRE(model.data().velocity != T{0});
+  REQUIRE(model.states().position != model.initial_position());
+  REQUIRE(model.states().velocity != T{0});
   REQUIRE(model.time() != 0);
   model.reset();
-  CHECK(model.data().position == model.initial_position());
-  CHECK(model.data().velocity == T{0});
+  CHECK(model.states().position == model.initial_position());
+  CHECK(model.states().velocity == T{0});
   CHECK(model.time() == 0);
 }
 
 template <typename T>
 void CheckReset_2() {
   Fuzzer fuzz;
-  auto model = make_model<PointMassModel<T>>();
-  model.data().position = fuzz.get<T>();
-  model.data().velocity = fuzz.get<T>();
+  auto model = make_model<Model<T>>();
+  model.states().position = fuzz.get<T>();
+  model.states().velocity = fuzz.get<T>();
   model.update();
-  REQUIRE(model.data().position != model.initial_position());
-  REQUIRE(model.data().velocity != T{0});
+  REQUIRE(model.states().position != model.initial_position());
+  REQUIRE(model.states().velocity != T{0});
   REQUIRE(model.time() != 0);
   auto v = fuzz.get<T>();
   model.reset(v);
   CHECK(model.initial_position() == v);
-  CHECK(model.data().position == model.initial_position());
-  CHECK(model.data().velocity == T{0});
+  CHECK(model.states().position == model.initial_position());
+  CHECK(model.states().velocity == T{0});
   CHECK(model.time() == 0);
 }
 
@@ -186,7 +188,7 @@ TEST_CASE("Check reset function in PointMassModel", "[PointMassModel][reset]") {
 
 template <typename T>
 void CheckSetForceCallback() {
-  auto model = make_model<PointMassModel<T>>();
+  auto model = make_model<Model<T>>();
   auto force = Fuzzer().get<T>();
   auto func = [force](const T&, const T&, const double&) { return force; };
   model.setForceCallback(func);
@@ -201,7 +203,7 @@ TEST_CASE("Check setForceCallback in PointMassModel",
 
 template <typename T>
 void CheckUpdateTime() {
-  auto model = make_model<PointMassModel<T>>();
+  auto model = make_model<Model<T>>();
   auto dt = Model<T>::default_time_step;
   REQUIRE(model.time() == 0);
   REQUIRE(model.time_step() == Approx(dt));
@@ -222,9 +224,9 @@ TEST_CASE("Check if time is updated by update in PointMassModel",
 
 template <typename T>
 void CheckUpdateWithoutForce() {
-  auto model = make_model<PointMassModel<T>>();
+  auto model = make_model<Model<T>>();
   while (model.time() < 1) model.update();
-  CHECK(model.data().position == T{0.0});
+  CHECK(model.states().position == T{0.0});
 }
 
 TEST_CASE("Check if point mass is still without adding force",
@@ -235,30 +237,30 @@ TEST_CASE("Check if point mass is still without adding force",
 
 TEST_CASE("Check if point mass is moving with adding force, one dimentinal",
           "[PointMassModel][update]") {
-  auto model = make_model<PointMassModel<double>>();
+  auto model = make_model<Model<double>>();
   auto f = [](const double&, const double&, const double) { return 1.0; };
   model.setForceCallback(f);
-  REQUIRE(model.data().position == 0);
+  REQUIRE(model.states().position == 0);
   REQUIRE(model.time() == 0);
   while (model.time() < 0.1) model.update();
-  CHECK(model.data().position > 0);
+  CHECK(model.states().position > 0);
   CHECK(model.time() == Approx(0.1));
 }
 
 TEST_CASE("Check if point mass is moving with adding force",
           "[PointMassModel][update]") {
   Vec3D force = {1, -1, 0};
-  auto model = make_model<PointMassModel<Vec3D>>();
+  auto model = make_model<Model<Vec3D>>();
   auto f = [force](const Vec3D&, const Vec3D&, const double) { return force; };
   model.setForceCallback(f);
-  REQUIRE(model.data().position.x() == 0);
-  REQUIRE(model.data().position.y() == 0);
-  REQUIRE(model.data().position.z() == 0);
+  REQUIRE(model.states().position.x() == 0);
+  REQUIRE(model.states().position.y() == 0);
+  REQUIRE(model.states().position.z() == 0);
   REQUIRE(model.time() == 0);
   while (model.time() < 0.1) model.update();
-  CHECK(model.data().position.x() > 0);
-  CHECK(model.data().position.y() < 0);
-  CHECK(model.data().position.z() == 0);
+  CHECK(model.states().position.x() > 0);
+  CHECK(model.states().position.y() < 0);
+  CHECK(model.states().position.z() == 0);
   CHECK(model.time() == Approx(0.1));
 }
 
@@ -267,27 +269,27 @@ void CheckDataAfterUpdate_checker(const Model<T>& model);
 
 template <>
 void CheckDataAfterUpdate_checker(const Model<double>& model) {
-  CHECK(model.data().position > 0);
-  CHECK(model.data().velocity > 0);
-  CHECK(model.data().acceleration == Approx(0.5));
-  CHECK(model.data().force == Approx(1.0));
+  CHECK(model.states().position > 0);
+  CHECK(model.states().velocity > 0);
+  CHECK(model.states().acceleration == Approx(0.5));
+  CHECK(model.states().force == Approx(1.0));
 }
 
 template <>
 void CheckDataAfterUpdate_checker(const Model<Vec3D>& model) {
-  for (const auto& elem : model.data().position) {
+  for (const auto& elem : model.states().position) {
     CHECK(elem > 0);
   }
-  for (const auto& elem : model.data().velocity) {
+  for (const auto& elem : model.states().velocity) {
     CHECK(elem > 0);
   }
-  CHECK(model.data().acceleration == Vec3D(0.5));
-  CHECK(model.data().force == Vec3D(1.0));
+  CHECK(model.states().acceleration == Vec3D(0.5));
+  CHECK(model.states().force == Vec3D(1.0));
 }
 
 template <typename T>
 void CheckDataAfterUpdate() {
-  auto model = make_model<PointMassModel<T>>(T{0}, 2);
+  auto model = make_model<Model<T>>(T{0}, 2);
   auto func = [](const T&, const T&, const double) { return T{1}; };
   model.setForceCallback(func);
   REQUIRE(model.update());

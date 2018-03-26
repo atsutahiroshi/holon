@@ -47,11 +47,11 @@ class PointMassModel : public ModelBase<State, Solver, Data, System> {
   PointMassModel(const State& t_initial_position, double t_mass)
       : PointMassModel(make_data<Data>(t_initial_position, t_mass)) {}
   explicit PointMassModel(Data t_data)
-      : Base(t_data), m_initial_position(Base::data().position) {}
+      : Base(t_data), m_initial_position(Base::states().position) {}
   virtual ~PointMassModel() = default;
 
   // accessors
-  double mass() const noexcept { return this->data().mass; }
+  double mass() const noexcept { return this->states().mass; }
   State initial_position() const noexcept { return m_initial_position; }
 
   // // mutators
@@ -61,8 +61,8 @@ class PointMassModel : public ModelBase<State, Solver, Data, System> {
   }
   virtual Self& reset() override {
     Base::reset();
-    this->data().position = m_initial_position;
-    this->data().velocity = State{0};
+    this->states().position = m_initial_position;
+    this->states().velocity = State{0};
   }
   virtual Self& reset(const State& t_initial_position) {
     this->set_initial_position(t_initial_position);
@@ -81,15 +81,15 @@ class PointMassModel : public ModelBase<State, Solver, Data, System> {
 
   // update
   virtual bool update() override {
-    StateArray state{{this->data().position, this->data().velocity}};
+    StateArray state{{this->states().position, this->states().velocity}};
     state = this->solver().update(this->system(), state, this->time(),
                                   this->time_step());
-    this->data().force = this->system().force(
-        this->data().position, this->data().velocity, this->time());
-    this->data().acceleration = this->system().acceleration(
-        this->data().position, this->data().velocity, this->time());
-    this->data().position = state[0];
-    this->data().velocity = state[1];
+    this->states().force = this->system().force(
+        this->states().position, this->states().velocity, this->time());
+    this->states().acceleration = this->system().acceleration(
+        this->states().position, this->states().velocity, this->time());
+    this->states().position = state[0];
+    this->states().velocity = state[1];
     if (!Base::update()) return false;
     return true;
   }

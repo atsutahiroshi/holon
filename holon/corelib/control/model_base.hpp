@@ -38,7 +38,7 @@ template <typename State, typename Solver, typename Data, typename System>
 class ModelBase {
   static_assert(std::is_base_of<OdeSolver<Solver>, Solver>::value,
                 "Solver must be derived from OdeSolver class.");
-  static_assert(detail::is_data_type<Data>::value,
+  static_assert(is_data_type<Data>::value,
                 "Data must be derived from DataSetBase class.");
   static_assert(std::is_base_of<SystemBase<State, Data>, System>::value,
                 "System must be derived from SystemBase class.");
@@ -113,8 +113,6 @@ class ModelBase {
 template <typename State, typename Solver, typename Data, typename System>
 constexpr double ModelBase<State, Solver, Data, System>::default_time_step;
 
-namespace detail {
-
 template <typename T, typename = int>
 struct is_model_type : std::false_type {};
 
@@ -122,12 +120,10 @@ template <typename T>
 struct is_model_type<T, decltype((void)T::is_model_type, 0)> : std::true_type {
 };
 
-}  // namespace detail
-
 // non-member functions
 template <typename Model, typename... Args>
 Model make_model(Args&&... args) {
-  static_assert(detail::is_model_type<Model>::value,
+  static_assert(is_model_type<Model>::value,
                 "make_model is able to make type derived from ModelBase only.");
   return Model(std::forward<Args>(args)...);
 }

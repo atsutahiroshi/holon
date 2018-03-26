@@ -35,33 +35,29 @@ std::shared_ptr<RawData> alloc_raw_data(Args&&... args) {
   return std::make_shared<RawData>(std::forward<Args>(args)...);
 }
 
-namespace detail {
-
 template <typename T, typename = int>
 struct is_data_type : std::false_type {};
 
 template <typename T>
 struct is_data_type<T, decltype((void)T::is_data_type, 0)> : std::true_type {};
 
-}  // namespace detail
-
 template <typename Data, typename... Args>
 Data make_data(Args&&... args) {
-  static_assert(detail::is_data_type<Data>::value,
+  static_assert(is_data_type<Data>::value,
                 "make_data is able to make instance derived from DataSetBase.");
   return Data(std::forward<Args>(args)...);
 }
 
 template <template <typename> class Data, typename State, typename... Args>
 Data<State> make_data(Args&&... args) {
-  static_assert(detail::is_data_type<Data<State>>::value,
+  static_assert(is_data_type<Data<State>>::value,
                 "make_data is able to make instance derived from DataSetBase.");
   return Data<State>(std::forward<Args>(args)...);
 }
 
 template <template <typename> class Data, typename State, typename... Args>
 Data<State> make_data(const State& state, Args&&... args) {
-  static_assert(detail::is_data_type<Data<State>>::value,
+  static_assert(is_data_type<Data<State>>::value,
                 "make_data is able to make instance derived from DataSetBase.");
   return Data<State>(state, std::forward<Args>(args)...);
 }

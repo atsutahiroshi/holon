@@ -29,6 +29,81 @@
 
 namespace holon {
 
+namespace experimental {
+
+template <typename State, typename StateArray = std::array<State, 2>,
+          typename Solver = RungeKutta4<StateArray>,
+          typename Data = PointMassModelData<State>,
+          typename System = PointMassModelSystem<State, Data>>
+class PointMassModel : public ModelBase<State, Solver, Data, System> {
+  using Self = PointMassModel<State, StateArray, Solver, Data, System>;
+  using Base = ModelBase<State, Solver, Data, System>;
+  using Function = typename System::Function;
+
+ public:
+  PointMassModel() : PointMassModel(State{0}, Data::default_mass) {}
+  explicit PointMassModel(const State& t_initial_position)
+      : PointMassModel(t_initial_position, Data::default_mass) {}
+  PointMassModel(const State& t_initial_position, double t_mass)
+      : PointMassModel(make_data<Data>(t_initial_position, t_mass)) {}
+  explicit PointMassModel(Data t_data)
+      : Base(t_data), m_initial_position(Base::data().position) {}
+  virtual ~PointMassModel() = default;
+
+  // accessors
+  double mass() const noexcept { return this->data().mass; }
+  State initial_position() const noexcept { return m_initial_position; }
+
+  // // mutators
+  Self& set_initial_position(const State& t_initial_position) {
+    m_initial_position = t_initial_position;
+    return *this;
+  }
+  virtual Self& reset() override {
+    Base::reset();
+    this->data().position = m_initial_position;
+    this->data().velocity = State{0};
+  }
+  virtual Self& reset(const State& t_initial_position) {
+    this->set_initial_position(t_initial_position);
+    return this->reset();
+  }
+
+  // callback functions
+  Self& setForceCallback(Function t_force_f) {
+    this->system().set_force(t_force_f);
+    return *this;
+  }
+  Self& setAccelerationCallback(Function t_acceleration_f) {
+    this->system().set_acceleration(t_acceleration_f);
+    return *this;
+  }
+
+  // update
+  virtual bool update() override {
+    StateArray state{{this->data().position, this->data().velocity}};
+    state = this->solver().update(this->system(), state, this->time(),
+                                  this->time_step());
+    this->data().force = this->system().force(
+        this->data().position, this->data().velocity, this->time());
+    this->data().acceleration = this->system().acceleration(
+        this->data().position, this->data().velocity, this->time());
+    this->data().position = state[0];
+    this->data().velocity = state[1];
+    if (!Base::update()) return false;
+    return true;
+  }
+  virtual bool update(double dt) override {
+    this->set_time_step(dt);
+    return update();
+  }
+
+ private:
+  State m_initial_position;
+};
+
+}  // namespace experimental
+
 template <typename State, typename StateArray = std::array<State, 2>,
           typename Solver = RungeKutta4<StateArray>,
           typename Data = PointMassModelData<State>,

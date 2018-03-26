@@ -20,6 +20,7 @@
 
 #include "holon/corelib/control/point_mass_model/point_mass_model_data.hpp"
 
+#include <memory>
 #include <type_traits>
 #include "holon/corelib/math/vec3d.hpp"
 
@@ -29,6 +30,8 @@
 namespace holon {
 namespace {
 
+template <typename T>
+using RawData = experimental::PointMassModelRawData<T>;
 template <typename T>
 using Data = experimental::PointMassModelData<T>;
 
@@ -51,13 +54,38 @@ void CheckCtor_0() {
 
 template <typename T>
 void CheckCtor_1() {
+  double mass = Fuzzer(0, 10).get();
+  auto v = Fuzzer().get<T>();
+  RawData<T> rawdata{mass, v, T{0}, T{0}, T{0}};
+  Data<T> data(rawdata);
+  CheckMembers(data, v, mass);
+  REQUIRE(data.template get_ptr<0>().get() != &rawdata);
+}
+
+template <typename T>
+void CheckCtor_2() {
+  double mass = Fuzzer(0, 10).get();
+  auto v = Fuzzer().get<T>();
+  auto rawdata_p = std::make_shared<RawData<T>>();
+  rawdata_p->mass = mass;
+  rawdata_p->position = v;
+  rawdata_p->velocity = T{0};
+  rawdata_p->acceleration = T{0};
+  rawdata_p->force = T{0};
+  Data<T> data(rawdata_p);
+  CheckMembers(data, v, mass);
+  REQUIRE(data.template get_ptr<0>() == rawdata_p);
+}
+
+template <typename T>
+void CheckCtor_3() {
   auto v = Fuzzer().get<T>();
   Data<T> data(v);
   CheckMembers(data, v, Data<T>::default_mass);
 }
 
 template <typename T>
-void CheckCtor_2() {
+void CheckCtor_4() {
   double mass = Fuzzer(0, 10).get();
   auto v = Fuzzer().get<T>();
   Data<T> data(v, mass);
@@ -77,6 +105,14 @@ TEST_CASE("exp:Constructor of PointMassModelData",
   SECTION("Overloaded constructor 2") {
     CheckCtor_2<double>();
     CheckCtor_2<Vec3D>();
+  }
+  SECTION("Overloaded constructor 3") {
+    CheckCtor_3<double>();
+    CheckCtor_3<Vec3D>();
+  }
+  SECTION("Overloaded constructor 4") {
+    CheckCtor_4<double>();
+    CheckCtor_4<Vec3D>();
   }
 }
 

@@ -48,12 +48,15 @@ class PointMassModelData : public DataSetBase<PointMassModelData<State>,
   static constexpr double default_mass = 1;
 
  public:
+  PointMassModelData(const RawData& t_raw_data) : Base(t_raw_data) {}
+  PointMassModelData(std::shared_ptr<RawData> t_raw_data_p)
+      : Base(t_raw_data_p) {}
   PointMassModelData() : PointMassModelData(State{0}, default_mass) {}
   PointMassModelData(const State& t_initial_position)
       : PointMassModelData(t_initial_position, default_mass) {}
   PointMassModelData(const State& t_initial_position, double t_mass)
-      : Base(RawData{t_mass, t_initial_position, State{0}, State{0},
-                     State{0}}) {}
+      : PointMassModelData(std::move(RawData{t_mass, t_initial_position,
+                                             State{0}, State{0}, State{0}})) {}
 };
 
 template <typename State>

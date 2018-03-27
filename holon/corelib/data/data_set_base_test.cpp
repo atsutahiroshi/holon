@@ -418,16 +418,27 @@ TEST_CASE("Check extract method in DataSetBase", "[DataSetBase][extract]") {
 
 namespace sub_data_test {
 
-struct A {};
-struct B {};
-struct C {};
-struct D {};
-struct E {};
+struct A {
+  double a;
+};
+struct B {
+  double b;
+};
+struct C {
+  double c;
+};
+struct D {
+  double d;
+};
+struct E {
+  double e;
+};
 struct Data : DataSetBase<Data, A, B, C, D, E> {
   using sub_index_t = index_seq<1, 3>;
   sub_index_t sub_index;
 };
 struct SubData : DataSetBase<SubData, B, D> {
+  SubData() {}
   SubData(std::shared_ptr<B> b, std::shared_ptr<D> d) : DataSetBase(b, d) {}
   explicit SubData(std::tuple<std::shared_ptr<B>, std::shared_ptr<D>> tuple)
       : DataSetBase(tuple) {}
@@ -466,6 +477,54 @@ TEST_CASE("Extract sub-data by indices", "[DataSetBase]") {
   CheckSubData(data, sub3);
   auto sub4 = data.extract<SubData>(data.sub_index);
   CheckSubData(data, sub4);
+}
+
+template <std::size_t I, typename... RawDataTypes>
+typename std::enable_if<I == sizeof...(RawDataTypes), void>::type
+copy_data_tuple_impl(std::tuple<RawDataTypes...> src,
+                     std::tuple<RawDataTypes...> dst) {}
+
+template <std::size_t I, typename... RawDataTypes>
+typename std::enable_if<(I < sizeof...(RawDataTypes)), void>::type
+copy_data_tuple_impl(std::tuple<RawDataTypes...> src,
+                     std::tuple<RawDataTypes...> dst) {
+  *std::get<I>(dst) = *std::get<I>(src);
+  copy_data_tuple_impl<I + 1, RawDataTypes...>(src, dst);
+}
+
+template <typename... RawDataTypes>
+void copy_data_tuple(std::tuple<RawDataTypes...> src,
+                     std::tuple<RawDataTypes...> dst) {
+  copy_data_tuple_impl<0, RawDataTypes...>(src, dst);
+}
+
+TEST_CASE("Copy sub-data by indices", "[DataSetBase]") {
+  using sub_data_test::Data;
+  using sub_data_test::SubData;
+  Fuzzer fuzz;
+  Data data;
+  data.get<0>().a = fuzz();
+  data.get<1>().b = fuzz();
+  data.get<2>().c = fuzz();
+  data.get<3>().d = fuzz();
+  data.get<4>().e = fuzz();
+  SubData sub;
+  sub.get<0>().b = fuzz();
+  sub.get<1>().d = fuzz();
+  SECTION("Copy SubData to Data") {
+    data.copy_subdata(sub, index_seq<0, 1>(), index_seq<1, 3>());
+    REQUIRE(data.get_ptr<1>() != sub.get_ptr<0>());
+    REQUIRE(data.get_ptr<3>() != sub.get_ptr<1>());
+    CHECK(data.get<1>().b == sub.get<0>().b);
+    CHECK(data.get<3>().d == sub.get<1>().d);
+  }
+  SECTION("Copy Data to SubData") {
+    sub.copy_subdata(data, index_seq<1, 3>(), index_seq<0, 1>());
+    REQUIRE(sub.get_ptr<0>() != data.get_ptr<1>());
+    REQUIRE(sub.get_ptr<1>() != data.get_ptr<3>());
+    CHECK(sub.get<0>().b == data.get<1>().b);
+    CHECK(sub.get<1>().d == data.get<3>().d);
+  }
 }
 
 }  // namespace

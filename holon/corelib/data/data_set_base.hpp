@@ -152,6 +152,16 @@ class DataSetBase {
     this->get<I>() = t_raw_data;
   }
 
+  template <typename Data, typename SrcIndex, typename DstIndex>
+  void copy_subdata(const Data& data, SrcIndex src_index, DstIndex dst_index) {
+    auto src = data.extract_ptr_tuple(src_index);
+    auto dst = this->extract_ptr_tuple(dst_index);
+    static_assert(std::is_same<decltype(dst), decltype(src)>::value,
+                  "copy_data failed. Inappropriate data index selection.");
+    copy_data_tuple(this->extract_ptr_tuple(dst_index),
+                    data.extract_ptr_tuple(src_index));
+  }
+
   void copy(const Self& other) { copy_impl<0>(other); }
   void copy(const RawDataTypes... args) { copy_data_impl<0>(args...); }
   void copy(const std::shared_ptr<RawDataTypes>... args) {
@@ -224,6 +234,22 @@ class DataSetBase {
   void copy_data_impl(std::shared_ptr<T> data_ptr, Types... args) {
     copy_index<I>(*data_ptr);
     copy_data_impl<I + 1>(args...);
+  }
+
+  template <typename... Ts>
+  void copy_data_tuple(std::tuple<Ts...> src, std::tuple<Ts...> dst) {
+    copy_data_tuple_impl<0, Ts...>(src, dst);
+  }
+
+  template <std::size_t I, typename... Ts>
+  typename std::enable_if<(I == sizeof...(Ts)), void>::type
+      copy_data_tuple_impl(std::tuple<Ts...>, std::tuple<Ts...>) {}
+
+  template <std::size_t I, typename... Ts>
+  typename std::enable_if<(I < sizeof...(Ts)), void>::type copy_data_tuple_impl(
+      std::tuple<Ts...> src, std::tuple<Ts...> dst) {
+    *std::get<I>(dst) = *std::get<I>(src);
+    copy_data_tuple_impl<I + 1, Ts...>(src, dst);
   }
 };
 

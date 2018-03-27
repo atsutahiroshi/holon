@@ -21,6 +21,7 @@
 #include "holon/corelib/data/data_set_base.hpp"
 
 #include <memory>
+#include <tuple>
 
 #include "catch.hpp"
 #include "holon/test/util/fuzzer/fuzzer.hpp"
@@ -413,6 +414,58 @@ TEST_CASE("Check extract method in DataSetBase", "[DataSetBase][extract]") {
   data_set3 = data_set2.extract<DataSetSample3, 0, 2>();
   CHECK(data_set3.get_ptr<0>() == data_set2.get_ptr<0>());
   CHECK(data_set3.get_ptr<1>() == data_set2.get_ptr<2>());
+}
+
+namespace sub_data_test {
+
+struct A {};
+struct B {};
+struct C {};
+struct D {};
+struct E {};
+struct Data : DataSetBase<Data, A, B, C, D, E> {
+  using sub_index_t = index_seq<1, 3>;
+  sub_index_t sub_index;
+};
+struct SubData : DataSetBase<SubData, B, D> {
+  SubData(std::shared_ptr<B> b, std::shared_ptr<D> d) : DataSetBase(b, d) {}
+  explicit SubData(std::tuple<std::shared_ptr<B>, std::shared_ptr<D>> tuple)
+      : DataSetBase(tuple) {}
+};
+
+void CheckSubData(const Data& data, const SubData& sub_data) {
+  REQUIRE(data.get_ptr<1>() == sub_data.get_ptr<0>());  // B
+  REQUIRE(data.get_ptr<3>() == sub_data.get_ptr<1>());  // D
+}
+
+}  // namespace sub_data_test
+
+TEST_CASE("Extract data pointer tuple by indices", "[DataSetBase]") {
+  using sub_data_test::Data;
+  using sub_data_test::SubData;
+  using sub_data_test::CheckSubData;
+  Data data;
+  SubData sub1(data.extract_ptr_tuple<1, 3>());
+  CheckSubData(data, sub1);
+  SubData sub2(data.extract_ptr_tuple(data.sub_index));
+  CheckSubData(data, sub2);
+  SubData sub3(data.extract_ptr_tuple(Data::sub_index_t()));
+  CheckSubData(data, sub3);
+}
+
+TEST_CASE("Extract sub-data by indices", "[DataSetBase]") {
+  using sub_data_test::Data;
+  using sub_data_test::SubData;
+  using sub_data_test::CheckSubData;
+  Data data;
+  SubData sub1(data.extract<SubData, 1, 3>());
+  CheckSubData(data, sub1);
+  SubData sub2(data.extract<SubData>(data.sub_index));
+  CheckSubData(data, sub2);
+  SubData sub3(data.extract<SubData>(Data::sub_index_t()));
+  CheckSubData(data, sub3);
+  auto sub4 = data.extract<SubData>(data.sub_index);
+  CheckSubData(data, sub4);
 }
 
 }  // namespace

@@ -62,12 +62,12 @@ Data<State> make_data(const State& state, Args&&... args) {
   return Data<State>(state, std::forward<Args>(args)...);
 }
 
-template <class Derived, class... RawDataTypes>
+template <class DataType, class... RawDataTypes>
 class DataSetBase {
   static_assert(sizeof...(RawDataTypes) > 0,
                 "DataSetBase must have at least one RawData class.");
 
-  using Self = DataSetBase<Derived, RawDataTypes...>;
+  using Self = DataSetBase<DataType, RawDataTypes...>;
   static constexpr std::size_t raw_data_num = sizeof...(RawDataTypes);
   static constexpr bool more_than_one = raw_data_num - 1;
 
@@ -102,6 +102,25 @@ class DataSetBase {
     return std::get<I>(m_data_ptr_tuple);
   }
 
+  template <std::size_t... I>
+  auto extract_ptr_tuple() const -> const std::tuple<RawDataPtrI<I>...> {
+    return std::make_tuple(std::get<I>(m_data_ptr_tuple)...);
+  }
+  template <std::size_t... I>
+  auto extract_ptr_tuple() -> std::tuple<RawDataPtrI<I>...> {
+    return std::make_tuple(std::get<I>(m_data_ptr_tuple)...);
+  }
+  template <std::size_t... I>
+  auto extract_ptr_tuple(index_seq<I...>) const
+      -> decltype(this->extract_ptr_tuple<I...>()) {
+    return this->extract_ptr_tuple<I...>();
+  }
+  template <std::size_t... I>
+  auto extract_ptr_tuple(index_seq<I...>)
+      -> decltype(this->extract_ptr_tuple<I...>()) {
+    return this->extract_ptr_tuple<I...>();
+  }
+
   template <std::size_t I = 0>
   const RawDataI<I>& get() const {
     return *std::get<I>(m_data_ptr_tuple);
@@ -112,12 +131,21 @@ class DataSetBase {
   }
 
   using CallOpRetType =
-      typename std::conditional<more_than_one, Derived, RawDataI<0>>::type;
+      typename std::conditional<more_than_one, DataType, RawDataI<0>>::type;
   const CallOpRetType& operator()() const {
     return this->call_op_impl(std::integral_constant<bool, more_than_one>());
   }
   CallOpRetType& operator()() {
     return this->call_op_impl(std::integral_constant<bool, more_than_one>());
+  }
+
+  template <std::size_t I = 0>
+  void copy_index(const Self& other) {
+    this->get<I>() = other.get<I>();
+  }
+  template <std::size_t I = 0>
+  void copy_index(const RawDataI<I>& t_raw_data) {
+    this->get<I>() = t_raw_data;
   }
 
   void copy(const Self& other) { copy_impl<0>(other); }
@@ -130,15 +158,20 @@ class DataSetBase {
     m_data_ptr_tuple = target.get_data_ptr_tuple();
   }
 
-  Derived clone() {
-    Derived tmp;
+  DataType clone() {
+    DataType tmp;
     tmp.copy(*this);
     return tmp;
   }
 
-  template <typename DerivedType, std::size_t... I>
-  DerivedType extract() {
-    return DerivedType(std::get<I>(m_data_ptr_tuple)...);
+  template <typename SubDataType, std::size_t... I>
+  SubDataType extract() {
+    return SubDataType(std::get<I>(m_data_ptr_tuple)...);
+  }
+
+  template <typename SubDataType, std::size_t... I>
+  SubDataType extract(index_seq<I...>) {
+    return SubDataType(std::get<I>(m_data_ptr_tuple)...);
   }
 
   bool operator==(const Self& rhs) const {
@@ -146,24 +179,15 @@ class DataSetBase {
   }
   bool operator!=(const Self& rhs) const { return !(*this == rhs); }
 
- protected:
-  template <std::size_t I = 0>
-  void copy_index(const Self& other) {
-    this->get<I>() = other.get<I>();
-  }
-
-  template <std::size_t I = 0>
-  void copy_index(const RawDataI<I>& t_raw_data) {
-    this->get<I>() = t_raw_data;
-  }
-
  private:
   RawDataPtrTuple m_data_ptr_tuple;
 
-  const Derived& call_op_impl(std::true_type) const {
-    return static_cast<Derived&>(*this);
+  const DataType& call_op_impl(std::true_type) const {
+    return static_cast<DataType&>(*this);
   }
-  Derived& call_op_impl(std::true_type) { return static_cast<Derived&>(*this); }
+  DataType& call_op_impl(std::true_type) {
+    return static_cast<DataType&>(*this);
+  }
 
   const RawDataI<0>& call_op_impl(std::false_type) const {
     return this->get<0>();

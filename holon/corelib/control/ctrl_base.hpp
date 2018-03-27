@@ -22,8 +22,57 @@
 #define HOLON_CONTROL_CTRL_BASE_HPP_
 
 #include <memory>
+#include <type_traits>
+#include "holon/corelib/control/model_base.hpp"
+#include "holon/corelib/data/data_set_base.hpp"
+#include "holon/corelib/math/ode_solver.hpp"
 
 namespace holon {
+
+namespace experimental {
+
+template <typename State, typename Solver, typename Data, typename Model>
+class CtrlBase {
+  static_assert(std::is_base_of<OdeSolver<Solver>, Solver>::value,
+                "Solver must be derived from OdeSolver class.");
+  static_assert(is_data_type<Data>::value,
+                "Data must be derived from DataSetBase class.");
+  static_assert(is_model_type<Model>::value,
+                "Model must be derived from ModelBase class.");
+  static_assert(std::is_default_constructible<Data>::value,
+                "Data must be default constructible.");
+
+ protected:
+  using Self = CtrlBase<State, Solver, Data, Model>;
+
+ public:
+  CtrlBase()
+      : m_data(),
+        m_model(m_data.template extract<typename Model::DataType>(
+            m_data.model_data_index)) {}
+  CtrlBase(const Model& t_model) : CtrlBase() {
+    m_data.template copy_subdata(t_model.data(), t_model.data().index,
+                                 m_data.model_data_index);
+  }
+
+  // accessors
+  const Data& data() const { return m_data; }
+  const Model& model() const { return m_model; }
+  double time() const { return model().time(); }
+  double time_step() const { return model().time_step(); }
+
+  // mutators
+  Self& set_time_step(double dt) {
+    m_model.set_time_step(dt);
+    return *this;
+  }
+
+ private:
+  Data m_data;
+  Model m_model;
+};
+
+}  // namespace experimental
 
 template <typename State, typename Solver, typename Data, typename Model,
           typename Refs, typename Outputs>

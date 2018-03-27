@@ -66,14 +66,18 @@ template <class DataType, class... RawDataTypes>
 class DataSetBase {
   static_assert(sizeof...(RawDataTypes) > 0,
                 "DataSetBase must have at least one RawData class.");
+  // static_assert(std::is_default_constructible<DataType>::value,
+  //               "DataType must be default constructible");
 
   using Self = DataSetBase<DataType, RawDataTypes...>;
   static constexpr std::size_t raw_data_num = sizeof...(RawDataTypes);
   static constexpr bool more_than_one = raw_data_num - 1;
 
- public:
+ protected:
   using RawDataTuple = std::tuple<RawDataTypes...>;
   using RawDataPtrTuple = std::tuple<std::shared_ptr<RawDataTypes>...>;
+
+ public:
   template <std::size_t I>
   using RawDataI = typename std::tuple_element<I, RawDataTuple>::type;
   template <std::size_t I>
@@ -166,11 +170,13 @@ class DataSetBase {
 
   template <typename SubDataType, std::size_t... I>
   SubDataType extract() {
+    // consider using make_data method...
     return SubDataType(std::get<I>(m_data_ptr_tuple)...);
   }
 
   template <typename SubDataType, std::size_t... I>
   SubDataType extract(index_seq<I...>) {
+    // consider using make_data method...
     return SubDataType(std::get<I>(m_data_ptr_tuple)...);
   }
 

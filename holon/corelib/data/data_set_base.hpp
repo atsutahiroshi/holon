@@ -83,6 +83,7 @@ class DataSetBase {
   template <std::size_t I>
   using RawDataPtrI = typename std::tuple_element<I, RawDataPtrTuple>::type;
   static constexpr bool is_data_type = true;
+  static const make_index_seq<raw_data_num> index;
 
  public:
   DataSetBase()

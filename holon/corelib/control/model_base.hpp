@@ -34,7 +34,18 @@ namespace holon {
 
 namespace experimental {
 
-template <typename State, typename Solver, typename Data, typename System>
+template <typename State, typename Data>
+struct DummySystem : SystemBase<State, Data> {
+  using Base = SystemBase<State, Data>;
+  explicit DummySystem(Data t_data) : Base(t_data) {}
+  typename Base::StateArray operator()(const typename Base::StateArray&,
+                                       const double) const {
+    return typename Base::StateArray{State{0}, State{0}};
+  }
+};
+
+template <typename State, typename Solver, typename Data,
+          typename System = DummySystem<State, Data>>
 class ModelBase {
   static_assert(std::is_base_of<OdeSolver<Solver>, Solver>::value,
                 "Solver must be derived from OdeSolver class.");

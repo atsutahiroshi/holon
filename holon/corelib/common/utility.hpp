@@ -58,6 +58,26 @@ constexpr typename std::add_const<T>::type& as_const(T& t) noexcept {
 }
 #endif
 
+template <std::size_t...>
+struct index_seq {};
+
+template <std::size_t N, typename T>
+struct make_index_seq_impl;
+
+template <std::size_t N, std::size_t... I>
+struct make_index_seq_impl<N, index_seq<I...>> {
+  using type =
+      typename make_index_seq_impl<N - 1, index_seq<N - 1, I...>>::type;
+};
+
+template <std::size_t... I>
+struct make_index_seq_impl<0, index_seq<I...>> {
+  using type = index_seq<I...>;
+};
+
+template <std::size_t N>
+using make_index_seq = typename make_index_seq_impl<N, index_seq<>>::type;
+
 }  // namespace holon
 
 #endif  // HOLON_COMMON_UTILITY_HPP_

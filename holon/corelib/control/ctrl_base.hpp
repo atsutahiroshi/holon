@@ -49,6 +49,9 @@ class CtrlBase {
   using OutputsDataIndex = typename Data::OutputsDataIndex;
 
  public:
+  static constexpr auto default_time_step = Model::default_time_step;
+
+ public:
   CtrlBase()
       : m_data(),
         m_model(m_data.template extract<typename Model::DataType>(
@@ -82,6 +85,13 @@ class CtrlBase {
   Self& set_time_step(double dt) {
     m_model.set_time_step(dt);
     return *this;
+  }
+
+  // update functions
+  virtual bool update() { return m_model.update(); }
+  virtual bool update(double dt) {
+    this->set_time_step(dt);
+    return this->update();
   }
 
  private:

@@ -126,6 +126,30 @@ TEST_CASE("Accessors / mutators in CtrlBase", "[CtrlBase][accessor][mutator]") {
   }
 }
 
+TEST_CASE("Check update in CtrlBase", "[CtrlBase][update]") {
+  TestCtrl ctrl;
+  SECTION("Overloaded function 1") {
+    const auto dt = TestCtrl::default_time_step;
+    REQUIRE(ctrl.time() == Approx(0.0));
+    ctrl.update();
+    CHECK(ctrl.time() == Approx(dt));
+    ctrl.update();
+    CHECK(ctrl.time() == Approx(2.0 * dt));
+  }
+  SECTION("Overloaded function 2") {
+    Fuzzer fuzz(0, 0.01);
+    REQUIRE(ctrl.time() == Approx(0.0));
+    double dt = fuzz();
+    ctrl.update(dt);
+    CHECK(ctrl.time_step() == Approx(dt));
+    CHECK(ctrl.time() == Approx(dt));
+    double dt2 = fuzz();
+    ctrl.update(dt2);
+    CHECK(ctrl.time_step() == Approx(dt2));
+    CHECK(ctrl.time() == Approx(dt + dt2));
+  }
+}
+
 namespace testing {
 
 struct A {

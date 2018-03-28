@@ -61,6 +61,16 @@ class CtrlBase {
   double time() const { return model().time(); }
   double time_step() const { return model().time_step(); }
 
+  // accessors to model
+  template <std::size_t I = 0>
+  const typename Model::template RawDataType<I>& states() const {
+    return m_model.template states<I>();
+  }
+  typename Model::DataType model_data() {
+    return m_data.template extract<typename Model::DataType>(
+        m_data.model_data_index);
+  }
+
   // mutators
   Self& set_time_step(double dt) {
     m_model.set_time_step(dt);

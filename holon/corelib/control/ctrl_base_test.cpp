@@ -161,7 +161,7 @@ struct Data : DataSetBase<Data, A, B, C, D, E, F> {
 class Ctrl
     : public CtrlBase<double, Euler<std::array<double, 2>>, Data, Model> {
  public:
-  // Ctrl() {}
+  Ctrl() {}
   explicit Ctrl(const Model& t_model) : CtrlBase(t_model) {}
 };
 
@@ -180,6 +180,15 @@ TEST_CASE("Check constructor of CtrlBase whether it copies data in model",
   REQUIRE(ctrl.model().data() != model.data());
   CHECK(ctrl.data().get<0>().a == model.data().get<0>().a);
   CHECK(ctrl.data().get<1>().b == model.data().get<1>().b);
+}
+
+TEST_CASE("CtrlBase::model_data() returns data that ist model has",
+          "[PdCtrl][model_data]") {
+  using testing::Model;
+  using testing::Ctrl;
+
+  Ctrl ctrl;
+  CHECK(ctrl.model_data() == ctrl.model().data());
 }
 
 }  // namespace

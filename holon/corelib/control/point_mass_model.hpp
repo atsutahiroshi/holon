@@ -54,7 +54,7 @@ class PointMassModel : public ModelBase<State, Solver, Data, System> {
   double mass() const noexcept { return this->states().mass; }
   State initial_position() const noexcept { return m_initial_position; }
 
-  // // mutators
+  // mutators
   Self& set_initial_position(const State& t_initial_position) {
     m_initial_position = t_initial_position;
     return *this;

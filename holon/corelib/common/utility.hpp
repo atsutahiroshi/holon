@@ -58,8 +58,18 @@ constexpr typename std::add_const<T>::type& as_const(T& t) noexcept {
 }
 #endif
 
-template <std::size_t...>
-struct index_seq {};
+template <std::size_t... Elem>
+struct index_seq {
+  static constexpr std::size_t num = sizeof...(Elem);
+  template <std::size_t I>
+  static constexpr std::size_t get() {
+    static_assert(I < num, "index_seq: out of range.");
+    return elem[I];
+  }
+
+ private:
+  static constexpr std::size_t elem[] = {Elem...};
+};
 
 template <std::size_t N, typename T>
 struct make_index_seq_impl;

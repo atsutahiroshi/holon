@@ -34,5 +34,19 @@ TEST_CASE("Check all_are_base_of", "[utility][all_are_base_of]") {
   CHECK_FALSE(all_are_base_of<Base, Derived, NotDerived>::value);
 }
 
+TEST_CASE("Get ith element of index_seq", "[utility][index_seq]") {
+  index_seq<1, 2, 3> index;
+  CHECK(index.get<0>() == 1);
+  CHECK(index.get<1>() == 2);
+  CHECK(index.get<2>() == 3);
+
+  index_seq<1, 3, 5, 7> index2;
+  CHECK(index2.get<0>() == 1);
+  CHECK(index2.get<1>() == 3);
+  CHECK(index2.get<2>() == 5);
+  CHECK(index2.get<3>() == 7);
+  // CHECK(index2.get<4>() == 0); // assert
+}
+
 }  // namespace
 }  // namespace holon

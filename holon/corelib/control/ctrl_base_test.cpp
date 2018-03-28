@@ -154,7 +154,11 @@ struct RefsData : DataSetBase<RefsData, C, E> {
   template <typename... Args>
   explicit RefsData(std::shared_ptr<Args>... args) : Base(args...) {}
 };
-struct OutputsData : DataSetBase<OutputsData, C, E> {};
+struct OutputsData : DataSetBase<OutputsData, D, F> {
+  using Base = DataSetBase<OutputsData, D, F>;
+  template <typename... Args>
+  explicit OutputsData(std::shared_ptr<Args>... args) : Base(args...) {}
+};
 
 struct Data : DataSetBase<Data, A, B, C, D, E, F> {
   using Base = DataSetBase<Data, A, B, C, D, E, F>;

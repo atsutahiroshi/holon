@@ -180,13 +180,13 @@ class DataSetBase {
   }
 
   template <typename SubDataType, std::size_t... I>
-  SubDataType extract() {
+  SubDataType extract() const {
     // consider using make_data method...
     return SubDataType(std::get<I>(m_data_ptr_tuple)...);
   }
 
   template <typename SubDataType, std::size_t... I>
-  SubDataType extract(index_seq<I...>) {
+  SubDataType extract(index_seq<I...>) const {
     // consider using make_data method...
     return SubDataType(std::get<I>(m_data_ptr_tuple)...);
   }

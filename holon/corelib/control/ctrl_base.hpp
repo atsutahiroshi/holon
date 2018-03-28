@@ -44,15 +44,18 @@ class CtrlBase {
 
  protected:
   using Self = CtrlBase<State, Solver, Data, Model>;
+  using ModelDataIndex = typename Data::ModelDataIndex;
+  using RefsDataIndex = typename Data::RefsDataIndex;
+  using OutputsDataIndex = typename Data::OutputsDataIndex;
 
  public:
   CtrlBase()
       : m_data(),
         m_model(m_data.template extract<typename Model::DataType>(
-            m_data.model_data_index)) {}
+            ModelDataIndex())) {}
   CtrlBase(const Model& t_model) : CtrlBase() {
     m_data.template copy_subdata(t_model.data(), t_model.data().index,
-                                 m_data.model_data_index);
+                                 ModelDataIndex());
   }
 
   // accessors
@@ -61,14 +64,18 @@ class CtrlBase {
   double time() const { return model().time(); }
   double time_step() const { return model().time_step(); }
 
-  // accessors to model
+  // accessors to data
   template <std::size_t I = 0>
   const typename Model::template RawDataType<I>& states() const {
     return m_model.template states<I>();
   }
-  typename Model::DataType model_data() {
-    return m_data.template extract<typename Model::DataType>(
-        m_data.model_data_index);
+  typename Model::DataType model_data() const {
+    return m_data.template extract<typename Model::DataType>(ModelDataIndex());
+  }
+  template <std::size_t I = 0>
+  const typename Data::template RawDataI<RefsDataIndex::template get<I>()>&
+  refs() const {
+    return m_data.template get<RefsDataIndex::template get<I>()>();
   }
 
   // mutators

@@ -74,9 +74,9 @@ struct TestCtrlData : DataSetBase<TestCtrlData, TestModelRawData,
   TestCtrlData(std::shared_ptr<TestModelRawData> t_model_data_p,
                std::shared_ptr<TestRefsRawData> t_refs_data_p,
                std::shared_ptr<TestOutputsRawData> t_outputs_data_p) {}
-  index_seq<0> model_data_index;
-  index_seq<1> refs_data_index;
-  index_seq<2> outputs_data_index;
+  using ModelDataIndex = index_seq<0>;
+  using RefsDataIndex = index_seq<1>;
+  using OutputsDataIndex = index_seq<2>;
 };
 
 class TestCtrl : public CtrlBase<double, Euler<std::array<double, 2>>,
@@ -149,14 +149,21 @@ struct Model : ModelBase<double, Euler<std::array<double, 2>>, ModelData> {
   Model() : ModelBase(make_data<ModelData>()) {}
   explicit Model(ModelData t_data) : ModelBase(t_data) {}
 };
+struct RefsData : DataSetBase<RefsData, C, E> {
+  using Base = DataSetBase<RefsData, C, E>;
+  template <typename... Args>
+  explicit RefsData(std::shared_ptr<Args>... args) : Base(args...) {}
+};
+struct OutputsData : DataSetBase<OutputsData, C, E> {};
+
 struct Data : DataSetBase<Data, A, B, C, D, E, F> {
   using Base = DataSetBase<Data, A, B, C, D, E, F>;
   Data() {}
   explicit Data(typename Base::RawDataPtrTuple raw_data_ptrs)
       : Base(raw_data_ptrs) {}
-  index_seq<0, 1> model_data_index;
-  index_seq<2, 3> refs_data_index;
-  index_seq<4, 5> outputs_data_index;
+  using ModelDataIndex = index_seq<0, 1>;
+  using RefsDataIndex = index_seq<2, 4>;
+  using OutputsDataIndex = index_seq<3, 5>;
 };
 class Ctrl
     : public CtrlBase<double, Euler<std::array<double, 2>>, Data, Model> {
@@ -182,13 +189,22 @@ TEST_CASE("Check constructor of CtrlBase whether it copies data in model",
   CHECK(ctrl.data().get<1>().b == model.data().get<1>().b);
 }
 
-TEST_CASE("CtrlBase::model_data() returns data that ist model has",
-          "[PdCtrl][model_data]") {
+TEST_CASE("CtrlBase::model_data() returns data that its model has",
+          "[CtrlBase][model_data]") {
   using testing::Model;
   using testing::Ctrl;
 
   Ctrl ctrl;
   CHECK(ctrl.model_data() == ctrl.model().data());
+}
+
+TEST_CASE("CtrlBase::refs() returns reference data", "[CtrlBase][refs_data]") {
+  using testing::Model;
+  using testing::Ctrl;
+
+  Ctrl ctrl;
+  CHECK(&ctrl.refs<0>() == &ctrl.data().get<2>());
+  CHECK(&ctrl.refs<1>() == &ctrl.data().get<4>());
 }
 
 }  // namespace

@@ -63,6 +63,7 @@ class PointMassModel : public ModelBase<State, Solver, Data, System> {
     Base::reset();
     this->states().position = m_initial_position;
     this->states().velocity = State{0};
+    return *this;
   }
   virtual Self& reset(const State& t_initial_position) {
     this->set_initial_position(t_initial_position);

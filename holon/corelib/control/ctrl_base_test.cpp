@@ -96,6 +96,7 @@ void CheckCtor_0() {
   CHECK(ctrl.data().get_ptr<1>() != nullptr);  // refs data
   CHECK(ctrl.data().get_ptr<2>() != nullptr);  // outputs data
   CHECK(ctrl.model().data().get_ptr<0>() == ctrl.data().get_ptr<0>());
+  CHECK(&ctrl.states() == &ctrl.model().states());
 }
 
 void CheckCtor_1() {
@@ -108,6 +109,8 @@ void CheckCtor_1() {
   REQUIRE(ctrl.data().get_ptr<0>() != model.data().get_ptr<0>());
   CHECK(ctrl.model().states().p == model.states().p);
   CHECK(ctrl.model().states().v == model.states().v);
+  CHECK(ctrl.states().p == model.states().p);
+  CHECK(ctrl.states().v == model.states().v);
   CHECK(ctrl.model().data().get_ptr<0>() == ctrl.data().get_ptr<0>());
 }
 

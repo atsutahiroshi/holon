@@ -60,6 +60,7 @@ class CtrlBase {
     m_data.template copy_subdata(t_model.data(), t_model.data().index,
                                  ModelDataIndex());
   }
+  virtual ~CtrlBase() = default;
 
   // accessors
   const Data& data() const { return m_data; }

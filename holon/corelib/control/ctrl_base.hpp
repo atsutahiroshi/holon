@@ -64,6 +64,7 @@ class CtrlBase {
   // accessors
   const Data& data() const { return m_data; }
   const Model& model() const { return m_model; }
+  Model& model() { return m_model; }
   double time() const { return model().time(); }
   double time_step() const { return model().time_step(); }
 
@@ -72,13 +73,34 @@ class CtrlBase {
   const typename Model::template RawDataType<I>& states() const {
     return m_model.template states<I>();
   }
+  template <std::size_t I = 0>
+  typename Model::template RawDataType<I>& states() {
+    return m_model.template states<I>();
+  }
+
   typename Model::DataType model_data() const {
     return m_data.template extract<typename Model::DataType>(ModelDataIndex());
   }
+
   template <std::size_t I = 0>
   const typename Data::template RawDataI<RefsDataIndex::template get<I>()>&
   refs() const {
     return m_data.template get<RefsDataIndex::template get<I>()>();
+  }
+  template <std::size_t I = 0>
+  typename Data::template RawDataI<RefsDataIndex::template get<I>()>& refs() {
+    return m_data.template get<RefsDataIndex::template get<I>()>();
+  }
+
+  template <std::size_t I = 0>
+  const typename Data::template RawDataI<OutputsDataIndex::template get<I>()>&
+  outputs() const {
+    return m_data.template get<OutputsDataIndex::template get<I>()>();
+  }
+  template <std::size_t I = 0>
+  typename Data::template RawDataI<OutputsDataIndex::template get<I>()>&
+  outputs() {
+    return m_data.template get<OutputsDataIndex::template get<I>()>();
   }
 
   // mutators

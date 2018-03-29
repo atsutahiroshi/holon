@@ -27,6 +27,123 @@
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
 namespace holon {
+namespace experimental {
+namespace {
+
+template <typename T>
+void CheckCtor_0() {
+  PdCtrl<T> ctrl;
+  REQUIRE(ctrl.model_data() == ctrl.model().data());
+}
+template <typename T>
+void CheckCtor_1() {
+  Fuzzer fuzz;
+  PointMassModel<T> model;
+  model.states().mass = Fuzzer(0, 10).get<double>();
+  model.states().position = fuzz.get<T>();
+  model.states().velocity = fuzz.get<T>();
+
+  PdCtrl<T> ctrl(model);
+  REQUIRE(ctrl.model_data() != model.data());
+  CHECK(ctrl.states().mass == model.states().mass);
+  CHECK(ctrl.states().position == model.states().position);
+  CHECK(ctrl.model().initial_position() == model.states().position);
+  CHECK(ctrl.states().velocity == model.states().velocity);
+  CHECK(ctrl.refs().position == model.states().position);
+  CHECK(ctrl.refs().velocity == model.states().velocity);
+}
+TEST_CASE("C'tor of PdCtrl", "[PdCtrl][ctor]") {
+  SECTION("Default c'tor") {
+    CheckCtor_0<double>();
+    CheckCtor_0<Vec3D>();
+  }
+  SECTION("Overloaded c'tor") {
+    CheckCtor_1<double>();
+    CheckCtor_1<Vec3D>();
+  }
+}
+
+template <typename T>
+void CheckReset_1() {
+  Fuzzer fuzz;
+  PdCtrl<T> ctrl;
+  ctrl.states().position = fuzz.get<T>();
+  ctrl.states().velocity = fuzz.get<T>();
+  ctrl.update();
+  REQUIRE(ctrl.time() != 0.0);
+  REQUIRE(ctrl.states().position != T{0});
+  REQUIRE(ctrl.states().velocity != T{0});
+  ctrl.reset();
+  CHECK(ctrl.time() == 0.0);
+  CHECK(ctrl.states().position == T{0});
+  CHECK(ctrl.states().velocity == T{0});
+}
+
+template <typename T>
+void CheckReset_2() {
+  Fuzzer fuzz;
+  PdCtrl<T> ctrl;
+  ctrl.states().position = fuzz.get<T>();
+  ctrl.states().velocity = fuzz.get<T>();
+  auto p = fuzz.get<T>();
+  ctrl.update();
+  REQUIRE(ctrl.time() != 0.0);
+  REQUIRE(ctrl.states().position != p);
+  REQUIRE(ctrl.states().velocity != T{0});
+  ctrl.reset(p);
+  CHECK(ctrl.time() == 0.0);
+  CHECK(ctrl.states().position == p);
+  CHECK(ctrl.states().velocity == T{0});
+}
+
+TEST_CASE("Check reset in PdCtrl", "[PdCtrl][reset]") {
+  SECTION("Overloaded function 1") {
+    CheckReset_1<double>();
+    CheckReset_1<Vec3D>();
+  }
+  SECTION("Overloaded function 2") {
+    CheckReset_2<double>();
+    CheckReset_2<Vec3D>();
+  }
+}
+
+template <typename T>
+void CheckOutputsAfterUpdate() {
+  Fuzzer fuzz;
+  PdCtrl<T> ctrl;
+  ctrl.states().mass = 2;
+  ctrl.refs().position = T{1};
+  ctrl.refs().stiffness = T{10};
+  ctrl.refs().damping = T{1};
+  ctrl.outputs().position = fuzz.get<T>();
+  ctrl.outputs().velocity = fuzz.get<T>();
+  ctrl.outputs().acceleration = fuzz.get<T>();
+  ctrl.outputs().force = fuzz.get<T>();
+
+  REQUIRE(ctrl.update());
+  CHECK(ctrl.outputs().position == ctrl.states().position);
+  CHECK(ctrl.outputs().velocity == ctrl.states().velocity);
+  CHECK(ctrl.outputs().acceleration == ctrl.states().acceleration);
+  CHECK(ctrl.outputs().force == ctrl.states().force);
+
+  REQUIRE(ctrl.update(0.02));
+  CHECK(ctrl.time_step() == 0.02);
+  CHECK(ctrl.outputs().position == ctrl.states().position);
+  CHECK(ctrl.outputs().velocity == ctrl.states().velocity);
+  CHECK(ctrl.outputs().acceleration == ctrl.states().acceleration);
+  CHECK(ctrl.outputs().force == ctrl.states().force);
+}
+
+TEST_CASE("Outputs should be updated after calling update of PdCtrl",
+          "[PdCtrl][update]") {
+  CheckOutputsAfterUpdate<double>();
+  CheckOutputsAfterUpdate<Vec3D>();
+}
+
+}  // namespace
+}  // namespace experimental
+
+#if 0
 namespace {
 
 template <typename T>
@@ -235,4 +352,5 @@ SCENARIO("Point mass is converged at the desired position with PD contrl",
 }
 
 }  // namespace
+#endif
 }  // namespace holon

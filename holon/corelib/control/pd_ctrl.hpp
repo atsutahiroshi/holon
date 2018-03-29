@@ -26,9 +26,97 @@
 #include "holon/corelib/control/ctrl_base.hpp"
 #include "holon/corelib/control/pd_ctrl/pd_ctrl_formula.hpp"
 #include "holon/corelib/control/point_mass_model.hpp"
+#include "holon/corelib/data/data_set_base.hpp"
 #include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
+
+namespace experimental {
+
+template <typename State>
+struct PdCtrlRefsRawData {
+  State position;
+  State velocity;
+  State stiffness;
+  State damping;
+};
+
+template <typename State>
+struct PdCtrlOutputsRawData {
+  State position;
+  State velocity;
+  State acceleration;
+  State force;
+};
+
+template <typename State>
+class PdCtrlData
+    : public DataSetBase<PdCtrlData<State>, PointMassModelRawData<State>,
+                         PdCtrlRefsRawData<State>,
+                         PdCtrlOutputsRawData<State>> {
+  using Base =
+      DataSetBase<PdCtrlData<State>, PointMassModelRawData<State>,
+                  PdCtrlRefsRawData<State>, PdCtrlOutputsRawData<State>>;
+
+ public:
+  using ModelRawData = PointMassModelRawData<State>;
+  using RefsRawData = PdCtrlRefsRawData<State>;
+  using OutputsRawData = PdCtrlOutputsRawData<State>;
+  using ModelDataIndex = index_seq<0>;
+  using RefsDataIndex = index_seq<1>;
+  using OutputsDataIndex = index_seq<2>;
+  static constexpr double default_mass =
+      PointMassModelData<State>::default_mass;
+
+  PdCtrlData() : PdCtrlData(State{0.0}, default_mass) {}
+  PdCtrlData(const State& t_initial_position, double t_mass)
+      : Base(ModelRawData{t_mass, t_initial_position}, RefsRawData{},
+             OutputsRawData{}) {}
+};
+
+template <typename State, typename Solver = RungeKutta4<std::array<State, 2>>,
+          typename Data = PdCtrlData<State>,
+          typename Model = PointMassModel<State>>
+class PdCtrl : public CtrlBase<State, Solver, Data, Model> {
+  using Self = PdCtrl<State, Solver, Data, Model>;
+  using Base = CtrlBase<State, Solver, Data, Model>;
+
+ public:
+  PdCtrl() {}
+  PdCtrl(const Model& t_model) : Base(t_model) {}
+  virtual ~PdCtrl() = default;
+
+  virtual Self& reset() override {
+    this->model().reset();
+    return *this;
+  }
+
+  virtual Self& reset(const State& t_initial_position) {
+    this->model().reset(t_initial_position);
+    return *this;
+  }
+
+  virtual bool update() override {
+    if (!Base::update()) return false;
+    updateOutputs();
+    return true;
+  }
+  virtual bool update(double dt) override {
+    this->set_time_step(dt);
+    return this->update();
+  }
+
+ private:
+  Self& updateOutputs() {
+    this->outputs().position = this->states().position;
+    this->outputs().velocity = this->states().velocity;
+    this->outputs().acceleration = this->states().acceleration;
+    this->outputs().force = this->states().force;
+    return *this;
+  }
+};
+
+}  // namespace experimental
 
 template <typename State>
 struct PdCtrlRefs {
@@ -52,7 +140,7 @@ template <
     typename Data = PointMassModelData<State>,
     typename System = PointMassModelSystem<State>,
     typename Model = PointMassModel<State, StateArray, Solver, Data, System>,
-    typename Refs = PdCtrlRefs<State>, typename Outputs = PdCtrlOutputs<State> >
+    typename Refs = PdCtrlRefs<State>, typename Outputs = PdCtrlOutputs<State>>
 class PdCtrl : public CtrlBase<State, Solver, Data, Model, Refs, Outputs> {
   using Self =
       PdCtrl<State, StateArray, Solver, Data, System, Model, Refs, Outputs>;

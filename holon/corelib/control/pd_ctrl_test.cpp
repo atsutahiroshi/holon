@@ -140,6 +140,28 @@ TEST_CASE("Outputs should be updated after calling update of PdCtrl",
   CheckOutputsAfterUpdate<Vec3D>();
 }
 
+SCENARIO("Point mass is converged at the desired position with PD contrl",
+         "[PdCtrl][update]") {
+  GIVEN("Point mass is currently at 1, desired position is 0") {
+    PointMassModel<double> model;
+    model.states().position = 1;
+    PdCtrl<double> ctrl(model);
+    REQUIRE(ctrl.states().position == 1);
+    ctrl.refs().position = 0;
+    ctrl.refs().stiffness = 100;
+    ctrl.refs().damping = 10;
+    WHEN("Update until 10 sec") {
+      while (ctrl.time() < 10) {
+        ctrl.update();
+      }
+      THEN("The point mass should be at 1") {
+        INFO(ctrl.states().position);
+        CHECK(ctrl.states().position == Approx(0.0).margin(1.0e-5));
+      }
+    }
+  }
+}
+
 }  // namespace
 }  // namespace experimental
 

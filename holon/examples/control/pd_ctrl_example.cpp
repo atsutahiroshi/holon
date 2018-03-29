@@ -24,6 +24,7 @@
 
 using holon::Vec3D;
 using holon::PdCtrl;
+// using holon::experimental::PdCtrl;
 
 const double T = 10;
 const double DT = 0.01;
@@ -47,11 +48,15 @@ int main() {
   PdCtrl<double> ctrl;
   ctrl.refs_ptr()->stiffness = 100;
   ctrl.refs_ptr()->damping = 10;
+  // ctrl.refs().stiffness = 100;
+  // ctrl.refs().damping = 10;
 
   log(ctrl);
   while (ctrl.time() < T) {
     ctrl.refs_ptr()->position = traj(ctrl.time());
     ctrl.refs_ptr()->velocity = traj_vel(ctrl.time());
+    // ctrl.refs().position = traj(ctrl.time());
+    // ctrl.refs().velocity = traj_vel(ctrl.time());
     ctrl.update(DT);
     log(ctrl);
   }

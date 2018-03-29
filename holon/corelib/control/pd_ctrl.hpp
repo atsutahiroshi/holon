@@ -70,8 +70,9 @@ class PdCtrlData
 
   PdCtrlData() : PdCtrlData(State{0.0}, default_mass) {}
   PdCtrlData(const State& t_initial_position, double t_mass)
-      : Base(ModelRawData{t_mass, t_initial_position}, RefsRawData{},
-             OutputsRawData{}) {}
+      : Base(ModelRawData{t_mass, t_initial_position, State{0}, State{0},
+                          State{0}},
+             RefsRawData(), OutputsRawData()) {}
 };
 
 template <typename State, typename Solver = RungeKutta4<std::array<State, 2>>,

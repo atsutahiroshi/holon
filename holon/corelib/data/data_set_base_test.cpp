@@ -503,27 +503,30 @@ TEST_CASE("Copy sub-data by indices", "[DataSetBase]") {
   using sub_data_test::SubData;
   Fuzzer fuzz;
   Data data;
-  data.get<0>().a = fuzz();
-  data.get<1>().b = fuzz();
-  data.get<2>().c = fuzz();
-  data.get<3>().d = fuzz();
-  data.get<4>().e = fuzz();
   SubData sub;
-  sub.get<0>().b = fuzz();
-  sub.get<1>().d = fuzz();
   SECTION("Copy SubData to Data") {
+    double b = fuzz(), d = fuzz();
+    sub.get<0>().b = b;
+    sub.get<1>().d = d;
     data.copy_subdata(sub, index_seq<0, 1>(), index_seq<1, 3>());
     REQUIRE(data.get_ptr<1>() != sub.get_ptr<0>());
     REQUIRE(data.get_ptr<3>() != sub.get_ptr<1>());
-    CHECK(data.get<1>().b == sub.get<0>().b);
-    CHECK(data.get<3>().d == sub.get<1>().d);
+    CHECK(sub.get<0>().b == b);
+    CHECK(sub.get<1>().d == d);
+    CHECK(data.get<1>().b == b);
+    CHECK(data.get<3>().d == d);
   }
   SECTION("Copy Data to SubData") {
+    double b = fuzz(), d = fuzz();
+    data.get<1>().b = b;
+    data.get<3>().d = d;
     sub.copy_subdata(data, index_seq<1, 3>(), index_seq<0, 1>());
     REQUIRE(sub.get_ptr<0>() != data.get_ptr<1>());
     REQUIRE(sub.get_ptr<1>() != data.get_ptr<3>());
-    CHECK(sub.get<0>().b == data.get<1>().b);
-    CHECK(sub.get<1>().d == data.get<3>().d);
+    CHECK(sub.get<0>().b == b);
+    CHECK(sub.get<1>().d == d);
+    CHECK(data.get<1>().b == b);
+    CHECK(data.get<3>().d == d);
   }
 }
 

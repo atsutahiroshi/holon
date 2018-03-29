@@ -159,8 +159,8 @@ class DataSetBase {
     auto dst = this->extract_ptr_tuple(dst_index);
     static_assert(std::is_same<decltype(dst), decltype(src)>::value,
                   "copy_data failed. Inappropriate data index selection.");
-    copy_data_tuple(this->extract_ptr_tuple(dst_index),
-                    data.extract_ptr_tuple(src_index));
+    copy_data_tuple(data.extract_ptr_tuple(src_index),
+                    this->extract_ptr_tuple(dst_index));
   }
 
   void copy(const Self& other) { copy_impl<0>(other); }

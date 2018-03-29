@@ -87,6 +87,12 @@ class CtrlBase {
     return *this;
   }
 
+  // reset
+  virtual Self& reset() {
+    this->m_model.reset();
+    return *this;
+  }
+
   // update functions
   virtual bool update() { return m_model.update(); }
   virtual bool update(double dt) {

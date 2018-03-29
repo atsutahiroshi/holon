@@ -131,9 +131,9 @@ TEST_CASE("Check update in CtrlBase", "[CtrlBase][update]") {
   SECTION("Overloaded function 1") {
     const auto dt = TestCtrl::default_time_step;
     REQUIRE(ctrl.time() == Approx(0.0));
-    ctrl.update();
+    CHECK(ctrl.update());
     CHECK(ctrl.time() == Approx(dt));
-    ctrl.update();
+    CHECK(ctrl.update());
     CHECK(ctrl.time() == Approx(2.0 * dt));
   }
   SECTION("Overloaded function 2") {
@@ -148,6 +148,14 @@ TEST_CASE("Check update in CtrlBase", "[CtrlBase][update]") {
     CHECK(ctrl.time_step() == Approx(dt2));
     CHECK(ctrl.time() == Approx(dt + dt2));
   }
+}
+
+TEST_CASE("Check reset in CtrlBase", "[CtrlBase][reset]") {
+  TestCtrl ctrl;
+  REQUIRE(ctrl.update());
+  REQUIRE(ctrl.time() != 0.0);
+  ctrl.reset();
+  CHECK(ctrl.time() == 0.0);
 }
 
 namespace testing {

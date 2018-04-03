@@ -35,20 +35,20 @@ const double G = RK_G;
 
 using experimental::ComZmpModelData;
 
-void RandomizeData(ComZmpModelData* data) {
+void RandomizeData(ComZmpModelData data) {
   Fuzzer fuzz;
   Fuzzer positive(0, 10);
 
-  data->get<0>().mass = positive();
-  data->get<0>().nu = fuzz.get<Vec3D>();
-  data->get<0>().com_position = fuzz.get<Vec3D>();
-  data->get<0>().com_position.set_z(positive());
-  data->get<0>().com_velocity = fuzz.get<Vec3D>();
-  data->get<0>().com_acceleration = fuzz.get<Vec3D>();
-  data->get<0>().zmp_position = fuzz.get<Vec3D>();
-  data->get<0>().reaction_force = fuzz.get<Vec3D>();
-  data->get<0>().external_force = fuzz.get<Vec3D>();
-  data->get<0>().total_force = fuzz.get<Vec3D>();
+  data.get<0>().mass = positive();
+  data.get<0>().nu = fuzz.get<Vec3D>();
+  data.get<0>().com_position = fuzz.get<Vec3D>();
+  data.get<0>().com_position.set_z(positive());
+  data.get<0>().com_velocity = fuzz.get<Vec3D>();
+  data.get<0>().com_acceleration = fuzz.get<Vec3D>();
+  data.get<0>().zmp_position = fuzz.get<Vec3D>();
+  data.get<0>().reaction_force = fuzz.get<Vec3D>();
+  data.get<0>().external_force = fuzz.get<Vec3D>();
+  data.get<0>().total_force = fuzz.get<Vec3D>();
 }
 
 #define CHECK_COMZMPMODELDATA_MEMBER(a, b, var) \
@@ -117,7 +117,7 @@ TEST_CASE("ComZmpModelData: constructor",
 
 TEST_CASE("ComZmpModelData: copy constructor") {
   ComZmpModelData a;
-  RandomizeData(&a);
+  RandomizeData(a);
   ComZmpModelData b(a);
   CheckData(a, b);
   REQUIRE(a.get_ptr<0>() == b.get_ptr<0>());
@@ -125,7 +125,7 @@ TEST_CASE("ComZmpModelData: copy constructor") {
 
 TEST_CASE("ComZmpModelData: copy assignment operator") {
   ComZmpModelData a, b;
-  RandomizeData(&a);
+  RandomizeData(a);
   b = a;
   CheckData(a, b);
   REQUIRE(a.get_ptr<0>() == b.get_ptr<0>());

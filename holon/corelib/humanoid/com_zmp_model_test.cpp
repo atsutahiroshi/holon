@@ -29,6 +29,9 @@
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
 namespace holon {
+
+namespace experimental {
+
 namespace {
 
 using Catch::Matchers::Equals;
@@ -39,23 +42,24 @@ using com_zmp_model_formula::computeComAcc;
 
 const double G = RK_G;
 
-void RandomizeData(ComZmpModelData* data) {
+void RandomizeData(ComZmpModelData data) {
   Fuzzer fuzz;
   Fuzzer positive(0, 10);
 
-  data->mass = positive();
-  data->nu = fuzz.get<Vec3D>();
-  data->com_position = fuzz.get<Vec3D>();
-  data->com_position.set_z(positive());
-  data->com_velocity = fuzz.get<Vec3D>();
-  data->com_acceleration = fuzz.get<Vec3D>();
-  data->zmp_position = fuzz.get<Vec3D>();
-  data->reaction_force = fuzz.get<Vec3D>();
-  data->external_force = fuzz.get<Vec3D>();
-  data->total_force = fuzz.get<Vec3D>();
+  data.get().mass = positive();
+  data.get().nu = fuzz.get<Vec3D>();
+  data.get().com_position = fuzz.get<Vec3D>();
+  data.get().com_position.set_z(positive());
+  data.get().com_velocity = fuzz.get<Vec3D>();
+  data.get().com_acceleration = fuzz.get<Vec3D>();
+  data.get().zmp_position = fuzz.get<Vec3D>();
+  data.get().reaction_force = fuzz.get<Vec3D>();
+  data.get().external_force = fuzz.get<Vec3D>();
+  data.get().total_force = fuzz.get<Vec3D>();
 }
 
-#define CHECK_COMZMPMODELDATA_MEMBER(a, b, var) CHECK(a.var == b.var)
+#define CHECK_COMZMPMODELDATA_MEMBER(a, b, var) \
+  CHECK(a.get<0>().var == b.get<0>().var)
 void CheckData(const ComZmpModelData& a, const ComZmpModelData& b) {
   CHECK_COMZMPMODELDATA_MEMBER(a, b, mass);
   CHECK_COMZMPMODELDATA_MEMBER(a, b, nu);
@@ -69,14 +73,14 @@ void CheckData(const ComZmpModelData& a, const ComZmpModelData& b) {
 }
 
 // ComZmpModel class
-TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
+TEST_CASE("Check C'tors of ComZmpModel", "[ComZmpModel][ctor]") {
   double default_mass = 1;
   Vec3D default_com_position = {0, 0, 1};
 
   SECTION("default constructor (no parameters)") {
     ComZmpModel model;
-    CHECK(model.data().mass == default_mass);
-    CHECK(model.data().com_position == default_com_position);
+    CHECK(model.states().mass == default_mass);
+    CHECK(model.states().com_position == default_com_position);
     CHECK(model.initial_com_position() == default_com_position);
     CHECK(model.time() == 0.0);
   }
@@ -87,8 +91,8 @@ TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
       double m = fuzz.get();
       auto p0 = fuzz.get<Vec3D>();
       ComZmpModel model(p0, m);
-      CHECK(model.data().mass == m);
-      CHECK(model.data().com_position == p0);
+      CHECK(model.states().mass == m);
+      CHECK(model.states().com_position == p0);
       CHECK(model.initial_com_position() == p0);
       CHECK(model.time() == 0.0);
     }
@@ -96,66 +100,52 @@ TEST_CASE("ComZmpModel constructor", "[corelib][humanoid][ComZmpModel]") {
     SECTION("mass should be positive") {
       zEchoOff();
       ComZmpModel model1(kVec3DZ, -1.0);
-      CHECK(model1.data().mass == 1.0);
+      CHECK(model1.states().mass == 1.0);
       ComZmpModel model2(kVec3DZ, 0.0);
-      CHECK(model2.data().mass == 1.0);
+      CHECK(model2.states().mass == 1.0);
       zEchoOn();
     }
   }
 
   SECTION("ComZmpModel(Data t_data)") {
-    auto data = createComZmpModelData();
-    data->com_position = Vec3D(0.1, 0.2, 0.3);
+    auto data = make_data<ComZmpModelData>();
+    data.get().com_position = Vec3D(0.1, 0.2, 0.3);
     ComZmpModel model(data);
-    CHECK(&model.data() == data.get());
-    CHECK(model.initial_com_position() == data->com_position);
+    CHECK(model.data() == data);
+    CHECK(model.initial_com_position() == data.get().com_position);
     CHECK(model.time() == 0.0);
   }
 }
 
-TEST_CASE("ComZmpModel: accessor/mutator of data",
-          "[corelib][humanoid][ComZmpModel]") {
-  ComZmpModel model;
-
-  SECTION("ComZmpModel can hold another Data pointer") {
-    auto data1 = createComZmpModelData();
-    REQUIRE(&model.data() != data1.get());
-    model.set_data_ptr(data1);
-    CHECK(&model.data() == data1.get());
-
-    auto data2 = createComZmpModelData();
-    REQUIRE(&model.data() != data2.get());
-    model.set_data_ptr(data2);
-    CHECK(&model.data() == data2.get());
-  }
-}
-
-TEST_CASE("ComZmpModel: accessor/mutator", "[corelib][humanoid][ComZmpModel]") {
-  ComZmpModel model;
+TEST_CASE("Check accessor/mutator of ComZmpModel",
+          "[ComZmpModel][accessor][mutator]") {
   Fuzzer fuzz;
+  ComZmpModel model;
 
+  SECTION("data") {
+    auto data1 = make_data<ComZmpModelData>();
+    REQUIRE(model.data() != data1);
+    model.set_data(data1);
+    CHECK(model.data() == data1);
+
+    auto data2 = make_data<ComZmpModelData>();
+    REQUIRE(model.data() != data2);
+    model.set_data(data2);
+    CHECK(model.data() == data2);
+  }
   SECTION("initial COM position") {
     auto v = fuzz.get<Vec3D>();
     REQUIRE(model.initial_com_position() != v);
     model.set_initial_com_position(v);
     CHECK(model.initial_com_position() == v);
   }
-}
-
-TEST_CASE("ComZmpModel: accessor/mutator of time step",
-          "[corelib][humanoid][ComZmpModel]") {
-  ComZmpModel model;
-
-  SECTION("default value is 0.001") {
-    CHECK(model.time_step() == Approx(0.001));
-  }
-  SECTION("set a value") {
+  SECTION("time step") {
     Fuzzer fuzz(0.0001, 0.1);
     double dt = fuzz.get();
     model.set_time_step(dt);
     CHECK(model.time_step() == Approx(dt));
   }
-  SECTION("non-positive values are not allowed") {
+  SECTION("non-positive time step is not allowed") {
     zEchoOff();
     model.set_time_step(0.1);
     CHECK(model.time_step() != 0.001);
@@ -170,60 +160,57 @@ TEST_CASE("ComZmpModel: accessor/mutator of time step",
   }
 }
 
-TEST_CASE("ComZmpModel::mass() returns mass value",
-          "[corelib][humanoid][ComZmpModel]") {
+TEST_CASE("ComZmpModel::mass() returns mass value", "[ComZmpModel][mass]") {
   SECTION("case 1") {
     ComZmpModel model;
-    auto data = model.data_ptr();
+    auto data = model.data();
     CHECK(model.mass() == 1.0);
-    data->mass = 10;
+    data.get().mass = 10;
     CHECK(model.mass() == 10.0);
   }
   SECTION("case 2") {
-    auto data = createComZmpModelData(kVec3DZ, 2);
+    auto data = make_data<ComZmpModelData>(kVec3DZ, 2);
     ComZmpModel model(data);
     CHECK(model.mass() == 2.0);
-    data->mass = 20;
+    data.get().mass = 20;
     CHECK(model.mass() == 20.0);
   }
   SECTION("case 3") {
     ComZmpModel model;
-    auto data = createComZmpModelData(kVec3DZ, 3);
-    model.set_data_ptr(data);
+    auto data = make_data<ComZmpModelData>(kVec3DZ, 3);
+    model.set_data(data);
     CHECK(model.mass() == 3.0);
-    data->mass = 30;
+    data.get().mass = 30;
     CHECK(model.mass() == 30.0);
   }
 }
 
-SCENARIO("ComZmpModel: function to reset COM position",
-         "[corelib][humanoid][ComZmpModel]") {
+SCENARIO("Check reset in ComZmpModel", "[ComZmpModel][reset]") {
   GIVEN("initialize with random values") {
-    auto data = createComZmpModelData();
+    auto data = make_data<ComZmpModelData>();
     ComZmpModel model(data);
     Fuzzer fuzz;
 
-    fuzz.randomize(data->com_position);
-    fuzz.randomize(data->com_velocity);
-    REQUIRE_THAT(model.data().com_position, !Equals(Vec3D(0, 0, 1)));
-    REQUIRE_THAT(model.data().com_velocity, !Equals(Vec3D(0, 0, 0)));
+    data.get().com_position = fuzz.get<Vec3D>();
+    data.get().com_velocity = fuzz.get<Vec3D>();
+    REQUIRE(model.states().com_position != Vec3D(0, 0, 1));
+    REQUIRE(model.states().com_velocity != Vec3D(0, 0, 0));
 
     WHEN("reset COM position") {
-      Vec3D p;
-      fuzz.randomize(p);
+      Vec3D p = fuzz.get<Vec3D>();
       model.reset(p);
 
       THEN("COM position should be that value and velocity should be zero") {
-        CHECK_THAT(model.data().com_position, Equals(p));
-        CHECK_THAT(model.initial_com_position(), Equals(p));
-        CHECK_THAT(model.data().com_velocity, Equals(kVec3DZero));
+        CHECK(model.states().com_position == p);
+        CHECK(model.initial_com_position() == p);
+        CHECK(model.states().com_velocity == kVec3DZero);
       }
     }
   }
 }
 
-TEST_CASE("ComZmpModel::reset() resets time to zero",
-          "[corelib][humanoid][ComZmpModel]") {
+TEST_CASE("Check if reset in ComZmpModel resets time to zero",
+          "[ComZmpModel][reset]") {
   ComZmpModel model;
   model.update();
   model.update();
@@ -232,32 +219,31 @@ TEST_CASE("ComZmpModel::reset() resets time to zero",
   CHECK(model.time() == 0.0);
 }
 
-TEST_CASE("ComZmpModel::copy_data should copy data from argument",
-          "[corelib][humanoid][ComZmpModel]") {
+TEST_CASE("Check copy_data in ComZmpModel", "[ComZmpModel][copy_data]") {
   Fuzzer fuzz;
 
   SECTION("ComZmpModel::copy_data(const ComZmpModel&)") {
     ComZmpModel a, b;
-    RandomizeData(a.data_ptr().get());
+    RandomizeData(a.data());
     b.copy_data(a);
     CheckData(b.data(), a.data());
     // initial COM position should be intact
-    CHECK(b.initial_com_position() != a.data().com_position);
+    CHECK(b.initial_com_position() != a.states().com_position);
   }
   SECTION("ComZmpModel::copy_data(const Data&)") {
     ComZmpModelData data;
-    RandomizeData(&data);
+    RandomizeData(data);
 
     ComZmpModel model;
     model.copy_data(data);
     CheckData(model.data(), data);
     // initial COM position should be intact
-    CHECK(model.initial_com_position() != data.com_position);
+    CHECK(model.initial_com_position() != data.get().com_position);
   }
 }
 
 TEST_CASE("ComZmpModel::setZmpPosition sets fixed ZMP position",
-          "[corelib][humanoid][ComZmpModel]") {
+          "[ComZmpModel][setZmpPosition]") {
   ComZmpModel model;
   Fuzzer fuzz;
   auto p = fuzz.get<Vec3D>();
@@ -278,7 +264,7 @@ TEST_CASE("ComZmpModel::setZmpPosition sets fixed ZMP position",
 }
 
 TEST_CASE("ComZmpModel::removeZmpPosition removes ZMP position",
-          "[corelib][humanoid][ComZmpModel]") {
+          "[ComZmpModel][removeZmpPosition]") {
   ComZmpModel model;
   Fuzzer fuzz;
   auto p = fuzz.get<Vec3D>();
@@ -304,7 +290,7 @@ TEST_CASE("ComZmpModel::removeZmpPosition removes ZMP position",
 }
 
 TEST_CASE("ComZmpModel::setReactionForce sets reaction force",
-          "[corelib][humanoid][ComZmpModel]") {
+          "[ComZmpModel][setReactionForce]") {
   ComZmpModel model;
   Fuzzer fuzz;
   auto p = fuzz.get<Vec3D>();
@@ -316,7 +302,7 @@ TEST_CASE("ComZmpModel::setReactionForce sets reaction force",
 }
 
 TEST_CASE("ComZmpModel::removeReactionForce removess reaction force",
-          "[corelib][humanoid][ComZmpModel]") {
+          "[ComZmpModel][removeReactionForce]") {
   ComZmpModel model;
   Fuzzer fuzz;
   auto p = fuzz.get<Vec3D>();
@@ -330,7 +316,7 @@ TEST_CASE("ComZmpModel::removeReactionForce removess reaction force",
 }
 
 TEST_CASE("ComZmpModel::setExternalForce sets external force",
-          "[corelib][humanoid][ComZmpModel]") {
+          "[ComZmpModel][setExternalForce]") {
   ComZmpModel model;
   Fuzzer fuzz;
   auto p = fuzz.get<Vec3D>();
@@ -342,7 +328,7 @@ TEST_CASE("ComZmpModel::setExternalForce sets external force",
 }
 
 TEST_CASE("ComZmpModel::removeExternalForce removes external force",
-          "[corelib][humanoid][ComZmpModel]") {
+          "[ComZmpModel][removeExternalForce]") {
   ComZmpModel model;
   Fuzzer fuzz;
   auto p = fuzz.get<Vec3D>();
@@ -355,8 +341,7 @@ TEST_CASE("ComZmpModel::removeExternalForce removes external force",
   CHECK(model.system().external_force(p, v, t) == kVec3DZero);
 }
 
-TEST_CASE("ComZmpModel::update counts time",
-          "[corelib][humanoid][ComZmpModel]") {
+TEST_CASE("ComZmpModel::update counts time", "[ComZmpModel][update]") {
   ComZmpModel model;
   REQUIRE(model.time() == 0.0);
   model.update();
@@ -368,7 +353,7 @@ TEST_CASE("ComZmpModel::update counts time",
 }
 
 TEST_CASE("ComZmpModel::update(double) modify step time",
-          "[corelib][humanoid][ComZmpModel]") {
+          "[ComZmpModel][update]") {
   ComZmpModel model;
   Fuzzer fuzz(0.0001, 0.1);
   double dt1 = fuzz.get();
@@ -388,37 +373,31 @@ TEST_CASE("ComZmpModel::update(double) modify step time",
 }
 
 TEST_CASE("ComZmpModel::update(double) counts time correctly",
-          "[corelib][humanoid][ComZmpModel]") {
+          "[ComZmpModel][update]") {
   ComZmpModel model;
   Fuzzer fuzz(0.0001, 0.1);
   double dt1 = fuzz.get();
   double dt2 = fuzz.get();
   double t = 0;
 
-  // REQUIRE(model.time_step() != dt1);
-  REQUIRE(model.time() == t);
+  REQUIRE(model.time() == Approx(t));
   model.update(dt1);
   t += dt1;
-  REQUIRE(model.time() == t);
-  // REQUIRE(model.time_step() == dt1);
+  REQUIRE(model.time() == Approx(t));
   model.update();
   t += dt1;
-  REQUIRE(model.time() == t);
-  // REQUIRE(model.time_step() == dt1);
+  REQUIRE(model.time() == Approx(t));
 
-  // REQUIRE(model.time_step() != dt2);
   model.update(dt2);
   t += dt2;
-  REQUIRE(model.time() == t);
-  // REQUIRE(model.time_step() == dt2);
+  REQUIRE(model.time() == Approx(t));
   model.update();
   t += dt2;
-  REQUIRE(model.time() == t);
-  // REQUIRE(model.time_step() == dt2);
+  REQUIRE(model.time() == Approx(t));
 }
 
 TEST_CASE("ComZmpModel::update computes COM acceleration",
-          "[corelib][humanoid][ComZmpModel]") {
+          "[ComZmpModel][update]") {
   ComZmpModel model;
 
   SECTION("update acceleration") {
@@ -432,51 +411,51 @@ TEST_CASE("ComZmpModel::update computes COM acceleration",
       Vec3D f = computeReactForce(c.com_pos, c.zmp_pos, model.mass() * G);
       Vec3D expected_com_acc = computeComAcc(f, model.mass());
 
-      model.data_ptr()->com_position = c.com_pos;
-      model.data_ptr()->com_velocity = c.com_vel;
+      model.states().com_position = c.com_pos;
+      model.states().com_velocity = c.com_vel;
       // model.inputZmpPos(c.zmp_pos);
       model.setZmpPosition(c.zmp_pos);
       model.update();
-      CHECK_THAT(model.data().com_acceleration, Equals(expected_com_acc));
+      CHECK(model.states().com_acceleration == expected_com_acc);
     }
   }
 }
 
 SCENARIO("update COM position, velocity, acceleration", "[corelib][humanoid]") {
   GIVEN("COM stays at (0, 0, 1)") {
-    auto data = createComZmpModelData();
+    auto data = make_data<ComZmpModelData>();
     ComZmpModel model(data);
 
     WHEN("input ZMP position as (-1, -0.5, 0) and update") {
       Vec3D zmp_pos = {-1, -0.5, 0};
       // model.inputZmpPos(zmp_pos);
       model.setZmpPosition(zmp_pos);
-      REQUIRE(model.data().com_position == kVec3DZ);
-      REQUIRE(model.data().com_velocity == kVec3DZero);
+      REQUIRE(model.states().com_position == kVec3DZ);
+      REQUIRE(model.states().com_velocity == kVec3DZero);
       REQUIRE(model.update());
 
       THEN("horizontal velocity should be positive") {
-        Vec3D vel = model.data().com_velocity;
+        Vec3D vel = model.states().com_velocity;
         CHECK(vel.x() > 0.0);
         CHECK(vel.y() > 0.0);
       }
       THEN("horizontal position should still be at zero") {
-        Vec3D pos = model.data().com_position;
+        Vec3D pos = model.states().com_position;
         CHECK(pos.x() == Approx(0.0).margin(1e-5));
         CHECK(pos.y() == Approx(0.0).margin(1e-5));
       }
 
       WHEN("and update once more") {
-        data->zmp_position = zmp_pos;
+        data.get().zmp_position = zmp_pos;
         REQUIRE(model.update());
 
         THEN("horizontal velocity should be positive") {
-          Vec3D vel = model.data().com_velocity;
+          Vec3D vel = model.states().com_velocity;
           CHECK(vel.x() > 0.0);
           CHECK(vel.y() > 0.0);
         }
         THEN("horizontal position should move forward") {
-          Vec3D pos = model.data().com_position;
+          Vec3D pos = model.states().com_position;
           CHECK(pos.x() > 0.0);
           CHECK(pos.y() > 0.0);
         }
@@ -486,39 +465,38 @@ SCENARIO("update COM position, velocity, acceleration", "[corelib][humanoid]") {
 }
 
 TEST_CASE("when COM height is zero, update should fail") {
-  auto data = createComZmpModelData();
+  auto data = make_data<ComZmpModelData>();
   ComZmpModel model(data);
   Vec3D p = {0, 0, 0};
 
-  data->com_position = p;
+  data.get().com_position = p;
   model.setZmpPosition(kVec3DZero);
   zEchoOff();
-  CAPTURE(model.data().com_position);
-  CAPTURE(model.data().com_velocity);
-  CAPTURE(model.data().com_acceleration);
+  CAPTURE(model.states().com_position);
+  CAPTURE(model.states().com_velocity);
+  CAPTURE(model.states().com_acceleration);
   CHECK_FALSE(model.update());
   zEchoOn();
 }
 
 TEST_CASE("ComZmpModel::update keeps consistency of vertical reaction force",
-          "[corelib][humanoid][ComZmpModel]") {
+          "[ComZmpModel][update]") {
   ComZmpModel model;
-  auto data = model.data_ptr();
+  auto data = model.data();
   model.reset(Vec3D(0, 0, 0.42));
 
   double desired_fz = 10;
   Vec3D desired_zmp = {-1, 0.42, 0};
-  // model.inputZmpPos(desired_zmp, desired_fz);
   model.setZmpPosition(desired_zmp, desired_fz);
   model.update();
-  CHECK(data->reaction_force == Vec3D(10. / 0.42, -10, desired_fz));
-  CHECK(data->com_acceleration == Vec3D(10. / 0.42, -10, 10 - G));
+  CHECK(data.get().reaction_force == Vec3D(10. / 0.42, -10, desired_fz));
+  CHECK(data.get().com_acceleration == Vec3D(10. / 0.42, -10, 10 - G));
 }
 
 TEST_CASE("ComZmpModel::update computes total force being applied to COM",
-          "[corelib][humanoid][ComZmpModel]") {
+          "[ComZmpModel][update]") {
   ComZmpModel model;
-  auto data = model.data_ptr();
+  auto data = model.data();
   model.reset(Vec3D(0, 0, 0.42));
 
   double desired_fz = 15;
@@ -527,25 +505,29 @@ TEST_CASE("ComZmpModel::update computes total force being applied to COM",
   model.setZmpPosition(desired_zmp, desired_fz);
   model.setExternalForce(ext_force);
   model.update();
-  CHECK(data->reaction_force == Vec3D(15. / 0.42, -15, desired_fz));
-  CHECK(data->total_force == Vec3D(15. / 0.42 + 1.2, -16.2, 14.8));
-  CHECK(data->com_acceleration == Vec3D(15. / 0.42 + 1.2, -16.2, 14.8 - G));
+  CHECK(data.get().reaction_force == Vec3D(15. / 0.42, -15, desired_fz));
+  CHECK(data.get().total_force == Vec3D(15. / 0.42 + 1.2, -16.2, 14.8));
+  CHECK(data.get().com_acceleration ==
+        Vec3D(15. / 0.42 + 1.2, -16.2, 14.8 - G));
 }
 
 TEST_CASE("ComZmpModel::update() updates external force in data",
-          "[corelib][humanoid][ComZmpModel]") {
+          "[ComZmpModel][update]") {
   ComZmpModel model;
-  auto data = model.data_ptr();
+  auto data = model.data();
   model.reset(Vec3D(0, 0, 0.42));
 
   Vec3D ext_force = {1.5, -1.5, -10};
   model.setExternalForce(ext_force);
-  REQUIRE(data->reaction_force == Vec3D(0, 0, G));
+  REQUIRE(data.get().reaction_force == Vec3D(0, 0, G));
   model.update();
-  CHECK(data->total_force == Vec3D(1.5, -1.5, G - 10));
-  CHECK(data->com_acceleration == Vec3D(1.5, -1.5, -10));
-  CHECK(data->external_force == ext_force);
+  CHECK(data.get().total_force == Vec3D(1.5, -1.5, G - 10));
+  CHECK(data.get().com_acceleration == Vec3D(1.5, -1.5, -10));
+  CHECK(data.get().external_force == ext_force);
 }
 
 }  // namespace
+
+}  // namespace experimental
+
 }  // namespace holon

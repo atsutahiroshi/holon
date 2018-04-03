@@ -27,6 +27,9 @@
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
 namespace holon {
+
+namespace experimental {
+
 namespace {
 
 using com_zmp_model_formula::computeComAcc;
@@ -34,35 +37,30 @@ using com_zmp_model_formula::computeComAcc;
 const double G = RK_G;
 
 // ComZmpModelSystem class
-TEST_CASE("ComZmpModelSystem: constructor",
-          "[corelib][humanoid][ComZmpModelSystem]") {
+TEST_CASE("ComZmpModelSystem: constructor", "[ComZmpModelSystem][ctor]") {
   SECTION("constructor with data pointer") {
-    auto data = createComZmpModelData();
-    REQUIRE(data.use_count() == 1);
+    auto data = make_data<ComZmpModelData>();
     ComZmpModelSystem sys(data);
-    CHECK(sys.data_ptr().get() == data.get());
-    CHECK(data.use_count() == 2);
+    CHECK(sys.data() == data);
   }
 }
 
 TEST_CASE("ComZmpModelSystem: accessors / mutators",
-          "[corelib][humanoid][ComZmpModelSystem]") {
-  auto data = createComZmpModelData();
+          "[ComZmpModelSystem][accessor][mutator]") {
+  auto data = make_data<ComZmpModelData>();
   ComZmpModelSystem sys(data);
 
   SECTION("data pointer") {
-    auto data2 = createComZmpModelData();
-    sys.set_data_ptr(data2);
-    CHECK(data.use_count() == 1);
-    CHECK(sys.data_ptr().get() == data2.get());
-    CHECK(data2.use_count() == 2);
+    auto data2 = make_data<ComZmpModelData>();
+    sys.set_data(data2);
+    CHECK(sys.data() == data2);
   }
 }
 
 TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
-          "[corelib][humanoid][ComZmpModelSystem]") {
+          "[ComZmpModelSystem]") {
   Fuzzer fuzz;
-  auto data = createComZmpModelData();
+  auto data = make_data<ComZmpModelData>();
   ComZmpModelSystem sys(data);
   Vec3D p = {0, 1, 2};
   Vec3D v = {1, -2, -1};
@@ -112,8 +110,8 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
     auto f_zmp = [zmp](const Vec3D&, const Vec3D&, const double) {
       return zmp;
     };
-    auto expected =
-        computeComAcc(p, zmp, Vec3D(0, 0, data->mass * G), data->mass);
+    auto expected = computeComAcc(p, zmp, Vec3D(0, 0, data.get().mass * G),
+                                  data.get().mass);
     sys.set_zmp_position_f(f_zmp);
     dxdt = sys(x, t);
     CHECK(dxdt[0] == v);
@@ -127,7 +125,7 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
     };
     Vec3D fz = {0, 0, 8};
     auto f_fz = [fz](const Vec3D&, const Vec3D&, const double) { return fz; };
-    auto expected = computeComAcc(p, zmp, fz, data->mass);
+    auto expected = computeComAcc(p, zmp, fz, data.get().mass);
     SECTION("Specify fz first then ZMP") {
       sys.set_reaction_force_f(f_fz);
       sys.set_zmp_position_f(f_zmp);
@@ -153,7 +151,7 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
     auto f_fz = [fz](const Vec3D&, const Vec3D&, const double) { return fz; };
     Vec3D ef = fuzz.get<Vec3D>();
     auto f_ef = [ef](const Vec3D&, const Vec3D&, const double) { return ef; };
-    auto expected = computeComAcc(p, zmp, fz, data->mass, ef);
+    auto expected = computeComAcc(p, zmp, fz, data.get().mass, ef);
     SECTION("Specify them in the following order: fz, ZMP, ef") {
       sys.set_reaction_force_f(f_fz);
       sys.set_zmp_position_f(f_zmp);
@@ -181,15 +179,15 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
   }
 
   SECTION("Mass value is not 1") {
-    data->mass = 2.5;
+    data.get().mass = 2.5;
     Vec3D zmp = {1, -1, 0};
     auto f_zmp = [zmp](const Vec3D&, const Vec3D&, const double) {
       return zmp;
     };
     Vec3D ef = fuzz.get<Vec3D>();
     auto f_ef = [ef](const Vec3D&, const Vec3D&, const double) { return ef; };
-    auto expected =
-        computeComAcc(p, zmp, Vec3D(0, 0, data->mass * G), data->mass, ef);
+    auto expected = computeComAcc(p, zmp, Vec3D(0, 0, data.get().mass * G),
+                                  data.get().mass, ef);
     sys.set_zmp_position_f(f_zmp);
     sys.set_external_force_f(f_ef);
     dxdt = sys(x, t);
@@ -199,8 +197,8 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
 }
 
 TEST_CASE("ComZmpModelSystem::isZmpPositionSet() returns if it is set",
-          "[corelib][humanoid][ComZmpModelSystem]") {
-  auto data = createComZmpModelData();
+          "[ComZmpModelSystem]") {
+  auto data = make_data<ComZmpModelData>();
   ComZmpModelSystem sys(data);
   CHECK_FALSE(sys.isZmpPositionSet());
   sys.set_zmp_position_f(
@@ -209,5 +207,7 @@ TEST_CASE("ComZmpModelSystem::isZmpPositionSet() returns if it is set",
 }
 
 }  // namespace
+
+}  // namespace experimental
 
 }  // namespace holon

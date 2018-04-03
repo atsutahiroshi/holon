@@ -81,15 +81,28 @@ template <typename State, typename Solver = RungeKutta4<std::array<State, 2>>,
 class PdCtrl : public CtrlBase<State, Solver, Data, Model> {
   using Self = PdCtrl<State, Solver, Data, Model>;
   using Base = CtrlBase<State, Solver, Data, Model>;
+  using Function = typename Model::Function;
 
  public:
-  PdCtrl() {}
+  PdCtrl() : PdCtrl(this->model()) {}
   PdCtrl(const Model& t_model) : Base(t_model) {
     this->model().set_initial_position(this->states().position);
     resetRefs();
-    // this->model().setForceCallback(getForceFunction());
+    this->model().setForceCallback(getForceFunction());
   }
   virtual ~PdCtrl() = default;
+
+  virtual State force(const State& t_position, const State& t_velocity,
+                      const double /* t_time */) {
+    return pd_ctrl_formula::computeDesForce(
+        t_position, t_velocity, this->refs().position, this->refs().velocity,
+        this->refs().stiffness, this->refs().damping);
+  }
+
+  virtual Function getForceFunction() {
+    namespace pl = std::placeholders;
+    return std::bind(&Self::force, this, pl::_1, pl::_2, pl::_3);
+  }
 
   virtual Self& reset() override {
     this->model().reset();

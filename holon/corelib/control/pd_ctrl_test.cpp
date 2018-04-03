@@ -150,6 +150,22 @@ TEST_CASE("Outputs should be updated after calling update of PdCtrl",
 
 SCENARIO("Point mass is converged at the desired position with PD contrl",
          "[PdCtrl][update]") {
+  GIVEN("Point mass is currently at 0, desired position is 1") {
+    PdCtrl<double> ctrl;
+    REQUIRE(ctrl.states().position == 0);
+    ctrl.refs().position = 1;
+    ctrl.refs().stiffness = 100;
+    ctrl.refs().damping = 10;
+    WHEN("Update until 10 sec") {
+      while (ctrl.time() < 10) {
+        ctrl.update();
+      }
+      THEN("The point mass should be at 1") {
+        INFO(ctrl.states().position);
+        CHECK(ctrl.states().position == Approx(1.0).margin(1.0e-5));
+      }
+    }
+  }
   GIVEN("Point mass is currently at 1, desired position is 0") {
     PointMassModel<double> model;
     model.states().position = 1;

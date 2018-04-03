@@ -38,6 +38,8 @@ template <typename State, typename StateArray = std::array<State, 2>,
 class PointMassModel : public ModelBase<State, Solver, Data, System> {
   using Self = PointMassModel<State, StateArray, Solver, Data, System>;
   using Base = ModelBase<State, Solver, Data, System>;
+
+ public:
   using Function = typename System::Function;
 
  public:

@@ -69,6 +69,8 @@ void CheckReset_1() {
   PdCtrl<T> ctrl;
   ctrl.states().position = fuzz.get<T>();
   ctrl.states().velocity = fuzz.get<T>();
+  ctrl.refs().position = fuzz.get<T>();
+  ctrl.refs().velocity = fuzz.get<T>();
   ctrl.update();
   REQUIRE(ctrl.time() != 0.0);
   REQUIRE(ctrl.states().position != T{0});
@@ -77,6 +79,8 @@ void CheckReset_1() {
   CHECK(ctrl.time() == 0.0);
   CHECK(ctrl.states().position == T{0});
   CHECK(ctrl.states().velocity == T{0});
+  CHECK(ctrl.refs().position == T{0});
+  CHECK(ctrl.refs().velocity == T{0});
 }
 
 template <typename T>
@@ -85,6 +89,8 @@ void CheckReset_2() {
   PdCtrl<T> ctrl;
   ctrl.states().position = fuzz.get<T>();
   ctrl.states().velocity = fuzz.get<T>();
+  ctrl.refs().position = fuzz.get<T>();
+  ctrl.refs().velocity = fuzz.get<T>();
   auto p = fuzz.get<T>();
   ctrl.update();
   REQUIRE(ctrl.time() != 0.0);
@@ -94,6 +100,8 @@ void CheckReset_2() {
   CHECK(ctrl.time() == 0.0);
   CHECK(ctrl.states().position == p);
   CHECK(ctrl.states().velocity == T{0});
+  CHECK(ctrl.refs().position == p);
+  CHECK(ctrl.refs().velocity == T{0});
 }
 
 TEST_CASE("Check reset in PdCtrl", "[PdCtrl][reset]") {

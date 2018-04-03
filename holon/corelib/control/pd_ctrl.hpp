@@ -84,17 +84,21 @@ class PdCtrl : public CtrlBase<State, Solver, Data, Model> {
 
  public:
   PdCtrl() {}
-  PdCtrl(const Model& t_model) : Base(t_model) {}
+  PdCtrl(const Model& t_model) : Base(t_model) {
+    this->model().set_initial_position(this->states().position);
+    resetRefs();
+    // this->model().setForceCallback(getForceFunction());
+  }
   virtual ~PdCtrl() = default;
 
   virtual Self& reset() override {
     this->model().reset();
-    return *this;
+    return this->resetRefs();
   }
 
   virtual Self& reset(const State& t_initial_position) {
     this->model().reset(t_initial_position);
-    return *this;
+    return this->resetRefs();
   }
 
   virtual bool update() override {
@@ -108,6 +112,11 @@ class PdCtrl : public CtrlBase<State, Solver, Data, Model> {
   }
 
  private:
+  Self& resetRefs() {
+    this->refs().position = this->states().position;
+    this->refs().velocity = this->states().velocity;
+    return *this;
+  }
   Self& updateOutputs() {
     this->outputs().position = this->states().position;
     this->outputs().velocity = this->states().velocity;

@@ -116,8 +116,8 @@ class DataSetBase {
     return std::make_tuple(std::get<I>(m_data_ptr_tuple)...);
   }
   template <std::size_t... I>
-  auto extract_ptr_tuple(index_seq<I...>) const
-      -> decltype(this->extract_ptr_tuple<I...>()) {
+  auto extract_ptr_tuple(index_seq<I...>) const -> const
+      decltype(this->extract_ptr_tuple<I...>()) {
     return this->extract_ptr_tuple<I...>();
   }
   template <std::size_t... I>

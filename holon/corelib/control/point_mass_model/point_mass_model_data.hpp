@@ -58,7 +58,7 @@ class PointMassModelData : public DataSetBase<PointMassModelRawData<State>> {
 
  public:
   template <typename... Args>
-  PointMassModelData(Args... args) : Base(args...) {}
+  explicit PointMassModelData(Args... args) : Base(args...) {}
 
   PointMassModelData(const State& t_initial_position)
       : PointMassModelData(t_initial_position, RawData::default_mass) {}

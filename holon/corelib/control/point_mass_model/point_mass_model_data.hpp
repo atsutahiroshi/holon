@@ -48,6 +48,9 @@ struct PointMassModelRawData {
 };
 
 template <typename State>
+constexpr double PointMassModelRawData<State>::default_mass;
+
+template <typename State>
 class PointMassModelData : public DataSetBase<PointMassModelRawData<State>> {
   using Self = PointMassModelData<State>;
   using RawData = PointMassModelRawData<State>;

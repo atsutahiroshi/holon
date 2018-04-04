@@ -65,6 +65,7 @@ class ModelBase {
   using RawDataType = typename Data::template RawDataI<I>;
 
  public:
+  ModelBase() : ModelBase(make_data<Data>()) {}
   explicit ModelBase(Data t_data)
       : m_time(0.0),
         m_time_step(default_time_step),

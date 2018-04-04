@@ -59,13 +59,9 @@ class CtrlBase {
   static constexpr auto default_time_step = Model::default_time_step;
 
  public:
-  CtrlBase()
-      : m_data(),
-        m_model(m_data.template extract<typename Model::DataType>(
-            ModelDataIndex())) {}
+  CtrlBase() : m_data(), m_model(this->model_data()) {}
   CtrlBase(const Model& t_model) : CtrlBase() {
-    m_data.template copy_subdata(t_model.data(), t_model.data().index,
-                                 ModelDataIndex());
+    this->copy_model_data(t_model);
   }
   virtual ~CtrlBase() = default;
 
@@ -88,6 +84,10 @@ class CtrlBase {
 
   typename Model::DataType model_data() const {
     return m_data.template extract<typename Model::DataType>(ModelDataIndex());
+  }
+
+  void copy_model_data(const Model& t_model) {
+    m_data.template copy_subdata(t_model.data(), ModelDataIndex());
   }
 
   template <std::size_t I = 0>

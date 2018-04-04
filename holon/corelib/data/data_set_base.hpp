@@ -95,6 +95,7 @@ class DataSetBase {
       : m_data_ptr_tuple(std::make_tuple(args...)) {}
   explicit DataSetBase(RawDataPtrTuple t_data_ptr_tuple)
       : m_data_ptr_tuple(t_data_ptr_tuple) {}
+  virtual ~DataSetBase() = default;
 
   const RawDataPtrTuple& get_data_ptr_tuple() const { return m_data_ptr_tuple; }
 

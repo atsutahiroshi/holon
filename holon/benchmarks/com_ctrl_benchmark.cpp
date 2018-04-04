@@ -35,14 +35,14 @@ class ComCtrlBenchmark : public ::hayai::Fixture {
   }
   virtual void TearDown() {}
 
-  ComCtrl ctrl;
+  experimental::ComCtrl ctrl;
   Vec3D ref_com_pos;
   Vec3D com_pos;
   Vec3D com_vel;
 };
 
 BENCHMARK_F(ComCtrlBenchmark, computeDesZmpPos, 100, 1000) {
-  ctrl.refs_ptr()->com_position = ref_com_pos;
+  ctrl.refs().com_position = ref_com_pos;
   auto desired_zmp_pos = ctrl.computeDesZmpPos(com_pos, com_vel, 0);
 }
 

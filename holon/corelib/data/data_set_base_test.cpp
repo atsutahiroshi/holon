@@ -368,16 +368,6 @@ TEST_CASE("Check share_with method in DataSetBase", "[DataSetBase]") {
   }
 }
 
-TEST_CASE("Check clone method in DataSetBase", "[DataSetBase]") {
-  SECTION("Sample DataSet 1") {
-    Fuzzer fuzz;
-    DataSetSample1 data1;
-    data1.get().v = fuzz();
-    DataSetSample1 data2(data1.clone());
-    CheckIfNotSharePtrButEqual1(data1, data2);
-  }
-}
-
 class DataSetSample3
     : public DataSetBase<DataSetSample3, RawDataSample1, RawDataSample2> {
  public:

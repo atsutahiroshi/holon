@@ -164,12 +164,6 @@ class DataSetBase {
     m_data_ptr_tuple = target.get_data_ptr_tuple();
   }
 
-  DataType clone() {
-    DataType tmp;
-    tmp.copy(*this);
-    return tmp;
-  }
-
   template <typename SubDataType, std::size_t... I>
   SubDataType extract() const {
     // consider using make_data method...

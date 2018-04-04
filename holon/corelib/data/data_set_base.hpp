@@ -155,6 +155,10 @@ class DataSetBase {
                   "copy_data failed. Inappropriate data index selection.");
     copy_data_tuple(src, dst);
   }
+  template <typename Data, typename DstIndex>
+  void copy_subdata(const Data& data, DstIndex dst_index) {
+    this->copy_subdata(data, data.index, dst_index);
+  }
 
   void copy(const Self& other) {
     copy_data_tuple(other.get_raw_data_ptr_tuple(), m_raw_data_ptr_tuple);

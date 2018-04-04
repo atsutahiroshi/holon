@@ -33,6 +33,8 @@ struct RawDataSample1 {
   static constexpr double default_v = 1.0;
   double v = default_v;
   double x = 0;
+  RawDataSample1() = default;
+  RawDataSample1(double t_v, double t_x) : v(t_v), x(t_x) {}
 };
 constexpr double RawDataSample1::default_v;
 
@@ -49,6 +51,8 @@ struct RawDataSample2 {
   static constexpr double default_in = 0.5;
   double in = default_in;
   double out = 0;
+  RawDataSample2() = default;
+  RawDataSample2(double t_in, double t_out) : in(t_in), out(t_out) {}
 };
 constexpr double RawDataSample2::default_in;
 
@@ -310,6 +314,26 @@ TEST_CASE("Check get_raw_data_num of DataSetBase",
   CHECK(data1.get_raw_data_num() == 1);
   DataSetSample2 data2;
   CHECK(data2.get_raw_data_num() == 3);
+}
+
+TEST_CASE("Check copy_index in DataSetBase", "[DataSetBase][copy_index]") {
+  Fuzzer fuzz;
+  SECTION("Overloaded function 1") {
+    double v = fuzz(), x = fuzz();
+    DataSetSample2 a, b;
+    a.get<0>().v = v;
+    a.get<0>().x = x;
+    b.copy_index<0>(a);
+    CheckIfNotSharePtrButEqual2(a, b);
+  }
+  SECTION("Overloaded function 2") {
+    double in = fuzz(), out = fuzz();
+    RawDataSample2 rawdata{in, out};
+    DataSetSample2 data;
+    data.copy_index<1>(rawdata);
+    CHECK(data.get<1>().in == in);
+    CHECK(data.get<1>().out == out);
+  }
 }
 
 TEST_CASE("Check copy method in DataSetBase", "[DataSetBase]") {

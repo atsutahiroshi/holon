@@ -36,14 +36,15 @@ template <typename State, typename StateArray = std::array<State, 2>,
 class PointMassModel : public ModelBase<State, Solver, Data, System> {
   using Self = PointMassModel<State, StateArray, Solver, Data, System>;
   using Base = ModelBase<State, Solver, Data, System>;
+  using RawData = PointMassModelRawData<State>;
 
  public:
   using Function = typename System::Function;
 
  public:
-  PointMassModel() : PointMassModel(State{0}, Data::default_mass) {}
+  PointMassModel() : PointMassModel(State{0}, RawData::default_mass) {}
   explicit PointMassModel(const State& t_initial_position)
-      : PointMassModel(t_initial_position, Data::default_mass) {}
+      : PointMassModel(t_initial_position, RawData::default_mass) {}
   PointMassModel(const State& t_initial_position, double t_mass)
       : PointMassModel(make_data<Data>(t_initial_position, t_mass)) {}
   explicit PointMassModel(Data t_data)

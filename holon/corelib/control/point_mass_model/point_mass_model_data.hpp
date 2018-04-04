@@ -54,22 +54,15 @@ class PointMassModelData : public DataSetBase<PointMassModelRawData<State>> {
   using Base = DataSetBase<RawData>;
 
  public:
-  static constexpr double default_mass = 1;
+  template <typename... Args>
+  PointMassModelData(Args... args) : Base(args...) {}
 
- public:
-  PointMassModelData(const RawData& t_raw_data) : Base(t_raw_data) {}
-  PointMassModelData(std::shared_ptr<RawData> t_raw_data_p)
-      : Base(t_raw_data_p) {}
-  PointMassModelData() : PointMassModelData(State{0}, default_mass) {}
   PointMassModelData(const State& t_initial_position)
-      : PointMassModelData(t_initial_position, default_mass) {}
+      : PointMassModelData(t_initial_position, RawData::default_mass) {}
   PointMassModelData(const State& t_initial_position, double t_mass)
-      : PointMassModelData(std::move(RawData{t_mass, t_initial_position,
-                                             State{0}, State{0}, State{0}})) {}
+      : PointMassModelData(
+            alloc_raw_data<RawData>(t_mass, t_initial_position)) {}
 };
-
-template <typename State>
-constexpr double PointMassModelData<State>::default_mass;
 
 }  // namespace holon
 

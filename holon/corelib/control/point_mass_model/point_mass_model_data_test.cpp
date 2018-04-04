@@ -49,7 +49,7 @@ void CheckMembers(const Data<T>& data, const T& expected_p0,
 template <typename T>
 void CheckCtor_0() {
   Data<T> data;
-  CheckMembers(data, T(0), Data<T>::default_mass);
+  CheckMembers(data, T(0), RawData<T>::default_mass);
 }
 
 template <typename T>
@@ -81,7 +81,7 @@ template <typename T>
 void CheckCtor_3() {
   auto v = Fuzzer().get<T>();
   Data<T> data(v);
-  CheckMembers(data, v, Data<T>::default_mass);
+  CheckMembers(data, v, RawData<T>::default_mass);
 }
 
 template <typename T>

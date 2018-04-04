@@ -62,10 +62,8 @@ class PdCtrlData
   using ModelDataIndex = index_seq<0>;
   using RefsDataIndex = index_seq<1>;
   using OutputsDataIndex = index_seq<2>;
-  static constexpr double default_mass =
-      PointMassModelData<State>::default_mass;
 
-  PdCtrlData() : PdCtrlData(State{0.0}, default_mass) {}
+  PdCtrlData() : PdCtrlData(State{0.0}, ModelRawData::default_mass) {}
   PdCtrlData(const State& t_initial_position, double t_mass)
       : Base(ModelRawData{t_mass, t_initial_position, State{0}, State{0},
                           State{0}},

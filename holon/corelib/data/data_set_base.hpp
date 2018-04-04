@@ -71,7 +71,6 @@ class DataSetBase {
 
   using Self = DataSetBase<DataType, RawDataTypes...>;
   static constexpr std::size_t raw_data_num = sizeof...(RawDataTypes);
-  static constexpr bool more_than_one = raw_data_num - 1;
 
  protected:
   using RawDataTuple = std::tuple<RawDataTypes...>;
@@ -136,15 +135,6 @@ class DataSetBase {
     return *std::get<I>(m_data_ptr_tuple);
   }
 
-  using CallOpRetType =
-      typename std::conditional<more_than_one, DataType, RawDataI<0>>::type;
-  const CallOpRetType& operator()() const {
-    return this->call_op_impl(std::integral_constant<bool, more_than_one>());
-  }
-  CallOpRetType& operator()() {
-    return this->call_op_impl(std::integral_constant<bool, more_than_one>());
-  }
-
   template <std::size_t I = 0>
   void copy_index(const Self& other) {
     this->get<I>() = other.get<I>();
@@ -199,18 +189,6 @@ class DataSetBase {
 
  private:
   RawDataPtrTuple m_data_ptr_tuple;
-
-  const DataType& call_op_impl(std::true_type) const {
-    return static_cast<DataType&>(*this);
-  }
-  DataType& call_op_impl(std::true_type) {
-    return static_cast<DataType&>(*this);
-  }
-
-  const RawDataI<0>& call_op_impl(std::false_type) const {
-    return this->get<0>();
-  }
-  RawDataI<0>& call_op_impl(std::false_type) { return this->get<0>(); }
 
   template <std::size_t I = 0>
   typename std::enable_if<(I == raw_data_num), void>::type copy_impl(

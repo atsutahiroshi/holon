@@ -121,7 +121,7 @@ void CheckForce() {
     auto f_force = [force](const T&, const T&, const double) { return force; };
     sys.set_force(f_force);
     CHECK(sys.force(p, v, t) == force);
-    CHECK(sys.acceleration(p, v, t) == force / data().mass);
+    CHECK(sys.acceleration(p, v, t) == force / data.get().mass);
   }
 }
 

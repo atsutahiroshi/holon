@@ -39,11 +39,11 @@ template <typename T>
 void CheckMembers(const Data<T>& data, const T& expected_p0,
                   const double expected_mass) {
   T zero(0.0);
-  CHECK(data().mass == expected_mass);
-  CHECK(data().position == expected_p0);
-  CHECK(data().velocity == zero);
-  CHECK(data().acceleration == zero);
-  CHECK(data().force == zero);
+  CHECK(data.get().mass == expected_mass);
+  CHECK(data.get().position == expected_p0);
+  CHECK(data.get().velocity == zero);
+  CHECK(data.get().acceleration == zero);
+  CHECK(data.get().force == zero);
 }
 
 template <typename T>

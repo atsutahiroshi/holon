@@ -258,30 +258,17 @@ TEST_CASE("Constructor which takes RawData pointer should share its data",
   }
 }
 
-TEST_CASE("Calling operator() in DataSet", "[DataSetBase]") {
-  SECTION("Sample DataSet 1") {
-    DataSetSample1 data;
-    data().v = 3;
-    CheckDataSetSample1(data, 3, 0);
-  }
-  SECTION("Sample DataSet 2") {
-    DataSetSample2 data;
-    data().data1().v = 2;
-    CheckDataSetSample2(data, 2, 0, 0.5, 0, 0.5, 0);
-  }
-}
-
 TEST_CASE("Copy ctor of DataSetBase should share its data pointer",
           "[DataSetBase][ctor]") {
   SECTION("Sample Data 1") {
     DataSetSample1 data1;
-    data1().v = Fuzzer().get();
+    data1.get().v = Fuzzer().get();
     DataSetSample1 data2(data1);
     CheckIfSharePtr1(data1, data2);
   }
   SECTION("Sample Data 2") {
     DataSetSample2 data1;
-    data1().get<0>().v = Fuzzer().get();
+    data1.get<0>().v = Fuzzer().get();
     DataSetSample2 data2(data1);
     CheckIfSharePtr2(data1, data2);
   }
@@ -291,14 +278,14 @@ TEST_CASE("Copy assignment of DataSetBase should share its data pointer",
           "[DataSetBase][ctor]") {
   SECTION("Sample Data 1") {
     DataSetSample1 data1;
-    data1().v = Fuzzer().get();
+    data1.get().v = Fuzzer().get();
     DataSetSample1 data2;
     data2 = data1;
     CheckIfSharePtr1(data1, data2);
   }
   SECTION("Sample Data 2") {
     DataSetSample2 data1;
-    data1().get<0>().v = Fuzzer().get();
+    data1.get<0>().v = Fuzzer().get();
     DataSetSample2 data2;
     data2 = data1;
     CheckIfSharePtr2(data1, data2);
@@ -320,7 +307,7 @@ TEST_CASE("Check equality operator of DataSetBase", "[DataSetBase]") {
 TEST_CASE("Check copy method in DataSetBase", "[DataSetBase]") {
   SECTION("Sample DataSet 1") {
     DataSetSample1 data1;
-    data1().v = Fuzzer().get();
+    data1.get().v = Fuzzer().get();
     DataSetSample1 data2;
     data2.copy(data1);
     CheckIfNotSharePtrButEqual1(data1, data2);
@@ -385,7 +372,7 @@ TEST_CASE("Check clone method in DataSetBase", "[DataSetBase]") {
   SECTION("Sample DataSet 1") {
     Fuzzer fuzz;
     DataSetSample1 data1;
-    data1().v = fuzz();
+    data1.get().v = fuzz();
     DataSetSample1 data2(data1.clone());
     CheckIfNotSharePtrButEqual1(data1, data2);
   }

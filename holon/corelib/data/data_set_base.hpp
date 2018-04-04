@@ -68,7 +68,6 @@ class DataSetBase {
                 "DataSetBase must have at least one RawData class.");
 
   using Self = DataSetBase<RawDataTypes...>;
-  static constexpr std::size_t raw_data_num = sizeof...(RawDataTypes);
 
  protected:
   using RawDataTuple = std::tuple<RawDataTypes...>;
@@ -79,8 +78,10 @@ class DataSetBase {
   using RawDataI = typename std::tuple_element<I, RawDataTuple>::type;
   template <std::size_t I>
   using RawDataPtrI = typename std::tuple_element<I, RawDataPtrTuple>::type;
+  static constexpr std::size_t raw_data_num = sizeof...(RawDataTypes);
   static constexpr bool is_data_type = true;
-  static const make_index_seq<raw_data_num> index;
+  using Index = make_index_seq<raw_data_num>;
+  static const Index index;
 
  public:
   DataSetBase()

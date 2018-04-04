@@ -26,8 +26,8 @@ const double T = 10;
 const double DT = 0.01;
 
 using holon::Vec3D;
-using holon::ComZmpModel;
-using holon::ComCtrl;
+using holon::experimental::ComZmpModel;
+using holon::experimental::ComCtrl;
 
 Vec3D force1 = {1, -1, 0};
 Vec3D force2 = {-1.5, 1.5, 0};
@@ -65,9 +65,9 @@ int main() {
 
     // logging
     std::cout << model.time() << " ";
-    std::cout << model.data().com_position.data() << " ";
-    std::cout << model.data().com_velocity.data() << " ";
-    std::cout << model.data().zmp_position.data() << "\n";
+    std::cout << model.states().com_position.data() << " ";
+    std::cout << model.states().com_velocity.data() << " ";
+    std::cout << model.states().zmp_position.data() << "\n";
   }
   return 0;
 }

@@ -25,8 +25,8 @@ const double T = 10;
 const double DT = 0.01;
 
 using holon::Vec3D;
-using holon::ComZmpModel;
-using holon::ComCtrl;
+using holon::experimental::ComZmpModel;
+using holon::experimental::ComCtrl;
 
 Vec3D force = {0, 0, -1};
 auto external_force = [](const Vec3D&, const Vec3D&, const double t) {
@@ -72,9 +72,9 @@ int main() {
     std::cout << ctrl.commands().xd.value() << " ";
     std::cout << ctrl.commands().yd.value() << " ";
     std::cout << ctrl.commands().zd.value() << " ";
-    std::cout << model.data().com_position.data() << " ";
-    std::cout << model.data().com_velocity.data() << " ";
-    std::cout << model.data().zmp_position.data() << "\n";
+    std::cout << model.states().com_position.data() << " ";
+    std::cout << model.states().com_velocity.data() << " ";
+    std::cout << model.states().zmp_position.data() << "\n";
   }
   return 0;
 }

@@ -62,7 +62,7 @@ class ModelBase {
   static constexpr double default_time_step = 0.001;
   using DataType = Data;
   template <std::size_t I>
-  using RawDataType = typename Data::template RawDataI<I>;
+  using RawDataType = typename Data::template RawDataType<I>;
 
  public:
   ModelBase() : ModelBase(make_data<Data>()) {}

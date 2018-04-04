@@ -40,11 +40,20 @@ class CtrlBase {
   static_assert(std::is_default_constructible<Data>::value,
                 "Data must be default constructible.");
 
- protected:
   using Self = CtrlBase<State, Solver, Data, Model>;
+
+ protected:
   using ModelDataIndex = typename Data::ModelDataIndex;
   using RefsDataIndex = typename Data::RefsDataIndex;
   using OutputsDataIndex = typename Data::OutputsDataIndex;
+  template <std::size_t I>
+  using ModelRawDataType = typename Model::template RawDataType<I>;
+  template <std::size_t I>
+  using RefsRawDataType =
+      typename Data::template RawDataType<RefsDataIndex::template get<I>()>;
+  template <std::size_t I>
+  using OutputsRawDataType =
+      typename Data::template RawDataType<OutputsDataIndex::template get<I>()>;
 
  public:
   static constexpr auto default_time_step = Model::default_time_step;
@@ -69,11 +78,11 @@ class CtrlBase {
 
   // accessors to data
   template <std::size_t I = 0>
-  const typename Model::template RawDataType<I>& states() const {
+  const ModelRawDataType<I>& states() const {
     return m_model.template states<I>();
   }
   template <std::size_t I = 0>
-  typename Model::template RawDataType<I>& states() {
+  ModelRawDataType<I>& states() {
     return m_model.template states<I>();
   }
 
@@ -82,23 +91,20 @@ class CtrlBase {
   }
 
   template <std::size_t I = 0>
-  const typename Data::template RawDataI<RefsDataIndex::template get<I>()>&
-  refs() const {
+  const RefsRawDataType<I>& refs() const {
     return m_data.template get<RefsDataIndex::template get<I>()>();
   }
   template <std::size_t I = 0>
-  typename Data::template RawDataI<RefsDataIndex::template get<I>()>& refs() {
+  RefsRawDataType<I>& refs() {
     return m_data.template get<RefsDataIndex::template get<I>()>();
   }
 
   template <std::size_t I = 0>
-  const typename Data::template RawDataI<OutputsDataIndex::template get<I>()>&
-  outputs() const {
+  const OutputsRawDataType<I>& outputs() const {
     return m_data.template get<OutputsDataIndex::template get<I>()>();
   }
   template <std::size_t I = 0>
-  typename Data::template RawDataI<OutputsDataIndex::template get<I>()>&
-  outputs() {
+  OutputsRawDataType<I>& outputs() {
     return m_data.template get<OutputsDataIndex::template get<I>()>();
   }
 

@@ -76,9 +76,9 @@ class DataSetBase {
 
  public:
   template <std::size_t I>
-  using RawDataI = typename std::tuple_element<I, RawDataTuple>::type;
+  using RawDataType = typename std::tuple_element<I, RawDataTuple>::type;
   template <std::size_t I>
-  using RawDataPtrI = typename std::tuple_element<I, RawDataPtrTuple>::type;
+  using RawDataPtrType = typename std::tuple_element<I, RawDataPtrTuple>::type;
   static constexpr bool is_data_type = true;
   using Index = make_index_seq<raw_data_num>;
   static const Index index;
@@ -102,29 +102,29 @@ class DataSetBase {
   constexpr std::size_t get_raw_data_num() const { return raw_data_num; }
 
   template <std::size_t I = 0>
-  const RawDataPtrI<I>& get_ptr() const {
+  const RawDataPtrType<I>& get_ptr() const {
     return std::get<I>(m_raw_data_ptr_tuple);
   }
   template <std::size_t I = 0>
-  RawDataPtrI<I>& get_ptr() {
+  RawDataPtrType<I>& get_ptr() {
     return std::get<I>(m_raw_data_ptr_tuple);
   }
 
   template <std::size_t I = 0>
-  const RawDataI<I>& get() const {
+  const RawDataType<I>& get() const {
     return *std::get<I>(m_raw_data_ptr_tuple);
   }
   template <std::size_t I = 0>
-  RawDataI<I>& get() {
+  RawDataType<I>& get() {
     return *std::get<I>(m_raw_data_ptr_tuple);
   }
 
   template <std::size_t... I>
-  auto extract_ptr_tuple() const -> const std::tuple<RawDataPtrI<I>...> {
+  auto extract_ptr_tuple() const -> const std::tuple<RawDataPtrType<I>...> {
     return std::make_tuple(std::get<I>(m_raw_data_ptr_tuple)...);
   }
   template <std::size_t... I>
-  auto extract_ptr_tuple() -> std::tuple<RawDataPtrI<I>...> {
+  auto extract_ptr_tuple() -> std::tuple<RawDataPtrType<I>...> {
     return std::make_tuple(std::get<I>(m_raw_data_ptr_tuple)...);
   }
   template <std::size_t... I>
@@ -143,7 +143,7 @@ class DataSetBase {
     this->get<I>() = other.get<I>();
   }
   template <std::size_t I = 0>
-  void copy_index(const RawDataI<I>& t_raw_data) {
+  void copy_index(const RawDataType<I>& t_raw_data) {
     this->get<I>() = t_raw_data;
   }
 

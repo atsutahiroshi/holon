@@ -21,6 +21,7 @@
 #include "holon/corelib/control/pd_ctrl.hpp"
 
 #include <memory>
+#include "holon/corelib/control/point_mass_model/point_mass_model_data.hpp"
 #include "holon/corelib/math/vec3d.hpp"
 
 #include "catch.hpp"
@@ -28,6 +29,36 @@
 
 namespace holon {
 namespace {
+
+namespace data {
+
+template <typename T>
+void CheckCtor_0() {
+  PdCtrlData<T> data;
+  CHECK(data.template get<0>().mass == PointMassModelRawData<T>::default_mass);
+}
+template <typename T>
+void CheckCtor_1() {
+  Fuzzer fuzz;
+  double m = fuzz();
+  auto p0 = fuzz.get<T>();
+  PdCtrlData<T> data(p0, m);
+  CHECK(data.template get<0>().mass == m);
+  CHECK(data.template get<0>().position == p0);
+}
+
+TEST_CASE("Check c'tor of PdCtrlData", "[PdCtrlData][ctor]") {
+  SECTION("Default c'tor") {
+    CheckCtor_0<double>();
+    CheckCtor_0<Vec3D>();
+  }
+  SECTION("Overloaded c'tor 1") {
+    CheckCtor_1<double>();
+    CheckCtor_1<Vec3D>();
+  }
+}
+
+}  // namespace data
 
 template <typename T>
 void CheckCtor_0() {

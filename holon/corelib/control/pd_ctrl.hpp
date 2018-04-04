@@ -33,18 +33,20 @@ namespace holon {
 
 template <typename State>
 struct PdCtrlRefsRawData {
-  State position;
-  State velocity;
-  State stiffness;
-  State damping;
+  State position = State{0};
+  State velocity = State{0};
+  State stiffness = State{0};
+  State damping = State{0};
+  PdCtrlRefsRawData() = default;
 };
 
 template <typename State>
 struct PdCtrlOutputsRawData {
-  State position;
-  State velocity;
-  State acceleration;
-  State force;
+  State position = State{0};
+  State velocity = State{0};
+  State acceleration = State{0};
+  State force = State{0};
+  PdCtrlOutputsRawData() = default;
 };
 
 template <typename State>
@@ -63,11 +65,12 @@ class PdCtrlData
   using RefsDataIndex = index_seq<1>;
   using OutputsDataIndex = index_seq<2>;
 
-  PdCtrlData() : PdCtrlData(State{0.0}, ModelRawData::default_mass) {}
+  template <typename... Args>
+  explicit PdCtrlData(Args... args) : Base(args...) {}
+
   PdCtrlData(const State& t_initial_position, double t_mass)
-      : Base(ModelRawData{t_mass, t_initial_position, State{0}, State{0},
-                          State{0}},
-             RefsRawData(), OutputsRawData()) {}
+      : Base(alloc_raw_data<ModelRawData>(t_mass, t_initial_position),
+             alloc_raw_data<RefsRawData>(), alloc_raw_data<OutputsRawData>()) {}
 };
 
 template <typename State, typename Solver = RungeKutta4<std::array<State, 2>>,

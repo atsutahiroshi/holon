@@ -24,10 +24,142 @@
 #include <memory>
 #include "holon/corelib/common/optional.hpp"
 #include "holon/corelib/control/ctrl_base.hpp"
+#include "holon/corelib/data/data_set_base.hpp"
 #include "holon/corelib/humanoid/com_zmp_model.hpp"
 #include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
+
+namespace experimental {
+
+struct ComCtrlCommandsRawData {
+  using opt_double = optional<double>;
+
+  opt_double xd, yd, zd;
+  opt_double vxd, vyd;
+  opt_double qx1, qx2;
+  opt_double qy1, qy2;
+  opt_double qz1, qz2;
+  opt_double rho, dist, kr;
+  opt_double vhp;
+
+  void clear();
+  void set_com_position(const Vec3D& t_com_position);
+  void set_com_position(opt_double t_xd, opt_double t_yd, opt_double t_zd);
+  void set_com_velocity(opt_double t_vxd, opt_double t_vyd);
+};
+
+struct ComCtrlRefsRawData {
+  Vec3D com_position;
+  Vec3D com_velocity;
+  double qx1, qx2;
+  double qy1, qy2;
+  double qz1, qz2;
+  double rho, dist, kr;
+  double vhp;
+};
+
+struct ComCtrlOutputsRawData {
+  Vec3D com_position;
+  Vec3D com_velocity;
+  Vec3D com_acceleration;
+  Vec3D zmp_position;
+  Vec3D reaction_force;
+};
+
+class ComCtrlData
+    : public DataSetBase<ComCtrlData, ComZmpModelRawData, ComCtrlRefsRawData,
+                         ComCtrlOutputsRawData, ComCtrlCommandsRawData> {
+  using Self = ComCtrlData;
+  using Base = DataSetBase<ComCtrlData, ComZmpModelRawData, ComCtrlRefsRawData,
+                           ComCtrlOutputsRawData, ComCtrlCommandsRawData>;
+
+ public:
+  using ModelRawData = ComZmpModelRawData;
+  using RefsRawData = ComCtrlRefsRawData;
+  using OutputsRawData = ComCtrlOutputsRawData;
+  using CommandsRawData = ComCtrlCommandsRawData;
+  using ModelDataIndex = index_seq<0>;
+  using RefsDataIndex = index_seq<1>;
+  using OutputsDataIndex = index_seq<2>;
+  using CommandsDataIndex = index_seq<3>;
+  static const double default_mass;
+  static const Vec3D default_com_position;
+
+  ComCtrlData(const Vec3D& t_com_position = default_com_position,
+              double t_mass = default_mass);
+};
+
+class ComCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
+                                ComCtrlData, ComZmpModel> {
+  using Self = ComCtrl;
+  using Base = CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>, ComCtrlData,
+                        ComZmpModel>;
+
+ public:
+  using Model = ComZmpModel;
+  using Data = ComCtrlData;
+
+  ComCtrl();
+  explicit ComCtrl(const Model& t_model);
+  virtual ~ComCtrl() = default;
+
+  // accessors
+  inline const Data::CommandsRawData& commands() const noexcept {
+    return data().get<Data::CommandsDataIndex::get<0>()>();
+  }
+  inline Vec3D initial_com_position() const noexcept {
+    return model().initial_com_position();
+  }
+  inline Vec3D default_com_position() const noexcept {
+    return m_default_com_position;
+  }
+  inline double canonical_foot_dist() const noexcept {
+    return m_canonical_foot_dist;
+  }
+
+  // mutators
+  Self& set_canonical_foot_dist(double t_canonical_foot_dist);
+  virtual Self& reset() override;
+  virtual Self& reset(const Vec3D& t_com_position);
+  virtual Self& reset(const Vec3D& t_com_position, double t_foot_dist);
+
+  //
+  std::shared_ptr<ComCtrlCommandsRawData> getCommands() const noexcept {
+    return data().get_ptr<Data::CommandsDataIndex::get<0>()>();
+  }
+
+  // update functions
+  void feedback(const Model& t_model);
+  void feedback(ComZmpModelData t_model_data);
+  void feedback(const Vec3D& t_com_position, const Vec3D& t_com_velocity);
+  virtual bool update() override;
+  virtual bool update(double t_time_step) override;
+
+  using CallbackFunc = ComZmpModel::CallbackFunc;
+  Vec3D computeDesReactForce(const Vec3D& t_com_position,
+                             const Vec3D& t_com_velocity, const double t);
+  Vec3D computeDesZmpPos(const Vec3D& t_com_position,
+                         const Vec3D& t_com_velocity, const double t);
+  CallbackFunc getReactionForceCallback();
+  CallbackFunc getZmpPositionCallback();
+
+  double phaseLF() const;
+  double phaseRF() const;
+
+ private:
+  Vec3D m_default_com_position;
+  double m_canonical_foot_dist;
+  double m_max_foot_dist;
+  double m_current_foot_dist;
+
+  void updateSideward();
+  void updateRefs();
+  void updateOutputs();
+  void updateDefaultComPosition();
+};
+
+}  // namespace experimental
 
 struct ComCtrlCommands {
   using opt_double = optional<double>;

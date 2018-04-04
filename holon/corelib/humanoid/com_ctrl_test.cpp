@@ -30,6 +30,9 @@
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
 namespace holon {
+
+namespace experimental {
+
 namespace {
 
 using Catch::Matchers::Equals;
@@ -40,9 +43,9 @@ namespace ctrl_z = com_ctrl_z;
 
 const double G = RK_G;
 
-TEST_CASE("ComCtrlCommands::clear() should clear all the values") {
+TEST_CASE("ComCtrlCommandsRawData::clear() should clear all the values") {
   Fuzzer fuzz;
-  ComCtrlCommands cmd;
+  ComCtrlCommandsRawData cmd;
 
   // randomize all
   cmd.xd = fuzz.get();
@@ -82,69 +85,28 @@ TEST_CASE("ComCtrlCommands::clear() should clear all the values") {
   CHECK(cmd.vhp == nullopt);
 }
 
-TEST_CASE("ComCtrlRefs: constructor", "[ComCtrlRefs]") {
+TEST_CASE("Check c'tor of ComCtrlData", "[ComCtrlData]") {
   SECTION("default constructor") {
-    ComCtrlRefs refs;
-    CHECK(refs.com_position == ComZmpModelData::default_com_position);
-    CHECK(refs.com_velocity == kVec3DZero);
-    CHECK(refs.qx1 == ctrl_x::default_q1);
-    CHECK(refs.qx2 == ctrl_x::default_q2);
-    CHECK(refs.qy1 == ctrl_y::default_q1);
-    CHECK(refs.qy2 == ctrl_y::default_q2);
-    CHECK(refs.rho == ctrl_y::default_rho);
-    CHECK(refs.dist == ctrl_y::default_dist);
-    CHECK(refs.kr == ctrl_y::default_kr);
-    CHECK(refs.qz1 == ctrl_z::default_q1);
-    CHECK(refs.qz2 == ctrl_z::default_q2);
-    CHECK(refs.vhp == 0);
-  }
-
-  SECTION("const ComZmpModelData&") {
-    Fuzzer fuzz(0, 5);
-    auto p0 = fuzz.get<Vec3D>();
-    auto data = createComZmpModelData(p0);
-    ComCtrlRefs refs(*data);
-    CHECK(refs.com_position == p0);
-    CHECK(refs.com_velocity == kVec3DZero);
-    CHECK(refs.qx1 == ctrl_x::default_q1);
-    CHECK(refs.qx2 == ctrl_x::default_q2);
-    CHECK(refs.qy1 == ctrl_y::default_q1);
-    CHECK(refs.qy2 == ctrl_y::default_q2);
-    CHECK(refs.rho == ctrl_y::default_rho);
-    CHECK(refs.dist == ctrl_y::default_dist);
-    CHECK(refs.kr == ctrl_y::default_kr);
-    CHECK(refs.qz1 == ctrl_z::default_q1);
-    CHECK(refs.qz2 == ctrl_z::default_q2);
-    CHECK(refs.vhp == 0);
-  }
-
-  SECTION("const ComZmpModel&") {
-    Fuzzer fuzz(0, 5);
-    auto p0 = fuzz.get<Vec3D>();
-    ComZmpModel model(p0);
-    ComCtrlRefs refs(model);
-    CHECK(refs.com_position == p0);
-    CHECK(refs.com_velocity == kVec3DZero);
-    CHECK(refs.qx1 == ctrl_x::default_q1);
-    CHECK(refs.qx2 == ctrl_x::default_q2);
-    CHECK(refs.qy1 == ctrl_y::default_q1);
-    CHECK(refs.qy2 == ctrl_y::default_q2);
-    CHECK(refs.rho == ctrl_y::default_rho);
-    CHECK(refs.dist == ctrl_y::default_dist);
-    CHECK(refs.kr == ctrl_y::default_kr);
-    CHECK(refs.qz1 == ctrl_z::default_q1);
-    CHECK(refs.qz2 == ctrl_z::default_q2);
-    CHECK(refs.vhp == 0);
+    ComCtrlData data;
+    constexpr auto i = ComCtrlData::RefsDataIndex::get<0>();
+    CHECK(data.get<i>().com_position == ComZmpModelData::default_com_position);
+    CHECK(data.get<i>().com_velocity == kVec3DZero);
+    CHECK(data.get<i>().qx1 == ctrl_x::default_q1);
+    CHECK(data.get<i>().qx2 == ctrl_x::default_q2);
+    CHECK(data.get<i>().qy1 == ctrl_y::default_q1);
+    CHECK(data.get<i>().qy2 == ctrl_y::default_q2);
+    CHECK(data.get<i>().rho == ctrl_y::default_rho);
+    CHECK(data.get<i>().dist == ctrl_y::default_dist);
+    CHECK(data.get<i>().kr == ctrl_y::default_kr);
+    CHECK(data.get<i>().qz1 == ctrl_z::default_q1);
+    CHECK(data.get<i>().qz2 == ctrl_z::default_q2);
+    CHECK(data.get<i>().vhp == 0);
   }
 }
 
 void checkConstructor(const ComCtrl& ctrl) {
-  SECTION("check if member pointers are preserved") {
-    REQUIRE(&ctrl.states());
-    REQUIRE(&ctrl.refs());
-    REQUIRE(&ctrl.outputs());
-    REQUIRE(&ctrl.commands());
-    REQUIRE(&ctrl.model().data() == &ctrl.states());
+  SECTION("check if data in model and states are indentical") {
+    REQUIRE(&ctrl.model().data().get() == &ctrl.states());
   }
 
   SECTION("check callback functions") {
@@ -160,28 +122,27 @@ void checkConstructor(const ComCtrl& ctrl) {
   }
 }
 
-TEST_CASE("ComCtrl() constructor", "[corelib][humanoid][ComCtrl]") {
+TEST_CASE("ComCtrl() constructor", "[ComCtrl]") {
   ComCtrl ctrl;
   checkConstructor(ctrl);
 }
 
-TEST_CASE("ComCtrl(const Model&) constructor", "[corelib][humanoid][ComCtrl]") {
+TEST_CASE("ComCtrl(const Model&) constructor", "[ComCtrl]") {
   ComCtrl::Model model;
   Fuzzer fuzz;
-  model.data_ptr()->com_position = fuzz.get<Vec3D>();
-  model.data_ptr()->com_velocity = fuzz.get<Vec3D>();
+  model.states().com_position = fuzz.get<Vec3D>();
+  model.states().com_velocity = fuzz.get<Vec3D>();
   ComCtrl ctrl(model);
   checkConstructor(ctrl);
 }
 
-TEST_CASE("Check data constructed by ComCtrl(const Model&)",
-          "[corelib][humanoid][ComCtrl]") {
+TEST_CASE("Check data constructed by ComCtrl(const Model&)", "[ComCtrl]") {
   ComCtrl::Model model;
   Fuzzer fuzz;
   auto p = fuzz.get<Vec3D>();
   auto v = fuzz.get<Vec3D>();
-  model.data_ptr()->com_position = p;
-  model.data_ptr()->com_velocity = v;
+  model.states().com_position = p;
+  model.states().com_velocity = v;
 
   ComCtrl ctrl(model);
   CHECK(ctrl.model().initial_com_position() == p);
@@ -192,60 +153,15 @@ TEST_CASE("Check data constructed by ComCtrl(const Model&)",
   v = fuzz.get<Vec3D>();
   ctrl.states().com_position = p;
   ctrl.states().com_velocity = v;
-  CHECK(model.data().com_position != p);
-  CHECK(model.data().com_velocity != v);
+  CHECK(model.states().com_position != p);
+  CHECK(model.states().com_velocity != v);
   CHECK(ctrl.model().initial_com_position() != p);
   CHECK(ctrl.states().com_position == p);
   CHECK(ctrl.states().com_velocity == v);
 }
 
-TEST_CASE("ComCtrl::set_states_ptr can set another pointer to states data",
-          "[corelib][humanoid][ComCtrl]") {
-  ComCtrl ctrl;
-  {
-    auto states1 = createComZmpModelData(Vec3D(0, 0, 1), 3);
-    REQUIRE(ctrl.states_ptr().get() != states1.get());
-    ctrl.set_states_ptr(states1);
-    REQUIRE(ctrl.states_ptr().get() == states1.get());
-    REQUIRE(ctrl.states().mass == 3.0);
-    REQUIRE(ctrl.model().data_ptr().get() == states1.get());
-    REQUIRE(ctrl.model().mass() == 3.0);
-    REQUIRE(states1.use_count() == 3);
-  }
-  REQUIRE(ctrl.states_ptr().use_count() == 2);
-  ctrl.states_ptr()->mass = 5.0;
-  REQUIRE(ctrl.states().mass == 5.0);
-  REQUIRE(ctrl.model().mass() == 5.0);
-}
-
-TEST_CASE("ComCtrl::set_refs_ptr can set another pointer to refs data",
-          "[corelib][humanoid][ComCtrl]") {
-  ComCtrl ctrl;
-  {
-    auto refs1 = createComCtrlRefs();
-    REQUIRE(ctrl.refs_ptr().get() != refs1.get());
-    ctrl.set_refs_ptr(refs1);
-    REQUIRE(ctrl.refs_ptr().get() == refs1.get());
-    REQUIRE(refs1.use_count() == 2);
-  }
-  REQUIRE(ctrl.refs_ptr().use_count() == 1);
-}
-
-TEST_CASE("ComCtrl::set_outputs_ptr can set another pointer to outputs data",
-          "[corelib][humanoid][ComCtrl]") {
-  ComCtrl ctrl;
-  {
-    auto outputs1 = createComCtrlOutputs();
-    REQUIRE(ctrl.outputs_ptr().get() != outputs1.get());
-    ctrl.set_outputs_ptr(outputs1);
-    REQUIRE(ctrl.outputs_ptr().get() == outputs1.get());
-    REQUIRE(outputs1.use_count() == 2);
-  }
-  REQUIRE(ctrl.outputs_ptr().use_count() == 1);
-}
-
 TEST_CASE("ComCtrl::set_canonical_foot_dist sets canonical foot distance",
-          "[corelib][humanoid][ComCtrl]") {
+          "[ComCtrl]") {
   ComCtrl ctrl;
   double dist = Fuzzer(0, 1).get<double>();
   REQUIRE(ctrl.canonical_foot_dist() != dist);
@@ -285,7 +201,7 @@ TEST_CASE("Check default COM position defined in ComCtrl", "[ComCtrl]") {
 }
 
 TEST_CASE("ComCtrl::reset(const Vec3D&) should reset initial COM position",
-          "[corelib][humanoid][ComCtrl]") {
+          "[ComCtrl]") {
   ComCtrl ctrl;
   Vec3D p0 = {0, 0, 1.5};
   REQUIRE_THAT(ctrl.model().initial_com_position(), !Equals(p0));
@@ -314,7 +230,7 @@ TEST_CASE(
 }
 
 TEST_CASE("ComCtrl::getCommands() provides a pointer to user commands",
-          "[corelib][humanoid][ComCtrl]") {
+          "[ComCtrl]") {
   ComCtrl ctrl;
 
   auto cmd = ctrl.getCommands();
@@ -332,7 +248,7 @@ TEST_CASE("ComCtrl::getCommands() provides a pointer to user commands",
 }
 
 TEST_CASE("ComCtrl::feedback should copy COM position / velocity",
-          "[corelib][humanoid][ComCtrl]") {
+          "[ComCtrl]") {
   ComCtrl ctrl;
   Fuzzer fuzz;
 
@@ -349,9 +265,9 @@ TEST_CASE("ComCtrl::feedback should copy COM position / velocity",
   SECTION("ComCtrl::feedback(const Model::DataPtr&)") {
     Vec3D p = fuzz.get<Vec3D>();
     Vec3D v = fuzz.get<Vec3D>();
-    auto data = createComZmpModelData();
-    data->com_position = p;
-    data->com_velocity = v;
+    auto data = make_data<ComZmpModelData>();
+    data.get().com_position = p;
+    data.get().com_velocity = v;
 
     REQUIRE(ctrl.states().com_position != p);
     REQUIRE(ctrl.states().com_velocity != v);
@@ -364,8 +280,8 @@ TEST_CASE("ComCtrl::feedback should copy COM position / velocity",
     Vec3D p = fuzz.get<Vec3D>();
     Vec3D v = fuzz.get<Vec3D>();
     ComCtrl::Model model;
-    model.data_ptr()->com_position = p;
-    model.data_ptr()->com_velocity = v;
+    model.states().com_position = p;
+    model.states().com_velocity = v;
 
     REQUIRE(ctrl.states().com_position != p);
     REQUIRE(ctrl.states().com_velocity != v);
@@ -409,7 +325,7 @@ TEST_CASE("check if desired ZMP position is modified after update",
   } testcases[] = {{{0, 0, 1}}, {{0.1, 0, 1}}, {{0.1, -0.1, 1}}};
   for (auto& c : testcases) {
     Vec3D expected_pz;
-    ctrl.refs_ptr()->com_position = c.pd;
+    ctrl.refs().com_position = c.pd;
     expected_pz = ctrl.computeDesZmpPos(ctrl.states().com_position,
                                         ctrl.states().com_velocity, 0);
 
@@ -419,18 +335,17 @@ TEST_CASE("check if desired ZMP position is modified after update",
   }
 }
 
-TEST_CASE("ComCtrl::update() updates control paramters",
-          "[corelib][humanoid][ComCtrl]") {
+TEST_CASE("ComCtrl::update() updates control paramters", "[ComCtrl]") {
   ComCtrl ctrl;
   Vec3D p0 = {0.1, -0.1, 1.5};
   double dist = 0.42;
   ctrl.reset(p0, dist);
   auto cmd = ctrl.getCommands();
-  auto refs = ctrl.refs_ptr();
+  auto refs = ctrl.refs();
 
   Fuzzer fuzz;
   SECTION("COM position") {
-    refs->com_position = fuzz.get<Vec3D>();
+    refs.com_position = fuzz.get<Vec3D>();
     SECTION("default") {
       REQUIRE(ctrl.update());
       CHECK(ctrl.refs().com_position == p0);
@@ -449,7 +364,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   }
 
   SECTION("COM velocity") {
-    refs->com_velocity = fuzz.get<Vec3D>();
+    refs.com_velocity = fuzz.get<Vec3D>();
     SECTION("default") {
       REQUIRE(ctrl.update());
       CHECK(ctrl.refs().com_velocity == kVec3DZero);
@@ -468,8 +383,8 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   }
 
   SECTION("qx1 and qx2") {
-    refs->qx1 = fuzz.get<double>();
-    refs->qx2 = fuzz.get<double>();
+    refs.qx1 = fuzz.get<double>();
+    refs.qx2 = fuzz.get<double>();
     SECTION("default") {
       REQUIRE(ctrl.update());
       CHECK(ctrl.refs().qx1 == 1.0);
@@ -491,8 +406,8 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   }
 
   SECTION("qy1 and qy2") {
-    refs->qy1 = fuzz.get<double>();
-    refs->qy2 = fuzz.get<double>();
+    refs.qy1 = fuzz.get<double>();
+    refs.qy2 = fuzz.get<double>();
     SECTION("default") {
       REQUIRE(ctrl.update());
       CHECK(ctrl.refs().qy1 == 1.0);
@@ -514,8 +429,8 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   }
 
   SECTION("qz1 and qz2") {
-    refs->qz1 = fuzz.get<double>();
-    refs->qz2 = fuzz.get<double>();
+    refs.qz1 = fuzz.get<double>();
+    refs.qz2 = fuzz.get<double>();
     SECTION("default") {
       REQUIRE(ctrl.update());
       CHECK(ctrl.refs().qz1 == 1.0);
@@ -537,7 +452,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   }
 
   SECTION("Virtual horizontal plane") {
-    refs->vhp = fuzz.get<double>();
+    refs.vhp = fuzz.get<double>();
     SECTION("default") {
       REQUIRE(ctrl.update());
       CHECK(ctrl.refs().vhp == 0.0);
@@ -555,7 +470,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   }
 
   SECTION("Stepping activation parameter") {
-    refs->rho = fuzz();
+    refs.rho = fuzz();
     SECTION("default") {
       REQUIRE(ctrl.update());
       CHECK(ctrl.refs().rho == 0.0);
@@ -573,7 +488,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   }
 
   SECTION("Canonical foot distance") {
-    refs->dist = fuzz();
+    refs.dist = fuzz();
     SECTION("default") {
       REQUIRE(ctrl.update());
       CHECK(ctrl.refs().dist == dist);
@@ -591,7 +506,7 @@ TEST_CASE("ComCtrl::update() updates control paramters",
   }
 
   SECTION("initial energy exersion") {
-    refs->kr = fuzz();
+    refs.kr = fuzz();
     SECTION("default") {
       REQUIRE(ctrl.update());
       CHECK(ctrl.refs().kr == 1.0);
@@ -656,8 +571,7 @@ SCENARIO("controller can regulate COM position at a point",
   }
 }
 
-SCENARIO("regulate COM position along vertical direction",
-         "[corelib][humanoid][ComCtrl]") {
+SCENARIO("regulate COM position along vertical direction", "[ComCtrl]") {
   GIVEN(
       "desired COM position = (0, 0, 0.42), "
       "initial COM position = (0, 0, 0.4)") {
@@ -707,7 +621,7 @@ TEST_CASE("com_ctrl: when COM height is zero, update should fail",
 }
 
 TEST_CASE("ComCtrl::update() when given COM height is zero, update should fail",
-          "[corelib][humanoid][ComCtrl]") {
+          "[ComCtrl]") {
   ComCtrl ctrl;
   Vec3D p = {0, 0, 0};
 
@@ -717,8 +631,7 @@ TEST_CASE("ComCtrl::update() when given COM height is zero, update should fail",
   zEchoOn();
 }
 
-SCENARIO("Controller makes COM oscillate sideward",
-         "[corelib][humanoid][ComCtrl]") {
+SCENARIO("Controller makes COM oscillate sideward", "[ComCtrl]") {
   GIVEN("Referential COM is at (0, 0, 0.42)") {
     ComCtrl ctrl;
     Vec3D pd = {0, 0, 0.42};
@@ -965,6 +878,8 @@ SCENARIO("Check relations among rho, yd, dist and vyd", "[ComCtrl]") {
     }
   }
 }
-
 }  // namespace
+
+}  // namespace experimental
+
 }  // namespace holon

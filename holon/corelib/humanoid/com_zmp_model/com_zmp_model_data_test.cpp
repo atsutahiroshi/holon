@@ -34,6 +34,7 @@ using Catch::Matchers::Equals;
 const double G = RK_G;
 
 using experimental::ComZmpModelData;
+using experimental::ComZmpModelRawData;
 
 void RandomizeData(ComZmpModelData data) {
   Fuzzer fuzz;
@@ -65,10 +66,49 @@ void CheckData(const ComZmpModelData& a, const ComZmpModelData& b) {
   CHECK_COMZMPMODELDATA_MEMBER(a, b, total_force);
 }
 
-TEST_CASE("ComZmpModelData: constructor",
-          "[corelib][humanoid][ComZmpModelData]") {
+TEST_CASE("ComZmpModelData: constructor", "[ComZmpModelData][ctor]") {
   double default_mass = 1;
   Vec3D default_com_position = {0, 0, 1};
+
+  SECTION("with raw data") {
+    Fuzzer fuzz;
+    auto m = fuzz.get();
+    auto p0 = fuzz.get<Vec3D>();
+    ComZmpModelRawData rawdata{m,          kVec3DZ,    p0,
+                               kVec3DZero, kVec3DZero, kVec3DZero,
+                               kVec3DZero, kVec3DZero, kVec3DZero};
+    ComZmpModelData data(rawdata);
+    CHECK(data().mass == m);
+    CHECK(data().nu == kVec3DZ);
+    CHECK(data().com_position == p0);
+    CHECK(data().com_velocity == kVec3DZero);
+    CHECK(data().com_acceleration == kVec3DZero);
+    CHECK(data().zmp_position == kVec3DZero);
+    CHECK(data().reaction_force == kVec3DZero);
+    CHECK(data().external_force == kVec3DZero);
+    CHECK(data().total_force == kVec3DZero);
+  }
+
+  SECTION("with raw data pointer") {
+    Fuzzer fuzz;
+    auto m = fuzz.get();
+    auto p0 = fuzz.get<Vec3D>();
+    auto rawdata_p = alloc_raw_data<ComZmpModelRawData>();
+    rawdata_p->mass = m;
+    rawdata_p->nu = Vec3D(0, 0, 1);
+    rawdata_p->com_position = p0;
+    ComZmpModelData data(rawdata_p);
+    CHECK(data().mass == m);
+    CHECK(data().nu == kVec3DZ);
+    CHECK(data().com_position == p0);
+    CHECK(data().com_velocity == kVec3DZero);
+    CHECK(data().com_acceleration == kVec3DZero);
+    CHECK(data().zmp_position == kVec3DZero);
+    CHECK(data().reaction_force == kVec3DZero);
+    CHECK(data().external_force == kVec3DZero);
+    CHECK(data().total_force == kVec3DZero);
+    REQUIRE(data.get_ptr() == rawdata_p);
+  }
 
   SECTION("default constructor (no parameters)") {
     ComZmpModelData data;

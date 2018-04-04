@@ -52,6 +52,8 @@ class ComZmpModelData
   static const Vec3D default_com_position;
 
  public:
+  ComZmpModelData(const RawData& t_raw_data);
+  ComZmpModelData(std::shared_ptr<RawData> t_raw_data_p);
   ComZmpModelData(const Vec3D& t_com_position = default_com_position,
                   double t_mass = default_mass);
 };

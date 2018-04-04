@@ -22,6 +22,7 @@
 
 #include <roki/rk_g.h>
 #include <memory>
+#include <utility>
 
 namespace holon {
 
@@ -30,16 +31,20 @@ namespace experimental {
 const double ComZmpModelData::default_mass = 1.0;
 const Vec3D ComZmpModelData::default_com_position = {0.0, 0.0, 1.0};
 
+ComZmpModelData::ComZmpModelData(const RawData& t_raw_data)
+    : Base(t_raw_data) {}
+ComZmpModelData::ComZmpModelData(std::shared_ptr<RawData> t_raw_data_p)
+    : Base(t_raw_data_p) {}
 ComZmpModelData::ComZmpModelData(const Vec3D& t_com_position, double t_mass)
-    : Base(ComZmpModelRawData({t_mass,
-                               kVec3DZ,
-                               t_com_position,
-                               kVec3DZero,
-                               kVec3DZero,
-                               kVec3DZero,
-                               {0, 0, t_mass * RK_G},
-                               kVec3DZero,
-                               {0, 0, t_mass * RK_G}})) {}
+    : ComZmpModelData(std::move(ComZmpModelRawData({t_mass,
+                                                    kVec3DZ,
+                                                    t_com_position,
+                                                    kVec3DZero,
+                                                    kVec3DZero,
+                                                    kVec3DZero,
+                                                    {0, 0, t_mass * RK_G},
+                                                    kVec3DZero,
+                                                    {0, 0, t_mass * RK_G}}))) {}
 
 }  // namespace experimental
 

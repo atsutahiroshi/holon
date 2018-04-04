@@ -462,25 +462,6 @@ TEST_CASE("Extract sub-data by indices", "[DataSetBase]") {
   CheckSubData(data, sub4);
 }
 
-template <std::size_t I, typename... RawDataTypes>
-typename std::enable_if<I == sizeof...(RawDataTypes), void>::type
-copy_data_tuple_impl(std::tuple<RawDataTypes...> src,
-                     std::tuple<RawDataTypes...> dst) {}
-
-template <std::size_t I, typename... RawDataTypes>
-typename std::enable_if<(I < sizeof...(RawDataTypes)), void>::type
-copy_data_tuple_impl(std::tuple<RawDataTypes...> src,
-                     std::tuple<RawDataTypes...> dst) {
-  *std::get<I>(dst) = *std::get<I>(src);
-  copy_data_tuple_impl<I + 1, RawDataTypes...>(src, dst);
-}
-
-template <typename... RawDataTypes>
-void copy_data_tuple(std::tuple<RawDataTypes...> src,
-                     std::tuple<RawDataTypes...> dst) {
-  copy_data_tuple_impl<0, RawDataTypes...>(src, dst);
-}
-
 TEST_CASE("Copy sub-data by indices", "[DataSetBase]") {
   using sub_data_test::Data;
   using sub_data_test::SubData;

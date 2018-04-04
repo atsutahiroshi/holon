@@ -35,6 +35,11 @@ std::shared_ptr<RawData> alloc_raw_data(Args&&... args) {
   return std::make_shared<RawData>(std::forward<Args>(args)...);
 }
 
+template <typename RawData, typename... Args>
+RawData make_raw_data(Args&&... args) {
+  return RawData(std::forward<Args>(args)...);
+}
+
 template <typename T, typename = int>
 struct is_data_type : std::false_type {};
 

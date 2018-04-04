@@ -85,35 +85,47 @@ class DataSetBase {
 
  public:
   DataSetBase()
-      : m_data_ptr_tuple(std::make_tuple(alloc_raw_data<RawDataTypes>()...)) {}
+      : m_raw_data_ptr_tuple(
+            std::make_tuple(alloc_raw_data<RawDataTypes>()...)) {}
   explicit DataSetBase(const RawDataTypes&... args)
-      : m_data_ptr_tuple(
+      : m_raw_data_ptr_tuple(
             std::make_tuple(alloc_raw_data<RawDataTypes>(args)...)) {}
   explicit DataSetBase(std::shared_ptr<RawDataTypes>... args)
-      : m_data_ptr_tuple(std::make_tuple(args...)) {}
-  explicit DataSetBase(RawDataPtrTuple t_data_ptr_tuple)
-      : m_data_ptr_tuple(t_data_ptr_tuple) {}
+      : m_raw_data_ptr_tuple(std::make_tuple(args...)) {}
+  explicit DataSetBase(RawDataPtrTuple t_raw_data_ptr_tuple)
+      : m_raw_data_ptr_tuple(t_raw_data_ptr_tuple) {}
   virtual ~DataSetBase() = default;
 
-  const RawDataPtrTuple& get_data_ptr_tuple() const { return m_data_ptr_tuple; }
+  const RawDataPtrTuple& get_raw_data_ptr_tuple() const {
+    return m_raw_data_ptr_tuple;
+  }
   constexpr std::size_t get_raw_data_num() const { return raw_data_num; }
 
   template <std::size_t I = 0>
   const RawDataPtrI<I>& get_ptr() const {
-    return std::get<I>(m_data_ptr_tuple);
+    return std::get<I>(m_raw_data_ptr_tuple);
   }
   template <std::size_t I = 0>
   RawDataPtrI<I>& get_ptr() {
-    return std::get<I>(m_data_ptr_tuple);
+    return std::get<I>(m_raw_data_ptr_tuple);
+  }
+
+  template <std::size_t I = 0>
+  const RawDataI<I>& get() const {
+    return *std::get<I>(m_raw_data_ptr_tuple);
+  }
+  template <std::size_t I = 0>
+  RawDataI<I>& get() {
+    return *std::get<I>(m_raw_data_ptr_tuple);
   }
 
   template <std::size_t... I>
   auto extract_ptr_tuple() const -> const std::tuple<RawDataPtrI<I>...> {
-    return std::make_tuple(std::get<I>(m_data_ptr_tuple)...);
+    return std::make_tuple(std::get<I>(m_raw_data_ptr_tuple)...);
   }
   template <std::size_t... I>
   auto extract_ptr_tuple() -> std::tuple<RawDataPtrI<I>...> {
-    return std::make_tuple(std::get<I>(m_data_ptr_tuple)...);
+    return std::make_tuple(std::get<I>(m_raw_data_ptr_tuple)...);
   }
   template <std::size_t... I>
   auto extract_ptr_tuple(index_seq<I...>) const -> const
@@ -124,15 +136,6 @@ class DataSetBase {
   auto extract_ptr_tuple(index_seq<I...>)
       -> decltype(this->extract_ptr_tuple<I...>()) {
     return this->extract_ptr_tuple<I...>();
-  }
-
-  template <std::size_t I = 0>
-  const RawDataI<I>& get() const {
-    return *std::get<I>(m_data_ptr_tuple);
-  }
-  template <std::size_t I = 0>
-  RawDataI<I>& get() {
-    return *std::get<I>(m_data_ptr_tuple);
   }
 
   template <std::size_t I = 0>
@@ -150,50 +153,37 @@ class DataSetBase {
     auto dst = this->extract_ptr_tuple(dst_index);
     static_assert(std::is_same<decltype(dst), decltype(src)>::value,
                   "copy_data failed. Inappropriate data index selection.");
-    copy_data_tuple(data.extract_ptr_tuple(src_index),
-                    this->extract_ptr_tuple(dst_index));
+    copy_data_tuple(src, dst);
   }
 
-  void copy(const Self& other) { copy_impl<0>(other); }
+  void copy(const Self& other) {
+    copy_data_tuple(other.get_raw_data_ptr_tuple(), m_raw_data_ptr_tuple);
+  }
   void copy(const RawDataTypes... args) { copy_data_impl<0>(args...); }
   void copy(const std::shared_ptr<RawDataTypes>... args) {
     copy_data_impl<0>(args...);
   }
 
   void share_with(const Self& target) {
-    m_data_ptr_tuple = target.get_data_ptr_tuple();
+    m_raw_data_ptr_tuple = target.get_raw_data_ptr_tuple();
   }
 
   template <typename SubDataType, std::size_t... I>
   SubDataType extract() const {
-    // consider using make_data method...
-    return SubDataType(std::get<I>(m_data_ptr_tuple)...);
+    return make_data<SubDataType>(std::get<I>(m_raw_data_ptr_tuple)...);
   }
-
   template <typename SubDataType, std::size_t... I>
   SubDataType extract(index_seq<I...>) const {
-    // consider using make_data method...
-    return SubDataType(std::get<I>(m_data_ptr_tuple)...);
+    return make_data<SubDataType>(std::get<I>(m_raw_data_ptr_tuple)...);
   }
 
   bool operator==(const Self& rhs) const {
-    return m_data_ptr_tuple == rhs.get_data_ptr_tuple();
+    return m_raw_data_ptr_tuple == rhs.get_raw_data_ptr_tuple();
   }
   bool operator!=(const Self& rhs) const { return !(*this == rhs); }
 
  private:
-  RawDataPtrTuple m_data_ptr_tuple;
-
-  template <std::size_t I = 0>
-  typename std::enable_if<(I == raw_data_num), void>::type copy_impl(
-      const Self& /* other */) {}
-
-  template <std::size_t I = 0>
-  typename std::enable_if<(I < raw_data_num), void>::type copy_impl(
-      const Self& other) {
-    copy_index<I>(other);
-    copy_impl<I + 1>(other);
-  }
+  RawDataPtrTuple m_raw_data_ptr_tuple;
 
   template <std::size_t I>
   void copy_data_impl() {}

@@ -3,6 +3,7 @@ set(sources
   com_zmp_model.cpp
   )
 set(test_sources
+  biped_model_test.cpp
   com_ctrl_test.cpp
   com_zmp_model_test.cpp
   )

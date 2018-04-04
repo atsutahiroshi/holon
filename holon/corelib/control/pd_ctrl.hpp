@@ -49,12 +49,11 @@ struct PdCtrlOutputsRawData {
 
 template <typename State>
 class PdCtrlData
-    : public DataSetBase<PdCtrlData<State>, PointMassModelRawData<State>,
-                         PdCtrlRefsRawData<State>,
+    : public DataSetBase<PointMassModelRawData<State>, PdCtrlRefsRawData<State>,
                          PdCtrlOutputsRawData<State>> {
   using Base =
-      DataSetBase<PdCtrlData<State>, PointMassModelRawData<State>,
-                  PdCtrlRefsRawData<State>, PdCtrlOutputsRawData<State>>;
+      DataSetBase<PointMassModelRawData<State>, PdCtrlRefsRawData<State>,
+                  PdCtrlOutputsRawData<State>>;
 
  public:
   using ModelRawData = PointMassModelRawData<State>;

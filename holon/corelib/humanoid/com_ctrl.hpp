@@ -66,10 +66,10 @@ struct ComCtrlOutputsRawData {
 };
 
 class ComCtrlData
-    : public DataSetBase<ComCtrlData, ComZmpModelRawData, ComCtrlRefsRawData,
+    : public DataSetBase<ComZmpModelRawData, ComCtrlRefsRawData,
                          ComCtrlOutputsRawData, ComCtrlCommandsRawData> {
   using Self = ComCtrlData;
-  using Base = DataSetBase<ComCtrlData, ComZmpModelRawData, ComCtrlRefsRawData,
+  using Base = DataSetBase<ComZmpModelRawData, ComCtrlRefsRawData,
                            ComCtrlOutputsRawData, ComCtrlCommandsRawData>;
 
  public:

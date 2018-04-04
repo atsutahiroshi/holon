@@ -36,13 +36,13 @@ struct RawDataSample1 {
 };
 constexpr double RawDataSample1::default_v;
 
-class DataSetSample1 : public DataSetBase<DataSetSample1, RawDataSample1> {
+class DataSetSample1 : public DataSetBase<RawDataSample1> {
  public:
   DataSetSample1() {}
   explicit DataSetSample1(const RawDataSample1& raw_data)
-      : DataSetBase<DataSetSample1, RawDataSample1>(raw_data) {}
+      : DataSetBase<RawDataSample1>(raw_data) {}
   explicit DataSetSample1(std::shared_ptr<RawDataSample1> raw_data)
-      : DataSetBase<DataSetSample1, RawDataSample1>(raw_data) {}
+      : DataSetBase<RawDataSample1>(raw_data) {}
 };
 
 struct RawDataSample2 {
@@ -52,20 +52,20 @@ struct RawDataSample2 {
 };
 constexpr double RawDataSample2::default_in;
 
-class DataSetSample2 : public DataSetBase<DataSetSample2, RawDataSample1,
-                                          RawDataSample2, RawDataSample2> {
+class DataSetSample2
+    : public DataSetBase<RawDataSample1, RawDataSample2, RawDataSample2> {
  public:
   DataSetSample2() {}
   DataSetSample2(const RawDataSample1& raw_data1,
                  const RawDataSample2& raw_data2,
                  const RawDataSample2& raw_data3)
-      : DataSetBase<DataSetSample2, RawDataSample1, RawDataSample2,
-                    RawDataSample2>(raw_data1, raw_data2, raw_data3) {}
+      : DataSetBase<RawDataSample1, RawDataSample2, RawDataSample2>(
+            raw_data1, raw_data2, raw_data3) {}
   DataSetSample2(std::shared_ptr<RawDataSample1> raw_data1,
                  std::shared_ptr<RawDataSample2> raw_data2,
                  std::shared_ptr<RawDataSample2> raw_data3)
-      : DataSetBase<DataSetSample2, RawDataSample1, RawDataSample2,
-                    RawDataSample2>(raw_data1, raw_data2, raw_data3) {}
+      : DataSetBase<RawDataSample1, RawDataSample2, RawDataSample2>(
+            raw_data1, raw_data2, raw_data3) {}
   RawDataSample1& data1() { return get<0>(); }
   RawDataSample2& data2() { return get<1>(); }
   RawDataSample2& data3() { return get<2>(); }
@@ -368,13 +368,11 @@ TEST_CASE("Check share_with method in DataSetBase", "[DataSetBase]") {
   }
 }
 
-class DataSetSample3
-    : public DataSetBase<DataSetSample3, RawDataSample1, RawDataSample2> {
+class DataSetSample3 : public DataSetBase<RawDataSample1, RawDataSample2> {
  public:
   DataSetSample3(std::shared_ptr<RawDataSample1> raw_data1,
                  std::shared_ptr<RawDataSample2> raw_data2)
-      : DataSetBase<DataSetSample3, RawDataSample1, RawDataSample2>(
-            raw_data1, raw_data2) {}
+      : DataSetBase<RawDataSample1, RawDataSample2>(raw_data1, raw_data2) {}
 };
 
 TEST_CASE("Check extract method in DataSetBase", "[DataSetBase][extract]") {
@@ -410,11 +408,11 @@ struct D {
 struct E {
   double e;
 };
-struct Data : DataSetBase<Data, A, B, C, D, E> {
+struct Data : DataSetBase<A, B, C, D, E> {
   using sub_index_t = index_seq<1, 3>;
   sub_index_t sub_index;
 };
-struct SubData : DataSetBase<SubData, B, D> {
+struct SubData : DataSetBase<B, D> {
   SubData() {}
   SubData(std::shared_ptr<B> b, std::shared_ptr<D> d) : DataSetBase(b, d) {}
   explicit SubData(std::tuple<std::shared_ptr<B>, std::shared_ptr<D>> tuple)

@@ -62,14 +62,12 @@ Data<State> make_data(const State& state, Args&&... args) {
   return Data<State>(state, std::forward<Args>(args)...);
 }
 
-template <class DataType, class... RawDataTypes>
+template <class... RawDataTypes>
 class DataSetBase {
   static_assert(sizeof...(RawDataTypes) > 0,
                 "DataSetBase must have at least one RawData class.");
-  // static_assert(std::is_default_constructible<DataType>::value,
-  //               "DataType must be default constructible");
 
-  using Self = DataSetBase<DataType, RawDataTypes...>;
+  using Self = DataSetBase<RawDataTypes...>;
   static constexpr std::size_t raw_data_num = sizeof...(RawDataTypes);
 
  protected:

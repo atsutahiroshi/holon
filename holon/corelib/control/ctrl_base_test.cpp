@@ -36,7 +36,7 @@ namespace {
 struct TestModelRawData {
   double p, v;
 };
-struct TestModelData : DataSetBase<TestModelData, TestModelRawData> {
+struct TestModelData : DataSetBase<TestModelRawData> {
   TestModelData() : DataSetBase(TestModelRawData{0, 0}) {}
   explicit TestModelData(std::shared_ptr<TestModelRawData> t_raw_data_p)
       : DataSetBase(t_raw_data_p) {}
@@ -67,8 +67,8 @@ struct TestOutputsRawData {
   double pp, vv;
 };
 
-struct TestCtrlData : DataSetBase<TestCtrlData, TestModelRawData,
-                                  TestRefsRawData, TestOutputsRawData> {
+struct TestCtrlData
+    : DataSetBase<TestModelRawData, TestRefsRawData, TestOutputsRawData> {
   TestCtrlData() {}
   TestCtrlData(std::shared_ptr<TestModelRawData> t_model_data_p,
                std::shared_ptr<TestRefsRawData> t_refs_data_p,
@@ -172,8 +172,8 @@ struct C {};
 struct D {};
 struct E {};
 struct F {};
-struct ModelData : DataSetBase<ModelData, A, B> {
-  using Base = DataSetBase<ModelData, A, B>;
+struct ModelData : DataSetBase<A, B> {
+  using Base = DataSetBase<A, B>;
   explicit ModelData(typename Base::RawDataPtrTuple raw_data_ptrs)
       : Base(raw_data_ptrs) {}
   ModelData() {}
@@ -183,19 +183,19 @@ struct Model : ModelBase<double, Euler<std::array<double, 2>>, ModelData> {
   Model() : ModelBase(make_data<ModelData>()) {}
   explicit Model(ModelData t_data) : ModelBase(t_data) {}
 };
-struct RefsData : DataSetBase<RefsData, C, E> {
-  using Base = DataSetBase<RefsData, C, E>;
+struct RefsData : DataSetBase<C, E> {
+  using Base = DataSetBase<C, E>;
   template <typename... Args>
   explicit RefsData(std::shared_ptr<Args>... args) : Base(args...) {}
 };
-struct OutputsData : DataSetBase<OutputsData, D, F> {
-  using Base = DataSetBase<OutputsData, D, F>;
+struct OutputsData : DataSetBase<D, F> {
+  using Base = DataSetBase<D, F>;
   template <typename... Args>
   explicit OutputsData(std::shared_ptr<Args>... args) : Base(args...) {}
 };
 
-struct Data : DataSetBase<Data, A, B, C, D, E, F> {
-  using Base = DataSetBase<Data, A, B, C, D, E, F>;
+struct Data : DataSetBase<A, B, C, D, E, F> {
+  using Base = DataSetBase<A, B, C, D, E, F>;
   Data() {}
   explicit Data(typename Base::RawDataPtrTuple raw_data_ptrs)
       : Base(raw_data_ptrs) {}

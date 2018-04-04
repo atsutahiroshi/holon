@@ -34,7 +34,7 @@ namespace {
 struct TestRawData {
   double p, v;
 };
-struct TestData : DataSetBase<TestData, TestRawData> {
+struct TestData : DataSetBase<TestRawData> {
   TestData() : DataSetBase(TestRawData{0, 0}) {}
   TestData(double p, double v) : DataSetBase(TestRawData{p, v}) {}
 };

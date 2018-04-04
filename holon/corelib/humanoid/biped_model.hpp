@@ -36,13 +36,12 @@
 
 namespace holon {
 
-class BipedModelData : public DataSetBase<BipedModelData, ComZmpModelRawData,
-                                          PointMassModelRawData<Vec3D>,
-                                          PointMassModelRawData<Vec3D>> {
+class BipedModelData
+    : public DataSetBase<ComZmpModelRawData, PointMassModelRawData<Vec3D>,
+                         PointMassModelRawData<Vec3D>> {
   using Self = BipedModelData;
-  using Base =
-      DataSetBase<BipedModelData, ComZmpModelRawData,
-                  PointMassModelRawData<Vec3D>, PointMassModelRawData<Vec3D>>;
+  using Base = DataSetBase<ComZmpModelRawData, PointMassModelRawData<Vec3D>,
+                           PointMassModelRawData<Vec3D>>;
   using TrunkRawDataType = ComZmpModelRawData;
   using FootRawDataType = PointMassModelRawData<Vec3D>;
 

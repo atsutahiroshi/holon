@@ -36,11 +36,10 @@ struct PointMassModelRawData {
 };
 
 template <typename State>
-class PointMassModelData : public DataSetBase<PointMassModelData<State>,
-                                              PointMassModelRawData<State>> {
+class PointMassModelData : public DataSetBase<PointMassModelRawData<State>> {
   using Self = PointMassModelData<State>;
   using RawData = PointMassModelRawData<State>;
-  using Base = DataSetBase<Self, RawData>;
+  using Base = DataSetBase<RawData>;
 
  public:
   static constexpr double default_mass = 1;

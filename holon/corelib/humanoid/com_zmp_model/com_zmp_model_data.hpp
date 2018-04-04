@@ -39,11 +39,10 @@ struct ComZmpModelRawData {
   Vec3D total_force;
 };
 
-class ComZmpModelData
-    : public DataSetBase<ComZmpModelData, ComZmpModelRawData> {
+class ComZmpModelData : public DataSetBase<ComZmpModelRawData> {
   using Self = ComZmpModelData;
   using RawData = ComZmpModelRawData;
-  using Base = DataSetBase<Self, RawData>;
+  using Base = DataSetBase<RawData>;
 
  public:
   static const double default_mass;

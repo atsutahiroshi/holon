@@ -29,7 +29,6 @@
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
 namespace holon {
-namespace experimental {
 namespace {
 
 struct TestRawData {
@@ -168,5 +167,4 @@ TEST_CASE("Check copy_data in ModelBase", "[ModelBase][copy_data]") {
 }
 
 }  // namespace
-}  // namespace experimental
 }  // namespace holon

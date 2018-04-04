@@ -21,6 +21,7 @@
 #include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_data.hpp"
 
 #include <roki/rk_g.h>
+#include <utility>
 
 #include "catch.hpp"
 #include "holon/test/util/catch/custom_matchers.hpp"
@@ -32,9 +33,6 @@ namespace {
 using Catch::Matchers::Equals;
 
 const double G = RK_G;
-
-using experimental::ComZmpModelData;
-using experimental::ComZmpModelRawData;
 
 void RandomizeData(ComZmpModelData data) {
   Fuzzer fuzz;

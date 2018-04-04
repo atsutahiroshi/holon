@@ -27,9 +27,6 @@
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
 namespace holon {
-
-namespace experimental {
-
 namespace {
 
 using com_zmp_model_formula::computeComAcc;
@@ -207,7 +204,4 @@ TEST_CASE("ComZmpModelSystem::isZmpPositionSet() returns if it is set",
 }
 
 }  // namespace
-
-}  // namespace experimental
-
 }  // namespace holon

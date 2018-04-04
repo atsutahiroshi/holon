@@ -31,7 +31,6 @@
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
 namespace holon {
-namespace experimental {
 namespace {
 
 struct TestModelRawData {
@@ -247,5 +246,4 @@ TEST_CASE("CtrlBase::refs() returns reference data", "[CtrlBase][refs_data]") {
 }
 
 }  // namespace
-}  // namespace experimental
 }  // namespace holon

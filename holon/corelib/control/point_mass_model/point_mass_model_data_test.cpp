@@ -31,9 +31,9 @@ namespace holon {
 namespace {
 
 template <typename T>
-using RawData = experimental::PointMassModelRawData<T>;
+using RawData = PointMassModelRawData<T>;
 template <typename T>
-using Data = experimental::PointMassModelData<T>;
+using Data = PointMassModelData<T>;
 
 template <typename T>
 void CheckMembers(const Data<T>& data, const T& expected_p0,

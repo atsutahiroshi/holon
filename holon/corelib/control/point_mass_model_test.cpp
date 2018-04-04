@@ -24,7 +24,6 @@
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
 namespace holon {
-namespace experimental {
 namespace {
 
 template <typename State>
@@ -303,5 +302,4 @@ TEST_CASE("Check if data is updated after update of PointMassModel",
 }
 
 }  // namespace
-}  // namespace experimental
 }  // namespace holon

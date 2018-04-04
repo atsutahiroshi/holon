@@ -28,8 +28,6 @@
 
 namespace holon {
 
-namespace experimental {
-
 template <template <typename, typename> class System, typename State,
           typename Data>
 System<State, Data> make_system(Data data) {
@@ -71,38 +69,6 @@ class SystemBase {
 
  private:
   Data m_data;
-};
-
-}  // namespace experimental
-
-template <typename State, typename Data>
-class SystemBase {
- protected:
-  using Self = SystemBase<State, Data>;
-  using StateArray = std::array<State, 2>;
-  using DataPtr = std::shared_ptr<Data>;
-
- public:
-  SystemBase() = delete;
-  SystemBase(DataPtr t_data_ptr) : m_data_ptr(t_data_ptr) {}
-  virtual ~SystemBase() = default;
-
-  // virtual function
-  virtual StateArray operator()(const StateArray& state,
-                                const double t) const = 0;
-
-  // accessors
-  DataPtr data_ptr() const noexcept { return m_data_ptr; }
-  Data data() const noexcept { return *m_data_ptr; }
-
-  // mutators
-  Self& set_data_ptr(DataPtr t_data_ptr) {
-    m_data_ptr = t_data_ptr;
-    return *this;
-  }
-
- private:
-  DataPtr m_data_ptr;
 };
 
 }  // namespace holon

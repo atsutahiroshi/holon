@@ -27,8 +27,6 @@
 
 namespace holon {
 
-namespace experimental {
-
 struct ComZmpModelRawData {
   double mass;
   Vec3D nu;
@@ -57,34 +55,6 @@ class ComZmpModelData
   ComZmpModelData(const Vec3D& t_com_position = default_com_position,
                   double t_mass = default_mass);
 };
-
-}  // namespace experimental
-
-struct ComZmpModelData {
-  static const double default_mass;
-  static const Vec3D default_com_position;
-
-  double mass;
-  Vec3D nu;
-  Vec3D com_position;
-  Vec3D com_velocity;
-  Vec3D com_acceleration;
-  Vec3D zmp_position;
-  Vec3D reaction_force;
-  Vec3D external_force;
-  Vec3D total_force;
-
-  // constructors
-  ComZmpModelData(const Vec3D& t_com_position = default_com_position,
-                  double t_mass = default_mass);
-};
-
-// non-member functions
-using ComZmpModelDataPtr = std::shared_ptr<ComZmpModelData>;
-ComZmpModelDataPtr createComZmpModelData();
-ComZmpModelDataPtr createComZmpModelData(const Vec3D& t_com_position);
-ComZmpModelDataPtr createComZmpModelData(const Vec3D& t_com_position,
-                                         double t_mass);
 
 }  // namespace holon
 

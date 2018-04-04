@@ -35,7 +35,7 @@ class ComCtrlBenchmark : public ::hayai::Fixture {
   }
   virtual void TearDown() {}
 
-  experimental::ComCtrl ctrl;
+  ComCtrl ctrl;
   Vec3D ref_com_pos;
   Vec3D com_pos;
   Vec3D com_vel;

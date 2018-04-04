@@ -26,8 +26,6 @@
 
 namespace holon {
 
-namespace experimental {
-
 template <typename State>
 struct PointMassModelRawData {
   double mass;
@@ -61,67 +59,6 @@ class PointMassModelData : public DataSetBase<PointMassModelData<State>,
 
 template <typename State>
 constexpr double PointMassModelData<State>::default_mass;
-
-}  // namespace experimental
-
-template <typename State>
-struct PointMassModelData {
-  static constexpr double default_mass = 1;
-
-  double mass;
-  State position;
-  State velocity;
-  State acceleration;
-  State force;
-
-  PointMassModelData();
-  PointMassModelData(const State& t_initial_position);
-  PointMassModelData(const State& t_initial_position, double t_mass);
-};
-
-template <typename State>
-constexpr double PointMassModelData<State>::default_mass;
-
-template <typename State>
-PointMassModelData<State>::PointMassModelData()
-    : PointMassModelData(State(0), default_mass) {}
-
-template <typename State>
-PointMassModelData<State>::PointMassModelData(const State& t_initial_position)
-    : PointMassModelData(t_initial_position, default_mass) {}
-
-template <typename State>
-PointMassModelData<State>::PointMassModelData(const State& t_initial_position,
-                                              double t_mass)
-    : mass(t_mass),
-      position(t_initial_position),
-      velocity(0),
-      acceleration(0),
-      force(0) {}
-
-// non-member functions
-template <typename State>
-using PointMassModelDataPtr = std::shared_ptr<PointMassModelData<State>>;
-
-template <typename State>
-PointMassModelDataPtr<State> createPointMassModelData() {
-  using Data = PointMassModelData<State>;
-  return std::make_shared<Data>();
-}
-
-template <typename State>
-PointMassModelDataPtr<State> createPointMassModelData(
-    const State& t_initial_position) {
-  using Data = PointMassModelData<State>;
-  return std::make_shared<Data>(t_initial_position);
-}
-
-template <typename State>
-PointMassModelDataPtr<State> createPointMassModelData(
-    const State& t_initial_position, double t_mass) {
-  using Data = PointMassModelData<State>;
-  return std::make_shared<Data>(t_initial_position, t_mass);
-}
 
 }  // namespace holon
 

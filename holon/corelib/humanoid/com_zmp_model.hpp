@@ -31,8 +31,6 @@
 
 namespace holon {
 
-namespace experimental {
-
 class ComZmpModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
                                      ComZmpModelData, ComZmpModelSystem> {
   using Self = ComZmpModel;
@@ -56,62 +54,6 @@ class ComZmpModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
     return m_initial_com_position;
   }
   inline double mass() const noexcept { return states<0>().mass; }
-
-  // mutators
-  Self& set_initial_com_position(const Vec3D& t_initial_com_position);
-  virtual Self& reset() override;
-  Self& reset(const Vec3D& t_com_position);
-
-  // callback functions
-  Self& setExternalForceCallback(CallbackFunc t_f);
-  Self& setReactionForceCallback(CallbackFunc t_f);
-  Self& setZmpPositionCallback(CallbackFunc t_f);
-  Self& setComAccelerationCallback(CallbackFunc t_f);
-
-  Self& setZmpPosition(const Vec3D& t_zmp_position,
-                       optional<double> t_reaction_force_z = nullopt);
-  Self& setReactionForce(const Vec3D& t_reaction_force);
-  Self& setExternalForce(const Vec3D& t_external_force);
-  Self& removeZmpPosition();
-  Self& removeReactionForce();
-  Self& removeExternalForce();
-
-  virtual bool update() override;
-  virtual bool update(double t_time_step) override;
-
- private:
-  Vec3D m_initial_com_position;
-
-  bool isUpdatable(const Vec3D& p, const Vec3D& v);
-  void updateData(const Vec3D& p, const Vec3D& v);
-};
-
-}  // namespace experimental
-
-class ComZmpModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
-                                     ComZmpModelData, ComZmpModelSystem> {
-  using Self = ComZmpModel;
-  using Base = ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
-                         ComZmpModelData, ComZmpModelSystem>;
-
- public:
-  using Data = ComZmpModelData;
-  using DataPtr = ComZmpModelDataPtr;
-  using System = ComZmpModelSystem;
-  using CallbackFunc = ComZmpModelSystem::Function;
-
- public:
-  ComZmpModel();
-  explicit ComZmpModel(const Vec3D& t_com_position);
-  ComZmpModel(const Vec3D& t_com_position, double t_mass);
-  explicit ComZmpModel(DataPtr t_data_ptr);
-  virtual ~ComZmpModel() = default;
-
-  // accessors
-  inline Vec3D initial_com_position() const noexcept {
-    return m_initial_com_position;
-  }
-  inline double mass() const noexcept { return data().mass; }
 
   // mutators
   Self& set_initial_com_position(const Vec3D& t_initial_com_position);

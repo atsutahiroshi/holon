@@ -28,11 +28,6 @@
 namespace holon {
 namespace {
 
-using experimental::PointMassModelRawData;
-using experimental::PointMassModelData;
-using experimental::PointMassModelSystem;
-using experimental::make_system;
-
 template <typename T>
 using System = PointMassModelSystem<T>;
 

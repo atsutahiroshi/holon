@@ -30,9 +30,6 @@
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
 namespace holon {
-
-namespace experimental {
-
 namespace {
 
 using Catch::Matchers::Equals;
@@ -878,8 +875,6 @@ SCENARIO("Check relations among rho, yd, dist and vyd", "[ComCtrl]") {
     }
   }
 }
+
 }  // namespace
-
-}  // namespace experimental
-
 }  // namespace holon

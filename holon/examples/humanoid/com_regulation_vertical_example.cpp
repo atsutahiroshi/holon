@@ -25,8 +25,8 @@ const double T = 10;
 const double DT = 0.01;
 
 using holon::Vec3D;
-using holon::experimental::ComZmpModel;
-using holon::experimental::ComCtrl;
+using holon::ComZmpModel;
+using holon::ComCtrl;
 
 Vec3D force = {0, 0, -1};
 auto external_force = [](const Vec3D&, const Vec3D&, const double t) {

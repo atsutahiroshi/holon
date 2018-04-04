@@ -29,9 +29,6 @@
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
 namespace holon {
-
-namespace experimental {
-
 namespace {
 
 using Catch::Matchers::Equals;
@@ -527,7 +524,4 @@ TEST_CASE("ComZmpModel::update() updates external force in data",
 }
 
 }  // namespace
-
-}  // namespace experimental
-
 }  // namespace holon

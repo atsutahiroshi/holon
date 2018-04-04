@@ -23,7 +23,7 @@
 #include <iostream>
 
 using holon::Vec3D;
-using holon::experimental::PdCtrl;
+using holon::PdCtrl;
 
 const double T = 10;
 const double DT = 0.01;

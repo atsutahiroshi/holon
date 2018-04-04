@@ -31,8 +31,6 @@
 
 namespace holon {
 
-namespace experimental {
-
 template <typename State>
 struct PdCtrlRefsRawData {
   State position;
@@ -135,91 +133,6 @@ class PdCtrl : public CtrlBase<State, Solver, Data, Model> {
     this->outputs().velocity = this->states().velocity;
     this->outputs().acceleration = this->states().acceleration;
     this->outputs().force = this->states().force;
-    return *this;
-  }
-};
-
-}  // namespace experimental
-
-template <typename State>
-struct PdCtrlRefs {
-  State position;
-  State velocity;
-  State stiffness;
-  State damping;
-};
-
-template <typename State>
-struct PdCtrlOutputs {
-  State position;
-  State velocity;
-  State acceleration;
-  State force;
-};
-
-template <
-    typename State, typename StateArray = std::array<State, 2>,
-    typename Solver = RungeKutta4<StateArray>,
-    typename Data = PointMassModelData<State>,
-    typename System = PointMassModelSystem<State>,
-    typename Model = PointMassModel<State, StateArray, Solver, Data, System>,
-    typename Refs = PdCtrlRefs<State>, typename Outputs = PdCtrlOutputs<State>>
-class PdCtrl : public CtrlBase<State, Solver, Data, Model, Refs, Outputs> {
-  using Self =
-      PdCtrl<State, StateArray, Solver, Data, System, Model, Refs, Outputs>;
-  using Base = CtrlBase<State, Solver, Data, Model, Refs, Outputs>;
-  using Function = typename System::Function;
-
- public:
-  PdCtrl() : PdCtrl(this->model()) {}
-  explicit PdCtrl(const Model& t_model) : Base(t_model) {
-    this->model().set_initial_position(this->states().position);
-    resetRefs();
-    this->model().setForceCallback(getForceFunction());
-  }
-  virtual ~PdCtrl() = default;
-
-  virtual Self& reset() {
-    this->model().reset();
-    return resetRefs();
-  }
-
-  virtual Self& reset(const State& t_initial_position) {
-    this->model().reset(t_initial_position);
-    return resetRefs();
-  }
-
-  virtual State force(const State& t_position, const State& t_velocity,
-                      const double /* t_time */) {
-    return pd_ctrl_formula::computeDesForce(
-        t_position, t_velocity, this->refs().position, this->refs().velocity,
-        this->refs().stiffness, this->refs().damping);
-  }
-
-  virtual Function getForceFunction() {
-    namespace pl = std::placeholders;
-    return std::bind(&Self::force, this, pl::_1, pl::_2, pl::_3);
-  }
-
-  virtual bool update() override {
-    if (!Base::update()) return false;
-    updateOutputs();
-    return true;
-  }
-
-  virtual bool update(double dt) override { return Base::update(dt); }
-
- private:
-  Self& resetRefs() {
-    this->refs_ptr()->position = this->states().position;
-    this->refs_ptr()->velocity = this->states().velocity;
-    return *this;
-  }
-  Self& updateOutputs() {
-    this->outputs_ptr()->position = this->states().position;
-    this->outputs_ptr()->velocity = this->states().velocity;
-    this->outputs_ptr()->acceleration = this->states().acceleration;
-    this->outputs_ptr()->force = this->states().force;
     return *this;
   }
 };

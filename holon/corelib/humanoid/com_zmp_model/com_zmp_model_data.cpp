@@ -26,8 +26,6 @@
 
 namespace holon {
 
-namespace experimental {
-
 const double ComZmpModelData::default_mass = 1.0;
 const Vec3D ComZmpModelData::default_com_position = {0.0, 0.0, 1.0};
 
@@ -45,35 +43,5 @@ ComZmpModelData::ComZmpModelData(const Vec3D& t_com_position, double t_mass)
                                                     {0, 0, t_mass * RK_G},
                                                     kVec3DZero,
                                                     {0, 0, t_mass * RK_G}}))) {}
-
-}  // namespace experimental
-
-const double ComZmpModelData::default_mass = 1.0;
-const Vec3D ComZmpModelData::default_com_position = {0.0, 0.0, 1.0};
-
-ComZmpModelData::ComZmpModelData(const Vec3D& t_com_position, double t_mass)
-    : mass(t_mass),
-      nu(kVec3DZ),
-      com_position(t_com_position),
-      com_velocity(kVec3DZero),
-      com_acceleration(kVec3DZero),
-      zmp_position(kVec3DZero),
-      reaction_force(0, 0, t_mass * RK_G),
-      external_force(kVec3DZero),
-      total_force(reaction_force) {}
-
-std::shared_ptr<ComZmpModelData> createComZmpModelData() {
-  return std::make_shared<ComZmpModelData>();
-}
-
-std::shared_ptr<ComZmpModelData> createComZmpModelData(
-    const Vec3D& t_com_position) {
-  return std::make_shared<ComZmpModelData>(t_com_position);
-}
-
-std::shared_ptr<ComZmpModelData> createComZmpModelData(
-    const Vec3D& t_com_position, double t_mass) {
-  return std::make_shared<ComZmpModelData>(t_com_position, t_mass);
-}
 
 }  // namespace holon

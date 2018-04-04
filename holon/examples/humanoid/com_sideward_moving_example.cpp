@@ -25,7 +25,7 @@ const double T = 20;
 const double DT = 0.01;
 
 using holon::Vec3D;
-using holon::experimental::ComCtrl;
+using holon::ComCtrl;
 
 int main() {
   ComCtrl ctrl;

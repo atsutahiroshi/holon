@@ -217,6 +217,16 @@ class DataSetBase {
   }
 };
 
+// stream insertion
+template <typename... RawDataTypes>
+std::ostream& operator<<(std::ostream& os,
+                         const DataSetBase<RawDataTypes...>& data) {
+  os << "{";
+  print_tuple(os, data.get_raw_data_ptr_tuple(),
+              make_index_seq<sizeof...(RawDataTypes)>());
+  return os << "}";
+}
+
 }  // namespace holon
 
 #endif  // HOLON_DATA_DATA_SET_BASE_HPP_

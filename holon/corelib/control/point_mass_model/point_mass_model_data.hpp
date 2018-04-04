@@ -28,11 +28,23 @@ namespace holon {
 
 template <typename State>
 struct PointMassModelRawData {
-  double mass;
-  State position;
-  State velocity;
-  State acceleration;
-  State force;
+  static constexpr double default_mass = 1;
+  double mass = default_mass;
+  State position = State{0};
+  State velocity = State{0};
+  State acceleration = State{0};
+  State force = State{0};
+  PointMassModelRawData() = default;
+  PointMassModelRawData(double t_mass) : mass(t_mass) {}
+  PointMassModelRawData(double t_mass, State t_position)
+      : mass(t_mass), position(t_position) {}
+  PointMassModelRawData(double t_mass, State t_position, State t_velocity,
+                        State t_acceleration, State t_force)
+      : mass(t_mass),
+        position(t_position),
+        velocity(t_velocity),
+        acceleration(t_acceleration),
+        force(t_force) {}
 };
 
 template <typename State>

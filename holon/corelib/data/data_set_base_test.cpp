@@ -304,6 +304,14 @@ TEST_CASE("Check equality operator of DataSetBase", "[DataSetBase]") {
   }
 }
 
+TEST_CASE("Check get_raw_data_num of DataSetBase",
+          "[DataSetBase][get_raw_data_num]") {
+  DataSetSample1 data1;
+  CHECK(data1.get_raw_data_num() == 1);
+  DataSetSample2 data2;
+  CHECK(data2.get_raw_data_num() == 3);
+}
+
 TEST_CASE("Check copy method in DataSetBase", "[DataSetBase]") {
   SECTION("Sample DataSet 1") {
     DataSetSample1 data1;

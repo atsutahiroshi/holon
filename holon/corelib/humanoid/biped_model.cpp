@@ -42,8 +42,20 @@ BipedModelData::BipedModelData(const Vec3D& t_com_position, double t_mass,
                      alloc_raw_data<FootRawDataType>(1.0, t_lf_position),
                      alloc_raw_data<FootRawDataType>(1.0, t_rf_position)) {}
 
-BipedModel::BipedModel()
-    : ModelBase(),
+BipedModel::BipedModel() : BipedModel(make_data<Data>()) {}
+
+BipedModel::BipedModel(const Vec3D& t_com_position, double t_mass,
+                       double t_foot_dist)
+    : BipedModel(make_data<Data>(t_com_position, t_mass, t_foot_dist)) {}
+
+BipedModel::BipedModel(const Vec3D& t_com_position, double t_mass,
+                       const Vec3D& t_left_foot_position,
+                       const Vec3D& t_right_foot_position)
+    : BipedModel(make_data<Data>(t_com_position, t_mass, t_left_foot_position,
+                                 t_right_foot_position)) {}
+
+BipedModel::BipedModel(Data t_data)
+    : ModelBase(t_data),
       m_trunk(data().extract<TrunkModelData>(Data::TrunkDataIndex())),
       m_left_foot(data().extract<FootModelData>(Data::LeftFootDataIndex())),
       m_right_foot(data().extract<FootModelData>(Data::RightFootDataIndex())) {}

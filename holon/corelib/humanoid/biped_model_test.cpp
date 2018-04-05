@@ -102,13 +102,31 @@ void CheckConstructor_0() {
                ComZmpModelRawData::default_mass, kVec3DZero, kVec3DZero);
 }
 
-void CheckConstructor_1() {}
+void CheckConstructor_1() {
+  Fuzzer fuzz(-2, 2);
+  Vec3D p0{fuzz(), fuzz(), Fuzzer(0, 2).get()};
+  double mass = Fuzzer(0, 1).get();
+  double dist = Fuzzer(0, 1).get();
+  BipedModel model(p0, mass, dist);
+  CheckMembers(model, p0, mass, {p0.x(), p0.y() + 0.5 * dist, 0},
+               {p0.x(), p0.y() - 0.5 * dist, 0});
+}
 
-void CheckConstructor_2() {}
+void CheckConstructor_2() {
+  Fuzzer rn(-2, 2);
+  Fuzzer rn_p(0, 1);
+  Vec3D p0 = {rn(), rn(), rn_p()};
+  double mass = rn_p();
+  Vec3D lfp = {rn(), rn(), rn_p()};
+  Vec3D rfp = {rn(), rn(), rn_p()};
+  BipedModel model(p0, mass, lfp, rfp);
+  CheckMembers(model, p0, mass, lfp, rfp);
+}
 
 TEST_CASE("Constructor of BipdeModel", "[BipdeModel][ctor]") {
   SECTION("Default constructor") { CheckConstructor_0(); }
-  // SECTION("Overloaded constructor 1") { CheckConstructor_1(); }
+  SECTION("Overloaded constructor 1") { CheckConstructor_1(); }
+  SECTION("Overloaded constructor 2") { CheckConstructor_2(); }
 }
 
 }  // namespace

@@ -84,7 +84,8 @@ class BipedModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
   BipedModel();
   BipedModel(const Vec3D& t_com_position, double t_mass, double t_foot_dist);
   BipedModel(const Vec3D& t_com_position, double t_mass,
-             const Vec3D& t_lfoot_position, const Vec3D& t_rfoot_position);
+             const Vec3D& t_left_foot_position,
+             const Vec3D& t_right_foot_position);
   explicit BipedModel(Data t_data);
   virtual ~BipedModel() = default;
 
@@ -97,9 +98,9 @@ class BipedModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
   FootModel& right_foot() { return m_right_foot; }
 
  private:
-  ComZmpModel m_trunk;
-  PointMassModel<Vec3D> m_left_foot;
-  PointMassModel<Vec3D> m_right_foot;
+  TrunkModel m_trunk;
+  FootModel m_left_foot;
+  FootModel m_right_foot;
 };
 
 }  // namespace holon

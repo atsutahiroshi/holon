@@ -46,20 +46,16 @@ class BipedModelData
   using FootRawDataType = PointMassModelRawData<Vec3D>;
 
  public:
-  BipedModelData() = default;
-  BipedModelData(const TrunkRawDataType& t_trunk_raw_data,
-                 const FootRawDataType& t_lf_raw_data,
-                 const FootRawDataType& t_rf_raw_data) {}
-  BipedModelData(std::shared_ptr<TrunkRawDataType> t_trunk_raw_data_ptr,
-                 std::shared_ptr<FootRawDataType> t_lf_raw_data_ptr,
-                 std::shared_ptr<FootRawDataType> t_rf_raw_data_ptr) {}
-  BipedModelData(const Vec3D& t_com_position, double t_mass,
-                 double t_foot_dist) {}
-  BipedModelData(const Vec3D& t_com_position, double t_mass,
-                 const Vec3D& t_lfoot_position, const Vec3D& t_rfoot_position) {
-  }
-  virtual ~BipedModelData() = default;
+  HOLON_DEFINE_DEFAULT_DATA_CTOR(BipedModelData)
 
+  BipedModelData(const Vec3D& t_com_position, double t_mass,
+                 double t_foot_dist);
+  BipedModelData(const Vec3D& t_com_position, double t_mass,
+                 const Vec3D& t_lf_position, const Vec3D& t_rf_position);
+
+  const TrunkRawDataType& trunk() const { return get<0>(); }
+  const FootRawDataType& left_foot() const { return get<1>(); }
+  const FootRawDataType& right_foot() const { return get<2>(); }
   TrunkRawDataType& trunk() { return get<0>(); }
   FootRawDataType& left_foot() { return get<1>(); }
   FootRawDataType& right_foot() { return get<2>(); }

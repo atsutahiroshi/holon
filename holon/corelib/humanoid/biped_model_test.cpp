@@ -21,9 +21,58 @@
 #include "holon/corelib/humanoid/biped_model.hpp"
 
 #include "catch.hpp"
+#include "holon/test/util/fuzzer/fuzzer.hpp"
 
 namespace holon {
 namespace {
+
+namespace data {
+
+void CheckMembers(const BipedModelData& data,
+                  const Vec3D& expected_trunk_position, double expected_mass,
+                  const Vec3D& expected_left_foot_position,
+                  const Vec3D& expected_right_foot_position) {
+  // COM-ZMP model
+  CHECK(data.trunk().mass == expected_mass);
+  CHECK(data.trunk().com_position == expected_trunk_position);
+  // left foot
+  CHECK(data.left_foot().position == expected_left_foot_position);
+  // right foot
+  CHECK(data.right_foot().position == expected_right_foot_position);
+}
+
+void CheckCtor_0() {
+  BipedModelData data;
+  CheckMembers(data, kVec3DZ, 1.0, kVec3DZero, kVec3DZero);
+}
+void CheckCtor_1() {
+  Fuzzer fuzz(-2, 2);
+  Vec3D p0{fuzz(), fuzz(), Fuzzer(0, 2).get()};
+  double mass = Fuzzer(0, 1).get();
+  double dist = Fuzzer(0, 1).get();
+  BipedModelData data(p0, mass, dist);
+  CheckMembers(data, p0, mass, {p0.x(), p0.y() + 0.5 * dist, 0},
+               {p0.x(), p0.y() - 0.5 * dist, 0});
+}
+
+void CheckCtor_2() {
+  Fuzzer rn(-2, 2);
+  Fuzzer rn_p(0, 1);
+  Vec3D p0 = {rn(), rn(), rn_p()};
+  double mass = rn_p();
+  Vec3D lfp = {rn(), rn(), rn_p()};
+  Vec3D rfp = {rn(), rn(), rn_p()};
+  BipedModelData data(p0, mass, lfp, rfp);
+  CheckMembers(data, p0, mass, lfp, rfp);
+}
+
+TEST_CASE("Check c'tors of BipedModelData", "[BipedModelData][ctor]") {
+  SECTION("Default c'tor") { CheckCtor_0(); }
+  SECTION("Overloaded c'tor 1") { CheckCtor_1(); }
+  SECTION("Overloaded c'tor 2") { CheckCtor_2(); }
+}
+
+}  // namespace data
 
 void CheckMembers(const BipedModel& model, const Vec3D& expected_trunk_position,
                   double expected_mass,

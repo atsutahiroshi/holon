@@ -1,4 +1,5 @@
 set(sources
+  biped_model.cpp
   com_ctrl.cpp
   com_zmp_model.cpp
   )

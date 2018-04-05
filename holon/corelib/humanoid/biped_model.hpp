@@ -61,41 +61,23 @@ class BipedModelData
   FootRawDataType& right_foot() { return get<2>(); }
 };
 
-class BipedModelSystem : public SystemBase<Vec3D, BipedModelData> {
-  using Data = BipedModelData;
-  using Self = BipedModelSystem;
-
- public:
-  using StateArray = std::array<Vec3D, 2>;
-  using Function =
-      std::function<Vec3D(const Vec3D&, const Vec3D&, const double)>;
-
-  BipedModelSystem(Data t_data) : SystemBase(t_data) {}
-  virtual ~BipedModelSystem() = default;
-
-  virtual StateArray operator()(const StateArray& state,
-                                const double t) const override {}
-};
-
 class BipedModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
-                                    BipedModelData, BipedModelSystem> {
+                                    BipedModelData> {
   using Self = BipedModel;
-  using Base = ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
-                         BipedModelData, BipedModelSystem>;
+  using Solver = RungeKutta4<std::array<Vec3D, 2>>;
+  using Base = ModelBase<Vec3D, Solver, BipedModelData>;
 
  public:
   using Data = BipedModelData;
-  using System = BipedModelSystem;
-  using Function = System::Function;
   using TrunkRawDataType = ComZmpModelRawData;
   using FootRawDataType = PointMassModelRawData<Vec3D>;
 
  public:
   BipedModel() = default;
-  BipedModel(const Vec3D& t_com_position, double t_mass, double t_foot_dist) {}
+  BipedModel(const Vec3D& t_com_position, double t_mass, double t_foot_dist);
   BipedModel(const Vec3D& t_com_position, double t_mass,
-             const Vec3D& t_lfoot_position, const Vec3D& t_rfoot_position) {}
-  explicit BipedModel(Data t_data) {}
+             const Vec3D& t_lfoot_position, const Vec3D& t_rfoot_position);
+  explicit BipedModel(Data t_data);
   virtual ~BipedModel() = default;
 
   // accessors
@@ -105,11 +87,6 @@ class BipedModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
   TrunkRawDataType& trunk();
   FootRawDataType& lfoot();
   FootRawDataType& rfoot();
-  virtual Self& reset() override {}
-
-  // update
-  virtual bool update() override {}
-  virtual bool update(double dt) override {}
 };
 
 }  // namespace holon

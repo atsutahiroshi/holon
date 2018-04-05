@@ -102,24 +102,9 @@ void CheckConstructor_0() {
                ComZmpModelRawData::default_mass, kVec3DZero, kVec3DZero);
 }
 
-void CheckConstructor_1() {
-  Vec3D p0 = {0.5, -0.5, 0.75};
-  double mass = 2.0;
-  double dist = 0.42;
-  BipedModel model(p0, mass, dist);
-  CheckMembers(model, p0, mass, {p0.x(), p0.y() + 0.5 * dist, 0},
-               {p0.x(), p0.y() - 0.5 * dist, 0});
-}
+void CheckConstructor_1() {}
 
-void CheckConstructor_2() {
-  Vec3D p0 = {-0.1, 0.1, 0.5};
-  double mass = 1.5;
-  Vec3D lfp = {-0.15, 0.25, 0};
-  Vec3D rfp = {-0.05, -0.05, 0};
-  double dist = 0.3;
-  BipedModel model(p0, mass, lfp, rfp);
-  CheckMembers(model, p0, mass, lfp, rfp);
-}
+void CheckConstructor_2() {}
 
 TEST_CASE("Constructor of BipdeModel", "[BipdeModel][ctor]") {
   // SECTION("Default constructor") { CheckConstructor_0(); }

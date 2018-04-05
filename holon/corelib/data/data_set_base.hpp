@@ -236,6 +236,11 @@ std::ostream& operator<<(std::ostream& os,
   return os << "}";
 }
 
+// macro
+#define HOLON_DEFINE_DEFAULT_DATA_CTOR(data_class) \
+  template <typename... Args>                      \
+  explicit data_class(Args... args) : Base(args...) {}
+
 }  // namespace holon
 
 #endif  // HOLON_DATA_DATA_SET_BASE_HPP_

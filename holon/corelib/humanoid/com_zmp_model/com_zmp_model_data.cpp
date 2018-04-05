@@ -29,19 +29,28 @@ namespace holon {
 const double ComZmpModelRawData::default_mass = 1.0;
 const Vec3D ComZmpModelRawData::default_com_position = {0.0, 0.0, 1.0};
 
-ComZmpModelData::ComZmpModelData(const RawData& t_raw_data)
-    : Base(t_raw_data) {}
-ComZmpModelData::ComZmpModelData(std::shared_ptr<RawData> t_raw_data_p)
-    : Base(t_raw_data_p) {}
+ComZmpModelRawData::ComZmpModelRawData(double t_mass, Vec3D t_com_position)
+    : mass(t_mass),
+      com_position(t_com_position),
+      reaction_force({0, 0, mass * RK_G}),
+      total_force(reaction_force) {}
+
+ComZmpModelRawData::ComZmpModelRawData(
+    double t_mass, Vec3D t_nu, Vec3D t_com_position, Vec3D t_com_velocity,
+    Vec3D t_com_acceleration, Vec3D t_zmp_position, Vec3D t_reaction_force,
+    Vec3D t_external_force, Vec3D t_total_force)
+    : mass(t_mass),
+      nu(t_nu),
+      com_position(t_com_position),
+      com_velocity(t_com_velocity),
+      com_acceleration(t_com_acceleration),
+      zmp_position(t_zmp_position),
+      reaction_force(t_reaction_force),
+      external_force(t_external_force),
+      total_force(t_total_force) {}
+
 ComZmpModelData::ComZmpModelData(const Vec3D& t_com_position, double t_mass)
-    : ComZmpModelData(std::move(ComZmpModelRawData({t_mass,
-                                                    kVec3DZ,
-                                                    t_com_position,
-                                                    kVec3DZero,
-                                                    kVec3DZero,
-                                                    kVec3DZero,
-                                                    {0, 0, t_mass * RK_G},
-                                                    kVec3DZero,
-                                                    {0, 0, t_mass * RK_G}}))) {}
+    : ComZmpModelData(
+          alloc_raw_data<ComZmpModelRawData>(t_mass, t_com_position)) {}
 
 }  // namespace holon

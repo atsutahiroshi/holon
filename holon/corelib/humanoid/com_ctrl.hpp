@@ -75,6 +75,8 @@ class ComCtrlData
                            ComCtrlOutputsRawData, ComCtrlCommandsRawData>;
 
  public:
+  HOLON_DEFINE_DEFAULT_DATA_CTOR(ComCtrlData)
+
   using ModelRawData = ComZmpModelRawData;
   using RefsRawData = ComCtrlRefsRawData;
   using OutputsRawData = ComCtrlOutputsRawData;

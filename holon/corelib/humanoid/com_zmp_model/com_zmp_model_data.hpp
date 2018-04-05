@@ -53,8 +53,7 @@ class ComZmpModelData : public DataSetBase<ComZmpModelRawData> {
   using Base = DataSetBase<RawData>;
 
  public:
-  template <typename... Args>
-  explicit ComZmpModelData(Args... args) : Base(args...) {}
+  HOLON_DEFINE_DEFAULT_DATA_CTOR(ComZmpModelData)
 
   ComZmpModelData(const Vec3D& t_com_position = RawData::default_com_position,
                   double t_mass = RawData::default_mass);

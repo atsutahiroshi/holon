@@ -58,15 +58,14 @@ class PdCtrlData
                   PdCtrlOutputsRawData<State>>;
 
  public:
+  HOLON_DEFINE_DEFAULT_DATA_CTOR(PdCtrlData)
+
   using ModelRawData = PointMassModelRawData<State>;
   using RefsRawData = PdCtrlRefsRawData<State>;
   using OutputsRawData = PdCtrlOutputsRawData<State>;
   using ModelDataIndex = index_seq<0>;
   using RefsDataIndex = index_seq<1>;
   using OutputsDataIndex = index_seq<2>;
-
-  template <typename... Args>
-  explicit PdCtrlData(Args... args) : Base(args...) {}
 
   PdCtrlData(const State& t_initial_position, double t_mass)
       : Base(alloc_raw_data<ModelRawData>(t_mass, t_initial_position),

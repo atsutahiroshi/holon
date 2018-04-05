@@ -57,8 +57,7 @@ class PointMassModelData : public DataSetBase<PointMassModelRawData<State>> {
   using Base = DataSetBase<RawData>;
 
  public:
-  template <typename... Args>
-  explicit PointMassModelData(Args... args) : Base(args...) {}
+  HOLON_DEFINE_DEFAULT_DATA_CTOR(PointMassModelData)
 
   PointMassModelData(const State& t_initial_position)
       : PointMassModelData(t_initial_position, RawData::default_mass) {}

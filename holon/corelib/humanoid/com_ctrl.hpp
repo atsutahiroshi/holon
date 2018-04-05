@@ -81,11 +81,9 @@ class ComCtrlData
   using RefsDataIndex = index_seq<1>;
   using OutputsDataIndex = index_seq<2>;
   using CommandsDataIndex = index_seq<3>;
-  static const double default_mass;
-  static const Vec3D default_com_position;
 
-  ComCtrlData(const Vec3D& t_com_position = default_com_position,
-              double t_mass = default_mass);
+  ComCtrlData(const Vec3D& t_com_position = ModelRawData::default_com_position,
+              double t_mass = ModelRawData::default_mass);
 };
 
 class ComCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,

@@ -84,7 +84,7 @@ ComCtrlData::ComCtrlData(const Vec3D& t_com_position, double t_mass)
                               {0, 0, t_mass * RK_G},
                               kVec3DZero,
                               {0, 0, t_mass * RK_G}},
-           ComCtrlRefsRawData{ComZmpModelData::default_com_position, kVec3DZero,
+           ComCtrlRefsRawData{ModelRawData::default_com_position, kVec3DZero,
                               ctrl_x::default_q1, ctrl_x::default_q2,
                               ctrl_y::default_q1, ctrl_y::default_q2,
                               ctrl_z::default_q1, ctrl_z::default_q2,
@@ -312,9 +312,5 @@ bool ComCtrl::update(double t_time_step) {
   set_time_step(t_time_step);
   return update();
 }
-
-const double ComCtrlData::default_mass = ComZmpModelData::default_mass;
-const Vec3D ComCtrlData::default_com_position =
-    ComZmpModelData::default_com_position;
 
 }  // namespace holon

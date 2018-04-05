@@ -49,8 +49,8 @@ void CheckMembers(const BipedModel& model, const Vec3D& expected_trunk_position,
 
 void CheckConstructor_0() {
   BipedModel model;
-  CheckMembers(model, ComZmpModelData::default_com_position,
-               ComZmpModelData::default_mass, kVec3DZero, kVec3DZero);
+  CheckMembers(model, ComZmpModelRawData::default_com_position,
+               ComZmpModelRawData::default_mass, kVec3DZero, kVec3DZero);
 }
 
 void CheckConstructor_1() {

@@ -33,10 +33,10 @@ using com_zmp_model_formula::isComZmpDiffValid;
 using com_zmp_model_formula::isReactionForceValid;
 
 ComZmpModel::ComZmpModel()
-    : ComZmpModel(Data::default_com_position, Data::default_mass) {}
+    : ComZmpModel(RawData::default_com_position, RawData::default_mass) {}
 
 ComZmpModel::ComZmpModel(const Vec3D& t_com_position)
-    : ComZmpModel(t_com_position, Data::default_mass) {}
+    : ComZmpModel(t_com_position, RawData::default_mass) {}
 
 ComZmpModel::ComZmpModel(const Vec3D& t_com_position, double t_mass)
     : ComZmpModel(isMassValid(t_mass) ? make_data<Data>(t_com_position, t_mass)

@@ -166,7 +166,7 @@ TEST_CASE("ComZmpModel::mass() returns mass value", "[ComZmpModel][mass]") {
     CHECK(model.mass() == 10.0);
   }
   SECTION("case 2") {
-    auto data = make_data<ComZmpModelData>(kVec3DZ, 2);
+    auto data = make_data<ComZmpModelData>(kVec3DZ, 2.0);
     ComZmpModel model(data);
     CHECK(model.mass() == 2.0);
     data.get().mass = 20;
@@ -174,7 +174,7 @@ TEST_CASE("ComZmpModel::mass() returns mass value", "[ComZmpModel][mass]") {
   }
   SECTION("case 3") {
     ComZmpModel model;
-    auto data = make_data<ComZmpModelData>(kVec3DZ, 3);
+    auto data = make_data<ComZmpModelData>(kVec3DZ, 3.0);
     model.set_data(data);
     CHECK(model.mass() == 3.0);
     data.get().mass = 30;

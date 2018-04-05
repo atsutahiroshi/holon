@@ -28,15 +28,31 @@
 namespace holon {
 
 struct ComZmpModelRawData {
-  double mass;
-  Vec3D nu;
-  Vec3D com_position;
-  Vec3D com_velocity;
-  Vec3D com_acceleration;
-  Vec3D zmp_position;
-  Vec3D reaction_force;
-  Vec3D external_force;
-  Vec3D total_force;
+  static const double default_mass;
+  static const Vec3D default_com_position;
+  double mass = default_mass;
+  Vec3D nu = kVec3DZ;
+  Vec3D com_position = kVec3DZ;
+  Vec3D com_velocity = kVec3DZero;
+  Vec3D com_acceleration = kVec3DZero;
+  Vec3D zmp_position = kVec3DZero;
+  Vec3D reaction_force = kVec3DZero;
+  Vec3D external_force = kVec3DZero;
+  Vec3D total_force = kVec3DZero;
+  ComZmpModelRawData() = default;
+  ComZmpModelRawData(double t_mass, Vec3D t_nu, Vec3D t_com_position,
+                     Vec3D t_com_velocity, Vec3D t_com_acceleration,
+                     Vec3D t_zmp_position, Vec3D t_reaction_force,
+                     Vec3D t_external_force, Vec3D t_total_force)
+      : mass(t_mass),
+        nu(t_nu),
+        com_position(t_com_position),
+        com_velocity(t_com_velocity),
+        com_acceleration(t_com_acceleration),
+        zmp_position(t_zmp_position),
+        reaction_force(t_reaction_force),
+        external_force(t_external_force),
+        total_force(t_total_force) {}
 };
 
 class ComZmpModelData : public DataSetBase<ComZmpModelRawData> {
@@ -45,14 +61,13 @@ class ComZmpModelData : public DataSetBase<ComZmpModelRawData> {
   using Base = DataSetBase<RawData>;
 
  public:
-  static const double default_mass;
-  static const Vec3D default_com_position;
-
- public:
   ComZmpModelData(const RawData& t_raw_data);
   ComZmpModelData(std::shared_ptr<RawData> t_raw_data_p);
-  ComZmpModelData(const Vec3D& t_com_position = default_com_position,
-                  double t_mass = default_mass);
+  // template <typename... Args>
+  // explicit ComZmpModelData(Args... args) : Base(args...) {}
+
+  ComZmpModelData(const Vec3D& t_com_position = RawData::default_com_position,
+                  double t_mass = RawData::default_mass);
 };
 
 }  // namespace holon

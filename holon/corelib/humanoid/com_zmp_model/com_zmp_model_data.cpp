@@ -26,8 +26,8 @@
 
 namespace holon {
 
-const double ComZmpModelData::default_mass = 1.0;
-const Vec3D ComZmpModelData::default_com_position = {0.0, 0.0, 1.0};
+const double ComZmpModelRawData::default_mass = 1.0;
+const Vec3D ComZmpModelRawData::default_com_position = {0.0, 0.0, 1.0};
 
 ComZmpModelData::ComZmpModelData(const RawData& t_raw_data)
     : Base(t_raw_data) {}

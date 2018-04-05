@@ -86,7 +86,8 @@ TEST_CASE("Check c'tor of ComCtrlData", "[ComCtrlData]") {
   SECTION("default constructor") {
     ComCtrlData data;
     constexpr auto i = ComCtrlData::RefsDataIndex::get<0>();
-    CHECK(data.get<i>().com_position == ComZmpModelData::default_com_position);
+    CHECK(data.get<i>().com_position ==
+          ComZmpModelRawData::default_com_position);
     CHECK(data.get<i>().com_velocity == kVec3DZero);
     CHECK(data.get<i>().qx1 == ctrl_x::default_q1);
     CHECK(data.get<i>().qx2 == ctrl_x::default_q2);

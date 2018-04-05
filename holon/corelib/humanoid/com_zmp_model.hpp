@@ -39,6 +39,7 @@ class ComZmpModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
 
  public:
   using Data = ComZmpModelData;
+  using RawData = ComZmpModelRawData;
   using System = ComZmpModelSystem;
   using CallbackFunc = ComZmpModelSystem::Function;
 

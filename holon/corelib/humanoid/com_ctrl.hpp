@@ -55,6 +55,7 @@ struct ComCtrlRefsRawData {
   double qz1, qz2;
   double rho, dist, kr;
   double vhp;
+  ComCtrlRefsRawData();
 };
 
 struct ComCtrlOutputsRawData {
@@ -63,6 +64,7 @@ struct ComCtrlOutputsRawData {
   Vec3D com_acceleration;
   Vec3D zmp_position;
   Vec3D reaction_force;
+  ComCtrlOutputsRawData();
 };
 
 class ComCtrlData

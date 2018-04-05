@@ -74,25 +74,32 @@ void ComCtrlCommandsRawData::set_com_velocity(optional<double> t_vxd,
   vyd = t_vyd;
 }
 
+ComCtrlRefsRawData::ComCtrlRefsRawData()
+    : com_position(ComZmpModelRawData::default_com_position),
+      com_velocity(kVec3DZero),
+      qx1(ctrl_x::default_q1),
+      qx2(ctrl_x::default_q2),
+      qy1(ctrl_y::default_q1),
+      qy2(ctrl_y::default_q2),
+      qz1(ctrl_z::default_q1),
+      qz2(ctrl_z::default_q2),
+      rho(ctrl_y::default_rho),
+      dist(ctrl_y::default_dist),
+      kr(ctrl_y::default_kr),
+      vhp(0.0) {}
+
+ComCtrlOutputsRawData::ComCtrlOutputsRawData()
+    : com_position(kVec3DZero),
+      com_velocity(kVec3DZero),
+      com_acceleration(kVec3DZero),
+      zmp_position(kVec3DZero),
+      reaction_force(kVec3DZero) {}
+
 ComCtrlData::ComCtrlData(const Vec3D& t_com_position, double t_mass)
-    : Base(ComZmpModelRawData{t_mass,
-                              kVec3DZ,
-                              t_com_position,
-                              kVec3DZero,
-                              kVec3DZero,
-                              kVec3DZero,
-                              {0, 0, t_mass * RK_G},
-                              kVec3DZero,
-                              {0, 0, t_mass * RK_G}},
-           ComCtrlRefsRawData{ModelRawData::default_com_position, kVec3DZero,
-                              ctrl_x::default_q1, ctrl_x::default_q2,
-                              ctrl_y::default_q1, ctrl_y::default_q2,
-                              ctrl_z::default_q1, ctrl_z::default_q2,
-                              ctrl_y::default_rho, ctrl_y::default_dist,
-                              ctrl_y::default_kr, 0},
-           ComCtrlOutputsRawData(), ComCtrlCommandsRawData()) {
-  {}
-}
+    : Base(alloc_raw_data<ComZmpModelRawData>(t_mass, t_com_position),
+           alloc_raw_data<ComCtrlRefsRawData>(),
+           alloc_raw_data<ComCtrlOutputsRawData>(),
+           alloc_raw_data<ComCtrlCommandsRawData>()) {}
 
 ComCtrl::ComCtrl() : ComCtrl(Base::model()) {}
 ComCtrl::ComCtrl(const Model& t_model)

@@ -46,8 +46,14 @@ class BipedModelData
   using FootRawDataType = PointMassModelRawData<Vec3D>;
 
  public:
-  HOLON_DEFINE_DEFAULT_DATA_CTOR(BipedModelData)
+  using TrunkDataIndex = index_seq<0>;
+  using LeftFootDataIndex = index_seq<1>;
+  using RightFootDataIndex = index_seq<2>;
+  TrunkDataIndex trunk_data_index;
+  LeftFootDataIndex left_foot_data_index;
+  RightFootDataIndex right_foot_data_index;
 
+  HOLON_DEFINE_DEFAULT_DATA_CTOR(BipedModelData)
   BipedModelData(const Vec3D& t_com_position, double t_mass,
                  double t_foot_dist);
   BipedModelData(const Vec3D& t_com_position, double t_mass,
@@ -69,11 +75,13 @@ class BipedModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
 
  public:
   using Data = BipedModelData;
-  using TrunkRawDataType = ComZmpModelRawData;
-  using FootRawDataType = PointMassModelRawData<Vec3D>;
+  using TrunkModel = ComZmpModel;
+  using FootModel = PointMassModel<Vec3D>;
+  using TrunkModelData = ComZmpModelData;
+  using FootModelData = PointMassModelData<Vec3D>;
 
  public:
-  BipedModel() = default;
+  BipedModel();
   BipedModel(const Vec3D& t_com_position, double t_mass, double t_foot_dist);
   BipedModel(const Vec3D& t_com_position, double t_mass,
              const Vec3D& t_lfoot_position, const Vec3D& t_rfoot_position);
@@ -81,12 +89,17 @@ class BipedModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
   virtual ~BipedModel() = default;
 
   // accessors
-  const TrunkRawDataType& trunk() const;
-  const FootRawDataType& lfoot() const;
-  const FootRawDataType& rfoot() const;
-  TrunkRawDataType& trunk();
-  FootRawDataType& lfoot();
-  FootRawDataType& rfoot();
+  const TrunkModel& trunk() const { return m_trunk; }
+  const FootModel& left_foot() const { return m_left_foot; }
+  const FootModel& right_foot() const { return m_right_foot; }
+  TrunkModel& trunk() { return m_trunk; }
+  FootModel& left_foot() { return m_left_foot; }
+  FootModel& right_foot() { return m_right_foot; }
+
+ private:
+  ComZmpModel m_trunk;
+  PointMassModel<Vec3D> m_left_foot;
+  PointMassModel<Vec3D> m_right_foot;
 };
 
 }  // namespace holon

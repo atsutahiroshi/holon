@@ -42,4 +42,10 @@ BipedModelData::BipedModelData(const Vec3D& t_com_position, double t_mass,
                      alloc_raw_data<FootRawDataType>(1.0, t_lf_position),
                      alloc_raw_data<FootRawDataType>(1.0, t_rf_position)) {}
 
+BipedModel::BipedModel()
+    : ModelBase(),
+      m_trunk(data().extract<TrunkModelData>(Data::TrunkDataIndex())),
+      m_left_foot(data().extract<FootModelData>(Data::LeftFootDataIndex())),
+      m_right_foot(data().extract<FootModelData>(Data::RightFootDataIndex())) {}
+
 }  // namespace holon

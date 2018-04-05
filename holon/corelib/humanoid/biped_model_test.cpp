@@ -82,18 +82,18 @@ void CheckMembers(const BipedModel& model, const Vec3D& expected_trunk_position,
   CHECK(model.time() == 0.0);
   CHECK(model.time_step() == BipedModel::default_time_step);
   // COM-ZMP model
-  // CHECK(model.data().trunk_ptr() == model.trunk().data_ptr());
-  // CHECK(model.data().trunk().mass == expected_mass);
-  // CHECK(model.data().trunk().com_position == expected_trunk_position);
-  // CHECK(model.trunk().initial_com_position() == expected_trunk_position);
+  CHECK(&model.data().trunk() == &model.trunk().states());
+  CHECK(model.data().trunk().mass == expected_mass);
+  CHECK(model.data().trunk().com_position == expected_trunk_position);
+  CHECK(model.trunk().initial_com_position() == expected_trunk_position);
   // Left foot
-  // CHECK(model.data().lfoot_ptr() == model.lfoot().data_ptr());
-  // CHECK(model.data().lfoot().position == expected_left_foot_position);
-  // CHECK(model.lfoot().initial_position() == expected_left_foot_position);
+  CHECK(&model.data().left_foot() == &model.left_foot().states());
+  CHECK(model.data().left_foot().position == expected_left_foot_position);
+  CHECK(model.left_foot().initial_position() == expected_left_foot_position);
   // Right foot
-  // CHECK(model.data().rfoot_ptr() == model.rfoot().data_ptr());
-  // CHECK(model.data().rfoot().position == expected_right_foot_position);
-  // CHECK(model.rfoot().initial_position() == expected_right_foot_position);
+  CHECK(&model.data().right_foot() == &model.right_foot().states());
+  CHECK(model.data().right_foot().position == expected_right_foot_position);
+  CHECK(model.right_foot().initial_position() == expected_right_foot_position);
 }
 
 void CheckConstructor_0() {
@@ -107,7 +107,7 @@ void CheckConstructor_1() {}
 void CheckConstructor_2() {}
 
 TEST_CASE("Constructor of BipdeModel", "[BipdeModel][ctor]") {
-  // SECTION("Default constructor") { CheckConstructor_0(); }
+  SECTION("Default constructor") { CheckConstructor_0(); }
   // SECTION("Overloaded constructor 1") { CheckConstructor_1(); }
 }
 

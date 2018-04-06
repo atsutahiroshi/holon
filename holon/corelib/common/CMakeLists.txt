@@ -1,5 +1,6 @@
 set(sources)
 set(test_sources
+  macro_test.cpp
   utility_test.cpp
   zip_test.cpp
   )

@@ -102,47 +102,28 @@ TEST_CASE("Check c'tor of ComCtrlData", "[ComCtrlData]") {
   }
 }
 
-void checkConstructor(const ComCtrl& ctrl) {
-  SECTION("check if data in model and states are indentical") {
-    REQUIRE(&ctrl.model().data().get() == &ctrl.states());
-  }
-
-  SECTION("check callback functions") {
-    CHECK(ctrl.model().system().is_set_zmp_position());
-  }
-
-  SECTION("check canonical foot distance") {
-    CHECK(ctrl.canonical_foot_dist() == ctrl_y::default_dist);
-  }
-
-  SECTION("check default COM position") {
-    CHECK(ctrl.default_com_position() == ctrl.initial_com_position());
-  }
-}
-
-TEST_CASE("ComCtrl() constructor", "[ComCtrl]") {
+void CheckCtor_0() {
   ComCtrl ctrl;
-  checkConstructor(ctrl);
+  REQUIRE(ctrl.model().data().get_ptr<0>() == ctrl.data().get_ptr<0>());
+  CHECK(ctrl.model().system().is_set_zmp_position());
+  CHECK(ctrl.canonical_foot_dist() == ctrl_y::default_dist);
+  CHECK(ctrl.default_com_position() == ctrl.initial_com_position());
 }
 
-TEST_CASE("ComCtrl(const Model&) constructor", "[ComCtrl]") {
-  ComCtrl::Model model;
+void CheckCtor_1() {
+  auto model = make_model<ComCtrl::Model>();
   Fuzzer fuzz;
-  model.states().com_position = fuzz.get<Vec3D>();
-  model.states().com_velocity = fuzz.get<Vec3D>();
-  ComCtrl ctrl(model);
-  checkConstructor(ctrl);
-}
-
-TEST_CASE("Check data constructed by ComCtrl(const Model&)", "[ComCtrl]") {
-  ComCtrl::Model model;
-  Fuzzer fuzz;
-  auto p = fuzz.get<Vec3D>();
-  auto v = fuzz.get<Vec3D>();
+  Vec3D p = fuzz.get<Vec3D>(), v = fuzz.get<Vec3D>();
   model.states().com_position = p;
   model.states().com_velocity = v;
 
   ComCtrl ctrl(model);
+  REQUIRE(ctrl.model().data().get_ptr<0>() == ctrl.data().get_ptr<0>());
+  CHECK(ctrl.model().system().is_set_zmp_position());
+  CHECK(ctrl.canonical_foot_dist() == ctrl_y::default_dist);
+  CHECK(ctrl.default_com_position() == ctrl.initial_com_position());
+
+  CHECK(ctrl.model().data().get_ptr<0>() != model.data().get_ptr<0>());
   CHECK(ctrl.model().initial_com_position() == p);
   CHECK(ctrl.states().com_position == p);
   CHECK(ctrl.states().com_velocity == v);
@@ -156,6 +137,41 @@ TEST_CASE("Check data constructed by ComCtrl(const Model&)", "[ComCtrl]") {
   CHECK(ctrl.model().initial_com_position() != p);
   CHECK(ctrl.states().com_position == p);
   CHECK(ctrl.states().com_velocity == v);
+}
+
+void CheckCtor_2() {
+  auto data = make_data<ComCtrl::Data>();
+  Fuzzer fuzz;
+  Vec3D p = fuzz.get<Vec3D>(), v = fuzz.get<Vec3D>();
+  data.get<0>().com_position = p;
+  data.get<0>().com_velocity = v;
+
+  ComCtrl ctrl(data);
+  REQUIRE(ctrl.model().data().get_ptr<0>() == ctrl.data().get_ptr<0>());
+  CHECK(ctrl.model().system().is_set_zmp_position());
+  CHECK(ctrl.canonical_foot_dist() == ctrl_y::default_dist);
+  CHECK(ctrl.default_com_position() == ctrl.initial_com_position());
+
+  CHECK(ctrl.model().data().get_ptr<0>() == data.get_ptr<0>());
+  CHECK(ctrl.model().initial_com_position() == p);
+  CHECK(ctrl.states().com_position == p);
+  CHECK(ctrl.states().com_velocity == v);
+
+  p = fuzz.get<Vec3D>();
+  v = fuzz.get<Vec3D>();
+  ctrl.states().com_position = p;
+  ctrl.states().com_velocity = v;
+  CHECK(data.get<0>().com_position == p);
+  CHECK(data.get<0>().com_velocity == v);
+  CHECK(ctrl.model().initial_com_position() != p);
+  CHECK(ctrl.states().com_position == p);
+  CHECK(ctrl.states().com_velocity == v);
+}
+
+TEST_CASE("Check c'tors of ComCtrl", "[ComCtrl][ctor]") {
+  SECTION("Default c'tor") { CheckCtor_0(); }
+  SECTION("Overloaded c'tor 1") { CheckCtor_1(); }
+  SECTION("Overloaded c'tor 2") { CheckCtor_2(); }
 }
 
 TEST_CASE("ComCtrl::set_canonical_foot_dist sets canonical foot distance",

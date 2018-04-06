@@ -101,11 +101,17 @@ ComCtrlData::ComCtrlData(const Vec3D& t_com_position, double t_mass)
            alloc_raw_data<ComCtrlOutputsRawData>(),
            alloc_raw_data<ComCtrlCommandsRawData>()) {}
 
-ComCtrl::ComCtrl() : ComCtrl(Base::model()) {}
+ComCtrl::ComCtrl() : ComCtrl(make_data<Data>()) {}
 ComCtrl::ComCtrl(const Model& t_model)
-    : CtrlBase(t_model),
-      m_default_com_position(model().initial_com_position()),
-      m_canonical_foot_dist(ctrl_y::default_dist) {
+    : CtrlBase(t_model), m_canonical_foot_dist(ctrl_y::default_dist) {
+  init();
+}
+ComCtrl::ComCtrl(Data t_data)
+    : CtrlBase(t_data), m_canonical_foot_dist(ctrl_y::default_dist) {
+  init();
+}
+
+void ComCtrl::init() {
   model().set_initial_com_position(states().com_position);
   m_default_com_position = model().initial_com_position();
   model().setReactionForceCallback(getReactionForceCallback());

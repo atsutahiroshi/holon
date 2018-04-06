@@ -102,6 +102,7 @@ class ComCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
 
   ComCtrl();
   explicit ComCtrl(const Model& t_model);
+  explicit ComCtrl(Data t_data);
   virtual ~ComCtrl() = default;
 
   // accessors
@@ -153,6 +154,7 @@ class ComCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
   double m_max_foot_dist;
   double m_current_foot_dist;
 
+  void init();
   void updateSideward();
   void updateRefs();
   void updateOutputs();

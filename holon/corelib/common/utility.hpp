@@ -111,12 +111,20 @@ using void_t = typename void_helper<Args...>::type;
 
 #define HOLON_HAS_MEMBER_TYPE(class, type) has_##type<class>::value
 
+#if 0
 #define HOLON_GENERATE_MEMBER_VAR_CHECKER(var)                 \
   template <class T, class = void>                             \
   struct has_##var : std::false_type {};                       \
   template <class T>                                           \
   struct has_##var<T, decltype(std::declval<T>().var, void())> \
       : std::true_type {}
+#else
+#define HOLON_GENERATE_MEMBER_VAR_CHECKER(var) \
+  template <class T, typename = int>           \
+  struct has_##var : std::false_type {};       \
+  template <class T>                           \
+  struct has_##var<T, decltype((void)T::var, 0)> : std::true_type {}
+#endif
 
 #define HOLON_HAS_MEMBER_VAR(class, var) has_##var<class>::value
 

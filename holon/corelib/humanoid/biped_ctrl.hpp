@@ -28,17 +28,18 @@
 
 namespace holon {
 
-class BipedCtrlData
-    : public DataSetBase<ComZmpModelRawData,            // COM-ZMP model
-                         PointMassModelRawData<Vec3D>,  // Left foot
-                         PointMassModelRawData<Vec3D>,  // Right foot
-                         ComCtrlRefsRawData,            // COM-ZMP ctrl
-                         PdCtrlRefsRawData<Vec3D>,      // Left foot ctrl
-                         PdCtrlRefsRawData<Vec3D>,      // right foot ctrl
-                         ComCtrlOutputsRawData,         // COM-ZMP ctrl
-                         PdCtrlOutputsRawData<Vec3D>,   // left foot
-                         PdCtrlOutputsRawData<Vec3D>,   // right foot
-                         ComCtrlCommandsRawData> {
+class BipedCtrlData : public DataSetBase<
+                          // model raw data
+                          ComZmpModelRawData, PointMassModelRawData<Vec3D>,
+                          PointMassModelRawData<Vec3D>,
+                          // refs raw data
+                          ComCtrlRefsRawData, PdCtrlRefsRawData<Vec3D>,
+                          PdCtrlRefsRawData<Vec3D>,
+                          // outputs raw data
+                          ComCtrlOutputsRawData, PdCtrlOutputsRawData<Vec3D>,
+                          PdCtrlOutputsRawData<Vec3D>,
+                          // commands raw data
+                          ComCtrlCommandsRawData> {
   HOLON_DEFINE_DEFAULT_DATA_CTOR(BipedCtrlData);
 
  public:

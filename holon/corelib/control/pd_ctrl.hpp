@@ -81,12 +81,9 @@ class PdCtrl : public CtrlBase<State, Solver, Data, Model> {
   using Function = typename Model::Function;
 
  public:
-  PdCtrl() : PdCtrl(this->model()) {}
-  PdCtrl(const Model& t_model) : Base(t_model) {
-    this->model().set_initial_position(this->states().position);
-    resetRefs();
-    this->model().setForceCallback(getForceFunction());
-  }
+  PdCtrl() : PdCtrl(make_data<Data>()) {}
+  PdCtrl(const Model& t_model) : Base(t_model) { init(); }
+  PdCtrl(Data t_data) : Base(t_data) { init(); }
   virtual ~PdCtrl() = default;
 
   virtual State force(const State& t_position, const State& t_velocity,
@@ -122,6 +119,11 @@ class PdCtrl : public CtrlBase<State, Solver, Data, Model> {
   }
 
  private:
+  void init() {
+    this->model().set_initial_position(this->states().position);
+    resetRefs();
+    this->model().setForceCallback(getForceFunction());
+  }
   Self& resetRefs() {
     this->refs().position = this->states().position;
     this->refs().velocity = this->states().velocity;

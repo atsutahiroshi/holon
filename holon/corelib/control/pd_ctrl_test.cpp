@@ -81,15 +81,40 @@ void CheckCtor_1() {
   CHECK(ctrl.states().velocity == model.states().velocity);
   CHECK(ctrl.refs().position == model.states().position);
   CHECK(ctrl.refs().velocity == model.states().velocity);
+  CHECK(ctrl.model().system().is_set_force());
+}
+template <typename T>
+void CheckCtor_2() {
+  Fuzzer fuzz;
+  PdCtrlData<T> data;
+  data.template get<0>().mass = Fuzzer(0, 10).get<double>();
+  data.template get<0>().position = fuzz.get<T>();
+  data.template get<0>().velocity = fuzz.get<T>();
+
+  PdCtrl<T> ctrl(data);
+  REQUIRE(ctrl.data() == data);
+  REQUIRE(ctrl.model().data().template get_ptr<0>() ==
+          data.template get_ptr<0>());
+  CHECK(ctrl.states().mass == data.template get<0>().mass);
+  CHECK(ctrl.states().position == data.template get<0>().position);
+  CHECK(ctrl.model().initial_position() == data.template get<0>().position);
+  CHECK(ctrl.states().velocity == data.template get<0>().velocity);
+  CHECK(ctrl.refs().position == data.template get<0>().position);
+  CHECK(ctrl.refs().velocity == data.template get<0>().velocity);
+  CHECK(ctrl.model().system().is_set_force());
 }
 TEST_CASE("C'tor of PdCtrl", "[PdCtrl][ctor]") {
   SECTION("Default c'tor") {
     CheckCtor_0<double>();
     CheckCtor_0<Vec3D>();
   }
-  SECTION("Overloaded c'tor") {
+  SECTION("Overloaded c'tor 1") {
     CheckCtor_1<double>();
     CheckCtor_1<Vec3D>();
+  }
+  SECTION("Overloaded c'tor 2") {
+    CheckCtor_2<double>();
+    CheckCtor_2<Vec3D>();
   }
 }
 

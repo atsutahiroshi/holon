@@ -59,10 +59,12 @@ class CtrlBase {
   static constexpr auto default_time_step = Model::default_time_step;
 
  public:
-  CtrlBase() : m_data(), m_model(this->model_data()) {}
-  CtrlBase(const Model& t_model) : CtrlBase() {
+  CtrlBase() : CtrlBase(make_data<Data>()) {}
+  CtrlBase(const Model& t_model) : CtrlBase(make_data<Data>()) {
     this->copy_model_data(t_model);
   }
+  explicit CtrlBase(Data t_data)
+      : m_data(t_data), m_model(this->model_data()) {}
   virtual ~CtrlBase() = default;
 
   // accessors

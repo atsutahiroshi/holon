@@ -83,6 +83,7 @@ class TestCtrl : public CtrlBase<double, Euler<std::array<double, 2>>,
  public:
   TestCtrl() {}
   explicit TestCtrl(const TestModel& t_model) : CtrlBase(t_model) {}
+  explicit TestCtrl(TestCtrlData t_data) : CtrlBase(t_data) {}
 
  private:
 };
@@ -113,9 +114,20 @@ void CheckCtor_1() {
   CHECK(ctrl.model().data().get_ptr<0>() == ctrl.data().get_ptr<0>());
 }
 
+void CheckCtor_2() {
+  auto data = make_data<TestCtrlData>();
+  TestCtrl ctrl(data);
+  REQUIRE(ctrl.data().get_ptr<0>() == data.get_ptr<0>());
+  REQUIRE(ctrl.data().get_ptr<0>() == ctrl.model().data().get_ptr<0>());
+  REQUIRE(ctrl.data().get_ptr<1>() == data.get_ptr<1>());
+  REQUIRE(ctrl.data().get_ptr<2>() == data.get_ptr<2>());
+  CHECK(&ctrl.states() == &ctrl.model().states());
+}
+
 TEST_CASE("Check c'tor of Ctrlbase", "[CtrlBase][ctor]") {
   SECTION("Default c'tor") { CheckCtor_0(); }
-  SECTION("Overloaded c'tor") { CheckCtor_1(); }
+  SECTION("Overloaded c'tor 1") { CheckCtor_1(); }
+  SECTION("Overloaded c'tor 2") { CheckCtor_2(); }
 }
 
 TEST_CASE("Accessors / mutators in CtrlBase", "[CtrlBase][accessor][mutator]") {

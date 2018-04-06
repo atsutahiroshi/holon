@@ -52,13 +52,10 @@ constexpr double PointMassModelRawData<State>::default_mass;
 
 template <typename State>
 class PointMassModelData : public DataSetBase<PointMassModelRawData<State>> {
-  using Self = PointMassModelData<State>;
   using RawData = PointMassModelRawData<State>;
-  using Base = DataSetBase<RawData>;
+  HOLON_DEFINE_DEFAULT_DATA_CTOR(PointMassModelData, RawData);
 
  public:
-  HOLON_DEFINE_DEFAULT_DATA_CTOR(PointMassModelData)
-
   PointMassModelData(const State& t_initial_position)
       : PointMassModelData(t_initial_position, RawData::default_mass) {}
   PointMassModelData(const State& t_initial_position, double t_mass)

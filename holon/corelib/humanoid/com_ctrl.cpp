@@ -96,10 +96,10 @@ ComCtrlOutputsRawData::ComCtrlOutputsRawData()
       reaction_force(kVec3DZero) {}
 
 ComCtrlData::ComCtrlData(const Vec3D& t_com_position, double t_mass)
-    : Base(alloc_raw_data<ComZmpModelRawData>(t_mass, t_com_position),
-           alloc_raw_data<ComCtrlRefsRawData>(),
-           alloc_raw_data<ComCtrlOutputsRawData>(),
-           alloc_raw_data<ComCtrlCommandsRawData>()) {}
+    : DataSetBase(alloc_raw_data<ComZmpModelRawData>(t_mass, t_com_position),
+                  alloc_raw_data<ComCtrlRefsRawData>(),
+                  alloc_raw_data<ComCtrlOutputsRawData>(),
+                  alloc_raw_data<ComCtrlCommandsRawData>()) {}
 
 ComCtrl::ComCtrl() : ComCtrl(make_data<Data>()) {}
 ComCtrl::ComCtrl(const Model& t_model)

@@ -70,13 +70,9 @@ struct ComCtrlOutputsRawData {
 class ComCtrlData
     : public DataSetBase<ComZmpModelRawData, ComCtrlRefsRawData,
                          ComCtrlOutputsRawData, ComCtrlCommandsRawData> {
-  using Self = ComCtrlData;
-  using Base = DataSetBase<ComZmpModelRawData, ComCtrlRefsRawData,
-                           ComCtrlOutputsRawData, ComCtrlCommandsRawData>;
+  HOLON_DEFINE_DEFAULT_DATA_CTOR(ComCtrlData);
 
  public:
-  HOLON_DEFINE_DEFAULT_DATA_CTOR(ComCtrlData)
-
   using ModelRawData = ComZmpModelRawData;
   using RefsRawData = ComCtrlRefsRawData;
   using OutputsRawData = ComCtrlOutputsRawData;

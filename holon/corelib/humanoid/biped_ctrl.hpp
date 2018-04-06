@@ -39,20 +39,13 @@ class BipedCtrlData
                          PdCtrlOutputsRawData<Vec3D>,   // left foot
                          PdCtrlOutputsRawData<Vec3D>,   // right foot
                          ComCtrlCommandsRawData> {
-  using Self = BipedCtrlData;
-  using Base = DataSetBase<ComZmpModelRawData, PointMassModelRawData<Vec3D>,
-                           PointMassModelRawData<Vec3D>, ComCtrlRefsRawData,
-                           PdCtrlRefsRawData<Vec3D>, PdCtrlRefsRawData<Vec3D>,
-                           ComCtrlOutputsRawData, PdCtrlOutputsRawData<Vec3D>,
-                           PdCtrlOutputsRawData<Vec3D>, ComCtrlCommandsRawData>;
+  HOLON_DEFINE_DEFAULT_DATA_CTOR(BipedCtrlData);
 
  public:
   using ModelDataIndex = index_seq<0, 1, 2>;
   using RefsDataIndex = index_seq<3, 4, 5>;
   using OutputsDataIndex = index_seq<6, 7, 8>;
   using CommandsDataIndex = index_seq<9>;
-
-  HOLON_DEFINE_DEFAULT_DATA_CTOR(BipedCtrlData)
 };
 
 class BipedCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
@@ -62,7 +55,13 @@ class BipedCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
                         BipedModel>;
 
  public:
+  using Model = BipedModel;
+  using Data = BipedCtrlData;
+
+ public:
   BipedCtrl();
+  explicit BipedCtrl(Data t_data);
+  explicit BipedCtrl(const Model& t_model);
   virtual ~BipedCtrl() = default;
 };
 

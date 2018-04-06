@@ -25,6 +25,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "holon/corelib/common/macro.hpp"
 #include "holon/corelib/common/utility.hpp"
 
 namespace holon {
@@ -72,10 +73,9 @@ class DataSetBase {
   static_assert(sizeof...(RawDataTypes) > 0,
                 "DataSetBase must have at least one RawData class.");
 
+ protected:
   using Self = DataSetBase<RawDataTypes...>;
   static constexpr std::size_t raw_data_num = sizeof...(RawDataTypes);
-
- protected:
   using RawDataTuple = std::tuple<RawDataTypes...>;
   using RawDataPtrTuple = std::tuple<std::shared_ptr<RawDataTypes>...>;
 
@@ -237,9 +237,26 @@ std::ostream& operator<<(std::ostream& os,
 }
 
 // macro
-#define HOLON_DEFINE_DEFAULT_DATA_CTOR(data_class) \
-  template <typename... Args>                      \
-  explicit data_class(Args... args) : Base(args...) {}
+#define HOLON_DEFINE_DEFAULT_DATA_CTOR(...)               \
+ public:                                                  \
+  template <typename... Args>                             \
+  explicit HOLON_DATA_CTOR(__VA_ARGS__)(Args... args)     \
+      : HOLON_DATA_SET_BASE_TYPE(__VA_ARGS__)(args...) {} \
+                                                          \
+ private:                                                 \
+  static_assert(true, "this is dummy")
+
+// TODO: this can be solved with __VA_OPT__ if C++20 is available
+#define HOLON_DATA_CTOR(...) HOLON_VA_ARGS_GET_FIRST(__VA_ARGS__)
+#define HOLON_DATA_SET_BASE_TYPE(...) \
+  HOLON_DATA_SET_BASE_TYPE_(HOLON_VA_ARGS_ONE_OR_MORE(__VA_ARGS__), __VA_ARGS__)
+#define HOLON_DATA_SET_BASE_TYPE_(qty, ...) \
+  HOLON_DATA_SET_BASE_TYPE__(qty, __VA_ARGS__)
+#define HOLON_DATA_SET_BASE_TYPE__(qty, ...) \
+  EXPAND(HOLON_DATA_SET_BASE_TYPE_##qty(__VA_ARGS__))
+#define HOLON_DATA_SET_BASE_TYPE_ONE(data_type) DataSetBase::Self
+#define HOLON_DATA_SET_BASE_TYPE_MORE(data_type, ...) \
+  DataSetBase<__VA_ARGS__>::Self
 
 }  // namespace holon
 

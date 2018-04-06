@@ -39,9 +39,8 @@ namespace holon {
 class BipedModelData
     : public DataSetBase<ComZmpModelRawData, PointMassModelRawData<Vec3D>,
                          PointMassModelRawData<Vec3D>> {
-  using Self = BipedModelData;
-  using Base = DataSetBase<ComZmpModelRawData, PointMassModelRawData<Vec3D>,
-                           PointMassModelRawData<Vec3D>>;
+  HOLON_DEFINE_DEFAULT_DATA_CTOR(BipedModelData);
+
   using TrunkRawDataType = ComZmpModelRawData;
   using FootRawDataType = PointMassModelRawData<Vec3D>;
 
@@ -53,7 +52,6 @@ class BipedModelData
   LeftFootDataIndex left_foot_data_index;
   RightFootDataIndex right_foot_data_index;
 
-  HOLON_DEFINE_DEFAULT_DATA_CTOR(BipedModelData)
   BipedModelData(const Vec3D& t_com_position, double t_mass,
                  double t_foot_dist);
   BipedModelData(const Vec3D& t_com_position, double t_mass,

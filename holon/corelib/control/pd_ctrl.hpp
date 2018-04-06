@@ -53,16 +53,16 @@ template <typename State>
 class PdCtrlData
     : public DataSetBase<PointMassModelRawData<State>, PdCtrlRefsRawData<State>,
                          PdCtrlOutputsRawData<State>> {
-  using Base =
-      DataSetBase<PointMassModelRawData<State>, PdCtrlRefsRawData<State>,
-                  PdCtrlOutputsRawData<State>>;
-
  public:
-  HOLON_DEFINE_DEFAULT_DATA_CTOR(PdCtrlData)
-
   using ModelRawData = PointMassModelRawData<State>;
   using RefsRawData = PdCtrlRefsRawData<State>;
   using OutputsRawData = PdCtrlOutputsRawData<State>;
+
+  HOLON_DEFINE_DEFAULT_DATA_CTOR(PdCtrlData, ModelRawData, RefsRawData,
+                                 OutputsRawData);
+  using Base = DataSetBase<ModelRawData, RefsRawData, OutputsRawData>;
+
+ public:
   using ModelDataIndex = index_seq<0>;
   using RefsDataIndex = index_seq<1>;
   using OutputsDataIndex = index_seq<2>;

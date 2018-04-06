@@ -145,5 +145,33 @@ TEST_CASE("PointMassModelSytem::setConstForce", "[PointMassModelSystem]") {
   SECTION("Case where state type is Vec3D") { CheckSetConstForce<Vec3D>(); }
 }
 
+template <typename T>
+void CheckIsSetForce() {
+  auto sys = prepareSystem(T(0.0), 1.0);
+  auto f_force = [](const T&, const T&, const double) { return T{0.0}; };
+  CHECK_FALSE(sys.is_set_force());
+  sys.set_force(f_force);
+  CHECK(sys.is_set_force());
+}
+TEST_CASE("PointMassModelSystem::is_set_force",
+          "[PointMassModelSystem][is_set_force]") {
+  CheckIsSetForce<double>();
+  CheckIsSetForce<Vec3D>();
+}
+
+template <typename T>
+void CheckIsSetAcceleration() {
+  auto sys = prepareSystem(T(0.0), 1.0);
+  auto f_acceleration = [](const T&, const T&, const double) { return T{0.0}; };
+  CHECK_FALSE(sys.is_set_acceleration());
+  sys.set_acceleration(f_acceleration);
+  CHECK(sys.is_set_acceleration());
+}
+TEST_CASE("PointMassModelSystem::is_set_acceleration",
+          "[PointMassModelSystem][is_set_acceleration]") {
+  CheckIsSetAcceleration<double>();
+  CheckIsSetAcceleration<Vec3D>();
+}
+
 }  // namespace
 }  // namespace holon

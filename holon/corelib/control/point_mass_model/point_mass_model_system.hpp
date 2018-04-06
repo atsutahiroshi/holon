@@ -74,6 +74,9 @@ class PointMassModelSystem : public SystemBase<State, Data> {
     });
   }
 
+  bool is_set_force() { return f_force != nullptr; }
+  bool is_set_acceleration() { return f_acceleration != nullptr; }
+
  private:
   Function f_acceleration = nullptr;
   Function f_force = nullptr;

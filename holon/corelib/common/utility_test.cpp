@@ -48,5 +48,37 @@ TEST_CASE("Get ith element of index_seq", "[utility][index_seq]") {
   // CHECK(index2.get<4>() == 0); // assert
 }
 
+HOLON_GENERATE_MEMBER_TYPE_CHECKER(special_type);
+
+TEST_CASE("Check member type checker", "[utility]") {
+  struct A {
+    using special_type = void;
+  };
+  struct B {};
+  struct C {
+    using special_type = B;
+  };
+  CHECK(HOLON_HAS_MEMBER_TYPE(A, special_type));
+  CHECK_FALSE(HOLON_HAS_MEMBER_TYPE(B, special_type));
+  CHECK(HOLON_HAS_MEMBER_TYPE(C, special_type));
+}
+
+HOLON_GENERATE_MEMBER_VAR_CHECKER(id);
+
+TEST_CASE("Check member variable checker", "[utility]") {
+  struct X {
+    int id;
+  };
+
+  struct Y {};
+
+  struct Z {
+    double id;
+  };
+  CHECK(HOLON_HAS_MEMBER_VAR(X, id));
+  CHECK_FALSE(HOLON_HAS_MEMBER_VAR(Y, id));
+  CHECK(HOLON_HAS_MEMBER_VAR(Z, id));
+}
+
 }  // namespace
 }  // namespace holon

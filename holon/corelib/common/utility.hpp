@@ -96,6 +96,30 @@ void print_tuple(std::basic_ostream<Ch, Tr>& os, const Tuple& t,
   (void)dummy{0, (void(os << (Is == 0 ? "" : ", ") << std::get<Is>(t)), 0)...};
 }
 
+template <class...>
+struct void_helper {
+  using type = void;
+};
+template <class... Args>
+using void_t = typename void_helper<Args...>::type;
+
+#define HOLON_GENERATE_MEMBER_TYPE_CHECKER(type) \
+  template <class T, class = void>               \
+  struct has_##type : std::false_type {};        \
+  template <class T>                             \
+  struct has_##type<T, void_t<typename T::type>> : std::true_type {}
+
+#define HOLON_HAS_MEMBER_TYPE(class, type) has_##type<class>::value
+
+#define HOLON_GENERATE_MEMBER_VAR_CHECKER(var)                 \
+  template <class T, class = void>                             \
+  struct has_##var : std::false_type {};                       \
+  template <class T>                                           \
+  struct has_##var<T, decltype(std::declval<T>().var, void())> \
+      : std::true_type {}
+
+#define HOLON_HAS_MEMBER_VAR(class, var) has_##var<class>::value
+
 }  // namespace holon
 
 #endif  // HOLON_COMMON_UTILITY_HPP_

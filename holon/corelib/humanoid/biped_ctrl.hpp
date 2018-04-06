@@ -52,8 +52,8 @@ class BipedCtrlData : public DataSetBase<
 class BipedCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
                                   BipedCtrlData, BipedModel> {
   using Self = BipedCtrl;
-  using Base = CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>, BipedCtrlData,
-                        BipedModel>;
+  using Solver = RungeKutta4<std::array<Vec3D, 2>>;
+  using Base = CtrlBase<Vec3D, Solver, BipedCtrlData, BipedModel>;
 
  public:
   using Model = BipedModel;

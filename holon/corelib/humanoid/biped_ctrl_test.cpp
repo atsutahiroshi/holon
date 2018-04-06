@@ -26,7 +26,11 @@
 namespace holon {
 namespace {
 
-TEST_CASE("") {}
+void CheckCtor_0() { BipedCtrl ctrl; }
+
+TEST_CASE("Check c'tors of BipedCtrl") {
+  SECTION("Default c'tor") {}
+}
 
 }  // namespace
 }  // namespace holon

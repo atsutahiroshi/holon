@@ -22,6 +22,6 @@
 
 namespace holon {
 
-//
+BipedCtrl::BipedCtrl() {}
 
 }  // namespace holon

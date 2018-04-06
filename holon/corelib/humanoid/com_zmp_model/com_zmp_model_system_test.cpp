@@ -193,14 +193,14 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
   }
 }
 
-TEST_CASE("ComZmpModelSystem::isZmpPositionSet() returns if it is set",
-          "[ComZmpModelSystem]") {
+TEST_CASE("ComZmpModelSystem::is_set_zmp_position",
+          "[ComZmpModelSystem][is_set_zmp_position]") {
   auto data = make_data<ComZmpModelData>();
   ComZmpModelSystem sys(data);
-  CHECK_FALSE(sys.isZmpPositionSet());
+  CHECK_FALSE(sys.is_set_zmp_position());
   sys.set_zmp_position_f(
       [](const Vec3D&, const Vec3D&, const double) { return kVec3DZero; });
-  CHECK(sys.isZmpPositionSet());
+  CHECK(sys.is_set_zmp_position());
 }
 
 }  // namespace

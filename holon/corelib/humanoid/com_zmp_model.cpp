@@ -127,7 +127,7 @@ ComZmpModel& ComZmpModel::removeExternalForce() {
 
 bool ComZmpModel::isUpdatable(const Vec3D& p, const Vec3D& v) {
   if (!isMassValid(mass())) return false;
-  if (system().isZmpPositionSet()) {
+  if (system().is_set_zmp_position()) {
     auto pz = system().zmp_position(p, v, time());
     if (!isComZmpDiffValid(p, pz)) return false;
   } else {
@@ -143,7 +143,7 @@ void ComZmpModel::updateData(const Vec3D& p, const Vec3D& v) {
   states().com_position = state[0];
   states().com_velocity = state[1];
   states().com_acceleration = system().com_acceleration(p, v, time());
-  if (system().isZmpPositionSet()) {
+  if (system().is_set_zmp_position()) {
     states().zmp_position = system().zmp_position(p, v, time());
     auto fz = system().reaction_force(p, v, time()).z();
     states().reaction_force = computeReactForce(p, states().zmp_position, fz);

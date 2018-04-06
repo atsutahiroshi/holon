@@ -108,7 +108,7 @@ void checkConstructor(const ComCtrl& ctrl) {
   }
 
   SECTION("check callback functions") {
-    CHECK(ctrl.model().system().isZmpPositionSet());
+    CHECK(ctrl.model().system().is_set_zmp_position());
   }
 
   SECTION("check canonical foot distance") {

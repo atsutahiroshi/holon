@@ -272,7 +272,7 @@ TEST_CASE("ComZmpModel::removeZmpPosition removes ZMP position",
     model.setZmpPosition(pz);
     CHECK(model.system().zmp_position(p, v, t) == pz);
     model.removeZmpPosition();
-    CHECK_FALSE(model.system().isZmpPositionSet());
+    CHECK_FALSE(model.system().is_set_zmp_position());
   }
   SECTION("set ZMP and fz then remove them") {
     auto pz = fuzz.get<Vec3D>();
@@ -281,7 +281,7 @@ TEST_CASE("ComZmpModel::removeZmpPosition removes ZMP position",
     CHECK(model.system().zmp_position(p, v, t) == pz);
     CHECK(model.system().reaction_force(p, v, t) == Vec3D(0, 0, fz));
     model.removeZmpPosition();
-    CHECK_FALSE(model.system().isZmpPositionSet());
+    CHECK_FALSE(model.system().is_set_zmp_position());
     CHECK(model.system().reaction_force(p, v, t) == Vec3D(0, 0, G));
   }
 }

@@ -61,7 +61,7 @@ class ComZmpModelSystem : public SystemBase<Vec3D, ComZmpModelData> {
                             const double t) const {
     return m_zmp_position_f(p, v, t);
   }
-  inline bool isZmpPositionSet() const {
+  inline bool is_set_zmp_position() const {
     return static_cast<bool>(m_zmp_position_f);
   }
 

@@ -41,29 +41,25 @@ RawData make_raw_data(Args&&... args) {
   return RawData(std::forward<Args>(args)...);
 }
 
-template <typename T, typename = int>
-struct is_data_type : std::false_type {};
-
-template <typename T>
-struct is_data_type<T, decltype((void)T::is_data_type, 0)> : std::true_type {};
+HOLON_GENERATE_MEMBER_VAR_CHECKER(is_data_type);
 
 template <typename Data, typename... Args>
 Data make_data(Args&&... args) {
-  static_assert(is_data_type<Data>::value,
+  static_assert(HOLON_HAS_MEMBER_VAR(Data, is_data_type),
                 "make_data is able to make instance derived from DataSetBase.");
   return Data(std::forward<Args>(args)...);
 }
 
 template <template <typename> class Data, typename State, typename... Args>
 Data<State> make_data(Args&&... args) {
-  static_assert(is_data_type<Data<State>>::value,
+  static_assert(HOLON_HAS_MEMBER_VAR(Data<State>, is_data_type),
                 "make_data is able to make instance derived from DataSetBase.");
   return Data<State>(std::forward<Args>(args)...);
 }
 
 template <template <typename> class Data, typename State, typename... Args>
 Data<State> make_data(const State& state, Args&&... args) {
-  static_assert(is_data_type<Data<State>>::value,
+  static_assert(HOLON_HAS_MEMBER_VAR(Data<State>, is_data_type),
                 "make_data is able to make instance derived from DataSetBase.");
   return Data<State>(state, std::forward<Args>(args)...);
 }

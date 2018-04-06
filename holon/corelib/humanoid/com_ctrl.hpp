@@ -47,7 +47,7 @@ struct ComCtrlCommandsRawData {
   void set_com_velocity(opt_double t_vxd, opt_double t_vyd);
 };
 
-struct ComCtrlRefsRawData {
+struct ComCtrlParamsRawData {
   Vec3D com_position;
   Vec3D com_velocity;
   double qx1, qx2;
@@ -55,7 +55,7 @@ struct ComCtrlRefsRawData {
   double qz1, qz2;
   double rho, dist, kr;
   double vhp;
-  ComCtrlRefsRawData();
+  ComCtrlParamsRawData();
 };
 
 struct ComCtrlOutputsRawData {
@@ -68,17 +68,17 @@ struct ComCtrlOutputsRawData {
 };
 
 class ComCtrlData
-    : public DataSetBase<ComZmpModelRawData, ComCtrlRefsRawData,
+    : public DataSetBase<ComZmpModelRawData, ComCtrlParamsRawData,
                          ComCtrlOutputsRawData, ComCtrlCommandsRawData> {
   HOLON_DEFINE_DEFAULT_DATA_CTOR(ComCtrlData);
 
  public:
   using ModelRawData = ComZmpModelRawData;
-  using RefsRawData = ComCtrlRefsRawData;
+  using ParamsRawData = ComCtrlParamsRawData;
   using OutputsRawData = ComCtrlOutputsRawData;
   using CommandsRawData = ComCtrlCommandsRawData;
   using ModelDataIndex = index_seq<0>;
-  using RefsDataIndex = index_seq<1>;
+  using ParamsDataIndex = index_seq<1>;
   using OutputsDataIndex = index_seq<2>;
   using CommandsDataIndex = index_seq<3>;
 
@@ -152,7 +152,7 @@ class ComCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
 
   void init();
   void updateSideward();
-  void updateRefs();
+  void updateParams();
   void updateOutputs();
   void updateDefaultComPosition();
 };

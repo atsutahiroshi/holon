@@ -53,8 +53,8 @@ int main() {
     ctrl.update(DT);
 
     std::cout << ctrl.time() << " ";
-    std::cout << ctrl.refs().com_position.x() << " ";
-    std::cout << ctrl.refs().com_position.y() << " ";
+    std::cout << ctrl.params().com_position.x() << " ";
+    std::cout << ctrl.params().com_position.y() << " ";
     std::cout << ctrl.commands().vxd.value_or(0) << " ";
     std::cout << ctrl.commands().vyd.value_or(0) << " ";
     std::cout << ctrl.states().com_position.data() << " ";

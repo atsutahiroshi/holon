@@ -32,12 +32,12 @@
 namespace holon {
 
 template <typename State>
-struct PdCtrlRefsRawData {
+struct PdCtrlParamsRawData {
   State position = State{0};
   State velocity = State{0};
   State stiffness = State{0};
   State damping = State{0};
-  PdCtrlRefsRawData() = default;
+  PdCtrlParamsRawData() = default;
 };
 
 template <typename State>
@@ -50,26 +50,27 @@ struct PdCtrlOutputsRawData {
 };
 
 template <typename State>
-class PdCtrlData
-    : public DataSetBase<PointMassModelRawData<State>, PdCtrlRefsRawData<State>,
-                         PdCtrlOutputsRawData<State>> {
+class PdCtrlData : public DataSetBase<PointMassModelRawData<State>,
+                                      PdCtrlParamsRawData<State>,
+                                      PdCtrlOutputsRawData<State>> {
  public:
   using ModelRawData = PointMassModelRawData<State>;
-  using RefsRawData = PdCtrlRefsRawData<State>;
+  using ParamsRawData = PdCtrlParamsRawData<State>;
   using OutputsRawData = PdCtrlOutputsRawData<State>;
 
-  HOLON_DEFINE_DEFAULT_DATA_CTOR(PdCtrlData, ModelRawData, RefsRawData,
+  HOLON_DEFINE_DEFAULT_DATA_CTOR(PdCtrlData, ModelRawData, ParamsRawData,
                                  OutputsRawData);
-  using Base = DataSetBase<ModelRawData, RefsRawData, OutputsRawData>;
+  using Base = DataSetBase<ModelRawData, ParamsRawData, OutputsRawData>;
 
  public:
   using ModelDataIndex = index_seq<0>;
-  using RefsDataIndex = index_seq<1>;
+  using ParamsDataIndex = index_seq<1>;
   using OutputsDataIndex = index_seq<2>;
 
   PdCtrlData(const State& t_initial_position, double t_mass)
       : Base(alloc_raw_data<ModelRawData>(t_mass, t_initial_position),
-             alloc_raw_data<RefsRawData>(), alloc_raw_data<OutputsRawData>()) {}
+             alloc_raw_data<ParamsRawData>(),
+             alloc_raw_data<OutputsRawData>()) {}
 };
 
 template <typename State, typename Solver = RungeKutta4<std::array<State, 2>>,
@@ -89,8 +90,9 @@ class PdCtrl : public CtrlBase<State, Solver, Data, Model> {
   virtual State force(const State& t_position, const State& t_velocity,
                       const double /* t_time */) {
     return pd_ctrl_formula::computeDesForce(
-        t_position, t_velocity, this->refs().position, this->refs().velocity,
-        this->refs().stiffness, this->refs().damping);
+        t_position, t_velocity, this->params().position,
+        this->params().velocity, this->params().stiffness,
+        this->params().damping);
   }
 
   virtual Function getForceFunction() {
@@ -100,12 +102,12 @@ class PdCtrl : public CtrlBase<State, Solver, Data, Model> {
 
   virtual Self& reset() override {
     this->model().reset();
-    return this->resetRefs();
+    return this->resetParams();
   }
 
   virtual Self& reset(const State& t_initial_position) {
     this->model().reset(t_initial_position);
-    return this->resetRefs();
+    return this->resetParams();
   }
 
   virtual bool update() override {
@@ -121,12 +123,12 @@ class PdCtrl : public CtrlBase<State, Solver, Data, Model> {
  private:
   void init() {
     this->model().set_initial_position(this->states().position);
-    resetRefs();
+    resetParams();
     this->model().setForceCallback(getForceFunction());
   }
-  Self& resetRefs() {
-    this->refs().position = this->states().position;
-    this->refs().velocity = this->states().velocity;
+  Self& resetParams() {
+    this->params().position = this->states().position;
+    this->params().velocity = this->states().velocity;
     return *this;
   }
   Self& updateOutputs() {

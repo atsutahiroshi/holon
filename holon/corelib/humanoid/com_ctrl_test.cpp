@@ -85,7 +85,7 @@ TEST_CASE("ComCtrlCommandsRawData::clear() should clear all the values") {
 TEST_CASE("Check c'tor of ComCtrlData", "[ComCtrlData]") {
   SECTION("default constructor") {
     ComCtrlData data;
-    constexpr auto i = ComCtrlData::RefsDataIndex::get<0>();
+    constexpr auto i = ComCtrlData::ParamsDataIndex::get<0>();
     CHECK(data.get<i>().com_position ==
           ComZmpModelRawData::default_com_position);
     CHECK(data.get<i>().com_velocity == kVec3DZero);
@@ -240,7 +240,7 @@ TEST_CASE(
   CHECK_THAT(ctrl.states().com_position, Equals(p0));
   CHECK_THAT(ctrl.states().com_velocity, Equals(kVec3DZero));
   CHECK(ctrl.canonical_foot_dist() == dist);
-  CHECK(ctrl.refs().dist == dist);
+  CHECK(ctrl.params().dist == dist);
 }
 
 TEST_CASE("ComCtrl::getCommands() provides a pointer to user commands",
@@ -339,7 +339,7 @@ TEST_CASE("check if desired ZMP position is modified after update",
   } testcases[] = {{{0, 0, 1}}, {{0.1, 0, 1}}, {{0.1, -0.1, 1}}};
   for (auto& c : testcases) {
     Vec3D expected_pz;
-    ctrl.refs().com_position = c.pd;
+    ctrl.params().com_position = c.pd;
     expected_pz = ctrl.computeDesZmpPos(ctrl.states().com_position,
                                         ctrl.states().com_velocity, 0);
 
@@ -355,185 +355,185 @@ TEST_CASE("ComCtrl::update() updates control paramters", "[ComCtrl]") {
   double dist = 0.42;
   ctrl.reset(p0, dist);
   auto cmd = ctrl.getCommands();
-  auto refs = ctrl.refs();
+  auto params = ctrl.params();
 
   Fuzzer fuzz;
   SECTION("COM position") {
-    refs.com_position = fuzz.get<Vec3D>();
+    params.com_position = fuzz.get<Vec3D>();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().com_position == p0);
+      CHECK(ctrl.params().com_position == p0);
     }
     SECTION("set user command") {
       Vec3D v = {1.2, -1.2, 1.5};
       cmd->set_com_position(v);
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().com_position == v);
+      CHECK(ctrl.params().com_position == v);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().com_position == p0);
+      CHECK(ctrl.params().com_position == p0);
     }
   }
 
   SECTION("COM velocity") {
-    refs.com_velocity = fuzz.get<Vec3D>();
+    params.com_velocity = fuzz.get<Vec3D>();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().com_velocity == kVec3DZero);
+      CHECK(ctrl.params().com_velocity == kVec3DZero);
     }
     SECTION("set user command") {
       Vec3D v = {1.2, -1.2, 0};
       cmd->set_com_velocity(v.x(), v.y());
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().com_velocity == v);
+      CHECK(ctrl.params().com_velocity == v);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().com_velocity == kVec3DZero);
+      CHECK(ctrl.params().com_velocity == kVec3DZero);
     }
   }
 
   SECTION("qx1 and qx2") {
-    refs.qx1 = fuzz.get<double>();
-    refs.qx2 = fuzz.get<double>();
+    params.qx1 = fuzz.get<double>();
+    params.qx2 = fuzz.get<double>();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().qx1 == 1.0);
-      CHECK(ctrl.refs().qx2 == 1.0);
+      CHECK(ctrl.params().qx1 == 1.0);
+      CHECK(ctrl.params().qx2 == 1.0);
     }
     SECTION("set user command") {
       cmd->qx1 = 0.8;
       cmd->qx2 = 0.5;
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().qx1 == 0.8);
-      CHECK(ctrl.refs().qx2 == 0.5);
+      CHECK(ctrl.params().qx1 == 0.8);
+      CHECK(ctrl.params().qx2 == 0.5);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().qx1 == 1.0);
-      CHECK(ctrl.refs().qx2 == 1.0);
+      CHECK(ctrl.params().qx1 == 1.0);
+      CHECK(ctrl.params().qx2 == 1.0);
     }
   }
 
   SECTION("qy1 and qy2") {
-    refs.qy1 = fuzz.get<double>();
-    refs.qy2 = fuzz.get<double>();
+    params.qy1 = fuzz.get<double>();
+    params.qy2 = fuzz.get<double>();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().qy1 == 1.0);
-      CHECK(ctrl.refs().qy2 == 1.0);
+      CHECK(ctrl.params().qy1 == 1.0);
+      CHECK(ctrl.params().qy2 == 1.0);
     }
     SECTION("set user command") {
       cmd->qy1 = 0.8;
       cmd->qy2 = 0.5;
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().qy1 == 0.8);
-      CHECK(ctrl.refs().qy2 == 0.5);
+      CHECK(ctrl.params().qy1 == 0.8);
+      CHECK(ctrl.params().qy2 == 0.5);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().qy1 == 1.0);
-      CHECK(ctrl.refs().qy2 == 1.0);
+      CHECK(ctrl.params().qy1 == 1.0);
+      CHECK(ctrl.params().qy2 == 1.0);
     }
   }
 
   SECTION("qz1 and qz2") {
-    refs.qz1 = fuzz.get<double>();
-    refs.qz2 = fuzz.get<double>();
+    params.qz1 = fuzz.get<double>();
+    params.qz2 = fuzz.get<double>();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().qz1 == 1.0);
-      CHECK(ctrl.refs().qz2 == 1.0);
+      CHECK(ctrl.params().qz1 == 1.0);
+      CHECK(ctrl.params().qz2 == 1.0);
     }
     SECTION("set user command") {
       cmd->qz1 = 0.8;
       cmd->qz2 = 0.5;
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().qz1 == 0.8);
-      CHECK(ctrl.refs().qz2 == 0.5);
+      CHECK(ctrl.params().qz1 == 0.8);
+      CHECK(ctrl.params().qz2 == 0.5);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().qz1 == 1.0);
-      CHECK(ctrl.refs().qz2 == 1.0);
+      CHECK(ctrl.params().qz1 == 1.0);
+      CHECK(ctrl.params().qz2 == 1.0);
     }
   }
 
   SECTION("Virtual horizontal plane") {
-    refs.vhp = fuzz.get<double>();
+    params.vhp = fuzz.get<double>();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().vhp == 0.0);
+      CHECK(ctrl.params().vhp == 0.0);
     }
     SECTION("set user command") {
       cmd->vhp = 0.1;
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().vhp == 0.1);
+      CHECK(ctrl.params().vhp == 0.1);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().vhp == 0.0);
+      CHECK(ctrl.params().vhp == 0.0);
     }
   }
 
   SECTION("Stepping activation parameter") {
-    refs.rho = fuzz();
+    params.rho = fuzz();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().rho == 0.0);
+      CHECK(ctrl.params().rho == 0.0);
     }
     SECTION("set user command") {
       cmd->rho = 1.0;
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().rho == 1.0);
+      CHECK(ctrl.params().rho == 1.0);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().rho == 0.0);
+      CHECK(ctrl.params().rho == 0.0);
     }
   }
 
   SECTION("Canonical foot distance") {
-    refs.dist = fuzz();
+    params.dist = fuzz();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().dist == dist);
+      CHECK(ctrl.params().dist == dist);
     }
     SECTION("set user command") {
       cmd->dist = 1.0;
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().dist == 1.0);
+      CHECK(ctrl.params().dist == 1.0);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().dist == dist);
+      CHECK(ctrl.params().dist == dist);
     }
   }
 
   SECTION("initial energy exersion") {
-    refs.kr = fuzz();
+    params.kr = fuzz();
     SECTION("default") {
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().kr == 1.0);
+      CHECK(ctrl.params().kr == 1.0);
     }
     SECTION("set user command") {
       cmd->kr = 0.5;
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().kr == 0.5);
+      CHECK(ctrl.params().kr == 0.5);
     }
     SECTION("clear") {
       cmd->clear();
       REQUIRE(ctrl.update());
-      CHECK(ctrl.refs().kr == 1.0);
+      CHECK(ctrl.params().kr == 1.0);
     }
   }
 
@@ -696,14 +696,14 @@ SCENARIO("Check relations among rho, qx1 and vxd", "[ComCtrl]") {
     double dist = 0.1;
     ctrl.reset(p0, dist);
     auto cmd = ctrl.getCommands();
-    REQUIRE(ctrl.refs().rho == 0);
-    REQUIRE(ctrl.refs().qx1 == 1);
+    REQUIRE(ctrl.params().rho == 0);
+    REQUIRE(ctrl.params().qx1 == 1);
     WHEN("Referential velocity is 0.0 and update") {
       cmd->vxd = 0;
       ctrl.update();
       THEN("Should be rho = 0, qx1 = 1") {
-        CHECK(ctrl.refs().rho == 0);
-        CHECK(ctrl.refs().qx1 == 1);
+        CHECK(ctrl.params().rho == 0);
+        CHECK(ctrl.params().qx1 == 1);
       }
     }
     WHEN("Referential velocity is 0.1 and update") {
@@ -711,14 +711,14 @@ SCENARIO("Check relations among rho, qx1 and vxd", "[ComCtrl]") {
       cmd->qx1 = 0.8;
       ctrl.update();
       THEN("Should be rho = 1, qx1 = 0") {
-        CHECK(ctrl.refs().rho == 1);
-        CHECK(ctrl.refs().qx1 == 0);
+        CHECK(ctrl.params().rho == 1);
+        CHECK(ctrl.params().qx1 == 0);
         WHEN("Referential velocity get back to 0 and update") {
           cmd->vxd = 0;
           ctrl.update();
           THEN("Should be rho = 0, qx1 = 0.8") {
-            CHECK(ctrl.refs().rho == 0);
-            CHECK(ctrl.refs().qx1 == 0.8);
+            CHECK(ctrl.params().rho == 0);
+            CHECK(ctrl.params().qx1 == 0.8);
           }
         }
       }
@@ -728,14 +728,14 @@ SCENARIO("Check relations among rho, qx1 and vxd", "[ComCtrl]") {
       cmd->qx1 = 0.8;
       ctrl.update();
       THEN("Should be rho = 1, qx1 = 0") {
-        CHECK(ctrl.refs().rho == 1);
-        CHECK(ctrl.refs().qx1 == 0);
+        CHECK(ctrl.params().rho == 1);
+        CHECK(ctrl.params().qx1 == 0);
         WHEN("Referential velocity get back to 0 and update") {
           cmd->vxd = 0;
           ctrl.update();
           THEN("Should be rho = 0, qx1 = 0.8") {
-            CHECK(ctrl.refs().rho == 0);
-            CHECK(ctrl.refs().qx1 == 0.8);
+            CHECK(ctrl.params().rho == 0);
+            CHECK(ctrl.params().qx1 == 0.8);
           }
         }
       }
@@ -760,9 +760,9 @@ SCENARIO("Controller enables logitudinal moving", "[ComCtrl]") {
         ctrl.update();
       }
       THEN("Start moving forward") {
-        CAPTURE(ctrl.refs().com_position.x());
+        CAPTURE(ctrl.params().com_position.x());
         CAPTURE(ctrl.states().com_position.x());
-        REQUIRE(ctrl.refs().com_position.x() > 0.0);
+        REQUIRE(ctrl.params().com_position.x() > 0.0);
         CHECK(ctrl.states().com_position.x() > 0.0);
         CHECK(ctrl.states().com_velocity.x() > 0.0);
         CHECK(ctrl.states().com_velocity.x() < vxd);
@@ -773,7 +773,7 @@ SCENARIO("Controller enables logitudinal moving", "[ComCtrl]") {
         ctrl.update();
       }
       THEN("Follow referential velocity") {
-        REQUIRE(ctrl.refs().com_position.x() > 0.0);
+        REQUIRE(ctrl.params().com_position.x() > 0.0);
         CHECK(ctrl.states().com_position.x() > 0.0);
         CHECK(ctrl.states().com_velocity.x() == Approx(vxd));
       }
@@ -789,7 +789,7 @@ SCENARIO("Controller enables logitudinal moving", "[ComCtrl]") {
         ctrl.update();
       }
       THEN("Stop") {
-        REQUIRE(ctrl.refs().com_position.x() == x);
+        REQUIRE(ctrl.params().com_position.x() == x);
         CHECK(ctrl.states().com_position.x() == Approx(x));
         CHECK(ctrl.states().com_velocity.x() == Approx(0).margin(1e-6));
       }
@@ -849,24 +849,24 @@ SCENARIO("Check relations among rho, yd, dist and vyd", "[ComCtrl]") {
     ctrl.reset(p0, dist);
     auto cmd = ctrl.getCommands();
     ctrl.states().com_velocity[1] += 0.000001;
-    REQUIRE(ctrl.refs().rho == 0);
-    REQUIRE(ctrl.refs().com_position[1] == 0);
-    REQUIRE(ctrl.refs().dist == dist);
+    REQUIRE(ctrl.params().rho == 0);
+    REQUIRE(ctrl.params().com_position[1] == 0);
+    REQUIRE(ctrl.params().dist == dist);
     WHEN("referential velocity is 0.1 and update") {
       cmd->vyd = 0.1;
       while (ctrl.time() < 1) ctrl.update();
       THEN("start moving leftwards") {
-        CHECK(ctrl.refs().rho == 1);
-        CHECK(ctrl.refs().com_position[1] > 0);
-        CHECK(ctrl.refs().dist > dist);
+        CHECK(ctrl.params().rho == 1);
+        CHECK(ctrl.params().com_position[1] > 0);
+        CHECK(ctrl.params().dist > dist);
         WHEN("referential velocity get back to 0 and update") {
           cmd->vyd = 0;
-          double yd = ctrl.refs().com_position[1];
+          double yd = ctrl.params().com_position[1];
           ctrl.update();
           THEN("stop at that position") {
-            CHECK(ctrl.refs().rho == 0);
-            CHECK(ctrl.refs().com_position[1] == yd);
-            CHECK(ctrl.refs().dist == dist);
+            CHECK(ctrl.params().rho == 0);
+            CHECK(ctrl.params().com_position[1] == yd);
+            CHECK(ctrl.params().dist == dist);
           }
         }
       }
@@ -875,17 +875,17 @@ SCENARIO("Check relations among rho, yd, dist and vyd", "[ComCtrl]") {
       cmd->vyd = -0.1;
       while (ctrl.time() < 1) ctrl.update();
       THEN("start moving rightwards") {
-        CHECK(ctrl.refs().rho == 1);
-        CHECK(ctrl.refs().com_position[1] < 0);
-        CHECK(ctrl.refs().dist > dist);
+        CHECK(ctrl.params().rho == 1);
+        CHECK(ctrl.params().com_position[1] < 0);
+        CHECK(ctrl.params().dist > dist);
         WHEN("referential velocity get back to 0 and update") {
           cmd->vyd = 0;
-          double yd = ctrl.refs().com_position[1];
+          double yd = ctrl.params().com_position[1];
           ctrl.update();
           THEN("stop at that position") {
-            CHECK(ctrl.refs().rho == 0);
-            CHECK(ctrl.refs().com_position[1] == yd);
-            CHECK(ctrl.refs().dist == dist);
+            CHECK(ctrl.params().rho == 0);
+            CHECK(ctrl.params().com_position[1] == yd);
+            CHECK(ctrl.params().dist == dist);
           }
         }
       }

@@ -44,13 +44,13 @@ class CtrlBase {
 
  protected:
   using ModelDataIndex = typename Data::ModelDataIndex;
-  using RefsDataIndex = typename Data::RefsDataIndex;
+  using ParamsDataIndex = typename Data::ParamsDataIndex;
   using OutputsDataIndex = typename Data::OutputsDataIndex;
   template <std::size_t I>
   using ModelRawDataType = typename Model::template RawDataType<I>;
   template <std::size_t I>
-  using RefsRawDataType =
-      typename Data::template RawDataType<RefsDataIndex::template get<I>()>;
+  using ParamsRawDataType =
+      typename Data::template RawDataType<ParamsDataIndex::template get<I>()>;
   template <std::size_t I>
   using OutputsRawDataType =
       typename Data::template RawDataType<OutputsDataIndex::template get<I>()>;
@@ -93,12 +93,12 @@ class CtrlBase {
   }
 
   template <std::size_t I = 0>
-  const RefsRawDataType<I>& refs() const {
-    return m_data.template get<RefsDataIndex::template get<I>()>();
+  const ParamsRawDataType<I>& params() const {
+    return m_data.template get<ParamsDataIndex::template get<I>()>();
   }
   template <std::size_t I = 0>
-  RefsRawDataType<I>& refs() {
-    return m_data.template get<RefsDataIndex::template get<I>()>();
+  ParamsRawDataType<I>& params() {
+    return m_data.template get<ParamsDataIndex::template get<I>()>();
   }
 
   template <std::size_t I = 0>

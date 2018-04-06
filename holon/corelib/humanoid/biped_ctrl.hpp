@@ -32,9 +32,9 @@ class BipedCtrlData : public DataSetBase<
                           // model raw data
                           ComZmpModelRawData, PointMassModelRawData<Vec3D>,
                           PointMassModelRawData<Vec3D>,
-                          // refs raw data
-                          ComCtrlRefsRawData, PdCtrlRefsRawData<Vec3D>,
-                          PdCtrlRefsRawData<Vec3D>,
+                          // params raw data
+                          ComCtrlParamsRawData, PdCtrlParamsRawData<Vec3D>,
+                          PdCtrlParamsRawData<Vec3D>,
                           // outputs raw data
                           ComCtrlOutputsRawData, PdCtrlOutputsRawData<Vec3D>,
                           PdCtrlOutputsRawData<Vec3D>,
@@ -44,7 +44,7 @@ class BipedCtrlData : public DataSetBase<
 
  public:
   using ModelDataIndex = index_seq<0, 1, 2>;
-  using RefsDataIndex = index_seq<3, 4, 5>;
+  using ParamsDataIndex = index_seq<3, 4, 5>;
   using OutputsDataIndex = index_seq<6, 7, 8>;
   using CommandsDataIndex = index_seq<9>;
 };

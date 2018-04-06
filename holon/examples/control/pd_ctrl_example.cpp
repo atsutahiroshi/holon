@@ -37,21 +37,21 @@ double traj_vel(double t) { return amp * omega * std::cos(omega * t - phase); }
 
 void log(const PdCtrl<double>& ctrl) {
   std::cout << ctrl.time() << " ";
-  std::cout << ctrl.refs().position << " ";
-  std::cout << ctrl.refs().velocity << " ";
+  std::cout << ctrl.params().position << " ";
+  std::cout << ctrl.params().velocity << " ";
   std::cout << ctrl.states().position << " ";
   std::cout << ctrl.states().velocity << "\n";
 }
 
 int main() {
   PdCtrl<double> ctrl;
-  ctrl.refs().stiffness = 100;
-  ctrl.refs().damping = 10;
+  ctrl.params().stiffness = 100;
+  ctrl.params().damping = 10;
 
   log(ctrl);
   while (ctrl.time() < T) {
-    ctrl.refs().position = traj(ctrl.time());
-    ctrl.refs().velocity = traj_vel(ctrl.time());
+    ctrl.params().position = traj(ctrl.time());
+    ctrl.params().velocity = traj_vel(ctrl.time());
     ctrl.update(DT);
     log(ctrl);
   }

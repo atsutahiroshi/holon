@@ -79,8 +79,8 @@ void CheckCtor_1() {
   CHECK(ctrl.states().position == model.states().position);
   CHECK(ctrl.model().initial_position() == model.states().position);
   CHECK(ctrl.states().velocity == model.states().velocity);
-  CHECK(ctrl.refs().position == model.states().position);
-  CHECK(ctrl.refs().velocity == model.states().velocity);
+  CHECK(ctrl.params().position == model.states().position);
+  CHECK(ctrl.params().velocity == model.states().velocity);
   CHECK(ctrl.model().system().is_set_force());
 }
 template <typename T>
@@ -99,8 +99,8 @@ void CheckCtor_2() {
   CHECK(ctrl.states().position == data.template get<0>().position);
   CHECK(ctrl.model().initial_position() == data.template get<0>().position);
   CHECK(ctrl.states().velocity == data.template get<0>().velocity);
-  CHECK(ctrl.refs().position == data.template get<0>().position);
-  CHECK(ctrl.refs().velocity == data.template get<0>().velocity);
+  CHECK(ctrl.params().position == data.template get<0>().position);
+  CHECK(ctrl.params().velocity == data.template get<0>().velocity);
   CHECK(ctrl.model().system().is_set_force());
 }
 TEST_CASE("C'tor of PdCtrl", "[PdCtrl][ctor]") {
@@ -124,8 +124,8 @@ void CheckReset_1() {
   PdCtrl<T> ctrl;
   ctrl.states().position = fuzz.get<T>();
   ctrl.states().velocity = fuzz.get<T>();
-  ctrl.refs().position = fuzz.get<T>();
-  ctrl.refs().velocity = fuzz.get<T>();
+  ctrl.params().position = fuzz.get<T>();
+  ctrl.params().velocity = fuzz.get<T>();
   ctrl.update();
   REQUIRE(ctrl.time() != 0.0);
   REQUIRE(ctrl.states().position != T{0});
@@ -134,8 +134,8 @@ void CheckReset_1() {
   CHECK(ctrl.time() == 0.0);
   CHECK(ctrl.states().position == T{0});
   CHECK(ctrl.states().velocity == T{0});
-  CHECK(ctrl.refs().position == T{0});
-  CHECK(ctrl.refs().velocity == T{0});
+  CHECK(ctrl.params().position == T{0});
+  CHECK(ctrl.params().velocity == T{0});
 }
 
 template <typename T>
@@ -144,8 +144,8 @@ void CheckReset_2() {
   PdCtrl<T> ctrl;
   ctrl.states().position = fuzz.get<T>();
   ctrl.states().velocity = fuzz.get<T>();
-  ctrl.refs().position = fuzz.get<T>();
-  ctrl.refs().velocity = fuzz.get<T>();
+  ctrl.params().position = fuzz.get<T>();
+  ctrl.params().velocity = fuzz.get<T>();
   auto p = fuzz.get<T>();
   ctrl.update();
   REQUIRE(ctrl.time() != 0.0);
@@ -155,8 +155,8 @@ void CheckReset_2() {
   CHECK(ctrl.time() == 0.0);
   CHECK(ctrl.states().position == p);
   CHECK(ctrl.states().velocity == T{0});
-  CHECK(ctrl.refs().position == p);
-  CHECK(ctrl.refs().velocity == T{0});
+  CHECK(ctrl.params().position == p);
+  CHECK(ctrl.params().velocity == T{0});
 }
 
 TEST_CASE("Check reset in PdCtrl", "[PdCtrl][reset]") {
@@ -175,9 +175,9 @@ void CheckOutputsAfterUpdate() {
   Fuzzer fuzz;
   PdCtrl<T> ctrl;
   ctrl.states().mass = 2;
-  ctrl.refs().position = T{1};
-  ctrl.refs().stiffness = T{10};
-  ctrl.refs().damping = T{1};
+  ctrl.params().position = T{1};
+  ctrl.params().stiffness = T{10};
+  ctrl.params().damping = T{1};
   ctrl.outputs().position = fuzz.get<T>();
   ctrl.outputs().velocity = fuzz.get<T>();
   ctrl.outputs().acceleration = fuzz.get<T>();
@@ -208,9 +208,9 @@ SCENARIO("Point mass is converged at the desired position with PD contrl",
   GIVEN("Point mass is currently at 0, desired position is 1") {
     PdCtrl<double> ctrl;
     REQUIRE(ctrl.states().position == 0);
-    ctrl.refs().position = 1;
-    ctrl.refs().stiffness = 100;
-    ctrl.refs().damping = 10;
+    ctrl.params().position = 1;
+    ctrl.params().stiffness = 100;
+    ctrl.params().damping = 10;
     WHEN("Update until 10 sec") {
       while (ctrl.time() < 10) {
         ctrl.update();
@@ -226,9 +226,9 @@ SCENARIO("Point mass is converged at the desired position with PD contrl",
     model.states().position = 1;
     PdCtrl<double> ctrl(model);
     REQUIRE(ctrl.states().position == 1);
-    ctrl.refs().position = 0;
-    ctrl.refs().stiffness = 100;
-    ctrl.refs().damping = 10;
+    ctrl.params().position = 0;
+    ctrl.params().stiffness = 100;
+    ctrl.params().damping = 10;
     WHEN("Update until 10 sec") {
       while (ctrl.time() < 10) {
         ctrl.update();

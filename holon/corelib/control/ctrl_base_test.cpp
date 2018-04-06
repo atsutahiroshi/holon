@@ -59,7 +59,7 @@ struct TestModel : ModelBase<double, Euler<std::array<double, 2>>,
   virtual ~TestModel() = default;
 };
 
-struct TestRefsRawData {
+struct TestParamsRawData {
   double pd, vd;
 };
 
@@ -68,13 +68,13 @@ struct TestOutputsRawData {
 };
 
 struct TestCtrlData
-    : DataSetBase<TestModelRawData, TestRefsRawData, TestOutputsRawData> {
+    : DataSetBase<TestModelRawData, TestParamsRawData, TestOutputsRawData> {
   TestCtrlData() {}
   TestCtrlData(std::shared_ptr<TestModelRawData> t_model_data_p,
-               std::shared_ptr<TestRefsRawData> t_refs_data_p,
+               std::shared_ptr<TestParamsRawData> t_params_data_p,
                std::shared_ptr<TestOutputsRawData> t_outputs_data_p) {}
   using ModelDataIndex = index_seq<0>;
-  using RefsDataIndex = index_seq<1>;
+  using ParamsDataIndex = index_seq<1>;
   using OutputsDataIndex = index_seq<2>;
 };
 
@@ -93,7 +93,7 @@ void CheckCtor_0() {
   REQUIRE(std::is_same<std::decay<decltype(ctrl.data())>::type,
                        TestCtrlData>::value);
   CHECK(ctrl.data().get_ptr<0>() != nullptr);  // model data
-  CHECK(ctrl.data().get_ptr<1>() != nullptr);  // refs data
+  CHECK(ctrl.data().get_ptr<1>() != nullptr);  // params data
   CHECK(ctrl.data().get_ptr<2>() != nullptr);  // outputs data
   CHECK(ctrl.model().data().get_ptr<0>() == ctrl.data().get_ptr<0>());
   CHECK(&ctrl.states() == &ctrl.model().states());
@@ -195,10 +195,10 @@ struct Model : ModelBase<double, Euler<std::array<double, 2>>, ModelData> {
   Model() : ModelBase(make_data<ModelData>()) {}
   explicit Model(ModelData t_data) : ModelBase(t_data) {}
 };
-struct RefsData : DataSetBase<C, E> {
+struct ParamsData : DataSetBase<C, E> {
   using Base = DataSetBase<C, E>;
   template <typename... Args>
-  explicit RefsData(std::shared_ptr<Args>... args) : Base(args...) {}
+  explicit ParamsData(std::shared_ptr<Args>... args) : Base(args...) {}
 };
 struct OutputsData : DataSetBase<D, F> {
   using Base = DataSetBase<D, F>;
@@ -212,7 +212,7 @@ struct Data : DataSetBase<A, B, C, D, E, F> {
   explicit Data(typename Base::RawDataPtrTuple raw_data_ptrs)
       : Base(raw_data_ptrs) {}
   using ModelDataIndex = index_seq<0, 1>;
-  using RefsDataIndex = index_seq<2, 4>;
+  using ParamsDataIndex = index_seq<2, 4>;
   using OutputsDataIndex = index_seq<3, 5>;
 };
 class Ctrl
@@ -248,13 +248,14 @@ TEST_CASE("CtrlBase::model_data() returns data that its model has",
   CHECK(ctrl.model_data() == ctrl.model().data());
 }
 
-TEST_CASE("CtrlBase::refs() returns reference data", "[CtrlBase][refs_data]") {
+TEST_CASE("CtrlBase::params() returns reference data",
+          "[CtrlBase][params_data]") {
   using testing::Model;
   using testing::Ctrl;
 
   Ctrl ctrl;
-  CHECK(&ctrl.refs<0>() == &ctrl.data().get<2>());
-  CHECK(&ctrl.refs<1>() == &ctrl.data().get<4>());
+  CHECK(&ctrl.params<0>() == &ctrl.data().get<2>());
+  CHECK(&ctrl.params<1>() == &ctrl.data().get<4>());
 }
 
 }  // namespace

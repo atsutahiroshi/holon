@@ -1,4 +1,5 @@
 set(example_sources
+  biped_model_walk_example.cpp
   com_longitudinal_moving_example.cpp
   com_oscillation_example.cpp
   com_regulation_example.cpp

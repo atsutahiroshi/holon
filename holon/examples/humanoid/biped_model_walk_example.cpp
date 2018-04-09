@@ -29,13 +29,20 @@ using holon::BipedCtrl;
 
 int main() {
   BipedCtrl ctrl;
-  // auto cmd = ctrl.get_commands_handle();
-  // Vec3D p0{0, 0, 0.42};
+  auto cmd = ctrl.get_commands_handler();
+  Vec3D p0{0, 0, 0.42};
+  double dist = 0.1;
 
-  // ctrl.reset(p0, dist);
+  ctrl.reset(p0, dist);
   ctrl.states().com_velocity = {0, 0.00001, 0};
   while (ctrl.time() < T) {
+    if (ctrl.time() < T) {
+      cmd->vxd = 0.1;
+    } else {
+      cmd->vxd = 0;
+    }
     ctrl.update(DT);
+
     // logging
     std::cout << ctrl.time() << " ";
     std::cout << ctrl.states().com_position.data() << " ";

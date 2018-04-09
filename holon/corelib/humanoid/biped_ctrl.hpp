@@ -64,6 +64,12 @@ class BipedCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
   explicit BipedCtrl(Data t_data);
   explicit BipedCtrl(const Model& t_model);
   virtual ~BipedCtrl() = default;
+
+  virtual Self& reset() override;
+  virtual Self& reset(const Vec3D& t_com_position, double t_foot_dist);
+  virtual Self& reset(const Vec3D& t_com_position,
+                      const Vec3D& t_left_foot_position,
+                      const Vec3D& t_right_foot_position);
 };
 
 }  // namespace holon

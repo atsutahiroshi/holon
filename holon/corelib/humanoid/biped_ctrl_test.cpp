@@ -50,26 +50,30 @@ void CheckCtor_1() {
   CHECK(ctrl.data().get_ptr<8>() == data.get_ptr<8>());
   CHECK(ctrl.data().get_ptr<9>() == data.get_ptr<9>());
 }
+void RandomizeModelData(BipedModel* model) {
+  Fuzzer fuzz;
+  // COM-ZMP model
+  model->states<0>().com_position = fuzz.get<Vec3D>();
+  model->states<0>().com_velocity = fuzz.get<Vec3D>();
+  // left foot
+  model->states<1>().position = fuzz.get<Vec3D>();
+  model->states<1>().velocity = fuzz.get<Vec3D>();
+  // right foot
+  model->states<2>().position = fuzz.get<Vec3D>();
+  model->states<2>().velocity = fuzz.get<Vec3D>();
+}
 void CheckCtor_2() {
   auto model = make_model<BipedModel>();
   Fuzzer fuzz;
-  Vec3D p = fuzz.get<Vec3D>(), v = fuzz.get<Vec3D>();
-  Vec3D pl = fuzz.get<Vec3D>(), vl = fuzz.get<Vec3D>();
-  Vec3D pr = fuzz.get<Vec3D>(), vr = fuzz.get<Vec3D>();
-  model.states<0>().com_position = p;
-  model.states<0>().com_velocity = v;
-  model.states<1>().position = pl;
-  model.states<1>().velocity = vl;
-  model.states<2>().position = pr;
-  model.states<2>().velocity = vr;
+  RandomizeModelData(&model);
   BipedCtrl ctrl(model);
   CheckCtor_common(ctrl);
-  CHECK(ctrl.states<0>().com_position == p);
-  CHECK(ctrl.states<0>().com_velocity == v);
-  CHECK(ctrl.states<1>().position == pl);
-  CHECK(ctrl.states<1>().velocity == vl);
-  CHECK(ctrl.states<2>().position == pr);
-  CHECK(ctrl.states<2>().velocity == vr);
+  CHECK(ctrl.states<0>().com_position == model.states<0>().com_position);
+  CHECK(ctrl.states<0>().com_velocity == model.states<0>().com_velocity);
+  CHECK(ctrl.states<1>().position == model.states<1>().position);
+  CHECK(ctrl.states<1>().velocity == model.states<1>().velocity);
+  CHECK(ctrl.states<2>().position == model.states<2>().position);
+  CHECK(ctrl.states<2>().velocity == model.states<2>().velocity);
   REQUIRE(ctrl.data().get_ptr<0>() != model.data().get_ptr<0>());
   REQUIRE(ctrl.data().get_ptr<1>() != model.data().get_ptr<1>());
   REQUIRE(ctrl.data().get_ptr<2>() != model.data().get_ptr<2>());
@@ -79,6 +83,62 @@ TEST_CASE("Check c'tors of BipedCtrl") {
   SECTION("Default c'tor") { CheckCtor_0(); }
   SECTION("Overloaded c'tor 1") { CheckCtor_1(); }
   SECTION("Overloaded c'tor 2") { CheckCtor_2(); }
+}
+
+void CheckReset_1() {
+  BipedCtrl ctrl;
+  ctrl.update();
+  RandomizeModelData(&ctrl.model());
+  REQUIRE(ctrl.time() != 0.0);
+  ctrl.reset();
+  CHECK(ctrl.time() == 0.0);
+  CHECK(ctrl.states<0>().com_position == Vec3D{0, 0, 1});
+  CHECK(ctrl.states<0>().com_velocity == kVec3DZero);
+  CHECK(ctrl.states<1>().position == kVec3DZero);
+  CHECK(ctrl.states<1>().velocity == kVec3DZero);
+  CHECK(ctrl.states<2>().position == kVec3DZero);
+  CHECK(ctrl.states<2>().velocity == kVec3DZero);
+}
+void CheckReset_2() {
+  BipedCtrl ctrl;
+  ctrl.update();
+  RandomizeModelData(&ctrl.model());
+  REQUIRE(ctrl.time() != 0.0);
+  Fuzzer fuzz;
+  auto p0 = fuzz.get<Vec3D>();
+  auto dist = fuzz.get();
+  ctrl.reset(p0, dist);
+  CHECK(ctrl.time() == 0.0);
+  CHECK(ctrl.states<0>().com_position == p0);
+  CHECK(ctrl.states<0>().com_velocity == kVec3DZero);
+  CHECK(ctrl.states<1>().position == Vec3D{p0.x(), p0.y() + 0.5 * dist, 0});
+  CHECK(ctrl.states<1>().velocity == kVec3DZero);
+  CHECK(ctrl.states<2>().position == Vec3D{p0.x(), p0.y() - 0.5 * dist, 0});
+  CHECK(ctrl.states<2>().velocity == kVec3DZero);
+}
+void CheckReset_3() {
+  BipedCtrl ctrl;
+  ctrl.update();
+  RandomizeModelData(&ctrl.model());
+  REQUIRE(ctrl.time() != 0.0);
+  Fuzzer fuzz;
+  auto p0 = fuzz.get<Vec3D>();
+  auto pl = fuzz.get<Vec3D>();
+  auto pr = fuzz.get<Vec3D>();
+  ctrl.reset(p0, pl, pr);
+  CHECK(ctrl.time() == 0.0);
+  CHECK(ctrl.states<0>().com_position == p0);
+  CHECK(ctrl.states<0>().com_velocity == kVec3DZero);
+  CHECK(ctrl.states<1>().position == pl);
+  CHECK(ctrl.states<1>().velocity == kVec3DZero);
+  CHECK(ctrl.states<2>().position == pr);
+  CHECK(ctrl.states<2>().velocity == kVec3DZero);
+}
+
+TEST_CASE("Check reset of BipedCtrl") {
+  SECTION("Overloaded function 1") { CheckReset_1(); }
+  SECTION("Overloaded function 2") { CheckReset_2(); }
+  SECTION("Overloaded function 2") { CheckReset_3(); }
 }
 
 }  // namespace

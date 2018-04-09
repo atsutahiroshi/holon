@@ -26,4 +26,19 @@ BipedCtrl::BipedCtrl() : BipedCtrl(make_data<Data>()) {}
 BipedCtrl::BipedCtrl(Data t_data) : CtrlBase(t_data) {}
 BipedCtrl::BipedCtrl(const Model& t_model) : CtrlBase(t_model) {}
 
+BipedCtrl& BipedCtrl::reset() {
+  model().reset();
+  return *this;
+}
+BipedCtrl& BipedCtrl::reset(const Vec3D& t_com_position, double t_foot_dist) {
+  model().reset(t_com_position, t_foot_dist);
+  return *this;
+}
+BipedCtrl& BipedCtrl::reset(const Vec3D& t_com_position,
+                            const Vec3D& t_left_foot_position,
+                            const Vec3D& t_right_foot_position) {
+  model().reset(t_com_position, t_left_foot_position, t_right_foot_position);
+  return *this;
+}
+
 }  // namespace holon

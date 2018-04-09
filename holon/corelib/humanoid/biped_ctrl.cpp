@@ -22,6 +22,8 @@
 
 namespace holon {
 
-BipedCtrl::BipedCtrl() {}
+BipedCtrl::BipedCtrl() : BipedCtrl(make_data<Data>()) {}
+BipedCtrl::BipedCtrl(Data t_data) : CtrlBase(t_data) {}
+BipedCtrl::BipedCtrl(const Model& t_model) : CtrlBase(t_model) {}
 
 }  // namespace holon

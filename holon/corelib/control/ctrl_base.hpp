@@ -46,6 +46,7 @@ class CtrlBase {
   using ModelDataIndex = typename Data::ModelDataIndex;
   using ParamsDataIndex = typename Data::ParamsDataIndex;
   using OutputsDataIndex = typename Data::OutputsDataIndex;
+  using CommandsDataIndex = typename Data::CommandsDataIndex;
   template <std::size_t I>
   using ModelRawDataType = typename Model::template RawDataType<I>;
   template <std::size_t I>
@@ -54,6 +55,12 @@ class CtrlBase {
   template <std::size_t I>
   using OutputsRawDataType =
       typename Data::template RawDataType<OutputsDataIndex::template get<I>()>;
+  template <std::size_t I>
+  using CommandsRawDataType =
+      typename Data::template RawDataType<CommandsDataIndex::template get<I>()>;
+  template <std::size_t I>
+  using CommandsRawDataPtrType = typename Data::template RawDataPtrType<
+      CommandsDataIndex::template get<I>()>;
 
  public:
   static constexpr auto default_time_step = Model::default_time_step;
@@ -108,6 +115,14 @@ class CtrlBase {
   template <std::size_t I = 0>
   OutputsRawDataType<I>& outputs() {
     return m_data.template get<OutputsDataIndex::template get<I>()>();
+  }
+  template <std::size_t I = 0>
+  const CommandsRawDataType<I>& commands() const {
+    return m_data.template get<CommandsDataIndex::template get<I>()>();
+  }
+  template <std::size_t I = 0>
+  CommandsRawDataPtrType<I> get_commands_handler() const {
+    return m_data.template get_ptr<CommandsDataIndex::template get<I>()>();
   }
 
   // mutators

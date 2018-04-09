@@ -66,6 +66,7 @@ class PdCtrlData : public DataSetBase<PointMassModelRawData<State>,
   using ModelDataIndex = index_seq<0>;
   using ParamsDataIndex = index_seq<1>;
   using OutputsDataIndex = index_seq<2>;
+  using CommandsDataIndex = index_seq<>;
 
   PdCtrlData(const State& t_initial_position, double t_mass)
       : Base(alloc_raw_data<ModelRawData>(t_mass, t_initial_position),

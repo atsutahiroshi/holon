@@ -76,6 +76,7 @@ struct TestCtrlData
   using ModelDataIndex = index_seq<0>;
   using ParamsDataIndex = index_seq<1>;
   using OutputsDataIndex = index_seq<2>;
+  using CommandsDataIndex = index_seq<>;
 };
 
 class TestCtrl : public CtrlBase<double, Euler<std::array<double, 2>>,
@@ -184,6 +185,8 @@ struct C {};
 struct D {};
 struct E {};
 struct F {};
+struct G {};
+struct H {};
 struct ModelData : DataSetBase<A, B> {
   using Base = DataSetBase<A, B>;
   explicit ModelData(typename Base::RawDataPtrTuple raw_data_ptrs)
@@ -206,14 +209,15 @@ struct OutputsData : DataSetBase<D, F> {
   explicit OutputsData(std::shared_ptr<Args>... args) : Base(args...) {}
 };
 
-struct Data : DataSetBase<A, B, C, D, E, F> {
-  using Base = DataSetBase<A, B, C, D, E, F>;
+struct Data : DataSetBase<A, B, C, D, E, F, G, H> {
+  using Base = DataSetBase<A, B, C, D, E, F, G, H>;
   Data() {}
   explicit Data(typename Base::RawDataPtrTuple raw_data_ptrs)
       : Base(raw_data_ptrs) {}
   using ModelDataIndex = index_seq<0, 1>;
   using ParamsDataIndex = index_seq<2, 4>;
   using OutputsDataIndex = index_seq<3, 5>;
+  using CommandsDataIndex = index_seq<6, 7>;
 };
 class Ctrl
     : public CtrlBase<double, Euler<std::array<double, 2>>, Data, Model> {
@@ -256,6 +260,25 @@ TEST_CASE("CtrlBase::params() returns reference data",
   Ctrl ctrl;
   CHECK(&ctrl.params<0>() == &ctrl.data().get<2>());
   CHECK(&ctrl.params<1>() == &ctrl.data().get<4>());
+}
+
+TEST_CASE("CtrlBase::commands() returns commands data",
+          "[CtrlBase][commands]") {
+  using testing::Ctrl;
+
+  Ctrl ctrl;
+  CHECK(&ctrl.commands<0>() == &ctrl.data().get<6>());
+  CHECK(&ctrl.commands<1>() == &ctrl.data().get<7>());
+}
+
+TEST_CASE("CtrlBase::get_commands_handler() returns handler to commands",
+          "[CtrlBase][get_commands_handler]") {
+  using testing::Ctrl;
+  Ctrl ctrl;
+  auto cmd1 = ctrl.get_commands_handler();
+  CHECK(cmd1 == ctrl.data().get_ptr<6>());
+  auto cmd2 = ctrl.get_commands_handler<1>();
+  CHECK(cmd2 == ctrl.data().get_ptr<7>());
 }
 
 }  // namespace

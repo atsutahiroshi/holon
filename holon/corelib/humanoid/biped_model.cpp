@@ -27,12 +27,7 @@ BipedModelData::BipedModelData(const Vec3D& t_com_position, double t_mass,
     : BipedModelData(alloc_raw_data<TrunkRawDataType>(t_mass, t_com_position),
                      alloc_raw_data<FootRawDataType>(),
                      alloc_raw_data<FootRawDataType>()) {
-  left_foot().position =
-      Vec3D{trunk().com_position.x(),
-            trunk().com_position.y() + 0.5 * t_foot_dist, 0.0};
-  right_foot().position =
-      Vec3D{trunk().com_position.x(),
-            trunk().com_position.y() - 0.5 * t_foot_dist, 0.0};
+  set_foot_dist(t_foot_dist);
 }
 
 BipedModelData::BipedModelData(const Vec3D& t_com_position, double t_mass,
@@ -41,6 +36,16 @@ BipedModelData::BipedModelData(const Vec3D& t_com_position, double t_mass,
     : BipedModelData(alloc_raw_data<TrunkRawDataType>(t_mass, t_com_position),
                      alloc_raw_data<FootRawDataType>(1.0, t_lf_position),
                      alloc_raw_data<FootRawDataType>(1.0, t_rf_position)) {}
+
+BipedModelData& BipedModelData::set_foot_dist(double t_foot_dist) {
+  left_foot().position =
+      Vec3D{trunk().com_position.x(),
+            trunk().com_position.y() + 0.5 * t_foot_dist, 0.0};
+  right_foot().position =
+      Vec3D{trunk().com_position.x(),
+            trunk().com_position.y() - 0.5 * t_foot_dist, 0.0};
+  return *this;
+}
 
 BipedModel::BipedModel() : BipedModel(make_data<Data>()) {}
 
@@ -59,5 +64,25 @@ BipedModel::BipedModel(Data t_data)
       m_trunk(data().extract<TrunkModelData>(Data::TrunkDataIndex())),
       m_left_foot(data().extract<FootModelData>(Data::LeftFootDataIndex())),
       m_right_foot(data().extract<FootModelData>(Data::RightFootDataIndex())) {}
+
+BipedModel& BipedModel::reset() {
+  return reset(trunk().initial_com_position(), left_foot().initial_position(),
+               right_foot().initial_position());
+}
+BipedModel& BipedModel::reset(const Vec3D& t_com_position, double t_foot_dist) {
+  return reset(
+      t_com_position,
+      {t_com_position.x(), t_com_position.y() + 0.5 * t_foot_dist, 0.0},
+      {t_com_position.x(), t_com_position.y() - 0.5 * t_foot_dist, 0.0});
+}
+BipedModel& BipedModel::reset(const Vec3D& t_com_position,
+                              const Vec3D& t_left_foot_position,
+                              const Vec3D& t_right_foot_position) {
+  m_trunk.reset(t_com_position);
+  m_left_foot.reset(t_left_foot_position);
+  m_right_foot.reset(t_right_foot_position);
+  Base::reset();
+  return *this;
+}
 
 }  // namespace holon

@@ -72,6 +72,19 @@ TEST_CASE("Check c'tors of BipedModelData", "[BipedModelData][ctor]") {
   SECTION("Overloaded c'tor 2") { CheckCtor_2(); }
 }
 
+void Randomize(BipedModelData* data) {
+  Fuzzer fuzz;
+  // COM-ZMP model
+  data->trunk().com_position = fuzz.get<Vec3D>();
+  data->trunk().com_velocity = fuzz.get<Vec3D>();
+  // left foot
+  data->left_foot().position = fuzz.get<Vec3D>();
+  data->left_foot().velocity = fuzz.get<Vec3D>();
+  // right foot
+  data->right_foot().position = fuzz.get<Vec3D>();
+  data->right_foot().velocity = fuzz.get<Vec3D>();
+}
+
 }  // namespace data
 
 void CheckMembers(const BipedModel& model, const Vec3D& expected_trunk_position,
@@ -127,6 +140,49 @@ TEST_CASE("Constructor of BipdeModel", "[BipdeModel][ctor]") {
   SECTION("Default constructor") { CheckConstructor_0(); }
   SECTION("Overloaded constructor 1") { CheckConstructor_1(); }
   SECTION("Overloaded constructor 2") { CheckConstructor_2(); }
+}
+
+void Randomize(BipedModel* model) { data::Randomize(&model->data()); }
+
+void CheckReset_1() {
+  BipedModel model;
+  model.update();
+  Randomize(&model);
+  REQUIRE(model.time() != 0.0);
+  model.reset();
+  CheckMembers(model, ComZmpModelRawData::default_com_position,
+               ComZmpModelRawData::default_mass, kVec3DZero, kVec3DZero);
+}
+void CheckReset_2() {
+  BipedModel model;
+  model.update();
+  Randomize(&model);
+  REQUIRE(model.time() != 0.0);
+  Fuzzer fuzz;
+  auto p0 = fuzz.get<Vec3D>();
+  auto dist = fuzz.get();
+  model.reset(p0, dist);
+  CheckMembers(model, p0, ComZmpModelRawData::default_mass,
+               {p0.x(), p0.y() + 0.5 * dist, 0},
+               {p0.x(), p0.y() - 0.5 * dist, 0});
+}
+void CheckReset_3() {
+  BipedModel model;
+  model.update();
+  Randomize(&model);
+  REQUIRE(model.time() != 0.0);
+  Fuzzer fuzz;
+  auto p0 = fuzz.get<Vec3D>();
+  auto pl = fuzz.get<Vec3D>();
+  auto pr = fuzz.get<Vec3D>();
+  model.reset(p0, pl, pr);
+  CheckMembers(model, p0, ComZmpModelRawData::default_mass, pl, pr);
+}
+
+TEST_CASE("Check reset of BipedModel") {
+  SECTION("Overloaded function 1") { CheckReset_1(); }
+  SECTION("Overloaded function 2") { CheckReset_2(); }
+  SECTION("Overloaded function 3") { CheckReset_3(); }
 }
 
 }  // namespace

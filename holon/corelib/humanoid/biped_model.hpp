@@ -41,6 +41,7 @@ class BipedModelData
                          PointMassModelRawData<Vec3D>> {
   HOLON_DEFINE_DEFAULT_DATA_CTOR(BipedModelData);
 
+  using Self = BipedModelData;
   using TrunkRawDataType = ComZmpModelRawData;
   using FootRawDataType = PointMassModelRawData<Vec3D>;
 
@@ -63,6 +64,8 @@ class BipedModelData
   TrunkRawDataType& trunk() { return get<0>(); }
   FootRawDataType& left_foot() { return get<1>(); }
   FootRawDataType& right_foot() { return get<2>(); }
+
+  Self& set_foot_dist(double t_foot_dist);
 };
 
 class BipedModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
@@ -94,6 +97,13 @@ class BipedModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
   TrunkModel& trunk() { return m_trunk; }
   FootModel& left_foot() { return m_left_foot; }
   FootModel& right_foot() { return m_right_foot; }
+
+  // reset
+  virtual Self& reset() override;
+  virtual Self& reset(const Vec3D& t_com_position, double t_foot_dist);
+  virtual Self& reset(const Vec3D& t_com_position,
+                      const Vec3D& t_left_foot_position,
+                      const Vec3D& t_right_foot_position);
 
  private:
   TrunkModel m_trunk;

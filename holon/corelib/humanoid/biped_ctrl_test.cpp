@@ -26,10 +26,35 @@
 namespace holon {
 namespace {
 
+void RandomizeModelData(BipedModel* model) {
+  Fuzzer fuzz;
+  // COM-ZMP model
+  model->states<0>().com_position = fuzz.get<Vec3D>();
+  model->states<0>().com_velocity = fuzz.get<Vec3D>();
+  // left foot
+  model->states<1>().position = fuzz.get<Vec3D>();
+  model->states<1>().velocity = fuzz.get<Vec3D>();
+  // right foot
+  model->states<2>().position = fuzz.get<Vec3D>();
+  model->states<2>().velocity = fuzz.get<Vec3D>();
+}
 void CheckCtor_common(const BipedCtrl& ctrl) {
   REQUIRE(ctrl.model().data().get_ptr<0>() == ctrl.data().get_ptr<0>());
   REQUIRE(ctrl.model().data().get_ptr<1>() == ctrl.data().get_ptr<1>());
   REQUIRE(ctrl.model().data().get_ptr<2>() == ctrl.data().get_ptr<2>());
+
+  REQUIRE(ctrl.trunk().data().get_ptr<0>() == ctrl.data().get_ptr<0>());
+  REQUIRE(ctrl.trunk().data().get_ptr<1>() == ctrl.data().get_ptr<3>());
+  REQUIRE(ctrl.trunk().data().get_ptr<2>() == ctrl.data().get_ptr<6>());
+  REQUIRE(ctrl.trunk().data().get_ptr<3>() == ctrl.data().get_ptr<9>());
+
+  REQUIRE(ctrl.left_foot().data().get_ptr<0>() == ctrl.data().get_ptr<1>());
+  REQUIRE(ctrl.left_foot().data().get_ptr<1>() == ctrl.data().get_ptr<4>());
+  REQUIRE(ctrl.left_foot().data().get_ptr<2>() == ctrl.data().get_ptr<7>());
+
+  REQUIRE(ctrl.right_foot().data().get_ptr<0>() == ctrl.data().get_ptr<2>());
+  REQUIRE(ctrl.right_foot().data().get_ptr<1>() == ctrl.data().get_ptr<5>());
+  REQUIRE(ctrl.right_foot().data().get_ptr<2>() == ctrl.data().get_ptr<8>());
 }
 void CheckCtor_0() {
   BipedCtrl ctrl;
@@ -49,18 +74,6 @@ void CheckCtor_1() {
   CHECK(ctrl.data().get_ptr<7>() == data.get_ptr<7>());
   CHECK(ctrl.data().get_ptr<8>() == data.get_ptr<8>());
   CHECK(ctrl.data().get_ptr<9>() == data.get_ptr<9>());
-}
-void RandomizeModelData(BipedModel* model) {
-  Fuzzer fuzz;
-  // COM-ZMP model
-  model->states<0>().com_position = fuzz.get<Vec3D>();
-  model->states<0>().com_velocity = fuzz.get<Vec3D>();
-  // left foot
-  model->states<1>().position = fuzz.get<Vec3D>();
-  model->states<1>().velocity = fuzz.get<Vec3D>();
-  // right foot
-  model->states<2>().position = fuzz.get<Vec3D>();
-  model->states<2>().velocity = fuzz.get<Vec3D>();
 }
 void CheckCtor_2() {
   auto model = make_model<BipedModel>();

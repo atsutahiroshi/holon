@@ -47,6 +47,9 @@ class BipedCtrlData : public DataSetBase<
   using ParamsDataIndex = index_seq<3, 4, 5>;
   using OutputsDataIndex = index_seq<6, 7, 8>;
   using CommandsDataIndex = index_seq<9>;
+  using TrunkDataIndex = index_seq<0, 3, 6, 9>;
+  using LeftFootDataIndex = index_seq<1, 4, 7>;
+  using RightFootDataIndex = index_seq<2, 5, 8>;
 };
 
 class BipedCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
@@ -58,6 +61,10 @@ class BipedCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
  public:
   using Model = BipedModel;
   using Data = BipedCtrlData;
+  using TrunkCtrlData = ComCtrlData;
+  using FootCtrlData = PdCtrlData<Vec3D>;
+  using TrunkCtrl = ComCtrl;
+  using FootCtrl = PdCtrl<Vec3D>;
 
  public:
   BipedCtrl();
@@ -65,11 +72,29 @@ class BipedCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
   explicit BipedCtrl(const Model& t_model);
   virtual ~BipedCtrl() = default;
 
+  // accessors
+  const TrunkCtrl& trunk() const { return m_trunk; }
+  const FootCtrl& left_foot() const { return m_left_foot; }
+  const FootCtrl& right_foot() const { return m_right_foot; }
+  TrunkCtrl& trunk() { return m_trunk; }
+  FootCtrl& left_foot() { return m_left_foot; }
+  FootCtrl& right_foot() { return m_right_foot; }
+
+  // reset functions
   virtual Self& reset() override;
   virtual Self& reset(const Vec3D& t_com_position, double t_foot_dist);
   virtual Self& reset(const Vec3D& t_com_position,
                       const Vec3D& t_left_foot_position,
                       const Vec3D& t_right_foot_position);
+
+  // update functions
+  // virtual bool update() override;
+  // virtual bool update(double t_time_step) override;
+
+ private:
+  TrunkCtrl m_trunk;
+  FootCtrl m_left_foot;
+  FootCtrl m_right_foot;
 };
 
 }  // namespace holon

@@ -23,8 +23,16 @@
 namespace holon {
 
 BipedCtrl::BipedCtrl() : BipedCtrl(make_data<Data>()) {}
-BipedCtrl::BipedCtrl(Data t_data) : CtrlBase(t_data) {}
-BipedCtrl::BipedCtrl(const Model& t_model) : CtrlBase(t_model) {}
+BipedCtrl::BipedCtrl(Data t_data)
+    : CtrlBase(t_data),
+      m_trunk(data().extract<ComCtrlData>(Data::TrunkDataIndex())),
+      m_left_foot(data().extract<FootCtrlData>(Data::LeftFootDataIndex())),
+      m_right_foot(data().extract<FootCtrlData>(Data::RightFootDataIndex())) {}
+BipedCtrl::BipedCtrl(const Model& t_model)
+    : CtrlBase(t_model),
+      m_trunk(data().extract<ComCtrlData>(Data::TrunkDataIndex())),
+      m_left_foot(data().extract<FootCtrlData>(Data::LeftFootDataIndex())),
+      m_right_foot(data().extract<FootCtrlData>(Data::RightFootDataIndex())) {}
 
 BipedCtrl& BipedCtrl::reset() {
   model().reset();

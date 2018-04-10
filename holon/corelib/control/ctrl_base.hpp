@@ -41,6 +41,7 @@ class CtrlBase {
                 "Data must be default constructible.");
 
   using Self = CtrlBase<State, Solver, Data, Model>;
+  using ModelPtr = std::shared_ptr<Model>;
 
  protected:
   using ModelDataIndex = typename Data::ModelDataIndex;
@@ -71,24 +72,25 @@ class CtrlBase {
     this->copy_model_data(t_model);
   }
   explicit CtrlBase(Data t_data)
-      : m_data(t_data), m_model(this->model_data()) {}
+      : m_data(t_data),
+        m_model_ptr(std::make_shared<Model>(this->model_data())) {}
   virtual ~CtrlBase() = default;
 
   // accessors
   const Data& data() const { return m_data; }
-  const Model& model() const { return m_model; }
-  Model& model() { return m_model; }
+  const Model& model() const { return *m_model_ptr; }
+  Model& model() { return *m_model_ptr; }
   double time() const { return model().time(); }
   double time_step() const { return model().time_step(); }
 
   // accessors to data
   template <std::size_t I = 0>
   const ModelRawDataType<I>& states() const {
-    return m_model.template states<I>();
+    return m_model_ptr->template states<I>();
   }
   template <std::size_t I = 0>
   ModelRawDataType<I>& states() {
-    return m_model.template states<I>();
+    return m_model_ptr->template states<I>();
   }
 
   typename Model::DataType model_data() const {
@@ -127,18 +129,18 @@ class CtrlBase {
 
   // mutators
   Self& set_time_step(double dt) {
-    m_model.set_time_step(dt);
+    m_model_ptr->set_time_step(dt);
     return *this;
   }
 
   // reset
   virtual Self& reset() {
-    this->m_model.reset();
+    this->m_model_ptr->reset();
     return *this;
   }
 
   // update functions
-  virtual bool update() { return m_model.update(); }
+  virtual bool update() { return m_model_ptr->update(); }
   virtual bool update(double dt) {
     this->set_time_step(dt);
     return this->update();
@@ -146,7 +148,7 @@ class CtrlBase {
 
  private:
   Data m_data;
-  Model m_model;
+  ModelPtr m_model_ptr;
 };
 
 }  // namespace holon

@@ -175,10 +175,14 @@ class DataSetBase {
 
   template <typename SubDataType, std::size_t... I>
   SubDataType extract() const {
+    static_assert(sizeof...(I),
+                  "more than one indices must be specified in extract method.");
     return make_data<SubDataType>(std::get<I>(m_raw_data_ptr_tuple)...);
   }
   template <typename SubDataType, std::size_t... I>
   SubDataType extract(index_seq<I...>) const {
+    static_assert(sizeof...(I),
+                  "more than one indices must be specified in extract method.");
     return make_data<SubDataType>(std::get<I>(m_raw_data_ptr_tuple)...);
   }
 

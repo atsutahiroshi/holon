@@ -24,18 +24,18 @@ namespace holon {
 
 BipedModelData::BipedModelData(const Vec3D& t_com_position, double t_mass,
                                double t_foot_dist)
-    : BipedModelData(alloc_raw_data<TrunkRawDataType>(t_mass, t_com_position),
-                     alloc_raw_data<FootRawDataType>(),
-                     alloc_raw_data<FootRawDataType>()) {
+    : BipedModelData(alloc_raw_data<TrunkRawData>(t_mass, t_com_position),
+                     alloc_raw_data<FootRawData>(),
+                     alloc_raw_data<FootRawData>()) {
   set_foot_dist(t_foot_dist);
 }
 
 BipedModelData::BipedModelData(const Vec3D& t_com_position, double t_mass,
                                const Vec3D& t_lf_position,
                                const Vec3D& t_rf_position)
-    : BipedModelData(alloc_raw_data<TrunkRawDataType>(t_mass, t_com_position),
-                     alloc_raw_data<FootRawDataType>(1.0, t_lf_position),
-                     alloc_raw_data<FootRawDataType>(1.0, t_rf_position)) {}
+    : BipedModelData(alloc_raw_data<TrunkRawData>(t_mass, t_com_position),
+                     alloc_raw_data<FootRawData>(1.0, t_lf_position),
+                     alloc_raw_data<FootRawData>(1.0, t_rf_position)) {}
 
 BipedModelData& BipedModelData::set_foot_dist(double t_foot_dist) {
   left_foot().position =

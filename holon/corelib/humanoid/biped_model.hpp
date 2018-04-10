@@ -42,8 +42,10 @@ class BipedModelData
   HOLON_DEFINE_DEFAULT_DATA_CTOR(BipedModelData);
 
   using Self = BipedModelData;
-  using TrunkRawDataType = ComZmpModelRawData;
-  using FootRawDataType = PointMassModelRawData<Vec3D>;
+  using TrunkRawData = ComZmpModelRawData;
+  using FootRawData = PointMassModelRawData<Vec3D>;
+  using TrunkModelData = ComZmpModelData;
+  using FootModelData = PointMassModelData<Vec3D>;
 
  public:
   using TrunkDataIndex = index_seq<0>;
@@ -58,14 +60,23 @@ class BipedModelData
   BipedModelData(const Vec3D& t_com_position, double t_mass,
                  const Vec3D& t_lf_position, const Vec3D& t_rf_position);
 
-  const TrunkRawDataType& trunk() const { return get<0>(); }
-  const FootRawDataType& left_foot() const { return get<1>(); }
-  const FootRawDataType& right_foot() const { return get<2>(); }
-  TrunkRawDataType& trunk() { return get<0>(); }
-  FootRawDataType& left_foot() { return get<1>(); }
-  FootRawDataType& right_foot() { return get<2>(); }
+  const TrunkRawData& trunk() const { return get<0>(); }
+  const FootRawData& left_foot() const { return get<1>(); }
+  const FootRawData& right_foot() const { return get<2>(); }
+  TrunkRawData& trunk() { return get<0>(); }
+  FootRawData& left_foot() { return get<1>(); }
+  FootRawData& right_foot() { return get<2>(); }
 
   Self& set_foot_dist(double t_foot_dist);
+  TrunkModelData extract_trunk_model_data() const {
+    return extract<TrunkModelData>(TrunkDataIndex());
+  }
+  FootModelData extract_left_foot_model_data() const {
+    return extract<FootModelData>(LeftFootDataIndex());
+  }
+  FootModelData extract_right_foot_model_data() const {
+    return extract<FootModelData>(RightFootDataIndex());
+  }
 };
 
 class BipedModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,

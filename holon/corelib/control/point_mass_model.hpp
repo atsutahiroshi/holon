@@ -83,7 +83,23 @@ class PointMassModel : public ModelBase<State, Solver, Data, System> {
 
   // update
   virtual bool update() override {
-    StateArray state{{this->states().position, this->states().velocity}};
+    auto p = this->states().position;
+    auto v = this->states().velocity;
+    update_data(p, v);
+    if (!Base::update()) return false;
+    return true;
+  }
+
+  virtual bool update(double dt) override {
+    this->set_time_step(dt);
+    return update();
+  }
+
+ private:
+  State m_initial_position;
+
+  void update_data(const State& p, const State& v) {
+    StateArray state{p, v};
     state = this->solver().update(this->system(), state, this->time(),
                                   this->time_step());
     this->states().force = this->system().force(
@@ -92,16 +108,7 @@ class PointMassModel : public ModelBase<State, Solver, Data, System> {
         this->states().position, this->states().velocity, this->time());
     this->states().position = state[0];
     this->states().velocity = state[1];
-    if (!Base::update()) return false;
-    return true;
   }
-  virtual bool update(double dt) override {
-    this->set_time_step(dt);
-    return update();
-  }
-
- private:
-  State m_initial_position;
 };
 
 }  // namespace holon

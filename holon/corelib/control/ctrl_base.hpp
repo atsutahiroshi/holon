@@ -93,6 +93,9 @@ class CtrlBase {
     return m_model_ptr->template states<I>();
   }
 
+  ModelPtr model_ptr() { return m_model_ptr; }
+  const ModelPtr& model_ptr() const { return m_model_ptr; }
+
   typename Model::DataType model_data() const {
     return m_data.template extract<typename Model::DataType>(ModelDataIndex());
   }

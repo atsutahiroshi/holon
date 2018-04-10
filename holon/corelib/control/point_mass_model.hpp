@@ -102,10 +102,9 @@ class PointMassModel : public ModelBase<State, Solver, Data, System> {
     StateArray state{p, v};
     state = this->solver().update(this->system(), state, this->time(),
                                   this->time_step());
-    this->states().force = this->system().force(
-        this->states().position, this->states().velocity, this->time());
-    this->states().acceleration = this->system().acceleration(
-        this->states().position, this->states().velocity, this->time());
+    this->states().force = this->system().force(p, v, this->time());
+    this->states().acceleration =
+        this->system().acceleration(p, v, this->time());
     this->states().position = state[0];
     this->states().velocity = state[1];
   }

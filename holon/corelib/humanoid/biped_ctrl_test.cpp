@@ -154,5 +154,38 @@ TEST_CASE("Check reset of BipedCtrl") {
   SECTION("Overloaded function 2") { CheckReset_3(); }
 }
 
+void CheckTimeUpdate_1() {
+  BipedCtrl ctrl;
+  auto dt = ComZmpModel::default_time_step;
+  CHECK(ctrl.time() == 0.0);
+  CHECK(ctrl.time_step() == Approx(dt));
+  ctrl.update();
+  CHECK(ctrl.time() == Approx(dt));
+  CHECK(ctrl.time_step() == Approx(dt));
+  ctrl.update();
+  CHECK(ctrl.time() == Approx(2.0 * dt));
+  CHECK(ctrl.time_step() == Approx(dt));
+}
+
+void CheckTimeUpdate_2() {
+  Fuzzer fuzz(0, 0.01);
+  BipedCtrl ctrl;
+  CHECK(ctrl.time() == 0.0);
+  CHECK(ctrl.time_step() == Approx(ComZmpModel::default_time_step));
+  auto dt1 = fuzz();
+  ctrl.update(dt1);
+  CHECK(ctrl.time() == Approx(dt1));
+  CHECK(ctrl.time_step() == Approx(dt1));
+  auto dt2 = fuzz();
+  ctrl.update(dt2);
+  CHECK(ctrl.time() == Approx(dt1 + dt2));
+  CHECK(ctrl.time_step() == Approx(dt2));
+}
+
+TEST_CASE("Check time update of BipedCtrl", "[BipedCtrl][update]") {
+  SECTION("Overloaded function 1") { CheckTimeUpdate_1(); }
+  SECTION("Overloaded function 2") { CheckTimeUpdate_2(); }
+}
+
 }  // namespace
 }  // namespace holon

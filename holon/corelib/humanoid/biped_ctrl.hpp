@@ -88,8 +88,8 @@ class BipedCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
                       const Vec3D& t_right_foot_position);
 
   // update functions
-  // virtual bool update() override;
-  // virtual bool update(double t_time_step) override;
+  virtual bool update() override;
+  virtual bool update(double t_time_step) override;
 
  private:
   TrunkCtrl m_trunk;

@@ -49,4 +49,13 @@ BipedCtrl& BipedCtrl::reset(const Vec3D& t_com_position,
   return *this;
 }
 
+bool BipedCtrl::update() {
+  if (!model().update()) return false;
+  return true;
+}
+bool BipedCtrl::update(double t_time_step) {
+  set_time_step(t_time_step);
+  return update();
+}
+
 }  // namespace holon

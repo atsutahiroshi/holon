@@ -68,15 +68,6 @@ class BipedModelData
   FootRawData& right_foot() { return get<2>(); }
 
   Self& set_foot_dist(double t_foot_dist);
-  TrunkModelData extract_trunk_model_data() const {
-    return extract<TrunkModelData>(TrunkDataIndex());
-  }
-  FootModelData extract_left_foot_model_data() const {
-    return extract<FootModelData>(LeftFootDataIndex());
-  }
-  FootModelData extract_right_foot_model_data() const {
-    return extract<FootModelData>(RightFootDataIndex());
-  }
 };
 
 class BipedModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,

@@ -61,12 +61,20 @@ BipedModel::BipedModel(const Vec3D& t_com_position, double t_mass,
                                  t_right_foot_position)) {}
 
 BipedModel::BipedModel(Data t_data)
+    : BipedModel(
+          t_data,
+          std::make_shared<TrunkModel>(t_data.extract_trunk_model_data()),
+          std::make_shared<FootModel>(t_data.extract_left_foot_model_data()),
+          std::make_shared<FootModel>(t_data.extract_right_foot_model_data())) {
+}
+
+BipedModel::BipedModel(Data t_data, TrunkModelPtr t_trunk_ptr,
+                       FootModelPtr t_left_foot_ptr,
+                       FootModelPtr t_right_foot_ptr)
     : ModelBase(t_data),
-      m_trunk_ptr(std::make_shared<TrunkModel>(extract_trunk_model_data())),
-      m_left_foot_ptr(
-          std::make_shared<FootModel>(extract_left_foot_model_data())),
-      m_right_foot_ptr(
-          std::make_shared<FootModel>(extract_right_foot_model_data())) {}
+      m_trunk_ptr(t_trunk_ptr),
+      m_left_foot_ptr(t_left_foot_ptr),
+      m_right_foot_ptr(t_right_foot_ptr) {}
 
 BipedModel& BipedModel::reset() {
   return reset(trunk().initial_com_position(), left_foot().initial_position(),

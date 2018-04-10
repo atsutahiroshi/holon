@@ -19,6 +19,7 @@
  */
 
 #include "holon/corelib/humanoid/biped_model.hpp"
+#include <memory>
 
 namespace holon {
 
@@ -61,9 +62,11 @@ BipedModel::BipedModel(const Vec3D& t_com_position, double t_mass,
 
 BipedModel::BipedModel(Data t_data)
     : ModelBase(t_data),
-      m_trunk(data().extract<TrunkModelData>(Data::TrunkDataIndex())),
-      m_left_foot(data().extract<FootModelData>(Data::LeftFootDataIndex())),
-      m_right_foot(data().extract<FootModelData>(Data::RightFootDataIndex())) {}
+      m_trunk_ptr(std::make_shared<TrunkModel>(extract_trunk_model_data())),
+      m_left_foot_ptr(
+          std::make_shared<FootModel>(extract_left_foot_model_data())),
+      m_right_foot_ptr(
+          std::make_shared<FootModel>(extract_right_foot_model_data())) {}
 
 BipedModel& BipedModel::reset() {
   return reset(trunk().initial_com_position(), left_foot().initial_position(),
@@ -78,9 +81,9 @@ BipedModel& BipedModel::reset(const Vec3D& t_com_position, double t_foot_dist) {
 BipedModel& BipedModel::reset(const Vec3D& t_com_position,
                               const Vec3D& t_left_foot_position,
                               const Vec3D& t_right_foot_position) {
-  m_trunk.reset(t_com_position);
-  m_left_foot.reset(t_left_foot_position);
-  m_right_foot.reset(t_right_foot_position);
+  m_trunk_ptr->reset(t_com_position);
+  m_left_foot_ptr->reset(t_left_foot_position);
+  m_right_foot_ptr->reset(t_right_foot_position);
   Base::reset();
   return *this;
 }

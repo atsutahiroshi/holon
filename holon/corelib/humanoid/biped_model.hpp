@@ -80,6 +80,8 @@ class BipedModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
   using Data = BipedModelData;
   using TrunkModel = ComZmpModel;
   using FootModel = PointMassModel<Vec3D>;
+  using TrunkModelPtr = std::shared_ptr<ComZmpModel>;
+  using FootModelPtr = std::shared_ptr<PointMassModel<Vec3D>>;
   using TrunkModelData = ComZmpModelData;
   using FootModelData = PointMassModelData<Vec3D>;
 
@@ -93,12 +95,12 @@ class BipedModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
   virtual ~BipedModel() = default;
 
   // accessors
-  const TrunkModel& trunk() const { return m_trunk; }
-  const FootModel& left_foot() const { return m_left_foot; }
-  const FootModel& right_foot() const { return m_right_foot; }
-  TrunkModel& trunk() { return m_trunk; }
-  FootModel& left_foot() { return m_left_foot; }
-  FootModel& right_foot() { return m_right_foot; }
+  const TrunkModel& trunk() const { return *m_trunk_ptr; }
+  const FootModel& left_foot() const { return *m_left_foot_ptr; }
+  const FootModel& right_foot() const { return *m_right_foot_ptr; }
+  TrunkModel& trunk() { return *m_trunk_ptr; }
+  FootModel& left_foot() { return *m_left_foot_ptr; }
+  FootModel& right_foot() { return *m_right_foot_ptr; }
 
   // reset
   virtual Self& reset() override;
@@ -108,9 +110,19 @@ class BipedModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
                       const Vec3D& t_right_foot_position);
 
  private:
-  TrunkModel m_trunk;
-  FootModel m_left_foot;
-  FootModel m_right_foot;
+  TrunkModelPtr m_trunk_ptr;
+  FootModelPtr m_left_foot_ptr;
+  FootModelPtr m_right_foot_ptr;
+
+  TrunkModelData extract_trunk_model_data() const {
+    return data().extract<TrunkModelData>(Data::TrunkDataIndex());
+  }
+  FootModelData extract_left_foot_model_data() const {
+    return data().extract<FootModelData>(Data::LeftFootDataIndex());
+  }
+  FootModelData extract_right_foot_model_data() const {
+    return data().extract<FootModelData>(Data::RightFootDataIndex());
+  }
 };
 
 }  // namespace holon

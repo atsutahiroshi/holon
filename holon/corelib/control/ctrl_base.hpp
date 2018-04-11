@@ -68,18 +68,25 @@ class CtrlBase {
 
  public:
   CtrlBase() : CtrlBase(make_data<Data>()) {}
-  CtrlBase(const Model& t_model) : CtrlBase(make_data<Data>()) {
+  explicit CtrlBase(const Model& t_model) : CtrlBase(make_data<Data>()) {
     this->copy_model_data(t_model);
   }
   explicit CtrlBase(Data t_data)
       : m_data(t_data),
         m_model_ptr(std::make_shared<Model>(this->model_data())) {}
+  CtrlBase(Data t_data, ModelPtr t_model_ptr)
+      : m_data(t_data), m_model_ptr(t_model_ptr) {
+    m_model_ptr->set_data(t_data.template extract<typename Model::DataType>(
+        typename decltype(t_data)::ModelDataIndex()));
+  }
   virtual ~CtrlBase() = default;
 
   // accessors
   const Data& data() const { return m_data; }
   const Model& model() const { return *m_model_ptr; }
   Model& model() { return *m_model_ptr; }
+  const ModelPtr& model_ptr() const { return m_model_ptr; }
+  ModelPtr model_ptr() { return m_model_ptr; }
   double time() const { return model().time(); }
   double time_step() const { return model().time_step(); }
 
@@ -92,9 +99,6 @@ class CtrlBase {
   ModelRawDataType<I>& states() {
     return m_model_ptr->template states<I>();
   }
-
-  ModelPtr model_ptr() { return m_model_ptr; }
-  const ModelPtr& model_ptr() const { return m_model_ptr; }
 
   typename Model::DataType model_data() const {
     return m_data.template extract<typename Model::DataType>(ModelDataIndex());

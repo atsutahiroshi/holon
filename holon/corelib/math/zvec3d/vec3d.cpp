@@ -20,6 +20,7 @@
 
 #include "holon/corelib/math/zvec3d/vec3d.hpp"
 
+#include <cmath>
 #include <iomanip>
 #include <sstream>
 #include <string>
@@ -125,6 +126,10 @@ Vec3D Vec3D::cross(const Vec3D& rhs) const {
   z_ = this->x() * rhs.y() - this->y() * rhs.x();
   return Vec3D(x_, y_, z_);
 }
+
+double Vec3D::norm() const { return std::sqrt(this->sqr_norm()); }
+
+double Vec3D::sqr_norm() const { return this->dot(*this); }
 
 Vec3D::iterator Vec3D::begin() {
   return Vec3DIterator<double>(const_cast<double*>(m_v.e));

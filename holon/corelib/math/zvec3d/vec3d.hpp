@@ -101,6 +101,10 @@ class Vec3D {
   double dot(const Vec3D& rhs) const;
   Vec3D cross(const Vec3D& rhs) const;
 
+  // norm computation
+  double norm() const;
+  double sqr_norm() const;
+
   // arithmetic unary operators
   inline Vec3D operator+() const { return clone(); }
   inline Vec3D operator-() const { return opposite(); }

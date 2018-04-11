@@ -541,6 +541,23 @@ TEST_CASE("zvec3d::Vec3D: outer product", "[corelib][math][Vec3D]") {
   }
 }
 
+TEST_CASE("zvec3d::Vec3D: computing norm", "[Vec3D][norm]") {
+  struct testcase_t {
+    Vec3D a;
+    double expected_norm, expected_sqr_norm;
+  } testcases[] = {
+      {{0, 0, 0}, 0, 0},
+      {{1, 1, 1}, sqrt(3), 3},
+      {{1, 2, 3}, sqrt(14), 14},
+      {{-1, 1, 2}, sqrt(6), 6},
+  };
+
+  for (const auto& c : testcases) {
+    CHECK(c.a.norm() == c.expected_norm);
+    CHECK(c.a.sqr_norm() == c.expected_sqr_norm);
+  }
+}
+
 TEST_CASE("zvec3d::Vec3D: loop with iterator", "[corelib][math][Vec3D]") {
   Vec3D a = {10, 20, 30};
   int cnt = 0;

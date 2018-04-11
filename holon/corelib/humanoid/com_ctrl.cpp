@@ -110,6 +110,11 @@ ComCtrl::ComCtrl(Data t_data)
     : CtrlBase(t_data), m_canonical_foot_dist(ctrl_y::default_dist) {
   init();
 }
+ComCtrl::ComCtrl(Data t_data, std::shared_ptr<Model> t_model_ptr)
+    : CtrlBase(t_data, t_model_ptr),
+      m_canonical_foot_dist(ctrl_y::default_dist) {
+  init();
+}
 
 void ComCtrl::init() {
   model().set_initial_com_position(states().com_position);

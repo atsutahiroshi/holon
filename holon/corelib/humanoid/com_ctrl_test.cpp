@@ -21,6 +21,7 @@
 #include "holon/corelib/humanoid/com_ctrl.hpp"
 
 #include <roki/rk_g.h>
+#include <memory>
 #include "holon/corelib/humanoid/com_ctrl/com_ctrl_x.hpp"
 #include "holon/corelib/humanoid/com_ctrl/com_ctrl_y.hpp"
 #include "holon/corelib/humanoid/com_ctrl/com_ctrl_z.hpp"
@@ -168,10 +169,44 @@ void CheckCtor_2() {
   CHECK(ctrl.states().com_velocity == v);
 }
 
+void CheckCtor_3() {
+  auto data = make_data<ComCtrl::Data>();
+  Fuzzer fuzz;
+  Vec3D p = fuzz.get<Vec3D>(), v = fuzz.get<Vec3D>();
+  data.get<0>().com_position = p;
+  data.get<0>().com_velocity = v;
+  auto model_ptr = std::make_shared<ComZmpModel>();
+
+  ComCtrl ctrl(data, model_ptr);
+  REQUIRE(ctrl.data() == data);
+  REQUIRE(ctrl.model().data().get_ptr<0>() == ctrl.data().get_ptr<0>());
+  REQUIRE(ctrl.model().data().get_ptr<0>() == model_ptr->data().get_ptr<>());
+  REQUIRE(&ctrl.model() == model_ptr.get());
+  CHECK(ctrl.model().system().is_set_zmp_position());
+  CHECK(ctrl.canonical_foot_dist() == ctrl_y::default_dist);
+  CHECK(ctrl.default_com_position() == ctrl.initial_com_position());
+
+  CHECK(ctrl.model().data().get_ptr<0>() == data.get_ptr<0>());
+  CHECK(ctrl.model().initial_com_position() == p);
+  CHECK(ctrl.states().com_position == p);
+  CHECK(ctrl.states().com_velocity == v);
+
+  p = fuzz.get<Vec3D>();
+  v = fuzz.get<Vec3D>();
+  ctrl.states().com_position = p;
+  ctrl.states().com_velocity = v;
+  CHECK(data.get<0>().com_position == p);
+  CHECK(data.get<0>().com_velocity == v);
+  CHECK(ctrl.model().initial_com_position() != p);
+  CHECK(ctrl.states().com_position == p);
+  CHECK(ctrl.states().com_velocity == v);
+}
+
 TEST_CASE("Check c'tors of ComCtrl", "[ComCtrl][ctor]") {
   SECTION("Default c'tor") { CheckCtor_0(); }
   SECTION("Overloaded c'tor 1") { CheckCtor_1(); }
   SECTION("Overloaded c'tor 2") { CheckCtor_2(); }
+  SECTION("Overloaded c'tor 3") { CheckCtor_3(); }
 }
 
 TEST_CASE("ComCtrl::set_canonical_foot_dist sets canonical foot distance",

@@ -99,6 +99,7 @@ class ComCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
   ComCtrl();
   explicit ComCtrl(const Model& t_model);
   explicit ComCtrl(Data t_data);
+  ComCtrl(Data t_data, std::shared_ptr<Model> t_model_ptr);
   virtual ~ComCtrl() = default;
 
   // accessors

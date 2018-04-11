@@ -164,6 +164,7 @@ void CheckReset_1() {
   CHECK(ctrl.states().velocity == T{0});
   CHECK(ctrl.params().position == T{0});
   CHECK(ctrl.params().velocity == T{0});
+  CHECK(ctrl.initial_position() == T{0});
 }
 
 template <typename T>
@@ -185,6 +186,7 @@ void CheckReset_2() {
   CHECK(ctrl.states().velocity == T{0});
   CHECK(ctrl.params().position == p);
   CHECK(ctrl.params().velocity == T{0});
+  CHECK(ctrl.initial_position() == p);
 }
 
 TEST_CASE("Check reset in PdCtrl", "[PdCtrl][reset]") {

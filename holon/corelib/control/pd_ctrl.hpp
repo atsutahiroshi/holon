@@ -110,6 +110,8 @@ class PdCtrl : public CtrlBase<State, Solver, Data, Model> {
     return this->resetParams();
   }
 
+  State initial_position() const { return this->model().initial_position(); }
+
   virtual Self& reset(const State& t_initial_position) {
     this->model().reset(t_initial_position);
     return this->resetParams();

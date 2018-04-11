@@ -51,17 +51,22 @@ BipedCtrl::BipedCtrl(Data t_data, std::shared_ptr<Model> t_model_ptr)
                    model().right_foot_ptr()) {}
 
 BipedCtrl& BipedCtrl::reset() {
-  model().reset();
-  return *this;
+  return reset(m_trunk.initial_com_position(), m_left_foot.initial_position(),
+               m_right_foot.initial_position());
 }
 BipedCtrl& BipedCtrl::reset(const Vec3D& t_com_position, double t_foot_dist) {
-  model().reset(t_com_position, t_foot_dist);
-  return *this;
+  return reset(t_com_position,
+               {t_com_position.x(), t_com_position.y() + 0.5 * t_foot_dist, 0},
+               {t_com_position.x(), t_com_position.y() - 0.5 * t_foot_dist, 0});
 }
 BipedCtrl& BipedCtrl::reset(const Vec3D& t_com_position,
                             const Vec3D& t_left_foot_position,
                             const Vec3D& t_right_foot_position) {
-  model().reset(t_com_position, t_left_foot_position, t_right_foot_position);
+  CtrlBase::reset();
+  auto foot_dist = (t_left_foot_position - t_right_foot_position).norm();
+  m_trunk.reset(t_com_position, foot_dist);
+  m_left_foot.reset(t_left_foot_position);
+  m_right_foot.reset(t_right_foot_position);
   return *this;
 }
 

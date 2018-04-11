@@ -128,19 +128,32 @@ TEST_CASE("Check c'tors of BipedCtrl") {
   SECTION("Overloaded c'tor 3") { CheckCtor_3(); }
 }
 
+void CheckReset_common(const BipedCtrl& ctrl, const Vec3D& expected_com_pos,
+                       const Vec3D& expected_lf_pos,
+                       const Vec3D& expected_rf_pos) {
+  auto expected_dist = (expected_lf_pos - expected_rf_pos).norm();
+  CHECK(ctrl.time() == 0.0);
+  CHECK(ctrl.states<0>().com_position == expected_com_pos);
+  CHECK(ctrl.states<0>().com_velocity == kVec3DZero);
+  CHECK(ctrl.states<1>().position == expected_lf_pos);
+  CHECK(ctrl.states<1>().velocity == kVec3DZero);
+  CHECK(ctrl.states<2>().position == expected_rf_pos);
+  CHECK(ctrl.states<2>().velocity == kVec3DZero);
+
+  CHECK(ctrl.trunk().model().initial_com_position() == expected_com_pos);
+  CHECK(ctrl.trunk().canonical_foot_dist() == Approx(expected_dist));
+  CHECK(ctrl.params<0>().dist == Approx(expected_dist));
+  CHECK(ctrl.left_foot().model().initial_position() == expected_lf_pos);
+  CHECK(ctrl.right_foot().model().initial_position() == expected_rf_pos);
+}
+
 void CheckReset_1() {
   BipedCtrl ctrl;
   ctrl.update();
   RandomizeModelData(&ctrl.model());
   REQUIRE(ctrl.time() != 0.0);
   ctrl.reset();
-  CHECK(ctrl.time() == 0.0);
-  CHECK(ctrl.states<0>().com_position == Vec3D{0, 0, 1});
-  CHECK(ctrl.states<0>().com_velocity == kVec3DZero);
-  CHECK(ctrl.states<1>().position == kVec3DZero);
-  CHECK(ctrl.states<1>().velocity == kVec3DZero);
-  CHECK(ctrl.states<2>().position == kVec3DZero);
-  CHECK(ctrl.states<2>().velocity == kVec3DZero);
+  CheckReset_common(ctrl, {0, 0, 1}, kVec3DZero, kVec3DZero);
 }
 void CheckReset_2() {
   BipedCtrl ctrl;
@@ -149,15 +162,11 @@ void CheckReset_2() {
   REQUIRE(ctrl.time() != 0.0);
   Fuzzer fuzz;
   auto p0 = fuzz.get<Vec3D>();
-  auto dist = fuzz.get();
+  auto dist = Fuzzer(0, 1).get();
+  auto pl = Vec3D{p0.x(), p0.y() + 0.5 * dist, 0};
+  auto pr = Vec3D{p0.x(), p0.y() - 0.5 * dist, 0};
   ctrl.reset(p0, dist);
-  CHECK(ctrl.time() == 0.0);
-  CHECK(ctrl.states<0>().com_position == p0);
-  CHECK(ctrl.states<0>().com_velocity == kVec3DZero);
-  CHECK(ctrl.states<1>().position == Vec3D{p0.x(), p0.y() + 0.5 * dist, 0});
-  CHECK(ctrl.states<1>().velocity == kVec3DZero);
-  CHECK(ctrl.states<2>().position == Vec3D{p0.x(), p0.y() - 0.5 * dist, 0});
-  CHECK(ctrl.states<2>().velocity == kVec3DZero);
+  CheckReset_common(ctrl, p0, pl, pr);
 }
 void CheckReset_3() {
   BipedCtrl ctrl;
@@ -168,14 +177,9 @@ void CheckReset_3() {
   auto p0 = fuzz.get<Vec3D>();
   auto pl = fuzz.get<Vec3D>();
   auto pr = fuzz.get<Vec3D>();
+  auto dist = (pl - pr).norm();
   ctrl.reset(p0, pl, pr);
-  CHECK(ctrl.time() == 0.0);
-  CHECK(ctrl.states<0>().com_position == p0);
-  CHECK(ctrl.states<0>().com_velocity == kVec3DZero);
-  CHECK(ctrl.states<1>().position == pl);
-  CHECK(ctrl.states<1>().velocity == kVec3DZero);
-  CHECK(ctrl.states<2>().position == pr);
-  CHECK(ctrl.states<2>().velocity == kVec3DZero);
+  CheckReset_common(ctrl, p0, pl, pr);
 }
 
 TEST_CASE("Check reset of BipedCtrl") {

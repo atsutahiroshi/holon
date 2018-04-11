@@ -188,37 +188,76 @@ TEST_CASE("Check reset of BipedCtrl") {
   SECTION("Overloaded function 2") { CheckReset_3(); }
 }
 
+void CheckTimeUpdate_common(const BipedCtrl& ctrl, double t, double dt) {
+  CAPTURE(t);
+  CAPTURE(dt);
+  CHECK(ctrl.time() == Approx(t));
+  CHECK(ctrl.trunk().time() == Approx(t));
+  CHECK(ctrl.left_foot().time() == Approx(t));
+  CHECK(ctrl.right_foot().time() == Approx(t));
+  CHECK(ctrl.time_step() == Approx(dt));
+}
 void CheckTimeUpdate_1() {
   BipedCtrl ctrl;
   auto dt = ComZmpModel::default_time_step;
-  CHECK(ctrl.time() == 0.0);
-  CHECK(ctrl.time_step() == Approx(dt));
+  CheckTimeUpdate_common(ctrl, 0, dt);
   ctrl.update();
-  CHECK(ctrl.time() == Approx(dt));
-  CHECK(ctrl.time_step() == Approx(dt));
+  CheckTimeUpdate_common(ctrl, dt, dt);
   ctrl.update();
-  CHECK(ctrl.time() == Approx(2.0 * dt));
-  CHECK(ctrl.time_step() == Approx(dt));
+  CheckTimeUpdate_common(ctrl, 2 * dt, dt);
 }
-
 void CheckTimeUpdate_2() {
   Fuzzer fuzz(0, 0.01);
   BipedCtrl ctrl;
-  CHECK(ctrl.time() == 0.0);
-  CHECK(ctrl.time_step() == Approx(ComZmpModel::default_time_step));
+  CheckTimeUpdate_common(ctrl, 0, ComZmpModel::default_time_step);
   auto dt1 = fuzz();
   ctrl.update(dt1);
-  CHECK(ctrl.time() == Approx(dt1));
-  CHECK(ctrl.time_step() == Approx(dt1));
+  CheckTimeUpdate_common(ctrl, dt1, dt1);
   auto dt2 = fuzz();
   ctrl.update(dt2);
-  CHECK(ctrl.time() == Approx(dt1 + dt2));
-  CHECK(ctrl.time_step() == Approx(dt2));
+  CheckTimeUpdate_common(ctrl, dt1 + dt2, dt2);
 }
 
 TEST_CASE("Check time update of BipedCtrl", "[BipedCtrl][update]") {
   SECTION("Overloaded function 1") { CheckTimeUpdate_1(); }
   SECTION("Overloaded function 2") { CheckTimeUpdate_2(); }
+}
+
+struct OscillationChecker {
+  const double epsilon = 1e-6;
+  double yzmin = 0, yzmax = 0;
+  void update(const Vec3D& current_zmp_pos) {
+    if (current_zmp_pos.y() > yzmax) yzmax = current_zmp_pos.y();
+    if (current_zmp_pos.y() < yzmin) yzmin = current_zmp_pos.y();
+  }
+  double amplitude() const { return yzmax - yzmin; }
+  bool isOscillating() const { return std::fabs(amplitude()) > epsilon; }
+};
+SCENARIO("Check sideward oscillation of body with BipedCtrl",
+         "[BipedCtrl][update]") {
+  BipedCtrl ctrl;
+  OscillationChecker checker;
+  GIVEN("Issue commands to make it oscillate the body sideways") {
+    double dist = 0.5;
+    ctrl.reset({0, 0, 0.42}, dist);
+    auto cmd = ctrl.get_commands_handler();
+    cmd->rho = 1;
+    WHEN("Update controller for 3 sec") {
+      ctrl.states<0>().com_velocity[1] += 0.00001;
+      while (ctrl.time() < 3) {
+        ctrl.update();
+        checker.update(ctrl.states<0>().zmp_position);
+      }
+      THEN("The body oscillates sideways") {
+        CHECK(checker.isOscillating());
+        CHECK(checker.amplitude() == Approx(dist));
+      }
+      THEN("The both feet touches on the ground") {
+        CHECK(ctrl.left_foot().states().position.z() == 0.0);
+        CHECK(ctrl.right_foot().states().position.z() == 0.0);
+      }
+    }
+  }
 }
 
 }  // namespace

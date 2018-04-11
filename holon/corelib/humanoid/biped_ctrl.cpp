@@ -71,11 +71,16 @@ BipedCtrl& BipedCtrl::reset(const Vec3D& t_com_position,
 }
 
 bool BipedCtrl::update() {
-  if (!model().update()) return false;
-  return true;
+  if (!m_trunk.update()) return false;
+  if (!m_left_foot.update()) return false;
+  if (!m_right_foot.update()) return false;
+  return CtrlBase::update();
 }
 bool BipedCtrl::update(double t_time_step) {
   set_time_step(t_time_step);
+  m_trunk.set_time_step(t_time_step);
+  m_left_foot.set_time_step(t_time_step);
+  m_right_foot.set_time_step(t_time_step);
   return update();
 }
 

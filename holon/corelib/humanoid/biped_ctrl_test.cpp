@@ -20,6 +20,8 @@
 
 #include "holon/corelib/humanoid/biped_ctrl.hpp"
 
+#include <memory>
+
 #include "catch.hpp"
 #include "holon/test/util/fuzzer/fuzzer.hpp"
 
@@ -55,6 +57,10 @@ void CheckCtor_common(const BipedCtrl& ctrl) {
   REQUIRE(ctrl.right_foot().data().get_ptr<0>() == ctrl.data().get_ptr<2>());
   REQUIRE(ctrl.right_foot().data().get_ptr<1>() == ctrl.data().get_ptr<5>());
   REQUIRE(ctrl.right_foot().data().get_ptr<2>() == ctrl.data().get_ptr<8>());
+
+  REQUIRE(ctrl.model().trunk_ptr() == ctrl.trunk().model_ptr());
+  REQUIRE(ctrl.model().left_foot_ptr() == ctrl.left_foot().model_ptr());
+  REQUIRE(ctrl.model().right_foot_ptr() == ctrl.right_foot().model_ptr());
 }
 void CheckCtor_0() {
   BipedCtrl ctrl;
@@ -77,7 +83,6 @@ void CheckCtor_1() {
 }
 void CheckCtor_2() {
   auto model = make_model<BipedModel>();
-  Fuzzer fuzz;
   RandomizeModelData(&model);
   BipedCtrl ctrl(model);
   CheckCtor_common(ctrl);
@@ -92,10 +97,35 @@ void CheckCtor_2() {
   REQUIRE(ctrl.data().get_ptr<2>() != model.data().get_ptr<2>());
 }
 
+void CheckCtor_3() {
+  auto data = make_data<BipedCtrlData>();
+  auto model_ptr = std::make_shared<BipedModel>();
+  BipedCtrl ctrl(data, model_ptr);
+  CheckCtor_common(ctrl);
+  CHECK(ctrl.data().get_ptr<0>() == data.get_ptr<0>());
+  CHECK(ctrl.data().get_ptr<1>() == data.get_ptr<1>());
+  CHECK(ctrl.data().get_ptr<2>() == data.get_ptr<2>());
+  CHECK(ctrl.data().get_ptr<3>() == data.get_ptr<3>());
+  CHECK(ctrl.data().get_ptr<4>() == data.get_ptr<4>());
+  CHECK(ctrl.data().get_ptr<5>() == data.get_ptr<5>());
+  CHECK(ctrl.data().get_ptr<6>() == data.get_ptr<6>());
+  CHECK(ctrl.data().get_ptr<7>() == data.get_ptr<7>());
+  CHECK(ctrl.data().get_ptr<8>() == data.get_ptr<8>());
+  CHECK(ctrl.data().get_ptr<9>() == data.get_ptr<9>());
+  CHECK(&ctrl.model() == model_ptr.get());
+  CHECK(ctrl.model().trunk_ptr() == model_ptr->trunk_ptr());
+  CHECK(ctrl.model().left_foot_ptr() == model_ptr->left_foot_ptr());
+  CHECK(ctrl.model().right_foot_ptr() == model_ptr->right_foot_ptr());
+  CHECK(ctrl.data().get_ptr<0>() == model_ptr->data().get_ptr<0>());
+  CHECK(ctrl.data().get_ptr<1>() == model_ptr->data().get_ptr<1>());
+  CHECK(ctrl.data().get_ptr<2>() == model_ptr->data().get_ptr<2>());
+}
+
 TEST_CASE("Check c'tors of BipedCtrl") {
   SECTION("Default c'tor") { CheckCtor_0(); }
   SECTION("Overloaded c'tor 1") { CheckCtor_1(); }
   SECTION("Overloaded c'tor 2") { CheckCtor_2(); }
+  SECTION("Overloaded c'tor 3") { CheckCtor_3(); }
 }
 
 void CheckReset_1() {

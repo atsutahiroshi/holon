@@ -20,19 +20,35 @@
 
 #include "holon/corelib/humanoid/biped_ctrl.hpp"
 
+#include <memory>
+
 namespace holon {
 
 BipedCtrl::BipedCtrl() : BipedCtrl(make_data<Data>()) {}
 BipedCtrl::BipedCtrl(Data t_data)
     : CtrlBase(t_data),
-      m_trunk(data().extract<ComCtrlData>(Data::TrunkDataIndex())),
-      m_left_foot(data().extract<FootCtrlData>(Data::LeftFootDataIndex())),
-      m_right_foot(data().extract<FootCtrlData>(Data::RightFootDataIndex())) {}
+      m_trunk(data().extract<ComCtrlData>(Data::TrunkDataIndex()),
+              model().trunk_ptr()),
+      m_left_foot(data().extract<FootCtrlData>(Data::LeftFootDataIndex()),
+                  model().left_foot_ptr()),
+      m_right_foot(data().extract<FootCtrlData>(Data::RightFootDataIndex()),
+                   model().right_foot_ptr()) {}
 BipedCtrl::BipedCtrl(const Model& t_model)
     : CtrlBase(t_model),
-      m_trunk(data().extract<ComCtrlData>(Data::TrunkDataIndex())),
-      m_left_foot(data().extract<FootCtrlData>(Data::LeftFootDataIndex())),
-      m_right_foot(data().extract<FootCtrlData>(Data::RightFootDataIndex())) {}
+      m_trunk(data().extract<ComCtrlData>(Data::TrunkDataIndex()),
+              model().trunk_ptr()),
+      m_left_foot(data().extract<FootCtrlData>(Data::LeftFootDataIndex()),
+                  model().left_foot_ptr()),
+      m_right_foot(data().extract<FootCtrlData>(Data::RightFootDataIndex()),
+                   model().right_foot_ptr()) {}
+BipedCtrl::BipedCtrl(Data t_data, std::shared_ptr<Model> t_model_ptr)
+    : CtrlBase(t_data, t_model_ptr),
+      m_trunk(data().extract<ComCtrlData>(Data::TrunkDataIndex()),
+              model().trunk_ptr()),
+      m_left_foot(data().extract<FootCtrlData>(Data::LeftFootDataIndex()),
+                  model().left_foot_ptr()),
+      m_right_foot(data().extract<FootCtrlData>(Data::RightFootDataIndex()),
+                   model().right_foot_ptr()) {}
 
 BipedCtrl& BipedCtrl::reset() {
   model().reset();

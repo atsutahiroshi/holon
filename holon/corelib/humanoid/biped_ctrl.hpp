@@ -70,6 +70,7 @@ class BipedCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
   BipedCtrl();
   explicit BipedCtrl(Data t_data);
   explicit BipedCtrl(const Model& t_model);
+  BipedCtrl(Data t_data, std::shared_ptr<Model> t_model_ptr);
   virtual ~BipedCtrl() = default;
 
   // accessors

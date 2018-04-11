@@ -112,6 +112,9 @@ class BipedModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
   TrunkModel& trunk() { return *m_trunk_ptr; }
   FootModel& left_foot() { return *m_left_foot_ptr; }
   FootModel& right_foot() { return *m_right_foot_ptr; }
+  const TrunkModelPtr& trunk_ptr() const { return m_trunk_ptr; }
+  const FootModelPtr& left_foot_ptr() const { return m_left_foot_ptr; }
+  const FootModelPtr& right_foot_ptr() const { return m_right_foot_ptr; }
 
   // reset
   virtual Self& reset() override;

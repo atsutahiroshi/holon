@@ -84,8 +84,12 @@ class PdCtrl : public CtrlBase<State, Solver, Data, Model> {
 
  public:
   PdCtrl() : PdCtrl(make_data<Data>()) {}
-  PdCtrl(const Model& t_model) : Base(t_model) { init(); }
-  PdCtrl(Data t_data) : Base(t_data) { init(); }
+  explicit PdCtrl(const Model& t_model) : Base(t_model) { init(); }
+  explicit PdCtrl(Data t_data) : Base(t_data) { init(); }
+  PdCtrl(Data t_data, std::shared_ptr<Model> t_model_ptr)
+      : Base(t_data, t_model_ptr) {
+    init();
+  }
   virtual ~PdCtrl() = default;
 
   virtual State force(const State& t_position, const State& t_velocity,

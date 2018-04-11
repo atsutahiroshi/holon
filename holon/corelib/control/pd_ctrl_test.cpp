@@ -103,6 +103,30 @@ void CheckCtor_2() {
   CHECK(ctrl.params().velocity == data.template get<0>().velocity);
   CHECK(ctrl.model().system().is_set_force());
 }
+template <typename T>
+void CheckCtor_3() {
+  Fuzzer fuzz;
+  PdCtrlData<T> data;
+  data.template get<0>().mass = Fuzzer(0, 10).get<double>();
+  data.template get<0>().position = fuzz.get<T>();
+  data.template get<0>().velocity = fuzz.get<T>();
+  auto model_ptr = std::make_shared<PointMassModel<T>>();
+
+  PdCtrl<T> ctrl(data, model_ptr);
+  REQUIRE(ctrl.data() == data);
+  REQUIRE(ctrl.model().data().template get_ptr<0>() ==
+          data.template get_ptr<0>());
+  REQUIRE(ctrl.data().template get_ptr<0>() ==
+          model_ptr->data().template get_ptr<0>());
+  REQUIRE(&ctrl.model() == model_ptr.get());
+  CHECK(ctrl.states().mass == data.template get<0>().mass);
+  CHECK(ctrl.states().position == data.template get<0>().position);
+  CHECK(ctrl.model().initial_position() == data.template get<0>().position);
+  CHECK(ctrl.states().velocity == data.template get<0>().velocity);
+  CHECK(ctrl.params().position == data.template get<0>().position);
+  CHECK(ctrl.params().velocity == data.template get<0>().velocity);
+  CHECK(ctrl.model().system().is_set_force());
+}
 TEST_CASE("C'tor of PdCtrl", "[PdCtrl][ctor]") {
   SECTION("Default c'tor") {
     CheckCtor_0<double>();
@@ -115,6 +139,10 @@ TEST_CASE("C'tor of PdCtrl", "[PdCtrl][ctor]") {
   SECTION("Overloaded c'tor 2") {
     CheckCtor_2<double>();
     CheckCtor_2<Vec3D>();
+  }
+  SECTION("Overloaded c'tor 3") {
+    CheckCtor_3<double>();
+    CheckCtor_3<Vec3D>();
   }
 }
 

@@ -30,6 +30,33 @@
 
 namespace holon {
 
+struct RawDataBase {
+  static constexpr bool is_raw_data_type = true;
+};
+
+HOLON_GENERATE_MEMBER_VAR_CHECKER(is_raw_data_type);
+template <typename T, typename E = void>
+struct is_raw_data_type {
+  static constexpr bool value = false;
+};
+template <typename T>
+struct is_raw_data_type<T, typename std::enable_if<HOLON_HAS_MEMBER_VAR(
+                               T, is_raw_data_type)>::type> {
+  static constexpr bool value = T::is_raw_data_type;
+};
+
+template <typename... Ts>
+struct all_raw_data_type;
+template <typename T, typename... Rs>
+struct all_raw_data_type<T, Rs...> {
+  static constexpr bool value =
+      is_raw_data_type<T>::value && all_raw_data_type<Rs...>::value;
+};
+template <>
+struct all_raw_data_type<> {
+  static constexpr bool value = true;
+};
+
 // non-member functions
 template <typename RawData, typename... Args>
 std::shared_ptr<RawData> alloc_raw_data(Args&&... args) {
@@ -77,6 +104,9 @@ template <class... RawDataTypes>
 class DataSetBase {
   static_assert(sizeof...(RawDataTypes) > 0,
                 "DataSetBase must have at least one RawData class.");
+  static_assert(
+      all_raw_data_type<RawDataTypes...>::value,
+      "All the template arguments must be derived from RawDataBase class.");
 
  protected:
   using Self = DataSetBase<RawDataTypes...>;

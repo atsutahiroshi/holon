@@ -38,11 +38,12 @@ void CheckCtor_common(const BipedFootCtrlData& data, const Vec3D& expected_p0) {
   CHECK(data.get<0>().acceleration == kVec3DZero);
   CHECK(data.get<0>().force == kVec3DZero);
   // params data
+  using ParamsRawData = BipedFootCtrlParamsRawData;
   CHECK(data.get<1>().position == expected_p0);
   CHECK(data.get<1>().velocity == kVec3DZero);
-  CHECK(data.get<1>().stiffness == kVec3DZero);
-  CHECK(data.get<1>().damping == kVec3DZero);
-  CHECK(data.get<1>().max_height == 0);
+  CHECK(data.get<1>().stiffness == ParamsRawData::default_stiffness);
+  CHECK(data.get<1>().damping == ParamsRawData::default_damping);
+  CHECK(data.get<1>().max_height == ParamsRawData::default_max_height);
   // outputs data
   CHECK(data.get<2>().position == kVec3DZero);
   CHECK(data.get<2>().velocity == kVec3DZero);

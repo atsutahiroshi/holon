@@ -22,6 +22,15 @@
 
 namespace holon {
 
+const double BipedFootCtrlParamsRawData::default_max_height = 0;
+const Vec3D BipedFootCtrlParamsRawData::default_stiffness = {3000, 3000, 3000};
+const Vec3D BipedFootCtrlParamsRawData::default_damping = {200, 200, 200};
+BipedFootCtrlParamsRawData::BipedFootCtrlParamsRawData()
+    : max_height(default_max_height) {
+  stiffness = default_stiffness;
+  damping = default_damping;
+}
+
 BipedFootCtrlData::BipedFootCtrlData(const Vec3D& t_initial_position)
     : DataSetBase(
           alloc_raw_data<PointMassModelRawData<Vec3D>>(1.0, t_initial_position),

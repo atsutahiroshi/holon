@@ -29,8 +29,11 @@
 namespace holon {
 
 struct BipedFootCtrlParamsRawData : PdCtrlParamsRawData<Vec3D> {
-  double max_height = 0;
-  BipedFootCtrlParamsRawData() = default;
+  static const double default_max_height;
+  static const Vec3D default_stiffness;
+  static const Vec3D default_damping;
+  double max_height;
+  BipedFootCtrlParamsRawData();
 };
 struct BipedFootCtrlOutputsRawData : PdCtrlOutputsRawData<Vec3D> {
   BipedFootCtrlOutputsRawData() = default;

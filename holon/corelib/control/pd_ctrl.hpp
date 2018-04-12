@@ -71,7 +71,10 @@ class PdCtrlData : public DataSetBase<PointMassModelRawData<State>,
   PdCtrlData(const State& t_initial_position, double t_mass)
       : Base(alloc_raw_data<ModelRawData>(t_mass, t_initial_position),
              alloc_raw_data<ParamsRawData>(),
-             alloc_raw_data<OutputsRawData>()) {}
+             alloc_raw_data<OutputsRawData>()) {
+    this->template get<1>().position = this->template get<0>().position;
+    this->template get<1>().velocity = this->template get<0>().velocity;
+  }
 };
 
 template <typename State, typename Solver = RungeKutta4<std::array<State, 2>>,

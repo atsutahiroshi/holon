@@ -33,9 +33,9 @@ template <typename State, typename Solver, typename Data, typename Model>
 class CtrlBase {
   static_assert(std::is_base_of<OdeSolver<Solver>, Solver>::value,
                 "Solver must be derived from OdeSolver class.");
-  static_assert(HOLON_HAS_MEMBER_VAR(Data, is_data_type),
+  static_assert(is_data_type<Data>::value,
                 "Data must be derived from DataSetBase class.");
-  static_assert(HOLON_HAS_MEMBER_VAR(Model, is_model_type),
+  static_assert(is_model_type<Model>::value,
                 "Model must be derived from ModelBase class.");
   static_assert(std::is_default_constructible<Data>::value,
                 "Data must be default constructible.");

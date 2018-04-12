@@ -136,9 +136,14 @@ template <typename State, typename Solver, typename Data, typename System>
 constexpr double ModelBase<State, Solver, Data, System>::default_time_step;
 
 HOLON_GENERATE_MEMBER_VAR_CHECKER(is_model_type);
-template <typename T>
+template <typename T, typename E = void>
 struct is_model_type {
-  static constexpr bool value = HOLON_HAS_MEMBER_VAR(T, is_model_type);
+  static constexpr bool value = false;
+};
+template <typename T>
+struct is_model_type<
+    T, typename std::enable_if<HOLON_HAS_MEMBER_VAR(T, is_model_type)>::type> {
+  static constexpr bool value = T::is_model_type;
 };
 
 // non-member functions

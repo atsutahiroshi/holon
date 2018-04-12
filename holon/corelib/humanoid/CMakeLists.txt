@@ -1,5 +1,6 @@
 set(sources
   biped_ctrl.cpp
+  biped_foot_ctrl.cpp
   biped_foot_model.cpp
   biped_model.cpp
   com_ctrl.cpp
@@ -7,6 +8,7 @@ set(sources
   )
 set(test_sources
   biped_ctrl_test.cpp
+  biped_foot_ctrl_test.cpp
   biped_foot_model_test.cpp
   biped_model_test.cpp
   com_ctrl_test.cpp

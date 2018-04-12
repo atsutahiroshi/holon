@@ -47,7 +47,7 @@ template <typename State, typename Solver, typename Data,
 class ModelBase {
   static_assert(std::is_base_of<OdeSolver<Solver>, Solver>::value,
                 "Solver must be derived from OdeSolver class.");
-  static_assert(HOLON_HAS_MEMBER_VAR(Data, is_data_type),
+  static_assert(is_data_type<Data>::value,
                 "Data must be derived from DataSetBase class.");
   static_assert(std::is_base_of<SystemBase<State, Data>, System>::value,
                 "System must be derived from SystemBase class.");
@@ -136,11 +136,15 @@ template <typename State, typename Solver, typename Data, typename System>
 constexpr double ModelBase<State, Solver, Data, System>::default_time_step;
 
 HOLON_GENERATE_MEMBER_VAR_CHECKER(is_model_type);
+template <typename T>
+struct is_model_type {
+  static constexpr bool value = HOLON_HAS_MEMBER_VAR(T, is_model_type);
+};
 
 // non-member functions
 template <typename Model, typename... Args>
 Model make_model(Args&&... args) {
-  static_assert(HOLON_HAS_MEMBER_VAR(Model, is_model_type),
+  static_assert(is_model_type<Model>::value,
                 "make_model is able to make type derived from ModelBase only.");
   return Model(std::forward<Args>(args)...);
 }

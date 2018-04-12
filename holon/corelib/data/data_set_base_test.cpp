@@ -29,7 +29,7 @@
 namespace holon {
 namespace {
 
-struct RawDataSample1 {
+struct RawDataSample1 : RawDataBase {
   static constexpr double default_v = 1.0;
   double v = default_v;
   double x = 0;
@@ -47,7 +47,7 @@ class DataSetSample1 : public DataSetBase<RawDataSample1> {
       : DataSetBase<RawDataSample1>(raw_data) {}
 };
 
-struct RawDataSample2 {
+struct RawDataSample2 : RawDataBase {
   static constexpr double default_in = 0.5;
   double in = default_in;
   double out = 0;
@@ -425,19 +425,19 @@ TEST_CASE("Check extract method in DataSetBase", "[DataSetBase][extract]") {
 
 namespace sub_data_test {
 
-struct A {
+struct A : RawDataBase {
   double a;
 };
-struct B {
+struct B : RawDataBase {
   double b;
 };
-struct C {
+struct C : RawDataBase {
   double c;
 };
-struct D {
+struct D : RawDataBase {
   double d;
 };
-struct E {
+struct E : RawDataBase {
   double e;
 };
 struct Data : DataSetBase<A, B, C, D, E> {

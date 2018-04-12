@@ -192,18 +192,18 @@ TEST_CASE("Check reset in CtrlBase", "[CtrlBase][reset]") {
 
 namespace testing {
 
-struct A {
+struct A : RawDataBase {
   double a;
 };
-struct B {
+struct B : RawDataBase {
   double b;
 };
-struct C {};
-struct D {};
-struct E {};
-struct F {};
-struct G {};
-struct H {};
+struct C : RawDataBase {};
+struct D : RawDataBase {};
+struct E : RawDataBase {};
+struct F : RawDataBase {};
+struct G : RawDataBase {};
+struct H : RawDataBase {};
 struct ModelData : DataSetBase<A, B> {
   using Base = DataSetBase<A, B>;
   explicit ModelData(typename Base::RawDataPtrTuple raw_data_ptrs)

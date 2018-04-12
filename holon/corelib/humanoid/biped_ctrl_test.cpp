@@ -246,7 +246,7 @@ SCENARIO("Check sideward oscillation of body with BipedCtrl",
       ctrl.states<0>().com_velocity[1] += 0.00001;
       while (ctrl.time() < 3) {
         ctrl.update();
-        checker.update(ctrl.states<0>().zmp_position);
+        checker.update(ctrl.trunk().states().zmp_position);
       }
       THEN("The body oscillates sideways") {
         CHECK(checker.isOscillating());
@@ -259,6 +259,111 @@ SCENARIO("Check sideward oscillation of body with BipedCtrl",
     }
   }
 }
+
+SCENARIO("Check stepping behavior with BipedCtrl", "[BipedCtrl][update][.]") {
+  BipedCtrl ctrl;
+  OscillationChecker checker;
+  const double margin = 0.0001;
+  const auto touch_on = Approx(0.0).margin(margin);
+  GIVEN("Issue commands to start stepping") {
+    double dist = 0.4;
+    ctrl.reset({0, 0, 0.6}, dist);
+    auto cmd = ctrl.get_commands_handler();
+    cmd->rho = 1;
+    WHEN("Update controller until COM moves leftwards") {
+      ctrl.states<0>().com_velocity[1] += 0.00001;
+      while (ctrl.trunk().states().zmp_position.y() < 0.1) {
+        ctrl.update();
+        checker.update(ctrl.trunk().states().zmp_position);
+      }
+      THEN("Right foot lifts up") {
+        REQUIRE(checker.isOscillating());
+        CHECK(ctrl.left_foot().states().position.z() == touch_on);
+        CHECK(ctrl.right_foot().states().position.z() > margin);
+        WHEN("Update controller until COM moves rightwards") {
+          while (ctrl.trunk().states().zmp_position.y() > -0.1) {
+            ctrl.update();
+            checker.update(ctrl.trunk().states().zmp_position);
+          }
+          THEN("Left foot lifts up") {
+            REQUIRE(checker.isOscillating());
+            CHECK(ctrl.left_foot().states().position.z() > margin);
+            CHECK(ctrl.right_foot().states().position.z() == touch_on);
+            WHEN("Update controller until COM moves leftwards, again") {
+              ctrl.states<0>().com_velocity[1] += 0.00001;
+              while (ctrl.trunk().states().zmp_position.y() < 0.1) {
+                ctrl.update();
+                checker.update(ctrl.trunk().states().zmp_position);
+              }
+              THEN("Right foot lifts up") {
+                REQUIRE(checker.isOscillating());
+                CHECK(ctrl.left_foot().states().position.z() == touch_on);
+                CHECK(ctrl.right_foot().states().position.z() > margin);
+                CHECK(checker.amplitude() == Approx(dist));
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}  // SCENARIO("Check stepping behavior with BipedCtrl")
+
+SCENARIO("Check walking forward with BipedCtrl", "[BipedCtrl][update][.]") {
+  BipedCtrl ctrl;
+  OscillationChecker checker;
+  const double margin = 0.0001;
+  const auto touch_on = Approx(0.0).margin(margin);
+
+  GIVEN("Issue commands to walk forward") {
+    double dist = 0.4;
+    ctrl.reset({0, 0, 0.6}, dist);
+    auto cmd = ctrl.get_commands_handler();
+    cmd->vxd = 0.1;
+    double x = 0;
+    WHEN("Update controller until COM moves leftwards") {
+      ctrl.states<0>().com_velocity[1] += 0.00001;
+      x = ctrl.trunk().states().com_position.x();
+      while (ctrl.trunk().states().zmp_position.y() < 0.1) {
+        ctrl.update();
+        checker.update(ctrl.trunk().states().zmp_position);
+      }
+      THEN("Right foot lifts up") {
+        REQUIRE(checker.isOscillating());
+        CHECK(ctrl.trunk().states().com_position.x() > x);
+        CHECK(ctrl.left_foot().states().position.z() == touch_on);
+        CHECK(ctrl.right_foot().states().position.z() > margin);
+        WHEN("Update controller until COM moves rightwards") {
+          x = ctrl.trunk().states().com_position.x();
+          while (ctrl.trunk().states().zmp_position.y() > -0.1) {
+            ctrl.update();
+            checker.update(ctrl.trunk().states().zmp_position);
+          }
+          THEN("Left foot lifts up") {
+            REQUIRE(checker.isOscillating());
+            CHECK(ctrl.trunk().states().com_position.x() > x);
+            CHECK(ctrl.left_foot().states().position.z() > margin);
+            CHECK(ctrl.right_foot().states().position.z() == touch_on);
+            WHEN("Update controller until COM moves leftwards, again") {
+              x = ctrl.trunk().states().com_position.x();
+              while (ctrl.trunk().states().zmp_position.y() < 0.1) {
+                ctrl.update();
+                checker.update(ctrl.trunk().states().zmp_position);
+              }
+              THEN("Right foot lifts up") {
+                REQUIRE(checker.isOscillating());
+                CHECK(ctrl.trunk().states().com_position.x() > x);
+                CHECK(ctrl.left_foot().states().position.z() == touch_on);
+                CHECK(ctrl.right_foot().states().position.z() > margin);
+                CHECK(checker.amplitude() == Approx(dist));
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}  // SCENARIO("Check walking forward with BipedCtrl")
 
 }  // namespace
 }  // namespace holon

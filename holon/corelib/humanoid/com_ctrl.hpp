@@ -30,7 +30,7 @@
 
 namespace holon {
 
-struct ComCtrlCommandsRawData {
+struct ComCtrlCommandsRawData : RawDataBase {
   using opt_double = optional<double>;
 
   opt_double xd, yd, zd;
@@ -41,13 +41,14 @@ struct ComCtrlCommandsRawData {
   opt_double rho, dist, kr;
   opt_double vhp;
 
+  ComCtrlCommandsRawData() = default;
   void clear();
   void set_com_position(const Vec3D& t_com_position);
   void set_com_position(opt_double t_xd, opt_double t_yd, opt_double t_zd);
   void set_com_velocity(opt_double t_vxd, opt_double t_vyd);
 };
 
-struct ComCtrlParamsRawData {
+struct ComCtrlParamsRawData : RawDataBase {
   Vec3D com_position;
   Vec3D com_velocity;
   double qx1, qx2;
@@ -58,7 +59,7 @@ struct ComCtrlParamsRawData {
   ComCtrlParamsRawData();
 };
 
-struct ComCtrlOutputsRawData {
+struct ComCtrlOutputsRawData : RawDataBase {
   Vec3D com_position;
   Vec3D com_velocity;
   Vec3D com_acceleration;

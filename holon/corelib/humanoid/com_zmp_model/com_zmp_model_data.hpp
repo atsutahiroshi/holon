@@ -27,7 +27,7 @@
 
 namespace holon {
 
-struct ComZmpModelRawData {
+struct ComZmpModelRawData : RawDataBase {
   static const double default_mass;
   static const Vec3D default_com_position;
   double mass = default_mass;

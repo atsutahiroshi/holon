@@ -33,8 +33,10 @@
 namespace holon {
 namespace {
 
-struct TestModelRawData {
+struct TestModelRawData : RawDataBase {
   double p, v;
+  TestModelRawData() = default;
+  TestModelRawData(double t_p, double t_v) : p(t_p), v(t_v) {}
 };
 struct TestModelData : DataSetBase<TestModelRawData> {
   TestModelData() : DataSetBase(TestModelRawData{0, 0}) {}
@@ -59,11 +61,11 @@ struct TestModel : ModelBase<double, Euler<std::array<double, 2>>,
   virtual ~TestModel() = default;
 };
 
-struct TestParamsRawData {
+struct TestParamsRawData : RawDataBase {
   double pd, vd;
 };
 
-struct TestOutputsRawData {
+struct TestOutputsRawData : RawDataBase {
   double pp, vv;
 };
 

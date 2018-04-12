@@ -31,8 +31,9 @@
 namespace holon {
 namespace {
 
-struct TestRawData {
+struct TestRawData : RawDataBase {
   double p, v;
+  TestRawData(double t_p, double t_v) : p(t_p), v(t_v) {}
 };
 struct TestData : DataSetBase<TestRawData> {
   TestData() : DataSetBase(TestRawData{0, 0}) {}

@@ -27,7 +27,7 @@
 namespace holon {
 
 template <typename State>
-struct PointMassModelRawData {
+struct PointMassModelRawData : RawDataBase {
   static constexpr double default_mass = 1;
   double mass = default_mass;
   State position = State{0};

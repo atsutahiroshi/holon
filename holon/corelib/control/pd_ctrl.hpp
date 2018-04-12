@@ -32,7 +32,7 @@
 namespace holon {
 
 template <typename State>
-struct PdCtrlParamsRawData {
+struct PdCtrlParamsRawData : RawDataBase {
   State position = State{0};
   State velocity = State{0};
   State stiffness = State{0};
@@ -41,7 +41,7 @@ struct PdCtrlParamsRawData {
 };
 
 template <typename State>
-struct PdCtrlOutputsRawData {
+struct PdCtrlOutputsRawData : RawDataBase {
   State position = State{0};
   State velocity = State{0};
   State acceleration = State{0};

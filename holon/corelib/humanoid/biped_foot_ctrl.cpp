@@ -51,13 +51,11 @@ BipedFootCtrl::BipedFootCtrl(Data t_data)
 BipedFootCtrl::BipedFootCtrl(Data t_data, std::shared_ptr<Model> t_model_ptr)
     : Base(t_data, t_model_ptr), m_tracker(data(), model_ptr()) {}
 
-BipedFootCtrl& BipedFootCtrl::reset() {
-  model().reset();
-  return *this;
-}
+BipedFootCtrl& BipedFootCtrl::reset() { return reset(initial_position()); }
 BipedFootCtrl& BipedFootCtrl::reset(const Vec3D& t_position) {
-  model().set_initial_position(t_position);
-  return reset();
+  Base::reset();
+  m_tracker.reset(t_position);
+  return *this;
 }
 
 bool BipedFootCtrl::update() {

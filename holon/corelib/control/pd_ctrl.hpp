@@ -112,13 +112,11 @@ class PdCtrl : public CtrlBase<State, Solver, Data, Model> {
     this->model().reset();
     return this->resetParams();
   }
-
-  State initial_position() const { return this->model().initial_position(); }
-
   virtual Self& reset(const State& t_initial_position) {
     this->model().reset(t_initial_position);
     return this->resetParams();
   }
+  State initial_position() const { return this->model().initial_position(); }
 
   virtual bool update() override {
     if (!Base::update()) return false;

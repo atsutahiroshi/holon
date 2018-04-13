@@ -24,13 +24,9 @@
 #include <array>
 #include <functional>
 #include <memory>
-#include "holon/corelib/control/model_base.hpp"
-#include "holon/corelib/control/point_mass_model.hpp"
-#include "holon/corelib/control/point_mass_model/point_mass_model_data.hpp"
-#include "holon/corelib/control/system_base.hpp"
 #include "holon/corelib/data/data_set_base.hpp"
+#include "holon/corelib/humanoid/biped_foot_model.hpp"
 #include "holon/corelib/humanoid/com_zmp_model.hpp"
-#include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_data.hpp"
 #include "holon/corelib/math/ode_runge_kutta4.hpp"
 #include "holon/corelib/math/vec3d.hpp"
 
@@ -45,7 +41,7 @@ class BipedModelData
   using TrunkRawData = ComZmpModelRawData;
   using FootRawData = PointMassModelRawData<Vec3D>;
   using TrunkModelData = ComZmpModelData;
-  using FootModelData = PointMassModelData<Vec3D>;
+  using FootModelData = BipedFootModelData;
 
  public:
   using TrunkDataIndex = index_seq<0>;
@@ -81,18 +77,18 @@ class BipedModelData
 
 class BipedModel : public ModelBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
                                     BipedModelData> {
-  using Self = BipedModel;
-  using Solver = RungeKutta4<std::array<Vec3D, 2>>;
-  using Base = ModelBase<Vec3D, Solver, BipedModelData>;
-
  public:
+  using Self = BipedModel;
   using Data = BipedModelData;
+  using Solver = RungeKutta4<std::array<Vec3D, 2>>;
+  using Base = ModelBase<Vec3D, Solver, Data>;
+
   using TrunkModel = ComZmpModel;
-  using FootModel = PointMassModel<Vec3D>;
-  using TrunkModelPtr = std::shared_ptr<ComZmpModel>;
-  using FootModelPtr = std::shared_ptr<PointMassModel<Vec3D>>;
+  using FootModel = BipedFootModel;
+  using TrunkModelPtr = std::shared_ptr<TrunkModel>;
+  using FootModelPtr = std::shared_ptr<FootModel>;
   using TrunkModelData = ComZmpModelData;
-  using FootModelData = PointMassModelData<Vec3D>;
+  using FootModelData = BipedFootModelData;
 
  public:
   BipedModel();

@@ -23,6 +23,7 @@
 
 #include "holon/corelib/control/pd_ctrl.hpp"
 #include "holon/corelib/data/data_set_base.hpp"
+#include "holon/corelib/humanoid/biped_foot_ctrl.hpp"
 #include "holon/corelib/humanoid/biped_model.hpp"
 #include "holon/corelib/humanoid/com_ctrl.hpp"
 
@@ -33,38 +34,41 @@ class BipedCtrlData : public DataSetBase<
                           ComZmpModelRawData, PointMassModelRawData<Vec3D>,
                           PointMassModelRawData<Vec3D>,
                           // params raw data
-                          ComCtrlParamsRawData, PdCtrlParamsRawData<Vec3D>,
-                          PdCtrlParamsRawData<Vec3D>,
+                          ComCtrlParamsRawData, BipedFootCtrlParamsRawData,
+                          BipedFootCtrlParamsRawData,
                           // outputs raw data
-                          ComCtrlOutputsRawData, PdCtrlOutputsRawData<Vec3D>,
-                          PdCtrlOutputsRawData<Vec3D>,
+                          ComCtrlOutputsRawData, BipedFootCtrlOutputsRawData,
+                          BipedFootCtrlOutputsRawData,
                           // commands raw data
-                          ComCtrlCommandsRawData> {
+                          ComCtrlCommandsRawData, BipedFootCtrlCommandsRawData,
+                          BipedFootCtrlCommandsRawData> {
   HOLON_DEFINE_DEFAULT_DATA_CTOR(BipedCtrlData);
 
  public:
   using ModelDataIndex = index_seq<0, 1, 2>;
   using ParamsDataIndex = index_seq<3, 4, 5>;
   using OutputsDataIndex = index_seq<6, 7, 8>;
-  using CommandsDataIndex = index_seq<9>;
+  using CommandsDataIndex = index_seq<9, 10, 11>;
   using TrunkDataIndex = index_seq<0, 3, 6, 9>;
-  using LeftFootDataIndex = index_seq<1, 4, 7>;
-  using RightFootDataIndex = index_seq<2, 5, 8>;
+  using LeftFootDataIndex = index_seq<1, 4, 7, 10>;
+  using RightFootDataIndex = index_seq<2, 5, 8, 11>;
 };
 
 class BipedCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
                                   BipedCtrlData, BipedModel> {
-  using Self = BipedCtrl;
-  using Solver = RungeKutta4<std::array<Vec3D, 2>>;
-  using Base = CtrlBase<Vec3D, Solver, BipedCtrlData, BipedModel>;
-
  public:
+  using Self = BipedCtrl;
   using Model = BipedModel;
   using Data = BipedCtrlData;
+  using Solver = RungeKutta4<std::array<Vec3D, 2>>;
+  using Base = CtrlBase<Vec3D, Solver, Data, Model>;
+
   using TrunkCtrlData = ComCtrlData;
-  using FootCtrlData = PdCtrlData<Vec3D>;
+  // using FootCtrlData = PdCtrlData<Vec3D>;
+  using FootCtrlData = BipedFootCtrlData;
   using TrunkCtrl = ComCtrl;
-  using FootCtrl = PdCtrl<Vec3D>;
+  // using FootCtrl = PdCtrlData<Vec3D>;
+  using FootCtrl = BipedFootCtrl;
 
  public:
   BipedCtrl();

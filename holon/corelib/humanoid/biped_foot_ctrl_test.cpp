@@ -93,6 +93,8 @@ void CheckData(const BipedFootModelData& data1,
 }
 void CheckCtor_common(const BipedFootCtrl& ctrl) {
   REQUIRE(ctrl.model().data().get_ptr<0>() == ctrl.data().get_ptr<0>());
+  REQUIRE(ctrl.data() == ctrl.tracker().data());
+  REQUIRE(ctrl.model_ptr() == ctrl.tracker().model_ptr());
 }
 void CheckCtor_0() {
   BipedFootCtrl ctrl;

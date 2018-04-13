@@ -43,11 +43,13 @@ BipedFootCtrlData::BipedFootCtrlData(const Vec3D& t_initial_position)
   get<1>().velocity = get<0>().velocity;
 }
 
-BipedFootCtrl::BipedFootCtrl() {}
-BipedFootCtrl::BipedFootCtrl(const Model& t_model) : Base(t_model) {}
-BipedFootCtrl::BipedFootCtrl(Data t_data) : Base(t_data) {}
+BipedFootCtrl::BipedFootCtrl() : BipedFootCtrl(make_data<Data>()) {}
+BipedFootCtrl::BipedFootCtrl(const Model& t_model)
+    : Base(t_model), m_tracker(data(), model_ptr()) {}
+BipedFootCtrl::BipedFootCtrl(Data t_data)
+    : Base(t_data), m_tracker(data(), model_ptr()) {}
 BipedFootCtrl::BipedFootCtrl(Data t_data, std::shared_ptr<Model> t_model_ptr)
-    : Base(t_data, t_model_ptr) {}
+    : Base(t_data, t_model_ptr), m_tracker(data(), model_ptr()) {}
 
 BipedFootCtrl& BipedFootCtrl::reset() {
   model().reset();

@@ -69,12 +69,13 @@ class BipedFootCtrlData
 class BipedFootCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
                                       BipedFootCtrlData, BipedFootModel> {
   using Self = BipedFootCtrl;
-  using Base = CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
-                        BipedFootCtrlData, BipedFootModel>;
 
  public:
+  using Solver = RungeKutta4<std::array<Vec3D, 2>>;
   using Model = BipedFootModel;
   using Data = BipedFootCtrlData;
+  using Base = CtrlBase<Vec3D, Solver, Data, Model>;
+  using Tracker = PdCtrl<Vec3D, Solver, BipedFootCtrlData, BipedFootModel>;
 
  public:
   BipedFootCtrl();
@@ -83,12 +84,18 @@ class BipedFootCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
   BipedFootCtrl(Data t_data, std::shared_ptr<Model> t_model_ptr);
   virtual ~BipedFootCtrl() = default;
 
+  // accessors
+  const Tracker tracker() const { return m_tracker; }
+
   virtual Self& reset() override;
   virtual Self& reset(const Vec3D& t_position);
   const Vec3D& initial_position() const { return model().initial_position(); }
 
   virtual bool update() override;
   virtual bool update(double t_time_step) override;
+
+ private:
+  Tracker m_tracker;
 };
 
 }  // namespace holon

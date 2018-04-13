@@ -53,7 +53,7 @@ class PointMassModel : public ModelBase<State, Solver, Data, System> {
 
   // accessors
   double mass() const noexcept { return this->states().mass; }
-  State initial_position() const noexcept { return m_initial_position; }
+  const State& initial_position() const noexcept { return m_initial_position; }
 
   // mutators
   Self& set_initial_position(const State& t_initial_position) {
@@ -64,6 +64,8 @@ class PointMassModel : public ModelBase<State, Solver, Data, System> {
     Base::reset();
     this->states().position = m_initial_position;
     this->states().velocity = State{0};
+    this->states().acceleration = State{0};
+    this->states().force = State{0};
     return *this;
   }
   virtual Self& reset(const State& t_initial_position) {

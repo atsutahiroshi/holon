@@ -66,8 +66,30 @@ class BipedFootCtrlData
   BipedFootCtrlData(const Vec3D& t_initial_position);
 };
 
-class BipedFootCtrl : CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
-                               BipedFootCtrlData, BipedFootModel> {};
+class BipedFootCtrl : public CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
+                                      BipedFootCtrlData, BipedFootModel> {
+  using Self = BipedFootCtrl;
+  using Base = CtrlBase<Vec3D, RungeKutta4<std::array<Vec3D, 2>>,
+                        BipedFootCtrlData, BipedFootModel>;
+
+ public:
+  using Model = BipedFootModel;
+  using Data = BipedFootCtrlData;
+
+ public:
+  BipedFootCtrl();
+  explicit BipedFootCtrl(const Model& t_model);
+  explicit BipedFootCtrl(Data t_data);
+  BipedFootCtrl(Data t_data, std::shared_ptr<Model> t_model_ptr);
+  virtual ~BipedFootCtrl() = default;
+
+  virtual Self& reset() override;
+  virtual Self& reset(const Vec3D& t_position);
+  const Vec3D& initial_position() const { return model().initial_position(); }
+
+  virtual bool update() override;
+  virtual bool update(double t_time_step) override;
+};
 
 }  // namespace holon
 

@@ -20,6 +20,8 @@
 
 #include "holon/corelib/humanoid/biped_foot_ctrl.hpp"
 
+#include <memory>
+
 namespace holon {
 
 const double BipedFootCtrlParamsRawData::default_max_height = 0;
@@ -39,6 +41,31 @@ BipedFootCtrlData::BipedFootCtrlData(const Vec3D& t_initial_position)
           alloc_raw_data<BipedFootCtrlCommandsRawData>()) {
   get<1>().position = get<0>().position;
   get<1>().velocity = get<0>().velocity;
+}
+
+BipedFootCtrl::BipedFootCtrl() {}
+BipedFootCtrl::BipedFootCtrl(const Model& t_model) : Base(t_model) {}
+BipedFootCtrl::BipedFootCtrl(Data t_data) : Base(t_data) {}
+BipedFootCtrl::BipedFootCtrl(Data t_data, std::shared_ptr<Model> t_model_ptr)
+    : Base(t_data, t_model_ptr) {}
+
+BipedFootCtrl& BipedFootCtrl::reset() {
+  model().reset();
+  return *this;
+}
+BipedFootCtrl& BipedFootCtrl::reset(const Vec3D& t_position) {
+  model().set_initial_position(t_position);
+  return reset();
+}
+
+bool BipedFootCtrl::update() {
+  if (!Base::update()) return false;
+  return true;
+}
+bool BipedFootCtrl::update(double t_time_step) {
+  set_time_step(t_time_step);
+  return update();
+  return true;
 }
 
 }  // namespace holon

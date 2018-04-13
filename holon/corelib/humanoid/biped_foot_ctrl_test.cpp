@@ -20,6 +20,7 @@
 
 #include "holon/corelib/humanoid/biped_foot_ctrl.hpp"
 
+#include <memory>
 #include <type_traits>
 
 #include "catch.hpp"
@@ -75,6 +76,122 @@ TEST_CASE("Check c'tors @BipedFootCtrlData", "[BipedFootCtrlData][ctor]") {
 }
 
 }  // namespace data
+
+void RandomizeModelData(BipedFootModel* model) {
+  Fuzzer fuzz;
+  model->states().position = fuzz.get<Vec3D>();
+  model->states().velocity = fuzz.get<Vec3D>();
+  model->states().acceleration = fuzz.get<Vec3D>();
+  model->states().force = fuzz.get<Vec3D>();
+}
+void CheckData(const BipedFootModelData& data1,
+               const BipedFootModelData& data2) {
+  CHECK(data1.get().position == data2.get().position);
+  CHECK(data1.get().velocity == data2.get().velocity);
+  CHECK(data1.get().acceleration == data2.get().acceleration);
+  CHECK(data1.get().force == data2.get().force);
+}
+void CheckCtor_common(const BipedFootCtrl& ctrl) {
+  REQUIRE(ctrl.model().data().get_ptr<0>() == ctrl.data().get_ptr<0>());
+}
+void CheckCtor_0() {
+  BipedFootCtrl ctrl;
+  CheckCtor_common(ctrl);
+}
+void CheckCtor_1() {
+  auto model = make_model<BipedFootModel>();
+  RandomizeModelData(&model);
+  BipedFootCtrl ctrl(model);
+  CheckCtor_common(ctrl);
+  CHECK(ctrl.data().get_ptr<0>() != model.data().get_ptr<0>());
+  CheckData(ctrl.model().data(), model.data());
+}
+void CheckCtor_2() {
+  auto data = make_data<BipedFootCtrlData>();
+  BipedFootCtrl ctrl(data);
+  CheckCtor_common(ctrl);
+  CHECK(ctrl.data() == data);
+}
+void CheckCtor_3() {
+  auto data = make_data<BipedFootCtrlData>();
+  auto model_ptr = std::make_shared<BipedFootModel>();
+  BipedFootCtrl ctrl(data, model_ptr);
+  CheckCtor_common(ctrl);
+  CHECK(ctrl.data() == data);
+  CHECK(&ctrl.model() == model_ptr.get());
+  CHECK(ctrl.data().get_ptr<0>() == model_ptr->data().get_ptr<0>());
+}
+TEST_CASE("Check c'tors @BipedFootCtrl") {
+  SECTION("Default c'tor") { CheckCtor_0(); }
+  SECTION("Overloaded c'tor 1") { CheckCtor_1(); }
+  SECTION("Overloaded c'tor 2") { CheckCtor_2(); }
+  SECTION("Overloaded c'tor 3") { CheckCtor_3(); }
+}
+
+void CheckReset_common(const BipedFootCtrl& ctrl,
+                       const BipedFootCtrlData& expected_data) {
+  CHECK(ctrl.time() == 0.0);
+  // model
+  CAPTURE(ctrl.data().get<0>().position);
+  CHECK(ctrl.data().get<0>().position == expected_data.get<0>().position);
+  CHECK(ctrl.data().get<0>().velocity == expected_data.get<0>().velocity);
+  CHECK(ctrl.data().get<0>().acceleration ==
+        expected_data.get<0>().acceleration);
+  CHECK(ctrl.data().get<0>().force == expected_data.get<0>().force);
+  CHECK(ctrl.initial_position() == expected_data.get<0>().position);
+}
+void CheckReset_1() {
+  BipedFootCtrl ctrl;
+  ctrl.update();
+  RandomizeModelData(&ctrl.model());
+  REQUIRE(ctrl.time() != 0.0);
+  ctrl.reset();
+  CheckReset_common(ctrl, BipedFootCtrlData(kVec3DZero));
+}
+void CheckReset_2() {
+  BipedFootCtrl ctrl;
+  ctrl.update();
+  RandomizeModelData(&ctrl.model());
+  REQUIRE(ctrl.time() != 0.0);
+  auto p0 = Fuzzer().get<Vec3D>();
+  ctrl.reset(p0);
+  CheckReset_common(ctrl, BipedFootCtrlData(p0));
+}
+TEST_CASE("Check reset @BipedFootCtrl") {
+  SECTION("Overloaded function 1") { CheckReset_1(); }
+  SECTION("Overloaded function 2") { CheckReset_2(); }
+}
+
+void CheckTimeUpdate_common(const BipedFootCtrl& ctrl, double t, double dt) {
+  CAPTURE(t);
+  CAPTURE(dt);
+  CHECK(ctrl.time() == Approx(t));
+  CHECK(ctrl.time_step() == Approx(dt));
+}
+void CheckTimeUpdate_1() {
+  BipedFootCtrl ctrl;
+  auto dt = BipedFootModel::default_time_step;
+  CheckTimeUpdate_common(ctrl, 0, dt);
+  ctrl.update();
+  CheckTimeUpdate_common(ctrl, dt, dt);
+  ctrl.update();
+  CheckTimeUpdate_common(ctrl, 2 * dt, dt);
+}
+void CheckTimeUpdate_2() {
+  Fuzzer fuzz(0, 0.01);
+  BipedFootCtrl ctrl;
+  CheckTimeUpdate_common(ctrl, 0, BipedFootModel::default_time_step);
+  auto dt1 = fuzz();
+  ctrl.update(dt1);
+  CheckTimeUpdate_common(ctrl, dt1, dt1);
+  auto dt2 = fuzz();
+  ctrl.update(dt2);
+  CheckTimeUpdate_common(ctrl, dt1 + dt2, dt2);
+}
+TEST_CASE("Check time update @BipedFootCtrl", "[BipedFootCtrl][update]") {
+  SECTION("Overloaded function 1") { CheckTimeUpdate_1(); }
+  SECTION("Overloaded function 2") { CheckTimeUpdate_2(); }
+}
 
 }  // namespace
 }  // namespace holon

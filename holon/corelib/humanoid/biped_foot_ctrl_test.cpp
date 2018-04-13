@@ -193,5 +193,28 @@ TEST_CASE("Check time update @BipedFootCtrl", "[BipedFootCtrl][update]") {
   SECTION("Overloaded function 2") { CheckTimeUpdate_2(); }
 }
 
+SCENARIO("Check positional tracking @BipedFootCtrl",
+         "[BipedFootCtrl][update][.]") {
+  Vec3D p0{0, 1, 0};
+  BipedFootModel model;
+  model.reset(p0);
+  BipedFootCtrl ctrl(model);
+  REQUIRE(ctrl.states().position == p0);
+
+  GIVEN("Assumes to lift up foot") {
+    Vec3D pd{0, 1, 1};
+    ctrl.params().position = pd;
+    WHEN("Update controller for 5 sec") {
+      while (ctrl.time() < 3) {
+        ctrl.update();
+      }
+      THEN("Foot reaches the desired position") {
+        CAPTURE(ctrl.states().position);
+        CHECK(ctrl.states().position == pd);
+      }
+    }
+  }
+}
+
 }  // namespace
 }  // namespace holon

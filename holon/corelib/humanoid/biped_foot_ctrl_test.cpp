@@ -165,10 +165,11 @@ TEST_CASE("Check reset @BipedFootCtrl") {
 }
 
 void CheckTimeUpdate_common(const BipedFootCtrl& ctrl, double t, double dt) {
-  CAPTURE(t);
-  CAPTURE(dt);
   CHECK(ctrl.time() == Approx(t));
   CHECK(ctrl.time_step() == Approx(dt));
+
+  CHECK(ctrl.tracker().time() == Approx(t));
+  CHECK(ctrl.tracker().time_step() == Approx(dt));
 }
 void CheckTimeUpdate_1() {
   BipedFootCtrl ctrl;
@@ -196,7 +197,7 @@ TEST_CASE("Check time update @BipedFootCtrl", "[BipedFootCtrl][update]") {
 }
 
 SCENARIO("Check positional tracking @BipedFootCtrl",
-         "[BipedFootCtrl][update][.]") {
+         "[BipedFootCtrl][update]") {
   Vec3D p0{0, 1, 0};
   BipedFootModel model;
   model.reset(p0);

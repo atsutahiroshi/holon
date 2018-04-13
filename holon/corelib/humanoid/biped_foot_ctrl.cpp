@@ -45,27 +45,23 @@ BipedFootCtrlData::BipedFootCtrlData(const Vec3D& t_initial_position)
 
 BipedFootCtrl::BipedFootCtrl() : BipedFootCtrl(make_data<Data>()) {}
 BipedFootCtrl::BipedFootCtrl(const Model& t_model)
-    : Base(t_model), m_tracker(data(), model_ptr()) {}
+    : CtrlBase(t_model), m_tracker(data(), model_ptr()) {}
 BipedFootCtrl::BipedFootCtrl(Data t_data)
-    : Base(t_data), m_tracker(data(), model_ptr()) {}
+    : CtrlBase(t_data), m_tracker(data(), model_ptr()) {}
 BipedFootCtrl::BipedFootCtrl(Data t_data, std::shared_ptr<Model> t_model_ptr)
-    : Base(t_data, t_model_ptr), m_tracker(data(), model_ptr()) {}
+    : CtrlBase(t_data, t_model_ptr), m_tracker(data(), model_ptr()) {}
 
 BipedFootCtrl& BipedFootCtrl::reset() { return reset(initial_position()); }
 BipedFootCtrl& BipedFootCtrl::reset(const Vec3D& t_position) {
-  Base::reset();
+  CtrlBase::reset();
   m_tracker.reset(t_position);
   return *this;
 }
 
-bool BipedFootCtrl::update() {
-  if (!Base::update()) return false;
-  return true;
-}
+bool BipedFootCtrl::update() { return m_tracker.update(); }
 bool BipedFootCtrl::update(double t_time_step) {
-  set_time_step(t_time_step);
+  m_tracker.set_time_step(t_time_step);
   return update();
-  return true;
 }
 
 }  // namespace holon

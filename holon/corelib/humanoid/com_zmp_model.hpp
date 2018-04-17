@@ -22,7 +22,7 @@
 #define HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
 
 #include <array>
-#include "holon/corelib/common/optional.hpp"
+#include "holon/corelib/common/types.hpp"
 #include "holon/corelib/control/model_base.hpp"
 #include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_data.hpp"
 #include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_system.hpp"

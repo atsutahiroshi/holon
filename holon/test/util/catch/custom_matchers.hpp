@@ -22,7 +22,7 @@
 #define HOLON_TEST_UTIL_CATCH_CUSTOM_MATCHERS_HPP_
 
 #include <zeo/zeo_vec3d.h>
-#include "holon/corelib/common/optional.hpp"
+#include "holon/corelib/common/types.hpp"
 #include "holon/corelib/math/vec3d.hpp"
 
 #include <sstream>

@@ -22,7 +22,7 @@
 #define HOLON_HUMANOID_COM_CTRL_HPP_
 
 #include <memory>
-#include "holon/corelib/common/optional.hpp"
+#include "holon/corelib/common/types.hpp"
 #include "holon/corelib/control/ctrl_base.hpp"
 #include "holon/corelib/data/data_set_base.hpp"
 #include "holon/corelib/humanoid/com_zmp_model.hpp"

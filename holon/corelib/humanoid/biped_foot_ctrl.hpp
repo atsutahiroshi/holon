@@ -1,3 +1,4 @@
+
 /* biped_foot_ctrl - Bipedal foot control
  *
  * Copyright (c) 2018 Hiroshi Atsuta <atsuta.hiroshi@gmail.com>
@@ -21,7 +22,7 @@
 #ifndef HOLON_HUMANOID_BIPED_FOOT_CTRL_HPP_
 #define HOLON_HUMANOID_BIPED_FOOT_CTRL_HPP_
 
-#include "holon/corelib/common/optional.hpp"
+#include "holon/corelib/common/types.hpp"
 #include "holon/corelib/control/pd_ctrl.hpp"
 #include "holon/corelib/data/data_set_base.hpp"
 #include "holon/corelib/humanoid/biped_foot_model.hpp"

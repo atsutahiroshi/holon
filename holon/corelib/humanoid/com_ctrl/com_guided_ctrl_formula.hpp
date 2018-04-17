@@ -23,6 +23,7 @@
 
 #include <array>
 #include <complex>
+#include "holon/corelib/common/types.hpp"
 #include "holon/corelib/math/vec3d.hpp"
 
 namespace holon {
@@ -32,14 +33,6 @@ struct ComCtrlParamsRawData;
 enum struct BipedFootType;
 
 namespace com_guided_ctrl_formula {
-
-template <typename T>
-using Array2 = std::array<T, 2>;
-template <typename T>
-using Array3 = std::array<T, 3>;
-using Array2d = Array2<double>;
-using Array3d = Array3<double>;
-using Complex = std::complex<double>;
 
 // computations of desired ZMP position
 double desired_zmp_position_x(double t_x, double t_v, double t_xd, double t_vd,

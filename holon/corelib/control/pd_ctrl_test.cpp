@@ -79,6 +79,7 @@ void CheckCtor_1() {
   CHECK(ctrl.states().position == model.states().position);
   CHECK(ctrl.model().initial_position() == model.states().position);
   CHECK(ctrl.states().velocity == model.states().velocity);
+  CHECK(ctrl.params().mass == model.states().mass);
   CHECK(ctrl.params().position == model.states().position);
   CHECK(ctrl.params().velocity == model.states().velocity);
   CHECK(ctrl.model().system().is_set_force());
@@ -99,6 +100,7 @@ void CheckCtor_2() {
   CHECK(ctrl.states().position == data.template get<0>().position);
   CHECK(ctrl.model().initial_position() == data.template get<0>().position);
   CHECK(ctrl.states().velocity == data.template get<0>().velocity);
+  CHECK(ctrl.params().mass == data.template get<0>().mass);
   CHECK(ctrl.params().position == data.template get<0>().position);
   CHECK(ctrl.params().velocity == data.template get<0>().velocity);
   CHECK(ctrl.model().system().is_set_force());
@@ -123,6 +125,7 @@ void CheckCtor_3() {
   CHECK(ctrl.states().position == data.template get<0>().position);
   CHECK(ctrl.model().initial_position() == data.template get<0>().position);
   CHECK(ctrl.states().velocity == data.template get<0>().velocity);
+  CHECK(ctrl.params().mass == data.template get<0>().mass);
   CHECK(ctrl.params().position == data.template get<0>().position);
   CHECK(ctrl.params().velocity == data.template get<0>().velocity);
   CHECK(ctrl.model().system().is_set_force());

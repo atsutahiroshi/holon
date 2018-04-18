@@ -33,6 +33,7 @@ namespace holon {
 
 template <typename State>
 struct PdCtrlParamsRawData : RawDataBase {
+  double mass = 1.0;
   State position = State{0};
   State velocity = State{0};
   State stiffness = State{0};
@@ -135,6 +136,7 @@ class PdCtrl : public CtrlBase<State, Solver, Data, Model> {
     this->model().setForceCallback(getForceFunction());
   }
   Self& resetParams() {
+    this->params().mass = this->states().mass;
     this->params().position = this->states().position;
     this->params().velocity = this->states().velocity;
     return *this;

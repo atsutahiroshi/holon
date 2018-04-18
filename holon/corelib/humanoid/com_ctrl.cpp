@@ -75,8 +75,14 @@ void ComCtrlCommandsRawData::set_com_velocity(optional<double> t_vxd,
 }
 
 ComCtrlParamsRawData::ComCtrlParamsRawData()
-    : com_position(ComZmpModelRawData::default_com_position),
+    : ComCtrlParamsRawData(ComZmpModelRawData::default_com_position,
+                           ComZmpModelRawData::default_mass) {}
+
+ComCtrlParamsRawData::ComCtrlParamsRawData(const Vec3D& t_com_position,
+                                           double t_mass)
+    : com_position(t_com_position),
       com_velocity(kVec3DZero),
+      mass(t_mass),
       qx1(ctrl_x::default_q1),
       qx2(ctrl_x::default_q2),
       qy1(ctrl_y::default_q1),
@@ -97,7 +103,7 @@ ComCtrlOutputsRawData::ComCtrlOutputsRawData()
 
 ComCtrlData::ComCtrlData(const Vec3D& t_com_position, double t_mass)
     : DataSetBase(alloc_raw_data<ComZmpModelRawData>(t_mass, t_com_position),
-                  alloc_raw_data<ComCtrlParamsRawData>(),
+                  alloc_raw_data<ComCtrlParamsRawData>(t_com_position, t_mass),
                   alloc_raw_data<ComCtrlOutputsRawData>(),
                   alloc_raw_data<ComCtrlCommandsRawData>()) {}
 
@@ -117,6 +123,7 @@ ComCtrl::ComCtrl(Data t_data, std::shared_ptr<Model> t_model_ptr)
 }
 
 void ComCtrl::init() {
+  params().mass = model().mass();
   model().set_initial_com_position(states().com_position);
   m_default_com_position = model().initial_com_position();
   model().setReactionForceCallback(getReactionForceCallback());

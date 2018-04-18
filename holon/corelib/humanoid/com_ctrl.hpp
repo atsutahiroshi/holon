@@ -51,12 +51,14 @@ struct ComCtrlCommandsRawData : RawDataBase {
 struct ComCtrlParamsRawData : RawDataBase {
   Vec3D com_position;
   Vec3D com_velocity;
+  double mass;
   double qx1, qx2;
   double qy1, qy2;
   double qz1, qz2;
   double rho, dist, kr;
   double vhp;
   ComCtrlParamsRawData();
+  ComCtrlParamsRawData(const Vec3D& t_com_position, double t_mass);
 };
 
 struct ComCtrlOutputsRawData : RawDataBase {

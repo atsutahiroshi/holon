@@ -90,6 +90,7 @@ TEST_CASE("Check c'tor of ComCtrlData", "[ComCtrlData]") {
     CHECK(data.get<i>().com_position ==
           ComZmpModelRawData::default_com_position);
     CHECK(data.get<i>().com_velocity == kVec3DZero);
+    CHECK(data.get<i>().mass == data.get<0>().mass);
     CHECK(data.get<i>().qx1 == ctrl_x::default_q1);
     CHECK(data.get<i>().qx2 == ctrl_x::default_q2);
     CHECK(data.get<i>().qy1 == ctrl_y::default_q1);
@@ -114,7 +115,9 @@ void CheckCtor_0() {
 void CheckCtor_1() {
   auto model = make_model<ComCtrl::Model>();
   Fuzzer fuzz;
+  double mass = fuzz();
   Vec3D p = fuzz.get<Vec3D>(), v = fuzz.get<Vec3D>();
+  model.states().mass = mass;
   model.states().com_position = p;
   model.states().com_velocity = v;
 
@@ -128,6 +131,7 @@ void CheckCtor_1() {
   CHECK(ctrl.model().initial_com_position() == p);
   CHECK(ctrl.states().com_position == p);
   CHECK(ctrl.states().com_velocity == v);
+  CHECK(ctrl.params().mass == mass);
 
   p = fuzz.get<Vec3D>();
   v = fuzz.get<Vec3D>();

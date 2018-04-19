@@ -32,6 +32,14 @@ extern const Vec3D kVec3DX;
 extern const Vec3D kVec3DY;
 extern const Vec3D kVec3DZ;
 
+namespace index_symbols {
+
+constexpr std::size_t _X = 0;
+constexpr std::size_t _Y = 1;
+constexpr std::size_t _Z = 2;
+
+}  // namespace symbols
+
 }  // namespace holon
 
 #endif  // HOLON_MATH_VEC3D_HPP_

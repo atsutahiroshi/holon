@@ -22,9 +22,6 @@
 
 #include <roki/rk_g.h>
 #include <memory>
-#include "holon/corelib/humanoid/com_ctrl/com_ctrl_x.hpp"
-#include "holon/corelib/humanoid/com_ctrl/com_ctrl_y.hpp"
-#include "holon/corelib/humanoid/com_ctrl/com_ctrl_z.hpp"
 
 #include "catch.hpp"
 #include "holon/test/util/catch/custom_matchers.hpp"
@@ -34,10 +31,6 @@ namespace holon {
 namespace {
 
 using Catch::Matchers::Equals;
-
-namespace ctrl_x = com_ctrl_x;
-namespace ctrl_y = com_ctrl_y;
-namespace ctrl_z = com_ctrl_z;
 
 const double G = RK_G;
 

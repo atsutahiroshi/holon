@@ -1,20 +1,12 @@
 set(sources
-  com_ctrl_x.cpp
-  com_ctrl_y.cpp
-  com_ctrl_z.cpp
   com_guided_ctrl_formula.cpp
-  phase_y.cpp
   )
 set(test_sources
-  com_ctrl_x_test.cpp
-  com_ctrl_y_test.cpp
-  com_ctrl_z_test.cpp
   com_guided_ctrl_formula_test.cpp
   com_guided_ctrl_formula_x_test.cpp
   com_guided_ctrl_formula_y_test.cpp
   com_guided_ctrl_formula_z_test.cpp
   com_guided_ctrl_formula_phase_test.cpp
-  phase_y_test.cpp
   )
 
 holon_add_corelib_module_source(humanoid

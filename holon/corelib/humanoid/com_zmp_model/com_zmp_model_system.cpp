@@ -26,14 +26,7 @@
 
 namespace holon {
 
-using com_zmp_model_formula::computeSqrZeta;
-using com_zmp_model_formula::computeZeta;
-using com_zmp_model_formula::computeReactForce;
-using com_zmp_model_formula::computeComAcc;
-using com_zmp_model_formula::isMassValid;
-using com_zmp_model_formula::isComZmpDiffValid;
-using com_zmp_model_formula::isReactionForceValid;
-using com_zmp_model_formula::isComAccelerationValid;
+namespace cz = com_zmp_model_formula;
 
 ComZmpModelSystem::ComZmpModelSystem(Data t_data)
     : SystemBase(t_data),
@@ -59,15 +52,15 @@ ComZmpModelSystem::Function ComZmpModelSystem::getDefaultComAccFunc() const {
 ComZmpModelSystem::Function ComZmpModelSystem::getComAccFuncWithReactForce()
     const {
   return [this](const Vec3D& p, const Vec3D& v, const double t) {
-    return computeComAcc(m_reaction_force_f(p, v, t), data().get().mass,
-                         m_external_force_f(p, v, t));
+    return cz::computeComAcc(m_reaction_force_f(p, v, t), data().get().mass,
+                             m_external_force_f(p, v, t));
   };
 }
 ComZmpModelSystem::Function ComZmpModelSystem::getComAccFuncWithZmpPos() const {
   return [this](const Vec3D& p, const Vec3D& v, const double t) {
-    return computeComAcc(p, m_zmp_position_f(p, v, t),
-                         m_reaction_force_f(p, v, t), data().get().mass,
-                         m_external_force_f(p, v, t));
+    return cz::computeComAcc(p, m_zmp_position_f(p, v, t),
+                             m_reaction_force_f(p, v, t), data().get().mass,
+                             m_external_force_f(p, v, t));
   };
 }
 

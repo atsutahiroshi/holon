@@ -32,10 +32,7 @@ namespace holon {
 namespace {
 
 using Catch::Matchers::Equals;
-using com_zmp_model_formula::computeSqrZeta;
-using com_zmp_model_formula::computeZeta;
-using com_zmp_model_formula::computeReactForce;
-using com_zmp_model_formula::computeComAcc;
+namespace cz = com_zmp_model_formula;
 
 const double G = RK_G;
 
@@ -405,8 +402,8 @@ TEST_CASE("ComZmpModel::update computes COM acceleration",
     } testcases[] = {{{0, 0, 1}, {0, 0, 0}, {1, 0, 0}},
                      {{0, 0.1, 1}, {0.1, -0.1, 0}, {0.2, 0.1, 0}}};
     for (auto& c : testcases) {
-      Vec3D f = computeReactForce(c.com_pos, c.zmp_pos, model.mass() * G);
-      Vec3D expected_com_acc = computeComAcc(f, model.mass());
+      Vec3D f = cz::computeReactForce(c.com_pos, c.zmp_pos, model.mass() * G);
+      Vec3D expected_com_acc = cz::computeComAcc(f, model.mass());
 
       model.states().com_position = c.com_pos;
       model.states().com_velocity = c.com_vel;

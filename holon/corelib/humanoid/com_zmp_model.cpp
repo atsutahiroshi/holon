@@ -25,12 +25,7 @@
 
 namespace holon {
 
-using com_zmp_model_formula::computeSqrZeta;
-using com_zmp_model_formula::computeZeta;
-using com_zmp_model_formula::computeReactForce;
-using com_zmp_model_formula::isMassValid;
-using com_zmp_model_formula::isComZmpDiffValid;
-using com_zmp_model_formula::isReactionForceValid;
+namespace cz = com_zmp_model_formula;
 
 ComZmpModel::ComZmpModel()
     : ComZmpModel(RawData::default_com_position, RawData::default_mass) {}
@@ -39,8 +34,9 @@ ComZmpModel::ComZmpModel(const Vec3D& t_com_position)
     : ComZmpModel(t_com_position, RawData::default_mass) {}
 
 ComZmpModel::ComZmpModel(const Vec3D& t_com_position, double t_mass)
-    : ComZmpModel(isMassValid(t_mass) ? make_data<Data>(t_com_position, t_mass)
-                                      : make_data<Data>(t_com_position)) {}
+    : ComZmpModel(cz::isMassValid(t_mass)
+                      ? make_data<Data>(t_com_position, t_mass)
+                      : make_data<Data>(t_com_position)) {}
 
 ComZmpModel::ComZmpModel(Data t_data)
     : ModelBase(t_data), m_initial_com_position(this->states().com_position) {}
@@ -126,13 +122,13 @@ ComZmpModel& ComZmpModel::removeExternalForce() {
 }
 
 bool ComZmpModel::isUpdatable(const Vec3D& p, const Vec3D& v) {
-  if (!isMassValid(mass())) return false;
+  if (!cz::isMassValid(mass())) return false;
   if (system().is_set_zmp_position()) {
     auto pz = system().zmp_position(p, v, time());
-    if (!isComZmpDiffValid(p, pz)) return false;
+    if (!cz::isComZmpDiffValid(p, pz)) return false;
   } else {
     auto f = system().reaction_force(p, v, time());
-    if (!isReactionForceValid(f)) return false;
+    if (!cz::isReactionForceValid(f)) return false;
   }
   return true;
 }
@@ -146,7 +142,8 @@ void ComZmpModel::updateData(const Vec3D& p, const Vec3D& v) {
   if (system().is_set_zmp_position()) {
     states().zmp_position = system().zmp_position(p, v, time());
     auto fz = system().reaction_force(p, v, time()).z();
-    states().reaction_force = computeReactForce(p, states().zmp_position, fz);
+    states().reaction_force =
+        cz::computeReactForce(p, states().zmp_position, fz);
   } else {
     states().reaction_force = system().reaction_force(p, v, time());
   }

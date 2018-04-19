@@ -29,7 +29,7 @@
 namespace holon {
 namespace {
 
-using com_zmp_model_formula::computeComAcc;
+namespace cz = com_zmp_model_formula;
 
 const double G = RK_G;
 
@@ -107,8 +107,8 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
     auto f_zmp = [zmp](const Vec3D&, const Vec3D&, const double) {
       return zmp;
     };
-    auto expected = computeComAcc(p, zmp, Vec3D(0, 0, data.get().mass * G),
-                                  data.get().mass);
+    auto expected = cz::computeComAcc(p, zmp, Vec3D(0, 0, data.get().mass * G),
+                                      data.get().mass);
     sys.set_zmp_position_f(f_zmp);
     dxdt = sys(x, t);
     CHECK(dxdt[0] == v);
@@ -122,7 +122,7 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
     };
     Vec3D fz = {0, 0, 8};
     auto f_fz = [fz](const Vec3D&, const Vec3D&, const double) { return fz; };
-    auto expected = computeComAcc(p, zmp, fz, data.get().mass);
+    auto expected = cz::computeComAcc(p, zmp, fz, data.get().mass);
     SECTION("Specify fz first then ZMP") {
       sys.set_reaction_force_f(f_fz);
       sys.set_zmp_position_f(f_zmp);
@@ -148,7 +148,7 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
     auto f_fz = [fz](const Vec3D&, const Vec3D&, const double) { return fz; };
     Vec3D ef = fuzz.get<Vec3D>();
     auto f_ef = [ef](const Vec3D&, const Vec3D&, const double) { return ef; };
-    auto expected = computeComAcc(p, zmp, fz, data.get().mass, ef);
+    auto expected = cz::computeComAcc(p, zmp, fz, data.get().mass, ef);
     SECTION("Specify them in the following order: fz, ZMP, ef") {
       sys.set_reaction_force_f(f_fz);
       sys.set_zmp_position_f(f_zmp);
@@ -183,8 +183,8 @@ TEST_CASE("ComZmpModelSystem::operator() defines system of COM-ZMP model",
     };
     Vec3D ef = fuzz.get<Vec3D>();
     auto f_ef = [ef](const Vec3D&, const Vec3D&, const double) { return ef; };
-    auto expected = computeComAcc(p, zmp, Vec3D(0, 0, data.get().mass * G),
-                                  data.get().mass, ef);
+    auto expected = cz::computeComAcc(p, zmp, Vec3D(0, 0, data.get().mass * G),
+                                      data.get().mass, ef);
     sys.set_zmp_position_f(f_zmp);
     sys.set_external_force_f(f_ef);
     dxdt = sys(x, t);

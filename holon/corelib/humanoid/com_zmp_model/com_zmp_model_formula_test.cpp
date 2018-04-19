@@ -29,14 +29,7 @@
 namespace holon {
 namespace {
 
-using com_zmp_model_formula::computeSqrZeta;
-using com_zmp_model_formula::computeZeta;
-using com_zmp_model_formula::computeReactForce;
-using com_zmp_model_formula::computeComAcc;
-using com_zmp_model_formula::isMassValid;
-using com_zmp_model_formula::isComZmpDiffValid;
-using com_zmp_model_formula::isReactionForceValid;
-using com_zmp_model_formula::isComAccelerationValid;
+namespace cz = com_zmp_model_formula;
 
 const double G = RK_G;
 
@@ -51,8 +44,8 @@ TEST_CASE("computeSqrZeta(double,double,double)",
     } testcases[] = {{1, G}, {G, 1.0}, {2, G / 2}, {4, G / 4}};
     for (const auto& c : testcases) {
       INFO("z=" << c.z << ", zz=" << zz << ", az=" << az);
-      CHECK(computeSqrZeta(c.z, zz, az) == c.expected_sqr_zeta);
-      CHECK(computeZeta(c.z, zz, az) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(c.z, zz, az) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(c.z, zz, az) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -66,8 +59,8 @@ TEST_CASE("computeSqrZeta(double,double,double)",
         {1, G}, {1.5, 2.0 * G}, {0.5, 2.0 * G / 3.0}, {-0.5, 2.0 * G / 5.0}};
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << c.zz << ", az=" << az);
-      CHECK(computeSqrZeta(z, c.zz, az) == c.expected_sqr_zeta);
-      CHECK(computeZeta(z, c.zz, az) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(z, c.zz, az) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(z, c.zz, az) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -81,8 +74,8 @@ TEST_CASE("computeSqrZeta(double,double,double)",
         {1, 1.0 + G}, {1.5, 1.5 + G}, {-1, -1.0 + G}, {G, 2.0 * G}};
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << zz << ", az=" << c.az);
-      CHECK(computeSqrZeta(z, zz, c.az) == c.expected_sqr_zeta);
-      CHECK(computeZeta(z, zz, c.az) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(z, zz, c.az) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(z, zz, c.az) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -96,8 +89,8 @@ TEST_CASE("computeSqrZeta(double,double,double)",
     zEchoOff();
     for (const auto& c : testcases) {
       INFO("z=" << c.z << ", zz=" << c.zz << ", az=" << az);
-      CHECK(computeSqrZeta(c.z, c.zz, az) == c.expected_sqr_zeta);
-      CHECK(computeZeta(c.z, c.zz, az) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(c.z, c.zz, az) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(c.z, c.zz, az) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -112,8 +105,8 @@ TEST_CASE("computeSqrZeta(double,double,double)",
     zEchoOff();
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << zz << ", az=" << c.az);
-      CHECK(computeSqrZeta(z, zz, c.az) == c.expected_sqr_zeta);
-      CHECK(computeZeta(z, zz, c.az) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(z, zz, c.az) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(z, zz, c.az) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -131,8 +124,8 @@ TEST_CASE("computeSqrZeta(double,double,double,double)",
     } testcases[] = {{1, G}, {G, 1.0}, {2, G / 2}, {4, G / 4}};
     for (const auto& c : testcases) {
       INFO("z=" << c.z << ", zz=" << zz << ", fz=" << fz << ", m=" << m);
-      CHECK(computeSqrZeta(c.z, zz, fz, m) == c.expected_sqr_zeta);
-      CHECK(computeZeta(c.z, zz, fz, m) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(c.z, zz, fz, m) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(c.z, zz, fz, m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -147,8 +140,8 @@ TEST_CASE("computeSqrZeta(double,double,double,double)",
         {1, G}, {1.5, 2.0 * G}, {0.5, 2.0 * G / 3.0}, {-0.5, 2.0 * G / 5.0}};
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << c.zz << ", fz=" << fz << ", m=" << m);
-      CHECK(computeSqrZeta(z, c.zz, fz, m) == c.expected_sqr_zeta);
-      CHECK(computeZeta(z, c.zz, fz, m) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(z, c.zz, fz, m) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(z, c.zz, fz, m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -162,8 +155,8 @@ TEST_CASE("computeSqrZeta(double,double,double,double)",
     } testcases[] = {{1, 1}, {1.5, 1.5}, {0.5, 0.5}, {G, G}};
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << zz << ", fz=" << c.fz << ", m=" << m);
-      CHECK(computeSqrZeta(z, zz, c.fz, m) == c.expected_sqr_zeta);
-      CHECK(computeZeta(z, zz, c.fz, m) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(z, zz, c.fz, m) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(z, zz, c.fz, m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -177,8 +170,8 @@ TEST_CASE("computeSqrZeta(double,double,double,double)",
     } testcases[] = {{1, 2}, {2, 1}, {0.5, 4}, {1.5, 4.0 / 3}};
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << zz << ", fz=" << fz << ", m=" << c.m);
-      CHECK(computeSqrZeta(z, zz, fz, c.m) == Approx(c.expected_sqr_zeta));
-      CHECK(computeZeta(z, zz, fz, c.m) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(z, zz, fz, c.m) == Approx(c.expected_sqr_zeta));
+      CHECK(cz::computeZeta(z, zz, fz, c.m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -193,8 +186,8 @@ TEST_CASE("computeSqrZeta(double,double,double,double)",
     zEchoOff();
     for (const auto& c : testcases) {
       INFO("z=" << c.z << ", zz=" << c.zz << ", fz=" << fz << ", m=" << m);
-      CHECK(computeSqrZeta(c.z, c.zz, fz, m) == c.expected_sqr_zeta);
-      CHECK(computeZeta(c.z, c.zz, fz, m) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(c.z, c.zz, fz, m) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(c.z, c.zz, fz, m) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -210,8 +203,8 @@ TEST_CASE("computeSqrZeta(double,double,double,double)",
     zEchoOff();
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << zz << ", fz=" << c.fz << ", m=" << m);
-      CHECK(computeSqrZeta(z, zz, c.fz, m) == c.expected_sqr_zeta);
-      CHECK(computeZeta(z, zz, c.fz, m) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(z, zz, c.fz, m) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(z, zz, c.fz, m) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -227,8 +220,8 @@ TEST_CASE("computeSqrZeta(double,double,double,double)",
     zEchoOff();
     for (const auto& c : testcases) {
       INFO("z=" << z << ", zz=" << zz << ", fz=" << fz << ", m=" << c.m);
-      CHECK(computeSqrZeta(z, zz, fz, c.m) == c.expected_sqr_zeta);
-      CHECK(computeZeta(z, zz, fz, c.m) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(z, zz, fz, c.m) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(z, zz, fz, c.m) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -248,8 +241,8 @@ TEST_CASE("computeSqrZeta(Vec3D&,Vec3D&,Vec3D&)",
       Vec3D pz{0, 1, zz};
       Vec3D ddp{1, 0, az};
       INFO("z=" << c.z << ", zz=" << zz << ", az=" << az);
-      CHECK(computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
-      CHECK(computeZeta(p, pz, ddp) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(p, pz, ddp) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -266,8 +259,8 @@ TEST_CASE("computeSqrZeta(Vec3D&,Vec3D&,Vec3D&)",
       Vec3D pz{1, 1, c.zz};
       Vec3D ddp{1, 2, az};
       INFO("z=" << z << ", zz=" << c.zz << ", az=" << az);
-      CHECK(computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
-      CHECK(computeZeta(p, pz, ddp) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(p, pz, ddp) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -284,8 +277,8 @@ TEST_CASE("computeSqrZeta(Vec3D&,Vec3D&,Vec3D&)",
       Vec3D pz{0, 0.1, zz};
       Vec3D ddp{1, 0.1, c.az};
       INFO("z=" << z << ", zz=" << zz << ", az=" << c.az);
-      CHECK(computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
-      CHECK(computeZeta(p, pz, ddp) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(p, pz, ddp) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -302,8 +295,8 @@ TEST_CASE("computeSqrZeta(Vec3D&,Vec3D&,Vec3D&)",
       Vec3D pz{0, 0, c.zz};
       Vec3D ddp{0, 0, az};
       INFO("z=" << c.z << ", zz=" << c.zz << ", az=" << az);
-      CHECK(computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
-      CHECK(computeZeta(p, pz, ddp) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(p, pz, ddp) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -321,8 +314,8 @@ TEST_CASE("computeSqrZeta(Vec3D&,Vec3D&,Vec3D&)",
       Vec3D pz{0, 0, zz};
       Vec3D ddp{0, 0, c.az};
       INFO("z=" << z << ", zz=" << zz << ", az=" << c.az);
-      CHECK(computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
-      CHECK(computeZeta(p, pz, ddp) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(p, pz, ddp) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(p, pz, ddp) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -343,8 +336,8 @@ TEST_CASE("computeSqrZeta(Vec3D&,Vec3D&,Vec3D&,Vec3D&)",
       Vec3D pz{0, 1, zz};
       Vec3D f{1, 0, fz};
       INFO("z=" << c.z << ", zz=" << zz << ", fz=" << fz << ", m=" << m);
-      CHECK(computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
-      CHECK(computeZeta(p, pz, f, m) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(p, pz, f, m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -362,8 +355,8 @@ TEST_CASE("computeSqrZeta(Vec3D&,Vec3D&,Vec3D&,Vec3D&)",
       Vec3D pz{1, 1, c.zz};
       Vec3D f{0, 2, fz};
       INFO("z=" << z << ", zz=" << c.zz << ", fz=" << fz << ", m=" << m);
-      CHECK(computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
-      CHECK(computeZeta(p, pz, f, m) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(p, pz, f, m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -380,8 +373,8 @@ TEST_CASE("computeSqrZeta(Vec3D&,Vec3D&,Vec3D&,Vec3D&)",
       Vec3D pz{0.1, 0, zz};
       Vec3D f{-0.1, 0, c.fz};
       INFO("z=" << z << ", zz=" << zz << ", fz=" << c.fz << ", m=" << m);
-      CHECK(computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
-      CHECK(computeZeta(p, pz, f, m) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(p, pz, f, m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -398,8 +391,8 @@ TEST_CASE("computeSqrZeta(Vec3D&,Vec3D&,Vec3D&,Vec3D&)",
       Vec3D pz{-1, 1, zz};
       Vec3D f{0, -1, fz};
       INFO("z=" << z << ", zz=" << zz << ", fz=" << fz << ", m=" << c.m);
-      CHECK(computeSqrZeta(p, pz, f, c.m) == c.expected_sqr_zeta);
-      CHECK(computeZeta(p, pz, f, c.m) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(p, pz, f, c.m) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(p, pz, f, c.m) == sqrt(c.expected_sqr_zeta));
     }
   }
 
@@ -417,8 +410,8 @@ TEST_CASE("computeSqrZeta(Vec3D&,Vec3D&,Vec3D&,Vec3D&)",
       Vec3D pz{0, 0, c.zz};
       Vec3D f{0, 0, fz};
       INFO("z=" << c.z << ", zz=" << c.zz << ", fz=" << fz << ", m=" << m);
-      CHECK(computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
-      CHECK(computeZeta(p, pz, f, m) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(p, pz, f, m) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -437,8 +430,8 @@ TEST_CASE("computeSqrZeta(Vec3D&,Vec3D&,Vec3D&,Vec3D&)",
       Vec3D pz{0, 0, zz};
       Vec3D f{0, 0, c.fz};
       INFO("z=" << z << ", zz=" << zz << ", fz=" << c.fz << ", m=" << m);
-      CHECK(computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
-      CHECK(computeZeta(p, pz, f, m) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(p, pz, f, m) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(p, pz, f, m) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -457,8 +450,8 @@ TEST_CASE("computeSqrZeta(Vec3D&,Vec3D&,Vec3D&,Vec3D&)",
       Vec3D pz{0, 0, zz};
       Vec3D f{0, 0, fz};
       INFO("z=" << z << ", zz=" << zz << ", fz=" << fz << ", m=" << c.m);
-      CHECK(computeSqrZeta(p, pz, f, c.m) == c.expected_sqr_zeta);
-      CHECK(computeZeta(p, pz, f, c.m) == sqrt(c.expected_sqr_zeta));
+      CHECK(cz::computeSqrZeta(p, pz, f, c.m) == c.expected_sqr_zeta);
+      CHECK(cz::computeZeta(p, pz, f, c.m) == sqrt(c.expected_sqr_zeta));
     }
     zEchoOn();
   }
@@ -476,7 +469,7 @@ TEST_CASE("computeReactForce(Vec3D&,double)",
                      {{-1, -3, G}, {-1, -3, 2 * G}}};
     for (const auto& c : testcases) {
       INFO("m = " << mass << ", acc = " << c.acc);
-      CHECK(computeReactForce(c.acc, mass) == c.expected_force);
+      CHECK(cz::computeReactForce(c.acc, mass) == c.expected_force);
     }
   }
 
@@ -489,7 +482,7 @@ TEST_CASE("computeReactForce(Vec3D&,double)",
         {1, {-1, 1, 0.5 * G}}, {3, {-3, 3, 1.5 * G}}, {5, {-5, 5, 2.5 * G}}};
     for (const auto& c : testcases) {
       INFO("m = " << c.mass << ", acc = " << acc);
-      CHECK(computeReactForce(acc, c.mass) == c.expected_force);
+      CHECK(cz::computeReactForce(acc, c.mass) == c.expected_force);
     }
   }
 }
@@ -509,7 +502,8 @@ TEST_CASE("computeReactForce(Vec3D&,Vec3D&,double,double)",
     for (const auto& c : testcases) {
       INFO("m = " << mass << ", zeta2 = " << zeta2 << ", com = " << c.com
                   << ", zmp = " << c.zmp);
-      CHECK(computeReactForce(c.com, c.zmp, zeta2, mass) == c.expected_force);
+      CHECK(cz::computeReactForce(c.com, c.zmp, zeta2, mass) ==
+            c.expected_force);
     }
   }
 
@@ -526,7 +520,8 @@ TEST_CASE("computeReactForce(Vec3D&,Vec3D&,double,double)",
     for (const auto& c : testcases) {
       INFO("m = " << c.mass << ", zeta2 = " << c.zeta2 << ", com = " << com
                   << ", zmp = " << zmp);
-      CHECK(computeReactForce(com, zmp, c.zeta2, c.mass) == c.expected_force);
+      CHECK(cz::computeReactForce(com, zmp, c.zeta2, c.mass) ==
+            c.expected_force);
     }
   }
 }
@@ -549,7 +544,7 @@ TEST_CASE("computeReactForce(Vec3D&,Vec3D&,Vec3D&,double)",
   for (const auto& c : testcases) {
     INFO("m = " << c.mass << ", com = " << c.com_p << ", zmp = " << c.zmp_p
                 << ", com acc = " << c.com_a);
-    CHECK(computeReactForce(c.com_p, c.zmp_p, c.com_a, c.mass) ==
+    CHECK(cz::computeReactForce(c.com_p, c.zmp_p, c.com_a, c.mass) ==
           c.expected_force);
   }
 }
@@ -569,7 +564,7 @@ TEST_CASE("computeReactForce(Vec3D&,Vec3D&,double)",
                    {{-0.5, 1.9, 1.4}, {1, -1.1, -0.1}, 10, {-10, 20, 10}}};
   for (const auto& c : testcases) {
     INFO("com = " << c.com_p << ", zmp = " << c.zmp_p << ", fz = " << c.fz);
-    CHECK(computeReactForce(c.com_p, c.zmp_p, c.fz) == c.expected_force);
+    CHECK(cz::computeReactForce(c.com_p, c.zmp_p, c.fz) == c.expected_force);
   }
 }
 
@@ -585,7 +580,7 @@ TEST_CASE("computeComAcc(Vec3D&,double)",
                      {{0, -1, -0.5 * G}, 1.5, {0, -2. / 3, -4. * G / 3}}};
     for (const auto& c : testcases) {
       INFO("m = " << c.m << ", f = " << c.f);
-      CHECK(computeComAcc(c.f, c.m) == c.expected_acc);
+      CHECK(cz::computeComAcc(c.f, c.m) == c.expected_acc);
     }
   }
   SECTION("with additional force") {
@@ -600,7 +595,7 @@ TEST_CASE("computeComAcc(Vec3D&,double)",
         {{0, -1, -0.5 * G}, 1.5, {0.5, -0.5, 0.5 * G}, {1. / 3, -1, -G}}};
     for (const auto& c : testcases) {
       INFO("m = " << c.m << ", f = " << c.f << ", added f = " << c.ef);
-      CHECK(computeComAcc(c.f, c.m, c.ef) == c.expected_acc);
+      CHECK(cz::computeComAcc(c.f, c.m, c.ef) == c.expected_acc);
     }
   }
 }
@@ -618,7 +613,7 @@ TEST_CASE("computeComAcc(Vec3D&,Vec3D&,double)",
                      {{-1, 1.5, 2}, {0.5, 1.5, 0}, 1.5, {-2.25, 0, 3. - G}}};
     for (const auto& c : testcases) {
       INFO("zeta2 = " << c.zeta2 << ", com = " << c.com << ", zmp = " << c.zmp);
-      CHECK(computeComAcc(c.com, c.zmp, c.zeta2) == c.expected_acc);
+      CHECK(cz::computeComAcc(c.com, c.zmp, c.zeta2) == c.expected_acc);
     }
   }
   SECTION("with additional force") {
@@ -636,7 +631,8 @@ TEST_CASE("computeComAcc(Vec3D&,Vec3D&,double)",
     for (const auto& c : testcases) {
       INFO("zeta2 = " << c.zeta2 << ", com = " << c.com << ", zmp = " << c.zmp
                       << ", mass = " << c.m << ", ef = " << c.ef);
-      CHECK(computeComAcc(c.com, c.zmp, c.zeta2, c.m, c.ef) == c.expected_acc);
+      CHECK(cz::computeComAcc(c.com, c.zmp, c.zeta2, c.m, c.ef) ==
+            c.expected_acc);
     }
   }
 }
@@ -661,7 +657,7 @@ TEST_CASE("computeComAcc(Vec3D&,Vec3D&,Vec3D&,double)",
     for (const auto& c : testcases) {
       INFO("com = " << c.com << ", zmp = " << c.zmp << ", mass = " << c.m
                     << ", f = " << c.f);
-      CHECK(computeComAcc(c.com, c.zmp, c.f, c.m) == c.expected_acc);
+      CHECK(cz::computeComAcc(c.com, c.zmp, c.f, c.m) == c.expected_acc);
     }
   }
   SECTION("with additional force") {
@@ -688,7 +684,7 @@ TEST_CASE("computeComAcc(Vec3D&,Vec3D&,Vec3D&,double)",
     for (const auto& c : testcases) {
       INFO("com = " << c.com << ", zmp = " << c.zmp << ", mass = " << c.m
                     << ", f = " << c.f << ", ef = " << c.ef);
-      CHECK(computeComAcc(c.com, c.zmp, c.f, c.m, c.ef) == c.expected_acc);
+      CHECK(cz::computeComAcc(c.com, c.zmp, c.f, c.m, c.ef) == c.expected_acc);
     }
   }
 }
@@ -734,7 +730,7 @@ TEST_CASE("computeComAcc(Vec3D&,Vec3D&,Vec3D&,double) 2",
     };
 
     for (auto c : testcases) {
-      Vec3D acc = computeComAcc(c.com_pos, c.zmp_pos, force, mass);
+      Vec3D acc = cz::computeComAcc(c.com_pos, c.zmp_pos, force, mass);
       CAPTURE(&c.com_pos);
       CAPTURE(&c.zmp_pos);
       CHECK(acc == c.expected_acc);

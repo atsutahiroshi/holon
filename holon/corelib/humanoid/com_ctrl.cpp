@@ -181,8 +181,7 @@ Vec3D ComCtrl::computeDesZmpPos(const Vec3D& t_com_position,
   using namespace index_symbols;
   auto fz =
       cgc::desired_reaction_force_z(t_com_position, t_com_velocity, params());
-  auto zeta =
-      cz::computeZeta(t_com_position[_Z], params().vhp, fz, model().mass());
+  auto zeta = cz::zeta(t_com_position[_Z], params().vhp, fz, model().mass());
   return cgc::desired_zmp_position(t_com_position, t_com_velocity, params(),
                                    zeta);
 }
@@ -199,8 +198,8 @@ ComCtrl::CallbackFunc ComCtrl::getZmpPositionCallback() {
 }
 
 double ComCtrl::phaseLF() const {
-  auto zeta = cz::computeZeta(outputs().com_position, outputs().zmp_position,
-                              outputs().com_acceleration);
+  auto zeta = cz::zeta(outputs().com_position, outputs().zmp_position,
+                       outputs().com_acceleration);
   auto pz = cgc::complex_zmp_y(outputs().zmp_position, outputs().com_velocity,
                                params(), zeta);
   auto pLin = cgc::complex_inner_edge(params().com_position, params(), pz,
@@ -209,8 +208,8 @@ double ComCtrl::phaseLF() const {
 }
 
 double ComCtrl::phaseRF() const {
-  auto zeta = cz::computeZeta(outputs().com_position, outputs().zmp_position,
-                              outputs().com_acceleration);
+  auto zeta = cz::zeta(outputs().com_position, outputs().zmp_position,
+                       outputs().com_acceleration);
   auto pz = cgc::complex_zmp_y(outputs().zmp_position, outputs().com_velocity,
                                params(), zeta);
   auto pRin = cgc::complex_inner_edge(params().com_position, params(), pz,
@@ -220,8 +219,8 @@ double ComCtrl::phaseRF() const {
 
 void ComCtrl::updateSideward() {
   using namespace index_symbols;
-  auto zeta = cz::computeZeta(states().com_position, states().zmp_position,
-                              states().com_acceleration);
+  auto zeta = cz::zeta(states().com_position, states().zmp_position,
+                       states().com_acceleration);
   auto pz = cgc::complex_zmp_y(outputs().zmp_position, outputs().com_velocity,
                                params(), zeta);
   auto pLin = cgc::complex_inner_edge(params().com_position, params(), pz,

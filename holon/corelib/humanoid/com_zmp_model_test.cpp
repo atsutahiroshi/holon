@@ -402,8 +402,8 @@ TEST_CASE("ComZmpModel::update computes COM acceleration",
     } testcases[] = {{{0, 0, 1}, {0, 0, 0}, {1, 0, 0}},
                      {{0, 0.1, 1}, {0.1, -0.1, 0}, {0.2, 0.1, 0}}};
     for (auto& c : testcases) {
-      Vec3D f = cz::computeReactForce(c.com_pos, c.zmp_pos, model.mass() * G);
-      Vec3D expected_com_acc = cz::computeComAcc(f, model.mass());
+      Vec3D f = cz::reaction_force(c.com_pos, c.zmp_pos, model.mass() * G);
+      Vec3D expected_com_acc = cz::com_acceleration(f, model.mass());
 
       model.states().com_position = c.com_pos;
       model.states().com_velocity = c.com_vel;

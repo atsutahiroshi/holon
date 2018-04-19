@@ -34,7 +34,7 @@ ComZmpModel::ComZmpModel(const Vec3D& t_com_position)
     : ComZmpModel(t_com_position, RawData::default_mass) {}
 
 ComZmpModel::ComZmpModel(const Vec3D& t_com_position, double t_mass)
-    : ComZmpModel(cz::isMassValid(t_mass)
+    : ComZmpModel(cz::is_mass_valid(t_mass)
                       ? make_data<Data>(t_com_position, t_mass)
                       : make_data<Data>(t_com_position)) {}
 
@@ -122,13 +122,13 @@ ComZmpModel& ComZmpModel::removeExternalForce() {
 }
 
 bool ComZmpModel::isUpdatable(const Vec3D& p, const Vec3D& v) {
-  if (!cz::isMassValid(mass())) return false;
+  if (!cz::is_mass_valid(mass())) return false;
   if (system().is_set_zmp_position()) {
     auto pz = system().zmp_position(p, v, time());
-    if (!cz::isComZmpDiffValid(p, pz)) return false;
+    if (!cz::is_com_zmp_diff_valid(p, pz)) return false;
   } else {
     auto f = system().reaction_force(p, v, time());
-    if (!cz::isReactionForceValid(f)) return false;
+    if (!cz::is_reaction_force_valid(f)) return false;
   }
   return true;
 }
@@ -142,8 +142,7 @@ void ComZmpModel::updateData(const Vec3D& p, const Vec3D& v) {
   if (system().is_set_zmp_position()) {
     states().zmp_position = system().zmp_position(p, v, time());
     auto fz = system().reaction_force(p, v, time()).z();
-    states().reaction_force =
-        cz::computeReactForce(p, states().zmp_position, fz);
+    states().reaction_force = cz::reaction_force(p, states().zmp_position, fz);
   } else {
     states().reaction_force = system().reaction_force(p, v, time());
   }

@@ -52,15 +52,15 @@ ComZmpModelSystem::Function ComZmpModelSystem::getDefaultComAccFunc() const {
 ComZmpModelSystem::Function ComZmpModelSystem::getComAccFuncWithReactForce()
     const {
   return [this](const Vec3D& p, const Vec3D& v, const double t) {
-    return cz::computeComAcc(m_reaction_force_f(p, v, t), data().get().mass,
-                             m_external_force_f(p, v, t));
+    return cz::com_acceleration(m_reaction_force_f(p, v, t), data().get().mass,
+                                m_external_force_f(p, v, t));
   };
 }
 ComZmpModelSystem::Function ComZmpModelSystem::getComAccFuncWithZmpPos() const {
   return [this](const Vec3D& p, const Vec3D& v, const double t) {
-    return cz::computeComAcc(p, m_zmp_position_f(p, v, t),
-                             m_reaction_force_f(p, v, t), data().get().mass,
-                             m_external_force_f(p, v, t));
+    return cz::com_acceleration(p, m_zmp_position_f(p, v, t),
+                                m_reaction_force_f(p, v, t), data().get().mass,
+                                m_external_force_f(p, v, t));
   };
 }
 

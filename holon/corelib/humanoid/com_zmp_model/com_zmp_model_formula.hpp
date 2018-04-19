@@ -27,63 +27,61 @@ namespace holon {
 namespace com_zmp_model_formula {
 
 // functions to compute squared zeta
-double computeSqrZeta(double t_com_position_z, double t_zmp_position_z,
-                      double t_com_acceleration_z);
-double computeSqrZeta(double t_com_position_z, double t_zmp_position_z,
-                      double t_reation_force_z, double t_mass);
-double computeSqrZeta(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
-                      const Vec3D& t_com_acceleration,
-                      const Vec3D& t_nu = kVec3DZ);
-double computeSqrZeta(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
-                      const Vec3D& t_reaction_force, double t_mass,
-                      const Vec3D& t_nu = kVec3DZ);
-
-// functions to compute zeta
-double computeZeta(double t_com_position_z, double t_zmp_position_z,
-                   double t_com_acceleration_z);
-double computeZeta(double t_com_position_z, double t_zmp_position_z,
-                   double t_reation_force_z, double t_mass);
-double computeZeta(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
-                   const Vec3D& t_com_acceleration,
-                   const Vec3D& t_nu = kVec3DZ);
-double computeZeta(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
-                   const Vec3D& t_reaction_force, double t_mass,
-                   const Vec3D& t_nu = kVec3DZ);
-
-// functions to compute reaction force
-Vec3D computeReactForce(const Vec3D& t_com_acceleration, double t_mass);
-Vec3D computeReactForce(const Vec3D& t_com_position,
-                        const Vec3D& t_zmp_position, double t_sqr_zeta,
-                        double t_mass);
-Vec3D computeReactForce(const Vec3D& t_com_position,
-                        const Vec3D& t_zmp_position,
-                        const Vec3D& t_com_acceleration, double t_mass,
-                        const Vec3D& t_nu = kVec3DZ);
-Vec3D computeReactForce(const Vec3D& t_com_position,
-                        const Vec3D& t_zmp_position, double t_reaction_force_z);
-
-// functions to compute COM acceleration
-Vec3D computeComAcc(const Vec3D& t_reaction_force, double t_mass,
-                    const Vec3D& t_external_force = kVec3DZero);
-Vec3D computeComAcc(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
-                    double t_sqr_zeta, double t_mass = 1,
-                    const Vec3D& t_external_force = kVec3DZero);
-Vec3D computeComAcc(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
+double squared_zeta(double t_com_position_z, double t_zmp_position_z,
+                    double t_com_acceleration_z);
+double squared_zeta(double t_com_position_z, double t_zmp_position_z,
+                    double t_reation_force_z, double t_mass);
+double squared_zeta(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
+                    const Vec3D& t_com_acceleration,
+                    const Vec3D& t_nu = kVec3DZ);
+double squared_zeta(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
                     const Vec3D& t_reaction_force, double t_mass,
-                    const Vec3D& t_external_force = kVec3DZero,
                     const Vec3D& t_nu = kVec3DZ);
 
-// functions to check if some relation is correct
-bool isMassValid(double t_mass);
-bool isComZmpDiffValid(double t_com_position_z, double t_zmp_position_z);
-bool isComZmpDiffValid(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
+// functions to compute zeta
+double zeta(double t_com_position_z, double t_zmp_position_z,
+            double t_com_acceleration_z);
+double zeta(double t_com_position_z, double t_zmp_position_z,
+            double t_reation_force_z, double t_mass);
+double zeta(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
+            const Vec3D& t_com_acceleration, const Vec3D& t_nu = kVec3DZ);
+double zeta(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
+            const Vec3D& t_reaction_force, double t_mass,
+            const Vec3D& t_nu = kVec3DZ);
+
+// functions to compute reaction force
+Vec3D reaction_force(const Vec3D& t_com_acceleration, double t_mass);
+Vec3D reaction_force(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
+                     double t_sqr_zeta, double t_mass);
+Vec3D reaction_force(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
+                     const Vec3D& t_com_acceleration, double t_mass,
+                     const Vec3D& t_nu = kVec3DZ);
+Vec3D reaction_force(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
+                     double t_reaction_force_z);
+
+// functions to compute COM acceleration
+Vec3D com_acceleration(const Vec3D& t_reaction_force, double t_mass,
+                       const Vec3D& t_external_force = kVec3DZero);
+Vec3D com_acceleration(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
+                       double t_sqr_zeta, double t_mass = 1,
+                       const Vec3D& t_external_force = kVec3DZero);
+Vec3D com_acceleration(const Vec3D& t_com_position, const Vec3D& t_zmp_position,
+                       const Vec3D& t_reaction_force, double t_mass,
+                       const Vec3D& t_external_force = kVec3DZero,
                        const Vec3D& t_nu = kVec3DZ);
-bool isReactionForceValid(double t_reaction_force_z);
-bool isReactionForceValid(const Vec3D& t_reaction_force,
-                          const Vec3D& t_nu = kVec3DZ);
-bool isComAccelerationValid(double t_com_acceleration_z);
-bool isComAccelerationValid(const Vec3D& t_com_acceleration,
-                            const Vec3D& t_nu = kVec3DZ);
+
+// functions to check if some relation is correct
+bool is_mass_valid(double t_mass);
+bool is_com_zmp_diff_valid(double t_com_position_z, double t_zmp_position_z);
+bool is_com_zmp_diff_valid(const Vec3D& t_com_position,
+                           const Vec3D& t_zmp_position,
+                           const Vec3D& t_nu = kVec3DZ);
+bool is_reaction_force_valid(double t_reaction_force_z);
+bool is_reaction_force_valid(const Vec3D& t_reaction_force,
+                             const Vec3D& t_nu = kVec3DZ);
+bool is_com_acceleration_valid(double t_com_acceleration_z);
+bool is_com_acceleration_valid(const Vec3D& t_com_acceleration,
+                               const Vec3D& t_nu = kVec3DZ);
 
 }  // namespace com_zmp_model_formula
 }  // namespace holon

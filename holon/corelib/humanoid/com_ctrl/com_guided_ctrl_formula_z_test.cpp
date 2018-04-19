@@ -22,6 +22,7 @@
 
 #include <cure/cure_misc.h>
 #include <roki/rk_g.h>
+#include "holon/corelib/humanoid/com_ctrl.hpp"
 
 #include "catch.hpp"
 #include "holon/test/util/fuzzer/fuzzer.hpp"
@@ -122,25 +123,44 @@ void CheckReactionForce_1(const testcase& testcases) {
   }
 }
 
+template <typename testcase>
+void CheckReactionForce_2(const testcase& testcases) {
+  for (const auto& tc : testcases) {
+    Vec3D p{0, 0, tc.z};
+    Vec3D v{0, 0, tc.v};
+    ComCtrlParamsRawData data;
+    data.com_position = {0, 0, tc.zd};
+    data.q1 = {1, 1, tc.q1};
+    data.q2 = {1, 1, tc.q2};
+    data.mass = tc.mass;
+    auto fz = desired_reaction_force_z(p, v, data);
+    CHECK(fz == Approx(tc.expected_fz));
+  }
+}
+
 TEST_CASE("Case 1: desired vertical reaction force with COM-guided control",
           "[com_guided_ctrl_formula][desired_reaction_force_z]") {
   SECTION("overloaded function 1") { CheckReactionForce_1(testcases1); }
+  SECTION("overloaded function 2") { CheckReactionForce_2(testcases1); }
 }
 
 TEST_CASE("Case 2: desired vertical reaction force with COM-guided control",
           "[com_guided_ctrl_formula][desired_reaction_force_z]") {
   SECTION("overloaded function 1") { CheckReactionForce_1(testcases2); }
+  SECTION("overloaded function 2") { CheckReactionForce_2(testcases2); }
 }
 
 TEST_CASE("Case 3: desired vertical reaction force with COM-guided control",
           "[com_guided_ctrl_formula][desired_reaction_force_z]") {
   SECTION("overloaded function 1") { CheckReactionForce_1(testcases3); }
+  SECTION("overloaded function 2") { CheckReactionForce_2(testcases3); }
 }
 
 TEST_CASE("Case 4: desired vertical reaction force with COM-guided control",
           "[com_guided_ctrl_formula][desired_reaction_force_z][exception]") {
   zEchoOff();
   SECTION("overloaded function 1") { CheckReactionForce_1(testcases4); }
+  SECTION("overloaded function 2") { CheckReactionForce_2(testcases4); }
   zEchoOn();
 }
 

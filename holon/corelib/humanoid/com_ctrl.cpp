@@ -22,19 +22,15 @@
 
 #include <roki/rk_g.h>
 #include <memory>
-#include "holon/corelib/humanoid/com_ctrl/com_ctrl_x.hpp"
-#include "holon/corelib/humanoid/com_ctrl/com_ctrl_y.hpp"
-#include "holon/corelib/humanoid/com_ctrl/com_ctrl_z.hpp"
-#include "holon/corelib/humanoid/com_ctrl/phase_y.hpp"
+#include "holon/corelib/humanoid/biped_foot_model.hpp"
+#include "holon/corelib/humanoid/com_ctrl/com_guided_ctrl_formula.hpp"
 #include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_formula.hpp"
 #include "holon/corelib/math/misc.hpp"
 
 namespace holon {
 
-namespace ctrl_x = com_ctrl_x;
-namespace ctrl_y = com_ctrl_y;
-namespace ctrl_z = com_ctrl_z;
-namespace formula = com_zmp_model_formula;
+namespace cz = com_zmp_model_formula;
+namespace cgc = com_guided_ctrl_formula;
 
 void ComCtrlCommandsRawData::clear() {
   xd = nullopt;
@@ -74,6 +70,13 @@ void ComCtrlCommandsRawData::set_com_velocity(optional<double> t_vxd,
   vyd = t_vyd;
 }
 
+const Array3d ComCtrlParamsRawData::default_q1 = {{1, 1, 1}};
+const Array3d ComCtrlParamsRawData::default_q2 = {{1, 1, 1}};
+const double ComCtrlParamsRawData::default_rho = 0;
+const double ComCtrlParamsRawData::default_dist = 0;
+const double ComCtrlParamsRawData::default_kr = 1;
+const double ComCtrlParamsRawData::default_vhp = 0;
+
 ComCtrlParamsRawData::ComCtrlParamsRawData()
     : ComCtrlParamsRawData(ComZmpModelRawData::default_com_position,
                            ComZmpModelRawData::default_mass) {}
@@ -83,16 +86,12 @@ ComCtrlParamsRawData::ComCtrlParamsRawData(const Vec3D& t_com_position,
     : com_position(t_com_position),
       com_velocity(kVec3DZero),
       mass(t_mass),
-      qx1(ctrl_x::default_q1),
-      qx2(ctrl_x::default_q2),
-      qy1(ctrl_y::default_q1),
-      qy2(ctrl_y::default_q2),
-      qz1(ctrl_z::default_q1),
-      qz2(ctrl_z::default_q2),
-      rho(ctrl_y::default_rho),
-      dist(ctrl_y::default_dist),
-      kr(ctrl_y::default_kr),
-      vhp(0.0) {}
+      q1(ComCtrlParamsRawData::default_q1),
+      q2(ComCtrlParamsRawData::default_q1),
+      rho(ComCtrlParamsRawData::default_rho),
+      dist(ComCtrlParamsRawData::default_dist),
+      kr(ComCtrlParamsRawData::default_kr),
+      vhp(ComCtrlParamsRawData::default_vhp) {}
 
 ComCtrlOutputsRawData::ComCtrlOutputsRawData()
     : com_position(kVec3DZero),
@@ -109,16 +108,18 @@ ComCtrlData::ComCtrlData(const Vec3D& t_com_position, double t_mass)
 
 ComCtrl::ComCtrl() : ComCtrl(make_data<Data>()) {}
 ComCtrl::ComCtrl(const Model& t_model)
-    : CtrlBase(t_model), m_canonical_foot_dist(ctrl_y::default_dist) {
+    : CtrlBase(t_model),
+      m_canonical_foot_dist(ComCtrlParamsRawData::default_dist) {
   init();
 }
 ComCtrl::ComCtrl(Data t_data)
-    : CtrlBase(t_data), m_canonical_foot_dist(ctrl_y::default_dist) {
+    : CtrlBase(t_data),
+      m_canonical_foot_dist(ComCtrlParamsRawData::default_dist) {
   init();
 }
 ComCtrl::ComCtrl(Data t_data, std::shared_ptr<Model> t_model_ptr)
     : CtrlBase(t_data, t_model_ptr),
-      m_canonical_foot_dist(ctrl_y::default_dist) {
+      m_canonical_foot_dist(ComCtrlParamsRawData::default_dist) {
   init();
 }
 
@@ -169,27 +170,21 @@ void ComCtrl::feedback(const Vec3D& t_com_position,
 Vec3D ComCtrl::computeDesReactForce(const Vec3D& t_com_position,
                                     const Vec3D& t_com_velocity,
                                     const double /* t */) {
-  auto fz = ctrl_z::computeDesReactForce(t_com_position, t_com_velocity,
-                                         params().com_position, params().qz1,
-                                         params().qz2, model().mass());
+  auto fz =
+      cgc::desired_reaction_force_z(t_com_position, t_com_velocity, params());
   return Vec3D(0, 0, fz);
 }
 
 Vec3D ComCtrl::computeDesZmpPos(const Vec3D& t_com_position,
                                 const Vec3D& t_com_velocity,
                                 const double /* t */) {
-  auto fz = ctrl_z::computeDesReactForce(t_com_position, t_com_velocity,
-                                         params().com_position, params().qz1,
-                                         params().qz2, model().mass());
-  auto zeta = formula::computeZeta(t_com_position.z(), params().vhp, fz,
-                                   model().mass());
-  auto xz = ctrl_x::computeDesZmpPos(
-      t_com_position, t_com_velocity, params().com_position,
-      params().com_velocity, params().qx1, params().qx2, zeta);
-  auto yz = ctrl_y::computeDesZmpPos(
-      t_com_position, t_com_velocity, params().com_position, params().qy1,
-      params().qy2, params().rho, params().dist, params().kr, zeta);
-  return Vec3D(xz, yz, params().vhp);
+  using namespace index_symbols;
+  auto fz =
+      cgc::desired_reaction_force_z(t_com_position, t_com_velocity, params());
+  auto zeta =
+      cz::computeZeta(t_com_position[_Z], params().vhp, fz, model().mass());
+  return cgc::desired_zmp_position(t_com_position, t_com_velocity, params(),
+                                   zeta);
 }
 
 ComCtrl::CallbackFunc ComCtrl::getReactionForceCallback() {
@@ -204,44 +199,40 @@ ComCtrl::CallbackFunc ComCtrl::getZmpPositionCallback() {
 }
 
 double ComCtrl::phaseLF() const {
-  auto zeta =
-      formula::computeZeta(outputs().com_position, outputs().zmp_position,
-                           outputs().com_acceleration);
-  auto pz = phase_y::computeComplexZmp(
-      outputs().zmp_position, outputs().com_velocity, params().com_position,
-      params().qy1, params().qy2, zeta);
-  auto pLin = phase_y::computeComplexInnerEdge(params().com_position,
-                                               params().com_position, pz, 1);
-  return phase_y::computePhase(pz, pLin);
+  auto zeta = cz::computeZeta(outputs().com_position, outputs().zmp_position,
+                              outputs().com_acceleration);
+  auto pz = cgc::complex_zmp_y(outputs().zmp_position, outputs().com_velocity,
+                               params(), zeta);
+  auto pLin = cgc::complex_inner_edge(params().com_position, params(), pz,
+                                      BipedFootType::left);
+  return cgc::phase_y(pz, pLin);
 }
 
 double ComCtrl::phaseRF() const {
-  auto zeta =
-      formula::computeZeta(outputs().com_position, outputs().zmp_position,
-                           outputs().com_acceleration);
-  auto pz = phase_y::computeComplexZmp(
-      outputs().zmp_position, outputs().com_velocity, params().com_position,
-      params().qy1, params().qy2, zeta);
-  auto pRin = phase_y::computeComplexInnerEdge(params().com_position,
-                                               params().com_position, pz, -1);
-  return phase_y::computePhase(pz, pRin);
+  auto zeta = cz::computeZeta(outputs().com_position, outputs().zmp_position,
+                              outputs().com_acceleration);
+  auto pz = cgc::complex_zmp_y(outputs().zmp_position, outputs().com_velocity,
+                               params(), zeta);
+  auto pRin = cgc::complex_inner_edge(params().com_position, params(), pz,
+                                      BipedFootType::right);
+  return cgc::phase_y(pz, pRin);
 }
 
 void ComCtrl::updateSideward() {
-  auto zeta = formula::computeZeta(states().com_position, states().zmp_position,
-                                   states().com_acceleration);
-  auto pz = phase_y::computeComplexZmp(
-      outputs().zmp_position, outputs().com_velocity, params().com_position,
-      params().qy1, params().qy2, zeta);
-  auto pLin = phase_y::computeComplexInnerEdge(params().com_position,
-                                               params().com_position, pz, 1);
-  auto pRin = phase_y::computeComplexInnerEdge(params().com_position,
-                                               params().com_position, pz, -1);
-  auto phaseL = phase_y::computePhase(pz, pLin);
-  auto phaseR = phase_y::computePhase(pz, pRin);
+  using namespace index_symbols;
+  auto zeta = cz::computeZeta(states().com_position, states().zmp_position,
+                              states().com_acceleration);
+  auto pz = cgc::complex_zmp_y(outputs().zmp_position, outputs().com_velocity,
+                               params(), zeta);
+  auto pLin = cgc::complex_inner_edge(params().com_position, params(), pz,
+                                      BipedFootType::left);
+  auto pRin = cgc::complex_inner_edge(params().com_position, params(), pz,
+                                      BipedFootType::right);
+  auto phaseL = cgc::phase_y(pz, pLin);
+  auto phaseR = cgc::phase_y(pz, pRin);
   double yd = params().com_position[1];
   double vyd = params().com_velocity[1];
-  double T = phase_y::computePeriod(params().qy1, params().qy2, zeta);
+  double T = cgc::period(params().q1[_Y], params().q2[_Y], zeta);
   double d0 = canonical_foot_dist();
   double d = m_current_foot_dist;
   if ((vyd > 0 && phaseR > 0 && phaseR < 1) ||
@@ -276,32 +267,39 @@ void ComCtrl::updateSideward() {
 }
 
 void ComCtrl::updateParams() {
+  using namespace index_symbols;
   params().com_position[0] = commands().xd.value_or(default_com_position().x());
   params().com_position[1] = commands().yd.value_or(default_com_position().y());
   params().com_position[2] = commands().zd.value_or(default_com_position().z());
   params().com_velocity[0] = commands().vxd.value_or(0);
   params().com_velocity[1] = commands().vyd.value_or(0);
   params().com_velocity[2] = 0;
-  params().rho = commands().rho.value_or(ctrl_y::default_rho);
-  params().qx1 = commands().qx1.value_or(ctrl_x::default_q1);
+  params().rho = commands().rho.value_or(ComCtrlParamsRawData::default_rho);
+  params().q1[_X] =
+      commands().qx1.value_or(ComCtrlParamsRawData::default_q1[_X]);
   if (commands().dist) set_canonical_foot_dist(commands().dist.value());
   params().dist = commands().dist.value_or(m_canonical_foot_dist);
   if (!zIsTiny(params().com_velocity[0]) ||
       !zIsTiny(params().com_velocity[1])) {
     params().rho = 1;
     if (!zIsTiny(params().com_velocity[0])) {
-      params().qx1 = 0;
+      params().q1[_X] = 0;
     }
     if (!zIsTiny(params().com_velocity[1])) {
       updateSideward();
     }
   }
-  params().qx2 = commands().qx2.value_or(ctrl_x::default_q2);
-  params().qy1 = commands().qy1.value_or(ctrl_y::default_q1);
-  params().qy2 = commands().qy2.value_or(ctrl_y::default_q2);
-  params().kr = commands().kr.value_or(ctrl_y::default_kr);
-  params().qz1 = commands().qz1.value_or(ctrl_z::default_q1);
-  params().qz2 = commands().qz2.value_or(ctrl_z::default_q2);
+  params().q2[_X] =
+      commands().qx2.value_or(ComCtrlParamsRawData::default_q2[_X]);
+  params().q1[_Y] =
+      commands().qy1.value_or(ComCtrlParamsRawData::default_q1[_Y]);
+  params().q2[_Y] =
+      commands().qy2.value_or(ComCtrlParamsRawData::default_q2[_Y]);
+  params().kr = commands().kr.value_or(ComCtrlParamsRawData::default_kr);
+  params().q1[_Z] =
+      commands().qz1.value_or(ComCtrlParamsRawData::default_q1[_Z]);
+  params().q2[_Z] =
+      commands().qz2.value_or(ComCtrlParamsRawData::default_q2[_Z]);
   params().vhp = commands().vhp.value_or(0);
 }
 

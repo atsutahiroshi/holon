@@ -28,9 +28,8 @@
 
 namespace holon {
 
-struct ComZmpModelRawData;
 struct ComCtrlParamsRawData;
-enum struct BipedFootType;
+enum class BipedFootType;
 
 namespace com_guided_ctrl_formula {
 
@@ -46,14 +45,16 @@ Vec3D desired_zmp_position(const Vec3D& t_com_position,
                            const Vec3D& t_ref_com_velocity, const Array3d& t_q1,
                            const Array3d& t_q2, double t_rho, double t_dist,
                            double t_kr, double t_vhp, double t_zeta);
-Vec3D desired_zmp_position(const ComZmpModelRawData& t_states,
+Vec3D desired_zmp_position(const Vec3D& t_com_position,
+                           const Vec3D& t_com_velocity,
                            const ComCtrlParamsRawData& t_params, double t_zeta);
 
 // compuations of desired reaction force along z-axis
 double desired_reaction_force_z(double t_z, double t_v, double t_zd,
                                 double t_q1, double t_q2, double t_mass);
-double desired_reaction_force_z(const ComZmpModelRawData& states,
-                                const ComCtrlParamsRawData& params);
+double desired_reaction_force_z(const Vec3D& t_com_position,
+                                const Vec3D& t_com_velocity,
+                                const ComCtrlParamsRawData& t_params);
 
 // computations related to sideward oscillation
 double frequency(double t_q1, double t_q2, double t_zeta);
@@ -62,17 +63,22 @@ double period(double t_q1, double t_q2, double t_zeta);
 // computations related to oscillation phase
 Complex complex_zmp_y(double t_yz, double t_vy, double t_yd, double t_q1,
                       double t_q2, double t_zeta);
+Complex complex_zmp_y(const Vec3D& t_zmp_position, const Vec3D& t_com_velocity,
+                      const ComCtrlParamsRawData& t_params, double t_zeta);
 Complex complex_inner_edge(double t_yin, double t_yd, const Complex& t_pz,
                            BipedFootType t_type);
+Complex complex_inner_edge(const Vec3D& t_inner_edge,
+                           const ComCtrlParamsRawData& t_params,
+                           const Complex& t_pz, BipedFootType t_type);
 double phase_y(double t_yz, double t_vy, double t_yd, double t_yin, double t_q1,
                double t_q2, double t_zeta, BipedFootType t_type);
-double phase_y(Complex t_pz, Complex t_p0);
+double phase_y(const Complex& t_pz, const Complex& t_p0);
 
-double time_span(Complex t_p0, double t_q1, double t_q2, double t_zeta);
-double elapsed_time(Complex t_pz, Complex t_p0, double t_q1, double t_q2,
-                    double t_zeta);
-double remaining_time(Complex t_pz, Complex t_p0, double t_q1, double t_q2,
-                      double t_zeta);
+double time_span(const Complex& t_p0, double t_q1, double t_q2, double t_zeta);
+double elapsed_time(const Complex& t_pz, const Complex& t_p0, double t_q1,
+                    double t_q2, double t_zeta);
+double remaining_time(const Complex& t_pz, const Complex& t_p0, double t_q1,
+                      double t_q2, double t_zeta);
 
 }  // namespace com_guided_ctrl_formula
 }  // namespace holon

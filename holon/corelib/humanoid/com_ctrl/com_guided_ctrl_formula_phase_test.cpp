@@ -22,6 +22,7 @@
 
 #include <cmath>
 #include "holon/corelib/humanoid/biped_foot_model.hpp"
+#include "holon/corelib/humanoid/com_ctrl.hpp"
 
 #include "catch.hpp"
 #include "holon/test/util/fuzzer/fuzzer.hpp"
@@ -119,6 +120,19 @@ TEST_CASE("Check complex number defined from ZMP along y-axis",
       CHECK(pz.imag() == Approx(tc.expected_pz.imag()));
     }
   }
+  SECTION("oveloaded function 2") {
+    for (const auto& tc : testcases1) {
+      Vec3D z{0, tc.yz, 0};
+      Vec3D v{0, tc.vy, 0};
+      ComCtrlParamsRawData data;
+      data.com_position = {0, tc.yd, 1};
+      data.q1 = {0, tc.q1, 0};
+      data.q2 = {0, tc.q2, 0};
+      auto pz = complex_zmp_y(z, v, data, tc.zeta);
+      CHECK(pz.real() == Approx(tc.expected_pz.real()));
+      CHECK(pz.imag() == Approx(tc.expected_pz.imag()));
+    }
+  }
 }
 
 }  // namespace check_complex_zmp_y
@@ -150,15 +164,28 @@ void CheckCompleInnerEdge_1(const testcase_t& testcases) {
     }
   }
 }
-
+template <typename testcase_t>
+void CheckCompleInnerEdge_2(const testcase_t& testcases) {
+  SECTION("oveloaded function 1") {
+    for (const auto& tc : testcases) {
+      Vec3D in{0, tc.yin, 0};
+      ComCtrlParamsRawData data;
+      data.com_position = {0, tc.yd, 1};
+      auto p0 = complex_inner_edge(in, data, tc.pz, tc.type);
+      CHECK(p0.real() == Approx(tc.expected_p0.real()));
+      CHECK(p0.imag() == Approx(tc.expected_p0.imag()));
+    }
+  }
+}
 TEST_CASE("Case 1: complex number defined from inner edge",
           "[com_guided_ctrl_formula][complex_inner_edge]") {
   CheckCompleInnerEdge_1(testcases1);
+  CheckCompleInnerEdge_2(testcases1);
 }
-
 TEST_CASE("Case 2: complex number defined from inner edge",
           "[com_guided_ctrl_formula][complex_inner_edge]") {
   CheckCompleInnerEdge_1(testcases2);
+  CheckCompleInnerEdge_2(testcases2);
 }
 
 }  // namespace check_complex_inner_edge

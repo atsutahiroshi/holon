@@ -22,10 +22,14 @@
 
 #include <roki/rk_g.h>
 #include <algorithm>
+#include "holon/corelib/humanoid/com_ctrl.hpp"
+#include "holon/corelib/humanoid/com_zmp_model/com_zmp_model_formula.hpp"
 #include "holon/corelib/math/misc.hpp"
 
 namespace holon {
 namespace com_guided_ctrl_formula {
+
+namespace cz = com_zmp_model_formula;
 
 double desired_zmp_position_x(double t_x, double t_v, double t_xd, double t_vd,
                               double t_q1, double t_q2, double t_zeta) {
@@ -70,13 +74,25 @@ Vec3D desired_zmp_position(const Vec3D& t_com_position,
                            const Vec3D& t_ref_com_velocity, const Array3d& t_q1,
                            const Array3d& t_q2, double t_rho, double t_dist,
                            double t_kr, double t_vhp, double t_zeta) {
-  return kVec3DZero;
+  using namespace index_symbols;
+  auto xz = desired_zmp_position_x(
+      t_com_position[_X], t_com_velocity[_X], t_ref_com_position[_X],
+      t_ref_com_velocity[_X], t_q1[_X], t_q2[_X], t_zeta);
+  auto yz = desired_zmp_position_y(t_com_position[_Y], t_com_velocity[_Y],
+                                   t_ref_com_position[_Y], t_q1[_Y], t_q2[_Y],
+                                   t_rho, t_dist, t_kr, t_zeta);
+  auto zz = t_vhp;
+  return Vec3D{xz, yz, zz};
 }
 
-Vec3D desired_zmp_position(const ComZmpModelRawData& t_states,
+Vec3D desired_zmp_position(const Vec3D& t_com_position,
+                           const Vec3D& t_com_velocity,
                            const ComCtrlParamsRawData& t_params,
                            double t_zeta) {
-  return kVec3DZero;
+  return desired_zmp_position(t_com_position, t_com_velocity,
+                              t_params.com_position, t_params.com_velocity,
+                              t_params.q1, t_params.q2, t_params.rho,
+                              t_params.dist, t_params.kr, t_params.vhp, t_zeta);
 }
 
 namespace detail_z {
@@ -100,9 +116,13 @@ double desired_reaction_force_z(double t_z, double t_v, double t_zd,
   fz *= t_mass;
   return std::max<double>(fz, 0);
 }
-double desired_reaction_force_z(const ComZmpModelRawData& states,
-                                const ComCtrlParamsRawData& params) {
-  return 0;
+double desired_reaction_force_z(const Vec3D& t_com_position,
+                                const Vec3D& t_com_velocity,
+                                const ComCtrlParamsRawData& t_params) {
+  using namespace index_symbols;
+  return desired_reaction_force_z(t_com_position[_Z], t_com_velocity[_Z],
+                                  t_params.com_position[_Z], t_params.q1[_Z],
+                                  t_params.q2[_Z], t_params.mass);
 }
 
 double frequency(double t_q1, double t_q2, double t_zeta) {
@@ -120,11 +140,27 @@ Complex complex_zmp_y(double t_yz, double t_vy, double t_yd, double t_q1,
   return Complex(t_yz - t_yd, -(t_q1 * t_q2 + 1.0) * t_vy / omega);
 }
 
+Complex complex_zmp_y(const Vec3D& t_zmp_position, const Vec3D& t_com_velocity,
+                      const ComCtrlParamsRawData& t_params, double t_zeta) {
+  using namespace index_symbols;
+  return complex_zmp_y(t_zmp_position[_Y], t_com_velocity[_Y],
+                       t_params.com_position[_Y], t_params.q1[_Y],
+                       t_params.q2[_Y], t_zeta);
+}
+
 Complex complex_inner_edge(double t_yin, double t_yd, const Complex& t_pz,
                            BipedFootType t_type) {
   double y = t_yin - t_yd;
   return Complex(
       y, -std::sqrt(std::norm(t_pz) - y * y) * sgn(static_cast<int>(t_type)));
+}
+
+Complex complex_inner_edge(const Vec3D& t_inner_edge,
+                           const ComCtrlParamsRawData& t_params,
+                           const Complex& t_pz, BipedFootType t_type) {
+  using namespace index_symbols;
+  return complex_inner_edge(t_inner_edge[_Y], t_params.com_position[_Y], t_pz,
+                            t_type);
 }
 
 double phase_y(double t_yz, double t_vy, double t_yd, double t_yin, double t_q1,
@@ -133,7 +169,7 @@ double phase_y(double t_yz, double t_vy, double t_yd, double t_yin, double t_q1,
   return phase_y(pz, complex_inner_edge(t_yin, t_yd, pz, t_type));
 }
 
-double phase_y(Complex t_pz, Complex t_p0) {
+double phase_y(const Complex& t_pz, const Complex& t_p0) {
   auto t_p1 = std::conj(t_p0);
   auto denom = std::arg(t_p1 / t_p0);
   if (denom < 0) denom += 2.0 * M_PI;
@@ -165,21 +201,21 @@ double period(double t_q1, double t_q2, double t_zeta) {
   return zPIx2 / omega;
 }
 
-double time_span(Complex t_p0, double t_q1, double t_q2, double t_zeta) {
+double time_span(const Complex& t_p0, double t_q1, double t_q2, double t_zeta) {
   auto omega = frequency(t_q1, t_q2, t_zeta);
   if (!detail_phase::is_omega_valid(omega)) return 0;
   return std::arg(std::conj(t_p0) / t_p0) / omega;
 }
 
-double elapsed_time(Complex t_pz, Complex t_p0, double t_q1, double t_q2,
-                    double t_zeta) {
+double elapsed_time(const Complex& t_pz, const Complex& t_p0, double t_q1,
+                    double t_q2, double t_zeta) {
   auto omega = frequency(t_q1, t_q2, t_zeta);
   if (!detail_phase::is_omega_valid(omega)) return 0;
   return std::arg(t_pz / t_p0) / omega;
 }
 
-double remaining_time(Complex t_pz, Complex t_p0, double t_q1, double t_q2,
-                      double t_zeta) {
+double remaining_time(const Complex& t_pz, const Complex& t_p0, double t_q1,
+                      double t_q2, double t_zeta) {
   auto omega = frequency(t_q1, t_q2, t_zeta);
   if (!detail_phase::is_omega_valid(omega)) return 0;
   return std::arg(std::conj(t_p0) / t_pz) / omega;

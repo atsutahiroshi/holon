@@ -49,12 +49,17 @@ struct ComCtrlCommandsRawData : RawDataBase {
 };
 
 struct ComCtrlParamsRawData : RawDataBase {
+  static const Array3d default_q1;
+  static const Array3d default_q2;
+  static const double default_rho;
+  static const double default_dist;
+  static const double default_kr;
+  static const double default_vhp;
+
   Vec3D com_position;
   Vec3D com_velocity;
   double mass;
-  double qx1, qx2;
-  double qy1, qy2;
-  double qz1, qz2;
+  Array3d q1, q2;
   double rho, dist, kr;
   double vhp;
   ComCtrlParamsRawData();

@@ -31,6 +31,9 @@ namespace holon {
 namespace {
 
 using Catch::Matchers::Equals;
+using index_symbols::_X;
+using index_symbols::_Y;
+using index_symbols::_Z;
 
 const double G = RK_G;
 
@@ -78,7 +81,6 @@ TEST_CASE("ComCtrlCommandsRawData::clear() should clear all the values") {
 
 TEST_CASE("Check c'tor of ComCtrlData", "[ComCtrlData]") {
   SECTION("default constructor") {
-    using namespace index_symbols;
     ComCtrlData data;
     constexpr auto i = ComCtrlData::ParamsDataIndex::get<0>();
     CHECK(data.get<i>().com_position ==
@@ -383,7 +385,6 @@ TEST_CASE("check if desired ZMP position is modified after update",
 }
 
 TEST_CASE("ComCtrl::update() updates control paramters", "[ComCtrl]") {
-  using namespace index_symbols;
   ComCtrl ctrl;
   Vec3D p0 = {0.1, -0.1, 1.5};
   double dist = 0.42;
@@ -724,7 +725,6 @@ SCENARIO("Controller makes COM oscillate sideward", "[ComCtrl]") {
 }
 
 SCENARIO("Check relations among rho, qx1 and vxd", "[ComCtrl]") {
-  using namespace index_symbols;
   GIVEN("COM controller is given") {
     ComCtrl ctrl;
     Vec3D p0 = {0, 0, 0.42};

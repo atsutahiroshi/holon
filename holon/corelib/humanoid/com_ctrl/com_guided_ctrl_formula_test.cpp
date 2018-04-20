@@ -30,7 +30,9 @@ namespace holon {
 namespace com_guided_ctrl_formula {
 namespace {
 
-using namespace index_symbols;
+using index_symbols::_X;
+using index_symbols::_Y;
+using index_symbols::_Z;
 
 TEST_CASE("Check computation of desired ZMP position",
           "[com_guided_ctrl_formula][desired_zmp_position]") {

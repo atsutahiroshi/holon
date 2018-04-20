@@ -30,6 +30,9 @@ namespace holon {
 namespace com_guided_ctrl_formula {
 
 namespace cz = com_zmp_model_formula;
+using index_symbols::_X;
+using index_symbols::_Y;
+using index_symbols::_Z;
 
 double desired_zmp_position_x(double t_x, double t_v, double t_xd, double t_vd,
                               double t_q1, double t_q2, double t_zeta) {
@@ -74,7 +77,6 @@ Vec3D desired_zmp_position(const Vec3D& t_com_position,
                            const Vec3D& t_ref_com_velocity, const Array3d& t_q1,
                            const Array3d& t_q2, double t_rho, double t_dist,
                            double t_kr, double t_vhp, double t_zeta) {
-  using namespace index_symbols;
   auto xz = desired_zmp_position_x(
       t_com_position[_X], t_com_velocity[_X], t_ref_com_position[_X],
       t_ref_com_velocity[_X], t_q1[_X], t_q2[_X], t_zeta);
@@ -119,7 +121,6 @@ double desired_reaction_force_z(double t_z, double t_v, double t_zd,
 double desired_reaction_force_z(const Vec3D& t_com_position,
                                 const Vec3D& t_com_velocity,
                                 const ComCtrlParamsRawData& t_params) {
-  using namespace index_symbols;
   return desired_reaction_force_z(t_com_position[_Z], t_com_velocity[_Z],
                                   t_params.com_position[_Z], t_params.q1[_Z],
                                   t_params.q2[_Z], t_params.mass);
@@ -142,7 +143,6 @@ Complex complex_zmp_y(double t_yz, double t_vy, double t_yd, double t_q1,
 
 Complex complex_zmp_y(const Vec3D& t_zmp_position, const Vec3D& t_com_velocity,
                       const ComCtrlParamsRawData& t_params, double t_zeta) {
-  using namespace index_symbols;
   return complex_zmp_y(t_zmp_position[_Y], t_com_velocity[_Y],
                        t_params.com_position[_Y], t_params.q1[_Y],
                        t_params.q2[_Y], t_zeta);
@@ -158,7 +158,6 @@ Complex complex_inner_edge(double t_yin, double t_yd, const Complex& t_pz,
 Complex complex_inner_edge(const Vec3D& t_inner_edge,
                            const ComCtrlParamsRawData& t_params,
                            const Complex& t_pz, BipedFootType t_type) {
-  using namespace index_symbols;
   return complex_inner_edge(t_inner_edge[_Y], t_params.com_position[_Y], t_pz,
                             t_type);
 }

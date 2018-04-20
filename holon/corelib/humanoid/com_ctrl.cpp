@@ -31,6 +31,9 @@ namespace holon {
 
 namespace cz = com_zmp_model_formula;
 namespace cgc = com_guided_ctrl_formula;
+using index_symbols::_X;
+using index_symbols::_Y;
+using index_symbols::_Z;
 
 void ComCtrlCommandsRawData::clear() {
   xd = nullopt;
@@ -178,7 +181,6 @@ Vec3D ComCtrl::computeDesReactForce(const Vec3D& t_com_position,
 Vec3D ComCtrl::computeDesZmpPos(const Vec3D& t_com_position,
                                 const Vec3D& t_com_velocity,
                                 const double /* t */) {
-  using namespace index_symbols;
   auto fz =
       cgc::desired_reaction_force_z(t_com_position, t_com_velocity, params());
   auto zeta = cz::zeta(t_com_position[_Z], params().vhp, fz, model().mass());
@@ -218,7 +220,6 @@ double ComCtrl::phaseRF() const {
 }
 
 void ComCtrl::updateSideward() {
-  using namespace index_symbols;
   auto zeta = cz::zeta(states().com_position, states().zmp_position,
                        states().com_acceleration);
   auto pz = cgc::complex_zmp_y(outputs().zmp_position, outputs().com_velocity,
@@ -266,7 +267,6 @@ void ComCtrl::updateSideward() {
 }
 
 void ComCtrl::updateParams() {
-  using namespace index_symbols;
   params().com_position[0] = commands().xd.value_or(default_com_position().x());
   params().com_position[1] = commands().yd.value_or(default_com_position().y());
   params().com_position[2] = commands().zd.value_or(default_com_position().z());

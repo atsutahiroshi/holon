@@ -80,6 +80,33 @@ double elapsed_time(const Complex& t_pz, const Complex& t_p0, double t_q1,
 double remaining_time(const Complex& t_pz, const Complex& t_p0, double t_q1,
                       double t_q2, double t_zeta);
 
+// computations related to capture point
+double stabilizable_point_x(double t_x, double t_v, double t_xd, double t_q1,
+                            double t_q2, double t_zeta);
+double stabilizable_point_y(double t_y, double t_v, double t_yd, double t_q1,
+                            double t_q2, double t_zeta);
+Vec3D stabilizable_point(const Vec3D& t_com_position,
+                         const Vec3D& t_com_velocity,
+                         const Vec3D& t_ref_com_position, const Array3d& t_q1,
+                         const Array3d& t_q2, double t_vhp, double t_zeta);
+Vec3D stabilizable_point(const Vec3D& t_com_position,
+                         const Vec3D& t_com_velocity,
+                         const ComCtrlParamsRawData& t_params, double t_zeta);
+double capture_point_x(double t_x, double t_v, double t_zeta);
+double capture_point_y(double t_y, double t_v, double t_zeta);
+Vec3D capture_point(const Vec3D& t_com_position, const Vec3D& t_com_velocity,
+                    double t_zeta);
+
+// computations related to foot lifting
+double desired_foot_height(const Complex& t_pz, double t_phase,
+                           double t_max_height, double t_rho, double t_dist);
+double desired_foot_height(const Complex& t_pz, double t_phase,
+                           double t_max_height,
+                           const ComCtrlParamsRawData& t_params);
+Vec3D desired_foot_position(const Vec3D& t_com_position,
+                            const Vec3D& t_com_velocity,
+                            const ComCtrlParamsRawData& t_com_ctrl_params);
+
 }  // namespace com_guided_ctrl_formula
 }  // namespace holon
 

@@ -4,7 +4,9 @@ add_library(Catch INTERFACE)
 target_include_directories(Catch INTERFACE ${CATCH_INCLUDE_DIR})
 
 # Build "hayai" library
-add_subdirectory(hayai)
+if(NOT TESTING_HOLON2)
+  add_subdirectory(hayai)
+endif()
 
 add_subdirectory(cure)
 add_subdirectory(zm)

@@ -1,10 +1,20 @@
 cmake_minimum_required(VERSION 3.2)
 
 project(holon CXX C)
+option(TESTING_HOLON2 "Testing holon2" ON)
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if(TESTING_HOLON2)
+  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+else()
+  set(CMAKE_CXX_STANDARD 11)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
 
 enable_testing()
 add_subdirectory(third_party)
-add_subdirectory(holon)
+if(TESTING_HOLON2)
+  add_subdirectory(holon2)
+else()
+  add_subdirectory(holon)
+endif()

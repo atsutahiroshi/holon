@@ -4,7 +4,7 @@ project(holon CXX C)
 option(TESTING_HOLON2 "Testing holon2" ON)
 
 if(TESTING_HOLON2)
-  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD 14)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
 else()
   set(CMAKE_CXX_STANDARD 11)

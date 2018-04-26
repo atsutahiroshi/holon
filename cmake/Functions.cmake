@@ -180,7 +180,9 @@ function(holon_make_corelib)
     $<$<CXX_COMPILER_ID:GNU>:-pedantic -Wall -Wextra -Wshadow -Wnon-virtual-dtor $<$<CONFIG:Debug>:-g3 -O0> $<$<CONFIG:Release>:-O3>>
     $<$<CXX_COMPILER_ID:MSVC>:/W4 $<$<CONFIG:Debug>:/Od> $<$<CONFIG:Release>:/O2>>
     )
-  target_link_libraries(holon PUBLIC roki)
+  if(NOT TESTING_HOLON2)
+    target_link_libraries(holon PUBLIC roki)
+  endif()
 endfunction(holon_make_corelib)
 
 

@@ -2,7 +2,7 @@ holon_init_corelib()
 
 # add_subdirectory(common)
 # add_subdirectory(control)
-# add_subdirectory(data)
+add_subdirectory(dataset)
 add_subdirectory(math)
 # add_subdirectory(humanoid)
 

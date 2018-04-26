@@ -24,7 +24,11 @@
 #include "holon2/corelib/math/vec.hpp"
 #include "third_party/eigen/Eigen/Dense"
 
+namespace holon {
+
 using Mat = Eigen::MatrixXd;
 using Mat3d = Eigen::Matrix3d;
+
+}  // namespace holon
 
 #endif  // HOLON_MATH_MAT_HPP_

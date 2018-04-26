@@ -22,7 +22,11 @@
 
 #include "third_party/eigen/Eigen/Dense"
 
+namespace holon {
+
 using Vec = Eigen::VectorXd;
 using Vec3d = Eigen::Vector3d;
+
+}  // namespace holon
 
 #endif  // HOLON_MATH_VEC_HPP_

@@ -22,6 +22,9 @@
 
 #include "third_party/catch/catch.hpp"
 
+namespace holon {
+namespace {
+
 TEST_CASE("Example 1 in Eigen tutorial", "[Mat]") {
   Mat m(2, 2);
   m(0, 0) = 3;
@@ -77,3 +80,6 @@ TEST_CASE("Example 2 in Eigen tutorial: size set at compile time",
   CHECK(mv(1) == Approx(m(1, 0) * v(0) + m(1, 1) * v(1) + m(1, 2) * v(2)));
   CHECK(mv(2) == Approx(m(2, 0) * v(0) + m(2, 1) * v(1) + m(2, 2) * v(2)));
 }
+
+}  // namespace
+}  // namespace holon

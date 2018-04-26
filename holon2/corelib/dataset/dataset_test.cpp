@@ -19,6 +19,7 @@
  */
 
 #include "holon2/corelib/dataset/dataset.hpp"
+#include "holon2/corelib/common/random.hpp"
 #include "holon2/corelib/math/vec.hpp"
 
 #include "third_party/catch/catch.hpp"
@@ -41,9 +42,11 @@ using TestDataset1 = Dataset<TestRawData1>;
 TestDataset1 TestDataset1Factory() { return TestDataset1(); }
 
 TEST_CASE("dataset: access to raw data", "[Dataset]") {
+  Random<double> rnd;
   TestDataset1 data;
-  data.get().a = 1;
-  CHECK(data.get().a == 1);
+  auto a = rnd();
+  data.get().a = a;
+  CHECK(data.get().a == a);
 }
 
 }  // namespace

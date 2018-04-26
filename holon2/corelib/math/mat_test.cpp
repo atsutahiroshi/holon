@@ -37,8 +37,8 @@ TEST_CASE("Example 1 in Eigen tutorial", "[Mat]") {
 TEST_CASE("Example 2 in Eigen tutorial: size set at run time", "[Mat][Vec]") {
   Mat m = Mat::Random(3, 3);
   m = (m + Mat::Constant(3, 3, 1.2)) * 50;
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
       CHECK(m(i, j) > 10);
       CHECK(m(i, j) < 110);
     }
@@ -60,8 +60,8 @@ TEST_CASE("Example 2 in Eigen tutorial: size set at compile time",
           "[Mat3d][Vec3d]") {
   Mat3d m = Mat3d::Random();
   m = (m + Mat3d::Constant(1.2)) * 50;
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
       CHECK(m(i, j) > 10);
       CHECK(m(i, j) < 110);
     }

@@ -55,3 +55,25 @@ TEST_CASE("Example 2 in Eigen tutorial: size set at run time", "[Mat][Vec]") {
   CHECK(mv(1) == Approx(m(1, 0) * v(0) + m(1, 1) * v(1) + m(1, 2) * v(2)));
   CHECK(mv(2) == Approx(m(2, 0) * v(0) + m(2, 1) * v(1) + m(2, 2) * v(2)));
 }
+
+TEST_CASE("Example 2 in Eigen tutorial: size set at compile time",
+          "[Mat3d][Vec3d]") {
+  Mat3d m = Mat3d::Random();
+  m = (m + Mat3d::Constant(1.2)) * 50;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      CHECK(m(i, j) > 10);
+      CHECK(m(i, j) < 110);
+    }
+  }
+
+  Vec3d v(1, 2, 3);
+  CHECK(v(0) == 1);
+  CHECK(v(1) == 2);
+  CHECK(v(2) == 3);
+
+  Vec3d mv = m * v;
+  CHECK(mv(0) == Approx(m(0, 0) * v(0) + m(0, 1) * v(1) + m(0, 2) * v(2)));
+  CHECK(mv(1) == Approx(m(1, 0) * v(0) + m(1, 1) * v(1) + m(1, 2) * v(2)));
+  CHECK(mv(2) == Approx(m(2, 0) * v(0) + m(2, 1) * v(1) + m(2, 2) * v(2)));
+}

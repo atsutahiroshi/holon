@@ -25,5 +25,6 @@
 #include "third_party/eigen/Eigen/Dense"
 
 using Mat = Eigen::MatrixXd;
+using Mat3d = Eigen::Matrix3d;
 
 #endif  // HOLON_MATH_MAT_HPP_

@@ -23,5 +23,6 @@
 #include "third_party/eigen/Eigen/Dense"
 
 using Vec = Eigen::VectorXd;
+using Vec3d = Eigen::Vector3d;
 
 #endif  // HOLON_MATH_VEC_HPP_

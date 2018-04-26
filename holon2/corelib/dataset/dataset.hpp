@@ -21,6 +21,8 @@
 #ifndef HOLON_DATASET_DATASET_HPP_
 #define HOLON_DATASET_DATASET_HPP_
 
+namespace holon {
+
 // template <typename... RawDataTypes>
 template <typename RawDataTypes>
 class Dataset {
@@ -30,5 +32,7 @@ class Dataset {
  private:
   RawDataTypes m_rawdata;
 };
+
+}  // namespace holon
 
 #endif  // HOLON_DATASET_DATASET_HPP_

@@ -23,6 +23,9 @@
 
 #include "third_party/catch/catch.hpp"
 
+namespace holon {
+namespace {
+
 struct TestRawData1 {
   double a, b;
 };
@@ -42,3 +45,6 @@ TEST_CASE("dataset: access to raw data", "[Dataset]") {
   data.get().a = 1;
   CHECK(data.get().a == 1);
 }
+
+}  // namespace
+}  // namespace holon

@@ -1,6 +1,6 @@
 holon_init_corelib()
 
-# add_subdirectory(common)
+add_subdirectory(common)
 # add_subdirectory(control)
 add_subdirectory(dataset)
 add_subdirectory(math)

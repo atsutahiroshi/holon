@@ -43,21 +43,25 @@ struct TestRawData3 {
 };
 using TestDataset1 = Dataset<TestRawData1, TestRawData2>;
 
-TEST_CASE("dataset: getRawDataNum returns number of given raw data",
-          "[Dataset]") {
-  TestDataset1 data;
-  CHECK(data.getRawDataNum() == 2);
-}
-
-TEST_CASE("dataset: raw data is kept as a smart pointer in Dataset",
-          "[Dataset]") {
-  TestDataset1 data;
+void checkCtor(const TestDataset1& data) {
   auto ptr1 = data.getRawDataPtr<0>();
   auto ptr2 = data.getRawDataPtr<1>();
   CHECK(ptr1 != nullptr);
   CHECK(ptr2 != nullptr);
   CHECK(std::is_same<decltype(ptr1), std::shared_ptr<TestRawData1>>::value);
   CHECK(std::is_same<decltype(ptr2), std::shared_ptr<TestRawData2>>::value);
+}
+TEST_CASE("dataset: c'tor of Dataset", "[Dataset]") {
+  SECTION("default c'tor") {
+    TestDataset1 data;
+    checkCtor(data);
+  }
+}
+
+TEST_CASE("dataset: getRawDataNum returns number of given raw data",
+          "[Dataset]") {
+  TestDataset1 data;
+  CHECK(data.getRawDataNum() == 2);
 }
 
 TEST_CASE("dataset: access to an element of raw data", "[Dataset]") {

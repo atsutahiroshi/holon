@@ -85,6 +85,15 @@ class Dataset {
     return this->getRawDataPtrSubTuple<I...>();
   }
 
+  template <std::size_t... I>
+  auto getSubDataset() const -> Dataset<RawDataType<I>...> {
+    return Dataset<RawDataType<I>...>(this->getRawDataPtrSubTuple<I...>());
+  }
+  template <std::size_t... I>
+  auto getSubDataset(IndexSeq<I...>) const -> Dataset<RawDataType<I>...> {
+    return this->getSubDataset<I...>();
+  }
+
  private:
   RawDataPtrTuple m_raw_data_ptr_tuple;
 };

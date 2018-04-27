@@ -140,5 +140,31 @@ TEST_CASE("dataset: get sub-tuple of raw data pointers", "[Dataset]") {
   }
 }
 
+void checkSubDataset(const SampleDataset& data, const SubDataset1& subdata1,
+                     const SubDataset2& subdata2) {
+  SECTION("case 1") {
+    CHECK(subdata1.getRawDataPtr<0>() == data.getRawDataPtr<0>());
+    CHECK(subdata1.getRawDataPtr<1>() == data.getRawDataPtr<1>());
+  }
+  SECTION("case 2") {
+    CHECK(subdata2.getRawDataPtr<0>() == data.getRawDataPtr<3>());
+    CHECK(subdata2.getRawDataPtr<1>() == data.getRawDataPtr<1>());
+    CHECK(subdata2.getRawDataPtr<2>() == data.getRawDataPtr<4>());
+  }
+}
+TEST_CASE("dataset: get sub Dataset", "[Dataset]") {
+  SampleDataset data;
+  SECTION("overloaded function 1") {
+    auto subdata1 = data.getSubDataset<0, 1>();
+    auto subdata2 = data.getSubDataset<3, 1, 4>();
+    checkSubDataset(data, subdata1, subdata2);
+  }
+  SECTION("overloaded function 2") {
+    auto subdata1 = data.getSubDataset(IndexSeq<0, 1>());
+    auto subdata2 = data.getSubDataset(IndexSeq<3, 1, 4>());
+    checkSubDataset(data, subdata1, subdata2);
+  }
+}
+
 }  // namespace
 }  // namespace holon

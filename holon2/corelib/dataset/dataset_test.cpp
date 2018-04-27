@@ -21,6 +21,7 @@
 #include "holon2/corelib/dataset/dataset.hpp"
 
 #include <memory>
+#include <tuple>
 #include <type_traits>
 #include "holon2/corelib/common/random.hpp"
 #include "holon2/corelib/common/utility.hpp"
@@ -106,33 +107,36 @@ struct D {
 struct E {
   double e;
 };
+using SampleDataset = Dataset<A, B, C, D, E>;
+using SubDatasetTuple1 = std::tuple<std::shared_ptr<A>, std::shared_ptr<B>>;
+using SubDataset1 = Dataset<A, B>;
+using SubDatasetTuple2 =
+    std::tuple<std::shared_ptr<D>, std::shared_ptr<B>, std::shared_ptr<E>>;
+using SubDataset2 = Dataset<D, B, E>;
+
+void checkSubTuple(const SampleDataset& data, SubDatasetTuple1 tuple1,
+                   SubDatasetTuple2 tuple2) {
+  SECTION("case 1") {
+    CHECK(std::get<0>(tuple1) == data.getRawDataPtr<0>());
+    CHECK(std::get<1>(tuple1) == data.getRawDataPtr<1>());
+  }
+  SECTION("case 2") {
+    CHECK(std::get<0>(tuple2) == data.getRawDataPtr<3>());
+    CHECK(std::get<1>(tuple2) == data.getRawDataPtr<1>());
+    CHECK(std::get<2>(tuple2) == data.getRawDataPtr<4>());
+  }
+}
 TEST_CASE("dataset: get sub-tuple of raw data pointers", "[Dataset]") {
-  Dataset<A, B, C, D, E> data;
+  SampleDataset data;
   SECTION("overloaded function 1") {
-    SECTION("case 1") {
-      auto subdata = data.getRawDataPtrSubTuple<0, 1>();
-      CHECK(std::get<0>(subdata) == data.getRawDataPtr<0>());
-      CHECK(std::get<1>(subdata) == data.getRawDataPtr<1>());
-    }
-    SECTION("case 2") {
-      auto subdata = data.getRawDataPtrSubTuple<3, 1>();
-      CHECK(std::get<0>(subdata) == data.getRawDataPtr<3>());
-      CHECK(std::get<1>(subdata) == data.getRawDataPtr<1>());
-    }
+    auto t1 = data.getRawDataPtrSubTuple<0, 1>();
+    auto t2 = data.getRawDataPtrSubTuple<3, 1, 4>();
+    checkSubTuple(data, t1, t2);
   }
   SECTION("overloaded function 2") {
-    SECTION("case 1") {
-      IndexSeq<0, 1> seq;
-      auto subdata = data.getRawDataPtrSubTuple(seq);
-      CHECK(std::get<0>(subdata) == data.getRawDataPtr<0>());
-      CHECK(std::get<1>(subdata) == data.getRawDataPtr<1>());
-    }
-    SECTION("case 2") {
-      IndexSeq<3, 1> seq;
-      auto subdata = data.getRawDataPtrSubTuple(seq);
-      CHECK(std::get<0>(subdata) == data.getRawDataPtr<3>());
-      CHECK(std::get<1>(subdata) == data.getRawDataPtr<1>());
-    }
+    auto t1 = data.getRawDataPtrSubTuple(IndexSeq<0, 1>());
+    auto t2 = data.getRawDataPtrSubTuple(IndexSeq<3, 1, 4>());
+    checkSubTuple(data, t1, t2);
   }
 }
 

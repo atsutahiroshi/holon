@@ -51,6 +51,8 @@ class Dataset {
             std::make_tuple(makeRawDataPtr<RawDataTypes>()...)) {}
   virtual ~Dataset() = default;
 
+  constexpr std::size_t getRawDataNum() const { return this->kRawDataNum; }
+
   const RawDataPtrTuple& getRawDataPtrTuple() const {
     return m_raw_data_ptr_tuple;
   }

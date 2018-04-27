@@ -73,7 +73,7 @@ class Dataset {
   }
 
   template <std::size_t... I>
-  auto getRawDataPtrSubTuple() -> const std::tuple<RawDataPtrType<I>...> {
+  auto getRawDataPtrSubTuple() const -> const std::tuple<RawDataPtrType<I>...> {
     return std::make_tuple(std::get<I>(m_raw_data_ptr_tuple)...);
   }
   template <std::size_t... I>

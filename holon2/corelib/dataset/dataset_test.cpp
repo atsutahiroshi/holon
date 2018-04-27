@@ -19,6 +19,9 @@
  */
 
 #include "holon2/corelib/dataset/dataset.hpp"
+
+#include <memory>
+#include <type_traits>
 #include "holon2/corelib/common/random.hpp"
 #include "holon2/corelib/math/vec.hpp"
 
@@ -37,16 +40,26 @@ struct TestRawData2 {
 struct TestRawData3 {
   Vec3d p, v;
 };
-using TestDataset1 = Dataset<TestRawData1>;
+using TestDataset1 = Dataset<TestRawData1, TestRawData2>;
 
-TestDataset1 TestDataset1Factory() { return TestDataset1(); }
+TEST_CASE("dataset: raw data is kept as a smart pointer in Dataset",
+          "[Dataset]") {
+  TestDataset1 data;
+  auto ptr1 = data.getRawDataPtr<0>();
+  auto ptr2 = data.getRawDataPtr<1>();
+  CHECK(std::is_same<decltype(ptr1), std::shared_ptr<TestRawData1>>::value);
+  CHECK(std::is_same<decltype(ptr2), std::shared_ptr<TestRawData2>>::value);
+}
 
-TEST_CASE("dataset: access to raw data", "[Dataset]") {
+TEST_CASE("dataset: access to an element of raw data", "[Dataset]") {
   Random<double> rnd;
   TestDataset1 data;
   auto a = rnd();
-  data.get().a = a;
-  CHECK(data.get().a == a);
+  auto x = rnd();
+  data.getRawData<0>().a = a;
+  data.getRawData<1>().x = x;
+  CHECK(data.getRawData<0>().a == a);
+  CHECK(data.getRawData<1>().x == x);
 }
 
 }  // namespace

@@ -21,16 +21,56 @@
 #ifndef HOLON_DATASET_DATASET_HPP_
 #define HOLON_DATASET_DATASET_HPP_
 
+#include <memory>
+#include <tuple>
+
 namespace holon {
 
-// template <typename... RawDataTypes>
-template <typename RawDataTypes>
+template <typename RawData, typename... Args>
+std::shared_ptr<RawData> makeRawDataPtr(Args&&... args) {
+  return std::make_shared<RawData>(std::forward<Args>(args)...);
+}
+
+template <typename... RawDataTypes>
 class Dataset {
+ protected:
+  static constexpr std::size_t kRawDataNum = sizeof...(RawDataTypes);
+  using Self = Dataset<RawDataTypes...>;
+  using RawDataTuple = std::tuple<RawDataTypes...>;
+  using RawDataPtrTuple = std::tuple<std::shared_ptr<RawDataTypes>...>;
+
  public:
-  RawDataTypes& get() { return m_rawdata; }
+  template <std::size_t I>
+  using RawDataType = typename std::tuple_element<I, RawDataTuple>::type;
+  template <std::size_t I>
+  using RawDataPtrType = typename std::tuple_element<I, RawDataPtrTuple>::type;
+
+ public:
+  Dataset()
+      : m_raw_data_ptr_tuple(
+            std::make_tuple(makeRawDataPtr<RawDataTypes>()...)) {}
+  virtual ~Dataset() = default;
+
+  const RawDataPtrTuple& getRawDataPtrTuple() const {
+    return m_raw_data_ptr_tuple;
+  }
+
+  template <std::size_t I = 0>
+  const RawDataPtrType<I>& getRawDataPtr() const {
+    return std::get<I>(this->getRawDataPtrTuple());
+  }
+
+  template <std::size_t I = 0>
+  const RawDataType<I>& getRawData() const {
+    return *this->getRawDataPtr<I>();
+  }
+  template <std::size_t I = 0>
+  RawDataType<I>& getRawData() {
+    return *this->getRawDataPtr<I>();
+  }
 
  private:
-  RawDataTypes m_rawdata;
+  RawDataPtrTuple m_raw_data_ptr_tuple;
 };
 
 }  // namespace holon

@@ -56,6 +56,22 @@ TEST_CASE("dataset: c'tor of Dataset", "[Dataset]") {
     TestDataset1 data;
     checkCtor(data);
   }
+  SECTION("if pointers of raw data are given object shares them") {
+    auto ptr1 = std::make_shared<TestRawData1>();
+    auto ptr2 = std::make_shared<TestRawData2>();
+    TestDataset1 data(ptr1, ptr2);
+    checkCtor(data);
+    CHECK(data.getRawDataPtr<0>() == ptr1);
+    CHECK(data.getRawDataPtr<1>() == ptr2);
+  }
+  SECTION("if tuple of raw data pointers is given object shares it") {
+    auto tuple = std::make_tuple(std::make_shared<TestRawData1>(),
+                                 std::make_shared<TestRawData2>());
+    TestDataset1 data(tuple);
+    checkCtor(data);
+    CHECK(data.getRawDataPtr<0>() == std::get<0>(tuple));
+    CHECK(data.getRawDataPtr<1>() == std::get<1>(tuple));
+  }
 }
 
 TEST_CASE("dataset: getRawDataNum returns number of given raw data",

@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <tuple>
+#include "holon2/corelib/common/utility.hpp"
 
 namespace holon {
 
@@ -69,6 +70,16 @@ class Dataset {
   template <std::size_t I = 0>
   RawDataType<I>& getRawData() {
     return *this->getRawDataPtr<I>();
+  }
+
+  template <std::size_t... I>
+  auto getRawDataPtrSubTuple() -> const std::tuple<RawDataPtrType<I>...> {
+    return std::make_tuple(std::get<I>(m_raw_data_ptr_tuple)...);
+  }
+  template <std::size_t... I>
+  auto getRawDataPtrSubTuple(IndexSeq<I...>)
+      -> const std::tuple<RawDataPtrType<I>...> {
+    return this->getRawDataPtrSubTuple<I...>();
   }
 
  private:

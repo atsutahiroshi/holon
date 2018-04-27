@@ -23,6 +23,7 @@
 #include <memory>
 #include <type_traits>
 #include "holon2/corelib/common/random.hpp"
+#include "holon2/corelib/common/utility.hpp"
 #include "holon2/corelib/math/vec.hpp"
 
 #include "third_party/catch/catch.hpp"
@@ -68,6 +69,51 @@ TEST_CASE("dataset: access to an element of raw data", "[Dataset]") {
   data.getRawData<1>().x = x;
   CHECK(data.getRawData<0>().a == a);
   CHECK(data.getRawData<1>().x == x);
+}
+
+struct A {
+  double a;
+};
+struct B {
+  double b;
+};
+struct C {
+  double c;
+};
+struct D {
+  double d;
+};
+struct E {
+  double e;
+};
+TEST_CASE("dataset: get sub-tuple of raw data pointers", "[Dataset]") {
+  Dataset<A, B, C, D, E> data;
+  SECTION("overloaded function 1") {
+    SECTION("case 1") {
+      auto subdata = data.getRawDataPtrSubTuple<0, 1>();
+      CHECK(std::get<0>(subdata) == data.getRawDataPtr<0>());
+      CHECK(std::get<1>(subdata) == data.getRawDataPtr<1>());
+    }
+    SECTION("case 2") {
+      auto subdata = data.getRawDataPtrSubTuple<3, 1>();
+      CHECK(std::get<0>(subdata) == data.getRawDataPtr<3>());
+      CHECK(std::get<1>(subdata) == data.getRawDataPtr<1>());
+    }
+  }
+  SECTION("overloaded function 2") {
+    SECTION("case 1") {
+      IndexSeq<0, 1> seq;
+      auto subdata = data.getRawDataPtrSubTuple(seq);
+      CHECK(std::get<0>(subdata) == data.getRawDataPtr<0>());
+      CHECK(std::get<1>(subdata) == data.getRawDataPtr<1>());
+    }
+    SECTION("case 2") {
+      IndexSeq<3, 1> seq;
+      auto subdata = data.getRawDataPtrSubTuple(seq);
+      CHECK(std::get<0>(subdata) == data.getRawDataPtr<3>());
+      CHECK(std::get<1>(subdata) == data.getRawDataPtr<1>());
+    }
+  }
 }
 
 }  // namespace

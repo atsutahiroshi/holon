@@ -86,15 +86,18 @@ class Dataset {
     return this->subdata<I...>();
   }
 
-  template <std::size_t... I>
+  template <typename T = void>
   void copy(const Self& t_other) {
-    this->copy_impl<I...>(t_other);
+    copyDataset(t_other, *this);
+  }
+  template <std::size_t I, std::size_t... Rest>
+  void copy(const Self& t_other) {
+    this->copy_impl<I, Rest...>(t_other);
   }
   template <std::size_t... I>
   void copy(const RawDataType<I>&... t_raw_data) {
     this->copy_impl<I...>(t_raw_data...);
   }
-
   template <typename... Ts, std::size_t... SrcIdx, std::size_t... DstIdx>
   void copy(const Dataset<Ts...>& t_src, IndexSeq<SrcIdx...> t_src_idx,
             IndexSeq<DstIdx...> t_dst_idx) {
@@ -103,10 +106,16 @@ class Dataset {
     copyDataset(src, dst);
   }
 
-  Self clone() {
+  template <typename T = void>
+  Self clone() const {
     Self ret;
-    copyDataset(*this, ret);
-    // ret.copy(*this);
+    ret.copy(*this);
+    return ret;
+  }
+  template <std::size_t I, std::size_t... Rest>
+  auto clone() const -> Dataset<RawDataType<I>, RawDataType<Rest>...> {
+    Dataset<RawDataType<I>, RawDataType<Rest>...> ret;
+    ret.copy(this->subdata<I, Rest...>());
     return ret;
   }
 

@@ -119,6 +119,9 @@ class Dataset {
     return ret;
   }
 
+  bool operator==(const Self& rhs) const { return tuple() == rhs.tuple(); }
+  bool operator!=(const Self& rhs) const { return !(*this == rhs); }
+
  protected:
   auto tuple() const -> const RawDataPtrTuple& { return m_raw_data_ptr_tuple; }
 

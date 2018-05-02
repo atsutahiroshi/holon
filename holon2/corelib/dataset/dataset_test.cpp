@@ -258,5 +258,24 @@ TEST_CASE("dataset: clone dataset instance", "[Dataset]") {
   }
 }
 
+TEST_CASE("dataset: check equality operator", "[Dataset]") {
+  SECTION("case 1") {
+    TestDataset2 a, b;
+    CHECK(a != b);
+    a = b;
+    CHECK(a == b);
+  }
+  SECTION("case 2") {
+    TestDataset2 a;
+    TestDataset2 b(a);
+    CHECK(a == b);
+  }
+  SECTION("case 3") {
+    TestDataset2 a;
+    auto b = a.clone();
+    CHECK(a != b);
+  }
+}
+
 }  // namespace
 }  // namespace holon

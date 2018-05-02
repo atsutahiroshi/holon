@@ -43,6 +43,7 @@ struct TestRawData3 {
   Vec3d p, v;
 };
 using TestDataset1 = Dataset<TestRawData1, TestRawData2>;
+using TestDataset2 = Dataset<TestRawData1, TestRawData2, TestRawData3>;
 
 void checkCtor(const TestDataset1& data) {
   auto ptr1 = data.getRawDataPtr<0>();
@@ -163,6 +164,90 @@ TEST_CASE("dataset: get sub Dataset", "[Dataset]") {
     auto subdata1 = data.getSubDataset(IndexSeq<0, 1>());
     auto subdata2 = data.getSubDataset(IndexSeq<3, 1, 4>());
     checkSubDataset(data, subdata1, subdata2);
+  }
+}
+
+TEST_CASE("dataset: copy contents of specific raw data", "[Dataset]") {
+  Random<double> rnd;
+  double a = rnd(), b = rnd();
+  SECTION("overloaded function 1") {
+    TestDataset1 src;
+    src.getRawData<0>().a = a;
+    src.getRawData<0>().b = b;
+    TestDataset1 dst;
+    dst.copyRawData<0>(src);
+    REQUIRE(dst.getRawDataPtr<0>() != src.getRawDataPtr<0>());
+    CHECK(dst.getRawData<0>().a == a);
+    CHECK(dst.getRawData<0>().b == b);
+  }
+  SECTION("overloaded function 2") {
+    TestRawData1 src;
+    src.a = a;
+    src.b = b;
+    TestDataset1 dst;
+    dst.copyRawData<0>(src);
+    REQUIRE(dst.getRawDataPtr<0>().get() != &src);
+    CHECK(dst.getRawData<0>().a == a);
+    CHECK(dst.getRawData<0>().b == b);
+  }
+}
+
+TEST_CASE("dataset: copy contents of multiple raw data", "[Dataset]") {
+  Random<double> rnd;
+  double a = rnd(), b = rnd();
+  double x = rnd(), y = rnd();
+  SECTION("overloaded function 1") {
+    TestDataset2 src;
+    src.getRawData<0>().a = a;
+    src.getRawData<0>().b = b;
+    src.getRawData<1>().x = x;
+    src.getRawData<1>().y = y;
+    TestDataset2 dst;
+    dst.copyRawData<0, 1>(src);
+    REQUIRE(dst.getRawDataPtr<0>() != src.getRawDataPtr<0>());
+    REQUIRE(dst.getRawDataPtr<1>() != src.getRawDataPtr<1>());
+    CHECK(dst.getRawData<0>().a == a);
+    CHECK(dst.getRawData<0>().b == b);
+    CHECK(dst.getRawData<1>().x == x);
+    CHECK(dst.getRawData<1>().y == y);
+  }
+  SECTION("overloaded function 2") {
+    TestRawData1 src1;
+    TestRawData2 src2;
+    src1.a = a;
+    src1.b = b;
+    src2.x = x;
+    src2.y = y;
+    TestDataset2 dst;
+    dst.copyRawData<0, 1>(src1, src2);
+    REQUIRE(dst.getRawDataPtr<0>().get() != &src1);
+    REQUIRE(dst.getRawDataPtr<1>().get() != &src2);
+    CHECK(dst.getRawData<0>().a == a);
+    CHECK(dst.getRawData<0>().b == b);
+    CHECK(dst.getRawData<1>().x == x);
+    CHECK(dst.getRawData<1>().y == y);
+  }
+}
+
+TEST_CASE("dataset: copy contents of some raw data between different dataset",
+          "[Dataset]") {
+  Random<double> rnd;
+  double a = rnd(), b = rnd();
+  double x = rnd(), y = rnd();
+  SECTION("overloaded function 1") {
+    TestDataset1 src;
+    src.getRawData<0>().a = a;
+    src.getRawData<0>().b = b;
+    src.getRawData<1>().x = x;
+    src.getRawData<1>().y = y;
+    TestDataset2 dst;
+    dst.copyRawData(src, IndexSeq<0, 1>(), IndexSeq<0, 1>());
+    REQUIRE(dst.getRawDataPtr<0>() != src.getRawDataPtr<0>());
+    REQUIRE(dst.getRawDataPtr<1>() != src.getRawDataPtr<1>());
+    CHECK(dst.getRawData<0>().a == a);
+    CHECK(dst.getRawData<0>().b == b);
+    CHECK(dst.getRawData<1>().x == x);
+    CHECK(dst.getRawData<1>().y == y);
   }
 }
 

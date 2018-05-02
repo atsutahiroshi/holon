@@ -27,8 +27,6 @@
 
 namespace holon {
 
-namespace detail = utility_detail;
-
 template <std::size_t... Ints>
 struct IndexSeq {
   static constexpr std::size_t size() { return sizeof...(Ints); }
@@ -45,7 +43,8 @@ struct IndexSeq {
 };
 
 template <std::size_t N>
-using makeIndexSeq = typename detail::makeIndexSeq_impl<N, IndexSeq<>>::type;
+using makeIndexSeq =
+    typename utility_detail::makeIndexSeq_impl<N, IndexSeq<>>::type;
 
 }  // namespace holon
 

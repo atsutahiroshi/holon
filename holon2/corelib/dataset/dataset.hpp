@@ -24,12 +24,18 @@
 #include <memory>
 #include <tuple>
 #include "holon2/corelib/common/utility.hpp"
+#include "holon2/corelib/dataset/detail/dataset_detail.hpp"
 
 namespace holon {
 
 template <typename RawData, typename... Args>
 std::shared_ptr<RawData> makeRawDataPtr(Args&&... args) {
   return std::make_shared<RawData>(std::forward<Args>(args)...);
+}
+
+template <typename... Ts>
+void copyDataset(const Dataset<Ts...>& t_src, Dataset<Ts...> t_dst) {
+  dataset_detail::copyDataset_impl<0, Ts...>(t_src, t_dst);
 }
 
 template <typename... RawDataTypes>
@@ -92,6 +98,41 @@ class Dataset {
   template <std::size_t... I>
   auto getSubDataset(IndexSeq<I...>) const -> Dataset<RawDataType<I>...> {
     return this->getSubDataset<I...>();
+  }
+
+  template <std::size_t... I>
+  void copyRawData(const Self& t_other) {
+    this->copyRawData_impl<I...>(t_other);
+  }
+  template <std::size_t... I>
+  void copyRawData(const RawDataType<I>&... t_raw_data) {
+    this->copyRawData_impl<I...>(t_raw_data...);
+  }
+
+  template <typename... Ts, std::size_t... SrcIdx, std::size_t... DstIdx>
+  void copyRawData(const Dataset<Ts...>& t_src, IndexSeq<SrcIdx...> t_src_idx,
+                   IndexSeq<DstIdx...> t_dst_idx) {
+    auto src = t_src.getSubDataset(t_src_idx);
+    auto dst = this->getSubDataset(t_dst_idx);
+    copyDataset(src, dst);
+  }
+
+ private:
+  template <typename T = void>
+  void copyRawData_impl(const Self&) {}
+  template <std::size_t I, std::size_t... Rest>
+  void copyRawData_impl(const Self& t_other) {
+    this->getRawData<I>() = t_other.getRawData<I>();
+    this->copyRawData_impl<Rest...>(t_other);
+  }
+
+  template <typename T = void>
+  void copyRawData_impl() {}
+  template <std::size_t I, std::size_t... Rest>
+  void copyRawData_impl(const RawDataType<I>& t_raw_data,
+                        const RawDataType<Rest>&... args) {
+    this->getRawData<I>() = t_raw_data;
+    this->copyRawData_impl<Rest...>(args...);
   }
 
  private:

@@ -61,78 +61,76 @@ class Dataset {
   Dataset(RawDataPtrTuple t_tuple) : m_raw_data_ptr_tuple(t_tuple) {}
   virtual ~Dataset() = default;
 
-  constexpr std::size_t getRawDataNum() const { return this->kRawDataNum; }
+  constexpr std::size_t size() const { return this->kRawDataNum; }
 
-  const RawDataPtrTuple& getRawDataPtrTuple() const {
-    return m_raw_data_ptr_tuple;
+  template <std::size_t I = 0>
+  const RawDataPtrType<I>& getptr() const {
+    return std::get<I>(this->tuple());
   }
 
   template <std::size_t I = 0>
-  const RawDataPtrType<I>& getRawDataPtr() const {
-    return std::get<I>(this->getRawDataPtrTuple());
-  }
-
-  template <std::size_t I = 0>
-  const RawDataType<I>& getRawData() const {
-    return *this->getRawDataPtr<I>();
+  const RawDataType<I>& get() const {
+    return *this->getptr<I>();
   }
   template <std::size_t I = 0>
-  RawDataType<I>& getRawData() {
-    return *this->getRawDataPtr<I>();
+  RawDataType<I>& get() {
+    return *this->getptr<I>();
   }
 
   template <std::size_t... I>
-  auto getRawDataPtrSubTuple() const -> const std::tuple<RawDataPtrType<I>...> {
-    return std::make_tuple(std::get<I>(m_raw_data_ptr_tuple)...);
+  auto subdata() const -> Dataset<RawDataType<I>...> {
+    return Dataset<RawDataType<I>...>(this->subtuple<I...>());
   }
   template <std::size_t... I>
-  auto getRawDataPtrSubTuple(IndexSeq<I...>)
-      -> const std::tuple<RawDataPtrType<I>...> {
-    return this->getRawDataPtrSubTuple<I...>();
-  }
-
-  template <std::size_t... I>
-  auto getSubDataset() const -> Dataset<RawDataType<I>...> {
-    return Dataset<RawDataType<I>...>(this->getRawDataPtrSubTuple<I...>());
-  }
-  template <std::size_t... I>
-  auto getSubDataset(IndexSeq<I...>) const -> Dataset<RawDataType<I>...> {
-    return this->getSubDataset<I...>();
+  auto subdata(IndexSeq<I...>) const -> Dataset<RawDataType<I>...> {
+    return this->subdata<I...>();
   }
 
   template <std::size_t... I>
-  void copyRawData(const Self& t_other) {
-    this->copyRawData_impl<I...>(t_other);
+  void copy(const Self& t_other) {
+    this->copy_impl<I...>(t_other);
   }
   template <std::size_t... I>
-  void copyRawData(const RawDataType<I>&... t_raw_data) {
-    this->copyRawData_impl<I...>(t_raw_data...);
+  void copy(const RawDataType<I>&... t_raw_data) {
+    this->copy_impl<I...>(t_raw_data...);
   }
 
   template <typename... Ts, std::size_t... SrcIdx, std::size_t... DstIdx>
-  void copyRawData(const Dataset<Ts...>& t_src, IndexSeq<SrcIdx...> t_src_idx,
-                   IndexSeq<DstIdx...> t_dst_idx) {
-    auto src = t_src.getSubDataset(t_src_idx);
-    auto dst = this->getSubDataset(t_dst_idx);
+  void copy(const Dataset<Ts...>& t_src, IndexSeq<SrcIdx...> t_src_idx,
+            IndexSeq<DstIdx...> t_dst_idx) {
+    auto src = t_src.subdata(t_src_idx);
+    auto dst = this->subdata(t_dst_idx);
     copyDataset(src, dst);
+  }
+
+ protected:
+  auto tuple() const -> const RawDataPtrTuple& { return m_raw_data_ptr_tuple; }
+
+  template <std::size_t... I>
+  auto subtuple() const -> const std::tuple<RawDataPtrType<I>...> {
+    return std::make_tuple(std::get<I>(m_raw_data_ptr_tuple)...);
+  }
+  template <std::size_t... I>
+  auto subtuple(IndexSeq<I...>) -> const std::tuple<RawDataPtrType<I>...> {
+    return this->subtuple<I...>();
   }
 
  private:
   template <typename T = void>
-  void copyRawData_impl(const Self&) {}
+  void copy_impl(const Self&) {}
   template <std::size_t I, std::size_t... Rest>
-  void copyRawData_impl(const Self& t_other) {
-    this->getRawData<I>() = t_other.getRawData<I>();
-    this->copyRawData_impl<Rest...>(t_other);
+  void copy_impl(const Self& t_other) {
+    this->get<I>() = t_other.get<I>();
+    this->copy_impl<Rest...>(t_other);
   }
 
   template <typename T = void>
-  void copyRawData_impl() {}
+  void copy_impl() {}
   template <std::size_t I, std::size_t... Rest>
-  void copyRawData_impl(const RawDataType<I>& t_raw_data,
-                        const RawDataType<Rest>&... args) {
-    this->getRawData<I>() = t_raw_data;
-    this->copyRawData_impl<Rest...>(args...);
+  void copy_impl(const RawDataType<I>& t_raw_data,
+                 const RawDataType<Rest>&... args) {
+    this->get<I>() = t_raw_data;
+    this->copy_impl<Rest...>(args...);
   }
 
  private:

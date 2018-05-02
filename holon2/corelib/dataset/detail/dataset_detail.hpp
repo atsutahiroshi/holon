@@ -21,7 +21,7 @@ typename std::enable_if<(I == sizeof...(Ts)), void>::type copyDataset_impl(
 template <std::size_t I, typename... Ts>
 typename std::enable_if<(I < sizeof...(Ts)), void>::type copyDataset_impl(
     Dataset<Ts...> t_src, Dataset<Ts...> t_dst) {
-  t_dst.template getRawData<I>() = t_src.template getRawData<I>();
+  t_dst.template get<I>() = t_src.template get<I>();
   copyDataset_impl<I + 1, Ts...>(t_src, t_dst);
 }
 

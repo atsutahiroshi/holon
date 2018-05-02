@@ -21,6 +21,7 @@
 #ifndef HOLON_COMMON_UTILITY_HPP_
 #define HOLON_COMMON_UTILITY_HPP_
 
+#include <iostream>
 #include <type_traits>
 #include <utility>
 #include "holon2/corelib/common/detail/utility_detail.hpp"
@@ -45,6 +46,13 @@ struct IndexSeq {
 template <std::size_t N>
 using makeIndexSeq =
     typename utility_detail::makeIndexSeq_impl<N, IndexSeq<>>::type;
+
+template <class Ch, class Tr, class Tuple, std::size_t... Is>
+void printTuple(std::basic_ostream<Ch, Tr>& os, const Tuple& t,
+                IndexSeq<Is...>) {
+  using dummy = int[];
+  (void)dummy{0, (void(os << (Is == 0 ? "" : ", ") << std::get<Is>(t)), 0)...};
+}
 
 }  // namespace holon
 

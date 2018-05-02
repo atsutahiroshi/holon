@@ -135,7 +135,18 @@ class Dataset {
 
  private:
   RawDataPtrTuple m_raw_data_ptr_tuple;
+
+  template <typename... Ts>
+  friend std::ostream& operator<<(std::ostream& os, const Dataset<Ts...>& data);
 };
+
+// stream insertion
+template <typename... Ts>
+std::ostream& operator<<(std::ostream& os, const Dataset<Ts...>& data) {
+  os << "{";
+  printTuple(os, data.tuple(), makeIndexSeq<sizeof...(Ts)>());
+  return os << "}";
+}
 
 }  // namespace holon
 

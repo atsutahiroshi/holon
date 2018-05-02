@@ -81,5 +81,12 @@ TEST_CASE("Example 2 in Eigen tutorial: size set at compile time",
   CHECK(mv(2) == Approx(m(2, 0) * v(0) + m(2, 1) * v(1) + m(2, 2) * v(2)));
 }
 
+TEST_CASE("Constant Vectors", "[Vec3d]") {
+  CHECK(kVec3dZero == Vec3d(0, 0, 0));
+  CHECK(kVec3dX == Vec3d(1, 0, 0));
+  CHECK(kVec3dY == Vec3d(0, 1, 0));
+  CHECK(kVec3dZ == Vec3d(0, 0, 1));
+}
+
 }  // namespace
 }  // namespace holon

@@ -1,5 +1,5 @@
 set(sources
-  dummy.cpp
+  vec.cpp
   )
 set(test_sources
   mat_test.cpp

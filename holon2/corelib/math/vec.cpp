@@ -17,24 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with holon.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef HOLON_MATH_VEC_HPP_
-#define HOLON_MATH_VEC_HPP_
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wshadow"
-#include "third_party/eigen/Eigen/Dense"
-#pragma GCC diagnostic pop
+#include "holon2/corelib/math/vec.hpp"
 
 namespace holon {
 
-using Vec = Eigen::VectorXd;
-using Vec3d = Eigen::Vector3d;
-
-extern const Vec3d kVec3dZero;
-extern const Vec3d kVec3dX;
-extern const Vec3d kVec3dY;
-extern const Vec3d kVec3dZ;
+const Vec3d kVec3dZero = {0, 0, 0};
+const Vec3d kVec3dX = {1, 0, 0};
+const Vec3d kVec3dY = {0, 1, 0};
+const Vec3d kVec3dZ = {0, 0, 1};
 
 }  // namespace holon
-
-#endif  // HOLON_MATH_VEC_HPP_

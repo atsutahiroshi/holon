@@ -21,6 +21,8 @@
 #include "holon2/corelib/common/optional.hpp"
 
 #include <cstdlib>
+#include "holon2/corelib/math/vec.hpp"
+
 #include "third_party/catch/catch.hpp"
 
 namespace holon {
@@ -38,6 +40,20 @@ TEST_CASE("optional: Example usage", "[optional]") {
   auto b = to_int("Nan");
   CHECK(a == 42);
   CHECK(b == nullopt);
+}
+
+TEST_CASE("optional: use with Vec3d", "[optional]") {
+  Vec3d z(0, 0, 0);
+  optional<Vec3d> ov;
+  CHECK(ov == nullopt);
+  Vec3d v;
+  v << 1, 2, 3;
+  ov = v;
+  CHECK(ov == v);
+  CHECK(ov.value() == v);
+  CHECK(ov.value()[0] == 1);
+  CHECK(ov.value()[1] == 2);
+  CHECK(ov.value()[2] == 3);
 }
 
 }  // namespace

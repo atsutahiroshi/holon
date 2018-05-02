@@ -224,5 +224,25 @@ TEST_CASE("dataset: copy contents of some raw data between different dataset",
   }
 }
 
+TEST_CASE("dataset: clone dataset instance", "[Dataset]") {
+  Random<double> rnd;
+  double a = rnd(), b = rnd();
+  double x = rnd(), y = rnd();
+  SECTION("overloaded function 1") {
+    TestDataset1 org;
+    org.get<0>().a = a;
+    org.get<0>().b = b;
+    org.get<1>().x = x;
+    org.get<1>().y = y;
+    TestDataset1 cln = org.clone();
+    REQUIRE(cln.getptr<0>() != org.getptr<0>());
+    REQUIRE(cln.getptr<1>() != org.getptr<1>());
+    CHECK(cln.get<0>().a == a);
+    CHECK(cln.get<0>().b == b);
+    CHECK(cln.get<1>().x == x);
+    CHECK(cln.get<1>().y == y);
+  }
+}
+
 }  // namespace
 }  // namespace holon

@@ -103,6 +103,13 @@ class Dataset {
     copyDataset(src, dst);
   }
 
+  Self clone() {
+    Self ret;
+    copyDataset(*this, ret);
+    // ret.copy(*this);
+    return ret;
+  }
+
  protected:
   auto tuple() const -> const RawDataPtrTuple& { return m_raw_data_ptr_tuple; }
 

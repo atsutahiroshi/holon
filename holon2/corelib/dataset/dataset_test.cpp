@@ -74,6 +74,22 @@ TEST_CASE("dataset: c'tor of Dataset", "[Dataset]") {
     CHECK(data.getptr<0>() == std::get<0>(tuple));
     CHECK(data.getptr<1>() == std::get<1>(tuple));
   }
+  SECTION("if raw data instances are given object copies the contents") {
+    Random<double> rnd;
+    TestRawData1 raw1;
+    TestRawData2 raw2;
+    raw1.a = rnd();
+    raw1.b = rnd();
+    raw2.x = rnd();
+    raw2.y = rnd();
+    TestDataset1 data(raw1, raw2);
+    CHECK(data.getptr<0>().get() != &raw1);
+    CHECK(data.getptr<1>().get() != &raw2);
+    CHECK(data.get<0>().a == raw1.a);
+    CHECK(data.get<0>().b == raw1.b);
+    CHECK(data.get<1>().x == raw2.x);
+    CHECK(data.get<1>().y == raw2.y);
+  }
 }
 
 TEST_CASE("dataset: size returns number of given raw data", "[Dataset]") {

@@ -74,6 +74,21 @@ TEST_CASE("com_zmp_model: check data builder (set parameters)",
   checkData(data, m, vhp, pg);
 }
 
+TEST_CASE("com_zmp_model: check data builder (give external dataset)",
+          "[ComZmpModelData][ComZmpModelDataBuilder]") {
+  Random<double> rnd(0, 1);
+  auto m = rnd();
+  auto vhp = rnd();
+  Vec3d pg(rnd(), rnd(), rnd());
+  ComZmpModelData data;
+  ComZmpModelDataBuilder()
+      .setMass(m)
+      .setVirtualHorizontalPlane(vhp)
+      .setComPosition(pg)
+      .build(data);
+  checkData(data, m, vhp, pg);
+}
+
 }  // namespace data
 
 }  // namespace

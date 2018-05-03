@@ -68,6 +68,7 @@ class ComZmpModelDataBuilder {
   Self& setComPosition(const Vec3d& t_com_position);
 
   Data build();
+  Data build(Data t_data);
 
  private:
   double m_mass;

@@ -34,12 +34,25 @@ class Random {};
 template <typename T>
 class Random<T,
              typename std::enable_if<std::is_floating_point<T>::value>::type> {
+  static constexpr double default_min = -1;
+  static constexpr double default_max = 1;
+
  public:
   Random()
       : m_rd(),
         m_seed({m_rd(), m_rd(), m_rd(), m_rd(), m_rd()}),
         m_engine(m_seed),
-        m_distribution(-1, 1) {}
+        m_distribution(default_min, default_max) {}
+  Random(std::seed_seq seed)
+      : m_rd(),
+        m_seed(seed),
+        m_engine(m_seed),
+        m_distribution(default_min, default_max) {}
+  Random(double min, double max)
+      : m_rd(),
+        m_seed({m_rd(), m_rd(), m_rd(), m_rd(), m_rd()}),
+        m_engine(m_seed),
+        m_distribution(min, max) {}
 
   // member functions
   T operator()() { return this->get(); }

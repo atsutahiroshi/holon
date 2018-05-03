@@ -38,5 +38,25 @@ TEST_CASE("random: generate pseudo-random number with double type",
   }
 }
 
+TEST_CASE("random: exact the same number is generated given the same seed",
+          "[Random]") {
+  Random<double> rnd1({0});
+  Random<double> rnd2({0});
+
+  for (auto i = 0; i < 10; ++i) {
+    REQUIRE(rnd1() == rnd2());
+  }
+}
+
+TEST_CASE("random: limit the generating number within a specific range",
+          "[Random]") {
+  Random<double> rnd(0, 0.1);
+
+  for (auto i = 0; i < 10; ++i) {
+    REQUIRE(rnd() > 0);
+    REQUIRE(rnd() < 0.1);
+  }
+}
+
 }  // namespace
 }  // namespace holon

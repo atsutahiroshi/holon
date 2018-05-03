@@ -3,6 +3,7 @@ set(sources
   )
 set(test_sources
   mat_test.cpp
+  misc_test.cpp
   )
 
 holon_add_corelib_module(

@@ -80,13 +80,19 @@ class ComZmpModelBuilder {
 };
 
 class ComZmpModel {
+  using Params = ComZmpModelParams;
+  using Inputs = ComZmpModelInputs;
+  using Outputs = ComZmpModelOutputs;
   using Data = ComZmpModelData;
 
  public:
   ComZmpModel() : m_data() {}
-  ComZmpModel(Data t_data) : m_data(t_data) {}
+  explicit ComZmpModel(Data t_data) : m_data(t_data) {}
 
   const Data& data() const { return m_data; }
+  const Params& params() const { return m_data.get<0>(); }
+  const Inputs& inputs() const { return m_data.get<1>(); }
+  const Outputs& outputs() const { return m_data.get<2>(); }
 
  private:
   Data m_data;

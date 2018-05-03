@@ -26,38 +26,33 @@
 namespace holon {
 namespace {
 
-namespace data {
-
-void checkModelData(const ComZmpModelData& data, const double expected_mass,
-                    const double expected_vhp, const Vec3d& expected_pg) {
+void checkModel(const ComZmpModel& model, const double expected_mass,
+                const double expected_vhp, const Vec3d& expected_pg) {
   // params
-  auto params = data.get<0>();
-  CHECK(params.mass == expected_mass);
-  CHECK(params.nu == kVec3dZ);
-  CHECK(params.vhp == expected_vhp);
+  CHECK(model.params().mass == expected_mass);
+  CHECK(model.params().nu == kVec3dZ);
+  CHECK(model.params().vhp == expected_vhp);
   // inputs
-  auto inputs = data.get<1>();
   Vec3d expected_pz(expected_pg[0], expected_pg[1], expected_vhp);
   Vec3d expected_f(0, 0, expected_mass * kGravAccel);
-  CHECK(inputs.com_position == expected_pg);
-  CHECK(inputs.com_velocity == kVec3dZero);
-  CHECK(inputs.zmp_position == expected_pz);
-  CHECK(inputs.reaction_force == expected_f);
-  CHECK(inputs.external_force == kVec3dZero);
+  CHECK(model.inputs().com_position == expected_pg);
+  CHECK(model.inputs().com_velocity == kVec3dZero);
+  CHECK(model.inputs().zmp_position == expected_pz);
+  CHECK(model.inputs().reaction_force == expected_f);
+  CHECK(model.inputs().external_force == kVec3dZero);
   // outputs
-  auto outputs = data.get<2>();
-  CHECK(outputs.com_position == kVec3dZero);
-  CHECK(outputs.com_velocity == kVec3dZero);
-  CHECK(outputs.com_acceleration == kVec3dZero);
-  CHECK(outputs.zmp_position == kVec3dZero);
-  CHECK(outputs.reaction_force == kVec3dZero);
-  CHECK(outputs.total_force == kVec3dZero);
+  CHECK(model.outputs().com_position == kVec3dZero);
+  CHECK(model.outputs().com_velocity == kVec3dZero);
+  CHECK(model.outputs().com_acceleration == kVec3dZero);
+  CHECK(model.outputs().zmp_position == kVec3dZero);
+  CHECK(model.outputs().reaction_force == kVec3dZero);
+  CHECK(model.outputs().total_force == kVec3dZero);
 }
 
 TEST_CASE("com_zmp_model: check model builder (default)",
           "[ComZmpModelData][ComZmpModelBuilder]") {
   auto model = ComZmpModelBuilder().build();
-  checkModelData(model.data(), 1.0, 0.0, {0, 0, 1});
+  checkModel(model, 1.0, 0.0, {0, 0, 1});
 }
 
 TEST_CASE("com_zmp_model: check model builder (set parameters)",
@@ -71,7 +66,7 @@ TEST_CASE("com_zmp_model: check model builder (set parameters)",
                    .setVirtualHorizontalPlane(vhp)
                    .setComPosition(pg)
                    .build();
-  checkModelData(model.data(), m, vhp, pg);
+  checkModel(model, m, vhp, pg);
 }
 
 TEST_CASE("com_zmp_model: check model builder (give external dataset)",
@@ -86,10 +81,8 @@ TEST_CASE("com_zmp_model: check model builder (give external dataset)",
                    .setVirtualHorizontalPlane(vhp)
                    .setComPosition(pg)
                    .build(data);
-  checkModelData(model.data(), m, vhp, pg);
+  checkModel(model, m, vhp, pg);
 }
-
-}  // namespace data
 
 }  // namespace
 }  // namespace holon

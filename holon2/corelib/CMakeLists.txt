@@ -4,6 +4,6 @@ add_subdirectory(common)
 # add_subdirectory(control)
 add_subdirectory(dataset)
 add_subdirectory(math)
-# add_subdirectory(humanoid)
+add_subdirectory(humanoid)
 
 holon_make_corelib()

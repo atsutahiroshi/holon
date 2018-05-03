@@ -32,23 +32,16 @@ struct ComZmpModelParams {
   Vec3d nu;
   double vhp;
 };
-struct ComZmpModelInputs {
-  Vec3d com_position;
-  Vec3d com_velocity;
-  Vec3d zmp_position;
-  Vec3d reaction_force;
-  Vec3d external_force;
-};
-struct ComZmpModelOutputs {
+struct ComZmpModelStates {
   Vec3d com_position;
   Vec3d com_velocity;
   Vec3d com_acceleration;
   Vec3d zmp_position;
   Vec3d reaction_force;
+  Vec3d external_force;
   Vec3d total_force;
 };
-using ComZmpModelData =
-    Dataset<ComZmpModelParams, ComZmpModelInputs, ComZmpModelOutputs>;
+using ComZmpModelData = Dataset<ComZmpModelParams, ComZmpModelStates>;
 
 class ComZmpModel;
 
@@ -58,8 +51,7 @@ class ComZmpModelBuilder {
   static const Vec3d default_com_position;
   using Self = ComZmpModelBuilder;
   using Params = ComZmpModelParams;
-  using Inputs = ComZmpModelInputs;
-  using Outputs = ComZmpModelOutputs;
+  using States = ComZmpModelStates;
   using Data = ComZmpModelData;
   using Model = ComZmpModel;
 
@@ -81,8 +73,7 @@ class ComZmpModelBuilder {
 
 class ComZmpModel {
   using Params = ComZmpModelParams;
-  using Inputs = ComZmpModelInputs;
-  using Outputs = ComZmpModelOutputs;
+  using States = ComZmpModelStates;
   using Data = ComZmpModelData;
 
  public:
@@ -91,8 +82,7 @@ class ComZmpModel {
 
   const Data& data() const { return m_data; }
   const Params& params() const { return m_data.get<0>(); }
-  const Inputs& inputs() const { return m_data.get<1>(); }
-  const Outputs& outputs() const { return m_data.get<2>(); }
+  const States& states() const { return m_data.get<1>(); }
 
  private:
   Data m_data;

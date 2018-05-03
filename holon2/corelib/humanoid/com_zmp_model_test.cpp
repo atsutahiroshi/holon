@@ -35,28 +35,23 @@ void checkModel(const ComZmpModel& model, const double expected_mass,
   // inputs
   Vec3d expected_pz(expected_pg[0], expected_pg[1], expected_vhp);
   Vec3d expected_f(0, 0, expected_mass * kGravAccel);
-  CHECK(model.inputs().com_position == expected_pg);
-  CHECK(model.inputs().com_velocity == kVec3dZero);
-  CHECK(model.inputs().zmp_position == expected_pz);
-  CHECK(model.inputs().reaction_force == expected_f);
-  CHECK(model.inputs().external_force == kVec3dZero);
-  // outputs
-  CHECK(model.outputs().com_position == kVec3dZero);
-  CHECK(model.outputs().com_velocity == kVec3dZero);
-  CHECK(model.outputs().com_acceleration == kVec3dZero);
-  CHECK(model.outputs().zmp_position == kVec3dZero);
-  CHECK(model.outputs().reaction_force == kVec3dZero);
-  CHECK(model.outputs().total_force == kVec3dZero);
+  CHECK(model.states().com_position == expected_pg);
+  CHECK(model.states().com_velocity == kVec3dZero);
+  CHECK(model.states().com_acceleration == kVec3dZero);
+  CHECK(model.states().zmp_position == expected_pz);
+  CHECK(model.states().reaction_force == expected_f);
+  CHECK(model.states().external_force == kVec3dZero);
+  CHECK(model.states().total_force == expected_f);
 }
 
 TEST_CASE("com_zmp_model: check model builder (default)",
-          "[ComZmpModelData][ComZmpModelBuilder]") {
+          "[ComZmpModel][ComZmpModelBuilder]") {
   auto model = ComZmpModelBuilder().build();
   checkModel(model, 1.0, 0.0, {0, 0, 1});
 }
 
 TEST_CASE("com_zmp_model: check model builder (set parameters)",
-          "[ComZmpModelData][ComZmpModelBuilder]") {
+          "[ComZmpModel][ComZmpModelBuilder]") {
   Random<double> rnd(0, 1);
   auto m = rnd();
   auto vhp = rnd();
@@ -70,7 +65,7 @@ TEST_CASE("com_zmp_model: check model builder (set parameters)",
 }
 
 TEST_CASE("com_zmp_model: check model builder (give external dataset)",
-          "[ComZmpModelData][ComZmpModelBuilder]") {
+          "[ComZmpModel][ComZmpModelBuilder]") {
   Random<double> rnd(0, 1);
   auto m = rnd();
   auto vhp = rnd();

@@ -56,12 +56,21 @@ ComZmpModel ComZmpModelBuilder::build() {
 ComZmpModel ComZmpModelBuilder::build(Data t_data) {
   Vec3d reaction_force = m_mass * kGravAccel * kVec3dZ;
   Vec3d zmp_position = {m_com_position[0], m_com_position[1], m_vhp};
-  Params params{m_mass, kVec3dZ, m_vhp};
-  Inputs inputs{m_com_position, kVec3dZero, zmp_position, reaction_force,
-                kVec3dZero};
-  Outputs outputs{kVec3dZero, kVec3dZero, kVec3dZero,
-                  kVec3dZero, kVec3dZero, kVec3dZero};
-  t_data.copy<0, 1, 2>(params, inputs, outputs);
+  Params params{
+      m_mass,   // mass
+      kVec3dZ,  // normal vector to virtual plane
+      m_vhp     // virtual horizontal plane
+  };
+  States states{
+      m_com_position,  // COM position
+      kVec3dZero,      // COM velocity
+      kVec3dZero,      // COM accel.
+      zmp_position,    // ZMP position
+      reaction_force,  // reaction force
+      kVec3dZero,      // external force
+      reaction_force   // total force
+  };
+  t_data.copy<0, 1>(params, states);
   return ComZmpModel(t_data);
 }
 

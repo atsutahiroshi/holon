@@ -28,8 +28,8 @@ namespace {
 
 namespace data {
 
-void checkData(const ComZmpModelData& data, const double expected_mass,
-               const double expected_vhp, const Vec3d& expected_pg) {
+void checkModelData(const ComZmpModelData& data, const double expected_mass,
+                    const double expected_vhp, const Vec3d& expected_pg) {
   // params
   auto params = data.get<0>();
   CHECK(params.mass == expected_mass);
@@ -54,39 +54,39 @@ void checkData(const ComZmpModelData& data, const double expected_mass,
   CHECK(outputs.total_force == kVec3dZero);
 }
 
-TEST_CASE("com_zmp_model: check data builder (default)",
-          "[ComZmpModelData][ComZmpModelDataBuilder]") {
-  auto data = ComZmpModelDataBuilder().build();
-  checkData(data, 1.0, 0.0, {0, 0, 1});
+TEST_CASE("com_zmp_model: check model builder (default)",
+          "[ComZmpModelData][ComZmpModelBuilder]") {
+  auto model = ComZmpModelBuilder().build();
+  checkModelData(model.data(), 1.0, 0.0, {0, 0, 1});
 }
 
-TEST_CASE("com_zmp_model: check data builder (set parameters)",
-          "[ComZmpModelData][ComZmpModelDataBuilder]") {
+TEST_CASE("com_zmp_model: check model builder (set parameters)",
+          "[ComZmpModelData][ComZmpModelBuilder]") {
   Random<double> rnd(0, 1);
   auto m = rnd();
   auto vhp = rnd();
   Vec3d pg(rnd(), rnd(), rnd());
-  auto data = ComZmpModelDataBuilder()
-                  .setMass(m)
-                  .setVirtualHorizontalPlane(vhp)
-                  .setComPosition(pg)
-                  .build();
-  checkData(data, m, vhp, pg);
+  auto model = ComZmpModelBuilder()
+                   .setMass(m)
+                   .setVirtualHorizontalPlane(vhp)
+                   .setComPosition(pg)
+                   .build();
+  checkModelData(model.data(), m, vhp, pg);
 }
 
-TEST_CASE("com_zmp_model: check data builder (give external dataset)",
-          "[ComZmpModelData][ComZmpModelDataBuilder]") {
+TEST_CASE("com_zmp_model: check model builder (give external dataset)",
+          "[ComZmpModelData][ComZmpModelBuilder]") {
   Random<double> rnd(0, 1);
   auto m = rnd();
   auto vhp = rnd();
   Vec3d pg(rnd(), rnd(), rnd());
   ComZmpModelData data;
-  ComZmpModelDataBuilder()
-      .setMass(m)
-      .setVirtualHorizontalPlane(vhp)
-      .setComPosition(pg)
-      .build(data);
-  checkData(data, m, vhp, pg);
+  auto model = ComZmpModelBuilder()
+                   .setMass(m)
+                   .setVirtualHorizontalPlane(vhp)
+                   .setComPosition(pg)
+                   .build(data);
+  checkModelData(model.data(), m, vhp, pg);
 }
 
 }  // namespace data

@@ -22,38 +22,38 @@
 
 namespace holon {
 
-const double ComZmpModelDataBuilder::default_mass = 1.0;
-const double ComZmpModelDataBuilder::default_vhp = 0.0;
-const Vec3d ComZmpModelDataBuilder::default_com_position = {0.0, 0.0, 1.0};
+const double ComZmpModelBuilder::default_mass = 1.0;
+const double ComZmpModelBuilder::default_vhp = 0.0;
+const Vec3d ComZmpModelBuilder::default_com_position = {0.0, 0.0, 1.0};
 
-ComZmpModelDataBuilder::ComZmpModelDataBuilder()
+ComZmpModelBuilder::ComZmpModelBuilder()
     : m_mass(default_mass),
       m_vhp(default_vhp),
       m_com_position(default_com_position) {}
 
-ComZmpModelDataBuilder& ComZmpModelDataBuilder::setMass(const double t_mass) {
+ComZmpModelBuilder& ComZmpModelBuilder::setMass(const double t_mass) {
   m_mass = t_mass;
   return *this;
 }
 
-ComZmpModelDataBuilder& ComZmpModelDataBuilder::setVirtualHorizontalPlane(
+ComZmpModelBuilder& ComZmpModelBuilder::setVirtualHorizontalPlane(
     const double t_vhp) {
   m_vhp = t_vhp;
   return *this;
 }
 
-ComZmpModelDataBuilder& ComZmpModelDataBuilder::setComPosition(
+ComZmpModelBuilder& ComZmpModelBuilder::setComPosition(
     const Vec3d& t_com_position) {
   m_com_position = t_com_position;
   return *this;
 }
 
-ComZmpModelData ComZmpModelDataBuilder::build() {
+ComZmpModel ComZmpModelBuilder::build() {
   Data data;
   return this->build(data);
 }
 
-ComZmpModelData ComZmpModelDataBuilder::build(Data t_data) {
+ComZmpModel ComZmpModelBuilder::build(Data t_data) {
   Vec3d reaction_force = m_mass * kGravAccel * kVec3dZ;
   Vec3d zmp_position = {m_com_position[0], m_com_position[1], m_vhp};
   Params params{m_mass, kVec3dZ, m_vhp};
@@ -62,7 +62,7 @@ ComZmpModelData ComZmpModelDataBuilder::build(Data t_data) {
   Outputs outputs{kVec3dZero, kVec3dZero, kVec3dZero,
                   kVec3dZero, kVec3dZero, kVec3dZero};
   t_data.copy<0, 1, 2>(params, inputs, outputs);
-  return t_data;
+  return ComZmpModel(t_data);
 }
 
 }  // namespace holon

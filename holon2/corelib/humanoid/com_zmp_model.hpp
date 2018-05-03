@@ -50,25 +50,28 @@ struct ComZmpModelOutputs {
 using ComZmpModelData =
     Dataset<ComZmpModelParams, ComZmpModelInputs, ComZmpModelOutputs>;
 
-class ComZmpModelDataBuilder {
+class ComZmpModel;
+
+class ComZmpModelBuilder {
   static const double default_mass;
   static const double default_vhp;
   static const Vec3d default_com_position;
-  using Self = ComZmpModelDataBuilder;
+  using Self = ComZmpModelBuilder;
   using Params = ComZmpModelParams;
   using Inputs = ComZmpModelInputs;
   using Outputs = ComZmpModelOutputs;
   using Data = ComZmpModelData;
+  using Model = ComZmpModel;
 
  public:
-  ComZmpModelDataBuilder();
+  ComZmpModelBuilder();
 
   Self& setMass(const double t_mass);
   Self& setVirtualHorizontalPlane(const double t_vhp);
   Self& setComPosition(const Vec3d& t_com_position);
 
-  Data build();
-  Data build(Data t_data);
+  Model build();
+  Model build(Data t_data);
 
  private:
   double m_mass;
@@ -77,7 +80,16 @@ class ComZmpModelDataBuilder {
 };
 
 class ComZmpModel {
+  using Data = ComZmpModelData;
+
+ public:
+  ComZmpModel() : m_data() {}
+  ComZmpModel(Data t_data) : m_data(t_data) {}
+
+  const Data& data() const { return m_data; }
+
  private:
+  Data m_data;
 };
 
 }  // namespace holon

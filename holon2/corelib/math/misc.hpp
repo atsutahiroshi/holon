@@ -40,7 +40,7 @@ T sqr(const T& x) {
 
 template <typename T>
 T sqrt(const T& x) {
-  return std::sqrt<T>(x);
+  return std::sqrt(x);
 }
 
 template <typename T>

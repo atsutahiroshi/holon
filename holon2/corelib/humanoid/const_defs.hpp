@@ -21,10 +21,13 @@
 #ifndef HOLON_HUMANOID_CONST_DEFS_HPP_
 #define HOLON_HUMANOID_CONST_DEFS_HPP_
 
+#include "holon2/corelib/math/vec.hpp"
+
 namespace holon {
 
 // the standard gravitational acceleration on Earth
 extern const double kGravAccel;
+extern const Vec3d kGravAccel3d;
 
 }  // namespace holon
 

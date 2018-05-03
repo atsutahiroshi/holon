@@ -23,5 +23,6 @@
 namespace holon {
 
 const double kGravAccel = 9.80665e0;
+const Vec3d kGravAccel3d = {0, 0, kGravAccel};
 
 }  // namespace holon

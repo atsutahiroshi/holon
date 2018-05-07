@@ -24,5 +24,31 @@
 #include "third_party/catch/catch.hpp"
 
 namespace holon {
-namespace {}  // namespace
+namespace {
+
+TEST_CASE("com_zmp_model: accessor to data", "[ComZmpModel]") {
+  Random<Vec3d> rnd;
+  Vec3d v = rnd();
+  ComZmpModel model;
+  model.data().get<1>().com_position = v;
+  CHECK(model.data().get<1>().com_position == v);
+}
+
+TEST_CASE("com_zmp_model: accessor to parameters", "[ComZmpModel]") {
+  Random<double> rnd;
+  double m = rnd();
+  ComZmpModel model;
+  model.params().mass = m;
+  CHECK(model.params().mass == m);
+}
+
+TEST_CASE("com_zmp_model: accessor to states", "[ComZmpModel]") {
+  Random<Vec3d> rnd;
+  Vec3d v = rnd();
+  ComZmpModel model;
+  model.states().com_position = v;
+  CHECK(model.states().com_position == v);
+}
+
+}  // namespace
 }  // namespace holon

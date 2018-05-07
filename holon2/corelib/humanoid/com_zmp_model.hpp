@@ -51,9 +51,26 @@ class ComZmpModel {
   ComZmpModel() : m_data() {}
   explicit ComZmpModel(Data t_data) : m_data(t_data) {}
 
-  const Data& data() const { return m_data; }
-  const Params& params() const { return m_data.get<0>(); }
-  const States& states() const { return m_data.get<1>(); }
+  // special member functions
+  ComZmpModel(const ComZmpModel&) = delete;
+  ComZmpModel& operator=(const ComZmpModel&) = delete;
+  ComZmpModel(ComZmpModel&&) = default;
+  ComZmpModel& operator=(ComZmpModel&&) = default;
+  virtual ~ComZmpModel() = default;
+
+  const Data& data() const noexcept { return m_data; }
+  const Params& params() const noexcept { return m_data.get<0>(); }
+  const States& states() const noexcept { return m_data.get<1>(); }
+
+  Data& data() {
+    return const_cast<Data&>(static_cast<const ComZmpModel&>(*this).data());
+  }
+  Params& params() {
+    return const_cast<Params&>(static_cast<const ComZmpModel&>(*this).params());
+  }
+  States& states() {
+    return const_cast<States&>(static_cast<const ComZmpModel&>(*this).states());
+  }
 
  private:
   Data m_data;

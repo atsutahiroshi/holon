@@ -19,61 +19,11 @@
  */
 
 #include "holon2/corelib/humanoid/com_zmp_model.hpp"
+#include "holon2/corelib/humanoid/const_defs.hpp"
 #include "holon2/corelib/math/misc.hpp"
 
 namespace holon {
 
-const double ComZmpModelBuilder::default_mass = 1.0;
-const double ComZmpModelBuilder::default_vhp = 0.0;
-const Vec3d ComZmpModelBuilder::default_com_position = {0.0, 0.0, 1.0};
-
-ComZmpModelBuilder::ComZmpModelBuilder()
-    : m_mass(default_mass),
-      m_vhp(default_vhp),
-      m_com_position(default_com_position) {}
-
-ComZmpModelBuilder& ComZmpModelBuilder::setMass(const double t_mass) {
-  m_mass = t_mass;
-  return *this;
-}
-
-ComZmpModelBuilder& ComZmpModelBuilder::setVirtualHorizontalPlane(
-    const double t_vhp) {
-  m_vhp = t_vhp;
-  return *this;
-}
-
-ComZmpModelBuilder& ComZmpModelBuilder::setComPosition(
-    const Vec3d& t_com_position) {
-  m_com_position = t_com_position;
-  return *this;
-}
-
-ComZmpModel ComZmpModelBuilder::build() {
-  Data data;
-  return this->build(data);
-}
-
-ComZmpModel ComZmpModelBuilder::build(Data t_data) {
-  Vec3d reaction_force = m_mass * kGravAccel * kVec3dZ;
-  Vec3d zmp_position = {m_com_position[0], m_com_position[1], m_vhp};
-  Params params{
-      m_mass,   // mass
-      kVec3dZ,  // normal vector to virtual plane
-      m_vhp     // virtual horizontal plane
-  };
-  States states{
-      m_com_position,  // COM position
-      kVec3dZero,      // COM velocity
-      kVec3dZero,      // COM accel.
-      zmp_position,    // ZMP position
-      reaction_force,  // reaction force
-      kVec3dZero,      // external force
-      reaction_force   // total force
-  };
-  t_data.copy<0, 1>(params, states);
-  return ComZmpModel(t_data);
-}
 namespace com_zmp_model_formula {
 
 namespace {

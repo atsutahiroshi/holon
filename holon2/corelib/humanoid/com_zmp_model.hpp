@@ -23,9 +23,7 @@
 
 #include <cmath>
 #include <utility>
-#include "holon2/corelib/dataset/dataset.hpp"
-#include "holon2/corelib/humanoid/const_defs.hpp"
-#include "holon2/corelib/math/vec.hpp"
+#include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_builder.hpp"
 
 namespace holon {
 
@@ -44,34 +42,6 @@ struct ComZmpModelStates {
   Vec3d total_force;
 };
 using ComZmpModelData = Dataset<ComZmpModelParams, ComZmpModelStates>;
-
-class ComZmpModel;
-
-class ComZmpModelBuilder {
-  static const double default_mass;
-  static const double default_vhp;
-  static const Vec3d default_com_position;
-  using Self = ComZmpModelBuilder;
-  using Params = ComZmpModelParams;
-  using States = ComZmpModelStates;
-  using Data = ComZmpModelData;
-  using Model = ComZmpModel;
-
- public:
-  ComZmpModelBuilder();
-
-  Self& setMass(const double t_mass);
-  Self& setVirtualHorizontalPlane(const double t_vhp);
-  Self& setComPosition(const Vec3d& t_com_position);
-
-  Model build();
-  Model build(Data t_data);
-
- private:
-  double m_mass;
-  double m_vhp;
-  Vec3d m_com_position;
-};
 
 class ComZmpModel {
   using Params = ComZmpModelParams;

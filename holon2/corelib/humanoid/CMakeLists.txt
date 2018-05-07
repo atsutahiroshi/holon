@@ -13,3 +13,5 @@ holon_add_module_test(
   humanoid
   SOURCES ${test_sources}
   )
+
+add_subdirectory(com_zmp_model)

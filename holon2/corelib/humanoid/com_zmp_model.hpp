@@ -23,6 +23,7 @@
 
 #include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_builder.hpp"
 #include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_formula.hpp"
+#include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_simulator.hpp"
 
 namespace holon {
 

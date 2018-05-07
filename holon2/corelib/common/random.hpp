@@ -28,41 +28,52 @@
 
 namespace holon {
 
-template <typename T, typename Enable = void>
-class Random {};
+template <typename T, typename Engine, typename Distribution>
+struct RandomAdapter {};
 
-template <typename T>
-class Random<T,
-             typename std::enable_if<std::is_floating_point<T>::value>::type> {
-  static constexpr double default_min = -1;
-  static constexpr double default_max = 1;
+template <typename Engine, typename Distribution>
+struct RandomAdapter<double, Engine, Distribution> {
+  using type = double;
+  type get(Engine& eng, Distribution& dist) { return dist(eng); }
+};
+
+template <typename T, typename Float = double>
+class Random {
+  static constexpr Float default_min = -1;
+  static constexpr Float default_max = 1;
 
  public:
   Random()
       : m_rd(),
         m_seed({m_rd(), m_rd(), m_rd(), m_rd(), m_rd()}),
         m_engine(m_seed),
-        m_distribution(default_min, default_max) {}
+        m_distribution(default_min, default_max),
+        m_adapter() {}
   Random(std::seed_seq seed)
       : m_rd(),
         m_seed(seed),
         m_engine(m_seed),
-        m_distribution(default_min, default_max) {}
-  Random(double min, double max)
+        m_distribution(default_min, default_max),
+        m_adapter() {}
+  Random(Float min, Float max)
       : m_rd(),
         m_seed({m_rd(), m_rd(), m_rd(), m_rd(), m_rd()}),
         m_engine(m_seed),
-        m_distribution(min, max) {}
+        m_distribution(min, max),
+        m_adapter() {}
 
   // member functions
   T operator()() { return this->get(); }
-  T get() { return m_distribution(m_engine); }
+  // T get() { return m_distribution(m_engine); }
+  T get() { return m_adapter.get(m_engine, m_distribution); }
 
  private:
   std::random_device m_rd;
   std::seed_seq m_seed;
   std::mt19937 m_engine;
-  std::uniform_real_distribution<T> m_distribution;
+  std::uniform_real_distribution<Float> m_distribution;
+  RandomAdapter<T, std::mt19937, std::uniform_real_distribution<Float>>
+      m_adapter;
 };
 
 }  // namespace holon

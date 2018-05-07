@@ -21,6 +21,7 @@
 #ifndef HOLON_HUMANOID_COM_ZMP_MODEL_SIMULATOR_HPP_
 #define HOLON_HUMANOID_COM_ZMP_MODEL_SIMULATOR_HPP_
 
+#include <memory>
 #include "holon2/corelib/dataset/dataset.hpp"
 
 namespace holon {
@@ -30,7 +31,27 @@ struct ComZmpModelStates;
 using ComZmpModelData = Dataset<ComZmpModelParams, ComZmpModelStates>;
 class ComZmpModel;
 
-class ComZmpModelSimulator {};
+class ComZmpModelSimulator {
+  using Data = ComZmpModelData;
+  using Model = ComZmpModel;
+
+ public:
+  // constructors
+  ComZmpModelSimulator();
+  ComZmpModelSimulator(Data t_data);
+  ComZmpModelSimulator(const Model& t_model);
+
+  // special member functions
+  ComZmpModelSimulator(const ComZmpModelSimulator&) = delete;
+  ComZmpModelSimulator& operator=(const ComZmpModelSimulator&) = delete;
+  ComZmpModelSimulator(ComZmpModelSimulator&&);
+  ComZmpModelSimulator& operator=(ComZmpModelSimulator&&);
+  virtual ~ComZmpModelSimulator();
+
+ private:
+  class Impl;
+  std::unique_ptr<Impl> pimpl;
+};
 
 }  // namespace holon
 

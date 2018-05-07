@@ -50,5 +50,61 @@ TEST_CASE("com_zmp_model: accessor to states", "[ComZmpModel]") {
   CHECK(model.states().com_position == v);
 }
 
+TEST_CASE("com_zmp_model: accessor to mass", "[ComZmpModel]") {
+  double m = Random<double>().get();
+  ComZmpModel model;
+  model.params().mass = m;
+  CHECK(model.mass() == m);
+}
+
+TEST_CASE("com_zmp_model: accessor to COM position", "[ComZmpModel]") {
+  Vec3d v = Random<Vec3d>().get();
+  ComZmpModel model;
+  model.states().com_position = v;
+  CHECK(model.com_position() == v);
+}
+
+TEST_CASE("com_zmp_model: accessor to COM velocity", "[ComZmpModel]") {
+  Vec3d v = Random<Vec3d>().get();
+  ComZmpModel model;
+  model.states().com_velocity = v;
+  CHECK(model.com_velocity() == v);
+}
+
+TEST_CASE("com_zmp_model: accessor to COM acceleration", "[ComZmpModel]") {
+  Vec3d v = Random<Vec3d>().get();
+  ComZmpModel model;
+  model.states().com_acceleration = v;
+  CHECK(model.com_acceleration() == v);
+}
+
+TEST_CASE("com_zmp_model: accessor to ZMP position", "[ComZmpModel]") {
+  Vec3d v = Random<Vec3d>().get();
+  ComZmpModel model;
+  model.states().zmp_position = v;
+  CHECK(model.zmp_position() == v);
+}
+
+TEST_CASE("com_zmp_model: accessor to reaction force", "[ComZmpModel]") {
+  Vec3d v = Random<Vec3d>().get();
+  ComZmpModel model;
+  model.states().reaction_force = v;
+  CHECK(model.reaction_force() == v);
+}
+
+TEST_CASE("com_zmp_model: accessor to external force", "[ComZmpModel]") {
+  Vec3d v = Random<Vec3d>().get();
+  ComZmpModel model;
+  model.states().external_force = v;
+  CHECK(model.external_force() == v);
+}
+
+TEST_CASE("com_zmp_model: accessor to total force", "[ComZmpModel]") {
+  Vec3d v = Random<Vec3d>().get();
+  ComZmpModel model;
+  model.states().total_force = v;
+  CHECK(model.total_force() == v);
+}
+
 }  // namespace
 }  // namespace holon

@@ -72,6 +72,15 @@ class ComZmpModel {
     return const_cast<States&>(static_cast<const ComZmpModel&>(*this).states());
   }
 
+  double mass() const noexcept { return params().mass; }
+  Vec3d com_position() const noexcept { return states().com_position; }
+  Vec3d com_velocity() const noexcept { return states().com_velocity; }
+  Vec3d com_acceleration() const noexcept { return states().com_acceleration; }
+  Vec3d zmp_position() const noexcept { return states().zmp_position; }
+  Vec3d reaction_force() const noexcept { return states().reaction_force; }
+  Vec3d external_force() const noexcept { return states().external_force; }
+  Vec3d total_force() const noexcept { return states().total_force; }
+
  private:
   Data m_data;
 };

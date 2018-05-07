@@ -20,10 +20,13 @@
 #ifndef HOLON_MATH_VEC_HPP_
 #define HOLON_MATH_VEC_HPP_
 
+#include <sstream>
+#include <string>
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
 #include "third_party/eigen/Eigen/Dense"
 #pragma GCC diagnostic pop
+#include "third_party/catch/catch.hpp"
 
 namespace holon {
 
@@ -36,5 +39,35 @@ extern const Vec3d kVec3dY;
 extern const Vec3d kVec3dZ;
 
 }  // namespace holon
+
+namespace Catch {
+namespace Matchers {
+namespace Vec {
+
+using holon::Vec3d;
+
+class ApproxEqualsMatcher : public MatcherBase<Vec3d> {
+ public:
+  explicit ApproxEqualsMatcher(const Vec3d& comparator)
+      : m_comparator(comparator) {}
+  bool match(const Vec3d& v) const override { return m_comparator.isApprox(v); }
+  std::string describe() const override {
+    std::ostringstream ss;
+    ss << m_comparator;
+    return "\nApprox. equals:\n" + ss.str();
+  }
+
+ private:
+  const Vec3d& m_comparator;
+};
+
+}  // namespace Vec
+
+inline Vec::ApproxEqualsMatcher ApproxEquals(const holon::Vec3d& comparator) {
+  return Vec::ApproxEqualsMatcher(comparator);
+}
+
+}  // namespace Matchers
+}  // namespace Catch
 
 #endif  // HOLON_MATH_VEC_HPP_

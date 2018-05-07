@@ -53,15 +53,22 @@ class Dataset {
   using RawDataPtrType = typename std::tuple_element<I, RawDataPtrTuple>::type;
 
  public:
+  // constructors
   Dataset()
       : m_raw_data_ptr_tuple(
             std::make_tuple(makeRawDataPtr<RawDataTypes>()...)) {}
-  Dataset(std::shared_ptr<RawDataTypes>... args)
+  explicit Dataset(std::shared_ptr<RawDataTypes>... args)
       : m_raw_data_ptr_tuple(std::make_tuple(args...)) {}
-  Dataset(RawDataPtrTuple t_tuple) : m_raw_data_ptr_tuple(t_tuple) {}
-  Dataset(const RawDataTypes&... args)
+  explicit Dataset(RawDataPtrTuple t_tuple) : m_raw_data_ptr_tuple(t_tuple) {}
+  explicit Dataset(const RawDataTypes&... args)
       : m_raw_data_ptr_tuple(
             std::make_tuple(makeRawDataPtr<RawDataTypes>(args)...)) {}
+
+  // special member functions
+  Dataset(const Self&) = default;
+  Dataset(Self&&) = default;
+  Self& operator=(const Self&) = default;
+  Self& operator=(Self&&) = default;
   virtual ~Dataset() = default;
 
   constexpr std::size_t size() const { return this->kRawDataNum; }

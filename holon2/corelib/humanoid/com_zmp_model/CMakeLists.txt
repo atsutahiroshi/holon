@@ -4,7 +4,7 @@ set(sources
   )
 set(test_sources
   com_zmp_model_builder_test.cpp
-  # com_zmp_model_formula_test.cpp
+  com_zmp_model_formula_test.cpp
   )
 
 holon_add_corelib_module_source(humanoid

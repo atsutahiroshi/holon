@@ -32,72 +32,72 @@
 namespace holon {
 namespace {
 
-struct TestRawData1 {
+struct TestDataUnit1 {
   double a, b;
 };
-struct TestRawData2 {
+struct TestDataUnit2 {
   int id;
   double x, y;
 };
-struct TestRawData3 {
+struct TestDataUnit3 {
   Vec3d p, v;
 };
-using TestDataset1 = Dataset<TestRawData1, TestRawData2>;
-using TestDataset2 = Dataset<TestRawData1, TestRawData2, TestRawData3>;
+using TestDataset1 = Dataset<TestDataUnit1, TestDataUnit2>;
+using TestDataset2 = Dataset<TestDataUnit1, TestDataUnit2, TestDataUnit3>;
 
 void checkCtor(const TestDataset1& data) {
   auto ptr1 = data.getptr<0>();
   auto ptr2 = data.getptr<1>();
   CHECK(ptr1 != nullptr);
   CHECK(ptr2 != nullptr);
-  CHECK(std::is_same<decltype(ptr1), std::shared_ptr<TestRawData1>>::value);
-  CHECK(std::is_same<decltype(ptr2), std::shared_ptr<TestRawData2>>::value);
+  CHECK(std::is_same<decltype(ptr1), std::shared_ptr<TestDataUnit1>>::value);
+  CHECK(std::is_same<decltype(ptr2), std::shared_ptr<TestDataUnit2>>::value);
 }
 TEST_CASE("dataset: c'tor of Dataset", "[Dataset]") {
   SECTION("default c'tor") {
     TestDataset1 data;
     checkCtor(data);
   }
-  SECTION("if pointers of raw data are given object shares them") {
-    auto ptr1 = std::make_shared<TestRawData1>();
-    auto ptr2 = std::make_shared<TestRawData2>();
+  SECTION("if pointers of data units are given object shares them") {
+    auto ptr1 = std::make_shared<TestDataUnit1>();
+    auto ptr2 = std::make_shared<TestDataUnit2>();
     TestDataset1 data(ptr1, ptr2);
     checkCtor(data);
     CHECK(data.getptr<0>() == ptr1);
     CHECK(data.getptr<1>() == ptr2);
   }
-  SECTION("if tuple of raw data pointers is given object shares it") {
-    auto tuple = std::make_tuple(std::make_shared<TestRawData1>(),
-                                 std::make_shared<TestRawData2>());
+  SECTION("if tuple of data unit pointers is given object shares it") {
+    auto tuple = std::make_tuple(std::make_shared<TestDataUnit1>(),
+                                 std::make_shared<TestDataUnit2>());
     TestDataset1 data(tuple);
     checkCtor(data);
     CHECK(data.getptr<0>() == std::get<0>(tuple));
     CHECK(data.getptr<1>() == std::get<1>(tuple));
   }
-  SECTION("if raw data instances are given object copies the contents") {
+  SECTION("if data unit instances are given object copies the contents") {
     Random<double> rnd;
-    TestRawData1 raw1;
-    TestRawData2 raw2;
-    raw1.a = rnd();
-    raw1.b = rnd();
-    raw2.x = rnd();
-    raw2.y = rnd();
-    TestDataset1 data(raw1, raw2);
-    CHECK(data.getptr<0>().get() != &raw1);
-    CHECK(data.getptr<1>().get() != &raw2);
-    CHECK(data.get<0>().a == raw1.a);
-    CHECK(data.get<0>().b == raw1.b);
-    CHECK(data.get<1>().x == raw2.x);
-    CHECK(data.get<1>().y == raw2.y);
+    TestDataUnit1 unit1;
+    TestDataUnit2 unit2;
+    unit1.a = rnd();
+    unit1.b = rnd();
+    unit2.x = rnd();
+    unit2.y = rnd();
+    TestDataset1 data(unit1, unit2);
+    CHECK(data.getptr<0>().get() != &unit1);
+    CHECK(data.getptr<1>().get() != &unit2);
+    CHECK(data.get<0>().a == unit1.a);
+    CHECK(data.get<0>().b == unit1.b);
+    CHECK(data.get<1>().x == unit2.x);
+    CHECK(data.get<1>().y == unit2.y);
   }
 }
 
-TEST_CASE("dataset: size returns number of given raw data", "[Dataset]") {
+TEST_CASE("dataset: size returns the number of given data units", "[Dataset]") {
   TestDataset1 data;
   CHECK(data.size() == 2);
 }
 
-TEST_CASE("dataset: access to an element of raw data", "[Dataset]") {
+TEST_CASE("dataset: access to an element of data unit", "[Dataset]") {
   Random<double> rnd;
   TestDataset1 data;
   auto a = rnd();
@@ -156,7 +156,7 @@ TEST_CASE("dataset: get sub Dataset", "[Dataset]") {
   }
 }
 
-TEST_CASE("dataset: copy contents of specific raw data", "[Dataset]") {
+TEST_CASE("dataset: copy contents of specific data unit", "[Dataset]") {
   Random<double> rnd;
   double a = rnd(), b = rnd();
   SECTION("overloaded function 1") {
@@ -170,7 +170,7 @@ TEST_CASE("dataset: copy contents of specific raw data", "[Dataset]") {
     CHECK(dst.get<0>().b == b);
   }
   SECTION("overloaded function 2") {
-    TestRawData1 src;
+    TestDataUnit1 src;
     src.a = a;
     src.b = b;
     TestDataset1 dst;
@@ -181,7 +181,7 @@ TEST_CASE("dataset: copy contents of specific raw data", "[Dataset]") {
   }
 }
 
-TEST_CASE("dataset: copy contents of multiple raw data", "[Dataset]") {
+TEST_CASE("dataset: copy contents of multiple data unit", "[Dataset]") {
   Random<double> rnd;
   double a = rnd(), b = rnd();
   double x = rnd(), y = rnd();
@@ -201,8 +201,8 @@ TEST_CASE("dataset: copy contents of multiple raw data", "[Dataset]") {
     CHECK(dst.get<1>().y == y);
   }
   SECTION("overloaded function 2") {
-    TestRawData1 src1;
-    TestRawData2 src2;
+    TestDataUnit1 src1;
+    TestDataUnit2 src2;
     src1.a = a;
     src1.b = b;
     src2.x = x;
@@ -218,7 +218,7 @@ TEST_CASE("dataset: copy contents of multiple raw data", "[Dataset]") {
   }
 }
 
-TEST_CASE("dataset: copy contents of some raw data between different dataset",
+TEST_CASE("dataset: copy contents of some data unit between different dataset",
           "[Dataset]") {
   Random<double> rnd;
   double a = rnd(), b = rnd();

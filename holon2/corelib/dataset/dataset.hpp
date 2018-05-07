@@ -28,9 +28,9 @@
 
 namespace holon {
 
-template <typename RawData, typename... Args>
-std::shared_ptr<RawData> makeRawDataPtr(Args&&... args) {
-  return std::make_shared<RawData>(std::forward<Args>(args)...);
+template <typename DataUnit, typename... Args>
+std::shared_ptr<DataUnit> makeDataUnitPtr(Args&&... args) {
+  return std::make_shared<DataUnit>(std::forward<Args>(args)...);
 }
 
 template <typename... Ts>
@@ -38,31 +38,32 @@ void copyDataset(const Dataset<Ts...>& t_src, Dataset<Ts...> t_dst) {
   dataset_detail::copyDataset_impl<0, Ts...>(t_src, t_dst);
 }
 
-template <typename... RawDataTypes>
+template <typename... DataUnitTypes>
 class Dataset {
  protected:
-  static constexpr std::size_t kRawDataNum = sizeof...(RawDataTypes);
-  using Self = Dataset<RawDataTypes...>;
-  using RawDataTuple = std::tuple<RawDataTypes...>;
-  using RawDataPtrTuple = std::tuple<std::shared_ptr<RawDataTypes>...>;
+  static constexpr std::size_t kDataUnitNum = sizeof...(DataUnitTypes);
+  using Self = Dataset<DataUnitTypes...>;
+  using DataUnitTuple = std::tuple<DataUnitTypes...>;
+  using DataUnitPtrTuple = std::tuple<std::shared_ptr<DataUnitTypes>...>;
 
  public:
   template <std::size_t I>
-  using RawDataType = typename std::tuple_element<I, RawDataTuple>::type;
+  using DataUnitType = typename std::tuple_element<I, DataUnitTuple>::type;
   template <std::size_t I>
-  using RawDataPtrType = typename std::tuple_element<I, RawDataPtrTuple>::type;
+  using DataUnitPtrType =
+      typename std::tuple_element<I, DataUnitPtrTuple>::type;
 
  public:
   // constructors
   Dataset()
-      : m_raw_data_ptr_tuple(
-            std::make_tuple(makeRawDataPtr<RawDataTypes>()...)) {}
-  explicit Dataset(std::shared_ptr<RawDataTypes>... args)
-      : m_raw_data_ptr_tuple(std::make_tuple(args...)) {}
-  explicit Dataset(RawDataPtrTuple t_tuple) : m_raw_data_ptr_tuple(t_tuple) {}
-  explicit Dataset(const RawDataTypes&... args)
-      : m_raw_data_ptr_tuple(
-            std::make_tuple(makeRawDataPtr<RawDataTypes>(args)...)) {}
+      : m_data_unit_ptr_tuple(
+            std::make_tuple(makeDataUnitPtr<DataUnitTypes>()...)) {}
+  explicit Dataset(std::shared_ptr<DataUnitTypes>... args)
+      : m_data_unit_ptr_tuple(std::make_tuple(args...)) {}
+  explicit Dataset(DataUnitPtrTuple t_tuple) : m_data_unit_ptr_tuple(t_tuple) {}
+  explicit Dataset(const DataUnitTypes&... args)
+      : m_data_unit_ptr_tuple(
+            std::make_tuple(makeDataUnitPtr<DataUnitTypes>(args)...)) {}
 
   // special member functions
   Dataset(const Self&) = default;
@@ -71,28 +72,28 @@ class Dataset {
   Self& operator=(Self&&) = default;
   virtual ~Dataset() = default;
 
-  constexpr std::size_t size() const { return this->kRawDataNum; }
+  constexpr std::size_t size() const { return this->kDataUnitNum; }
 
   template <std::size_t I = 0>
-  const RawDataPtrType<I>& getptr() const {
+  const DataUnitPtrType<I>& getptr() const {
     return std::get<I>(this->tuple());
   }
 
   template <std::size_t I = 0>
-  const RawDataType<I>& get() const {
+  const DataUnitType<I>& get() const {
     return *this->getptr<I>();
   }
   template <std::size_t I = 0>
-  RawDataType<I>& get() {
+  DataUnitType<I>& get() {
     return *this->getptr<I>();
   }
 
   template <std::size_t... I>
-  auto subdata() const -> Dataset<RawDataType<I>...> {
-    return Dataset<RawDataType<I>...>(this->subtuple<I...>());
+  auto subdata() const -> Dataset<DataUnitType<I>...> {
+    return Dataset<DataUnitType<I>...>(this->subtuple<I...>());
   }
   template <std::size_t... I>
-  auto subdata(IndexSeq<I...>) const -> Dataset<RawDataType<I>...> {
+  auto subdata(IndexSeq<I...>) const -> Dataset<DataUnitType<I>...> {
     return this->subdata<I...>();
   }
 
@@ -105,8 +106,8 @@ class Dataset {
     this->copy_impl<I, Rest...>(t_other);
   }
   template <std::size_t... I>
-  void copy(const RawDataType<I>&... t_raw_data) {
-    this->copy_impl<I...>(t_raw_data...);
+  void copy(const DataUnitType<I>&... t_data_unit) {
+    this->copy_impl<I...>(t_data_unit...);
   }
   template <typename... Ts, std::size_t... SrcIdx, std::size_t... DstIdx>
   void copy(const Dataset<Ts...>& t_src, IndexSeq<SrcIdx...> t_src_idx,
@@ -123,8 +124,8 @@ class Dataset {
     return ret;
   }
   template <std::size_t I, std::size_t... Rest>
-  auto clone() const -> Dataset<RawDataType<I>, RawDataType<Rest>...> {
-    Dataset<RawDataType<I>, RawDataType<Rest>...> ret;
+  auto clone() const -> Dataset<DataUnitType<I>, DataUnitType<Rest>...> {
+    Dataset<DataUnitType<I>, DataUnitType<Rest>...> ret;
     ret.copy(this->subdata<I, Rest...>());
     return ret;
   }
@@ -133,14 +134,16 @@ class Dataset {
   bool operator!=(const Self& rhs) const { return !(*this == rhs); }
 
  protected:
-  auto tuple() const -> const RawDataPtrTuple& { return m_raw_data_ptr_tuple; }
+  auto tuple() const -> const DataUnitPtrTuple& {
+    return m_data_unit_ptr_tuple;
+  }
 
   template <std::size_t... I>
-  auto subtuple() const -> const std::tuple<RawDataPtrType<I>...> {
-    return std::make_tuple(std::get<I>(m_raw_data_ptr_tuple)...);
+  auto subtuple() const -> const std::tuple<DataUnitPtrType<I>...> {
+    return std::make_tuple(std::get<I>(m_data_unit_ptr_tuple)...);
   }
   template <std::size_t... I>
-  auto subtuple(IndexSeq<I...>) -> const std::tuple<RawDataPtrType<I>...> {
+  auto subtuple(IndexSeq<I...>) -> const std::tuple<DataUnitPtrType<I>...> {
     return this->subtuple<I...>();
   }
 
@@ -156,14 +159,14 @@ class Dataset {
   template <typename T = void>
   void copy_impl() {}
   template <std::size_t I, std::size_t... Rest>
-  void copy_impl(const RawDataType<I>& t_raw_data,
-                 const RawDataType<Rest>&... args) {
-    this->get<I>() = t_raw_data;
+  void copy_impl(const DataUnitType<I>& t_data_unit,
+                 const DataUnitType<Rest>&... args) {
+    this->get<I>() = t_data_unit;
     this->copy_impl<Rest...>(args...);
   }
 
  private:
-  RawDataPtrTuple m_raw_data_ptr_tuple;
+  DataUnitPtrTuple m_data_unit_ptr_tuple;
 
   template <typename... Ts>
   friend std::ostream& operator<<(std::ostream& os, const Dataset<Ts...>& data);

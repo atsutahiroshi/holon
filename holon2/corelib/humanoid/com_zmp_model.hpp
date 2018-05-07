@@ -21,9 +21,8 @@
 #ifndef HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
 #define HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
 
-#include <cmath>
-#include <utility>
 #include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_builder.hpp"
+#include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_formula.hpp"
 
 namespace holon {
 
@@ -59,48 +58,6 @@ class ComZmpModel {
  private:
   Data m_data;
 };
-
-namespace com_zmp_model_formula {
-
-// functions to compute zeta squared
-double zetaSqr(double t_com_position_z, double t_zmp_position_z,
-               double t_com_acceleration_z);
-double zetaSqr(double t_com_position_z, double t_zmp_position_z,
-               double t_reation_force_z, double t_mass);
-double zetaSqr(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
-               const Vec3d& t_com_acceleration, const Vec3d& t_nu = kVec3dZ);
-double zetaSqr(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
-               const Vec3d& t_reaction_force, double t_mass,
-               const Vec3d& t_nu = kVec3dZ);
-
-// functions to compute zeta
-template <typename... Args>
-double zeta(Args&&... args) {
-  return std::sqrt(zetaSqr(std::forward<Args>(args)...));
-}
-
-// functions to compute reaction force
-Vec3d reactForce(const Vec3d& t_com_acceleration, double t_mass);
-Vec3d reactForce(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
-                 double t_sqr_zeta, double t_mass);
-Vec3d reactForce(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
-                 const Vec3d& t_com_acceleration, double t_mass,
-                 const Vec3d& t_nu = kVec3dZ);
-Vec3d reactForce(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
-                 double t_reaction_force_z);
-
-// functions to compute COM acceleration
-Vec3d comAccel(const Vec3d& t_reaction_force, double t_mass,
-               const Vec3d& t_external_force = kVec3dZero);
-Vec3d comAccel(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
-               double t_sqr_zeta, double t_mass = 1,
-               const Vec3d& t_external_force = kVec3dZero);
-Vec3d comAccel(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
-               const Vec3d& t_reaction_force, double t_mass,
-               const Vec3d& t_external_force = kVec3dZero,
-               const Vec3d& t_nu = kVec3dZ);
-
-}  // namespace com_zmp_model_formula
 
 }  // namespace holon
 

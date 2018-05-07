@@ -22,6 +22,7 @@
 
 #include <sstream>
 #include <string>
+#include "holon2/corelib/common/random.hpp"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
 #include "third_party/eigen/Eigen/Dense"
@@ -37,6 +38,15 @@ extern const Vec3d kVec3dZero;
 extern const Vec3d kVec3dX;
 extern const Vec3d kVec3dY;
 extern const Vec3d kVec3dZ;
+
+// for random number generator
+template <typename Engine, typename Distribution>
+struct RandomAdapter<Vec3d, Engine, Distribution> {
+  using type = Vec3d;
+  type get(Engine& eng, Distribution& dist) {
+    return Vec3d(dist(eng), dist(eng), dist(eng));
+  }
+};
 
 }  // namespace holon
 

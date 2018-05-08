@@ -88,5 +88,12 @@ TEST_CASE("Constant Vectors", "[Vec3d]") {
   CHECK(kVec3dZ == Vec3d(0, 0, 1));
 }
 
+TEST_CASE("allclose for Mat class", "[Mat]") {
+  Mat3d m1, m2;
+  m1 << 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9;
+  m2 << 0.1, 0.2, 0.1 + 0.2, 0.4, 0.5, 0.3 + 0.3, 0.7, 0.8, 0.9;
+  CHECK(allclose(m1, m2));
+}
+
 }  // namespace
 }  // namespace holon

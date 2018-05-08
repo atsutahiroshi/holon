@@ -20,6 +20,7 @@
 #ifndef HOLON_MATH_VEC_HPP_
 #define HOLON_MATH_VEC_HPP_
 
+#include <limits>
 #include <sstream>
 #include <string>
 #include "holon2/corelib/common/random.hpp"
@@ -38,6 +39,19 @@ extern const Vec3d kVec3dZero;
 extern const Vec3d kVec3dX;
 extern const Vec3d kVec3dY;
 extern const Vec3d kVec3dZ;
+
+// ref: https://stackoverflow.com/a/15052131
+template <typename DerivedA, typename DerivedB>
+bool allclose(
+    const Eigen::DenseBase<DerivedA>& a, const Eigen::DenseBase<DerivedB>& b,
+    const typename DerivedA::RealScalar& rtol =
+        Eigen::NumTraits<typename DerivedA::RealScalar>::dummy_precision(),
+    const typename DerivedA::RealScalar& atol =
+        Eigen::NumTraits<typename DerivedA::RealScalar>::epsilon()) {
+  return ((a.derived() - b.derived()).array().abs() <=
+          (atol + rtol * b.derived().array().abs()))
+      .all();
+}
 
 // for random number generator
 template <typename Engine, typename Distribution>
@@ -58,9 +72,12 @@ using holon::Vec3d;
 
 class ApproxEqualsMatcher : public MatcherBase<Vec3d> {
  public:
-  explicit ApproxEqualsMatcher(const Vec3d& comparator)
-      : m_comparator(comparator) {}
-  bool match(const Vec3d& v) const override { return m_comparator.isApprox(v); }
+  explicit ApproxEqualsMatcher(const Vec3d& comparator, const double tol)
+      : m_comparator(comparator), m_tol(tol) {}
+  bool match(const Vec3d& v) const override {
+    return ::holon::allclose(
+        m_comparator, v, Eigen::NumTraits<double>::dummy_precision(), m_tol);
+  }
   std::string describe() const override {
     std::ostringstream ss;
     ss << m_comparator;
@@ -69,12 +86,15 @@ class ApproxEqualsMatcher : public MatcherBase<Vec3d> {
 
  private:
   const Vec3d& m_comparator;
+  const double m_tol;
 };
 
 }  // namespace Vec
 
-inline Vec::ApproxEqualsMatcher ApproxEquals(const holon::Vec3d& comparator) {
-  return Vec::ApproxEqualsMatcher(comparator);
+inline Vec::ApproxEqualsMatcher ApproxEquals(
+    const holon::Vec3d& comparator,
+    const double tol = std::numeric_limits<double>::epsilon()) {
+  return Vec::ApproxEqualsMatcher(comparator, tol);
 }
 
 }  // namespace Matchers

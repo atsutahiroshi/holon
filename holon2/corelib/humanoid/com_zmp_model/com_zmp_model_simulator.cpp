@@ -30,22 +30,29 @@ class ComZmpModelSimulator::Impl {
  public:
   Impl()
       : m_model(ComZmpModelBuilder().build()),
+        m_ctrl_input_type(CtrlInputType::kNotDetermined),
         m_initial_com_position(model().com_position()) {}
   explicit Impl(Data t_data)
-      : m_model(t_data), m_initial_com_position(model().com_position()) {}
+      : m_model(t_data),
+        m_ctrl_input_type(CtrlInputType::kNotDetermined),
+        m_initial_com_position(model().com_position()) {}
   explicit Impl(const Model& t_model)
       : m_model(t_model.clone()),
+        m_ctrl_input_type(CtrlInputType::kNotDetermined),
         m_initial_com_position(model().com_position()) {}
 
   const Model& model() const { return m_model; }
+  CtrlInputType getCtrlInputType() const { return m_ctrl_input_type; }
   Vec3d getInitialComPosition() const { return m_initial_com_position; }
 
+  void setCtrlInputType(CtrlInputType t_type) { m_ctrl_input_type = t_type; }
   void setInitialComPosition(const Vec3d& t_p0) {
     m_initial_com_position = t_p0;
   }
 
  private:
   Model m_model;
+  CtrlInputType m_ctrl_input_type;
   Vec3d m_initial_com_position;
 };
 
@@ -63,11 +70,22 @@ ComZmpModelSimulator::~ComZmpModelSimulator() = default;
 const ComZmpModel& ComZmpModelSimulator::model() const {
   return m_impl->model();
 }
+
+ComZmpModelSimulator::CtrlInputType ComZmpModelSimulator::getCtrlInputType()
+    const {
+  return m_impl->getCtrlInputType();
+}
+
 Vec3d ComZmpModelSimulator::getInitialComPosition() const {
   return m_impl->getInitialComPosition();
 }
 
-// mutators
+ComZmpModelSimulator& ComZmpModelSimulator::setCtrlInputType(
+    CtrlInputType t_type) {
+  m_impl->setCtrlInputType(t_type);
+  return *this;
+}
+
 ComZmpModelSimulator& ComZmpModelSimulator::setInitialComPosition(
     const Vec3d& t_p0) {
   m_impl->setInitialComPosition(t_p0);

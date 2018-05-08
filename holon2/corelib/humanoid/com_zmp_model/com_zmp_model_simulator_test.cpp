@@ -34,6 +34,8 @@ void checkCtor(const ComZmpModelSimulator& sim, const Vec3d& expected_pg) {
   CHECK(sim.time_step() == kDefaultTimeStep);
   CHECK(sim.model().com_position() == expected_pg);
   CHECK(sim.getInitialComPosition() == expected_pg);
+  CHECK(sim.getCtrlInputType() ==
+        ComZmpModelSimulator::CtrlInputType::kNotDetermined);
 }
 TEST_CASE("com_zmp_model_simulator: check c'tors",
           "[ComZmpModel][ComZmpModelSimulator]") {
@@ -67,6 +69,23 @@ TEST_CASE("com_zmp_model_simulator: set initial COM position",
   sim.setInitialComPosition(p0);
   CHECK(sim.getInitialComPosition() == p0);
 }
+
+TEST_CASE("com_zmp_model_simulator: set control input type",
+          "[ComZmpModel][ComZmpModelSimulator]") {
+  ComZmpModelSimulator sim;
+  using Type = ComZmpModelSimulator::CtrlInputType;
+  SECTION("set ZMP position as control input") {
+    sim.setCtrlInputType(Type::kZmpPosition);
+    CHECK(sim.getCtrlInputType() == Type::kZmpPosition);
+  }
+  SECTION("set reaction force as control input") {
+    sim.setCtrlInputType(Type::kReactionForce);
+    CHECK(sim.getCtrlInputType() == Type::kReactionForce);
+  }
+}
+
+TEST_CASE("com_zmp_model_simulator: get COM accel. under specific pos/vel",
+          "[ComZmpModel][ComZmpModelSimulator]") {}
 
 TEST_CASE("com_zmp_model_simulator: ", "[ComZmpModel][ComZmpModelSimulator]") {}
 

@@ -21,6 +21,7 @@
 #ifndef HOLON_HUMANOID_COM_ZMP_MODEL_SIMULATOR_HPP_
 #define HOLON_HUMANOID_COM_ZMP_MODEL_SIMULATOR_HPP_
 
+#include <functional>
 #include <memory>
 #include "holon2/corelib/dataset/dataset.hpp"
 #include "holon2/corelib/humanoid/simulator.hpp"
@@ -37,6 +38,15 @@ class ComZmpModelSimulator : public Simulator {
   using Self = ComZmpModelSimulator;
   using Data = ComZmpModelData;
   using Model = ComZmpModel;
+  using Functor =
+      std::function<Vec3d(const Vec3d&, const Vec3d&, const double)>;
+
+ public:
+  enum class CtrlInputType {
+    kNotDetermined,
+    kReactionForce,
+    kZmpPosition,
+  };
 
  public:
   // constructors
@@ -53,10 +63,11 @@ class ComZmpModelSimulator : public Simulator {
 
   // accessors
   const Model& model() const;
-
+  CtrlInputType getCtrlInputType() const;
   Vec3d getInitialComPosition() const;
 
   // mutators
+  ComZmpModelSimulator& setCtrlInputType(CtrlInputType t_type);
   ComZmpModelSimulator& setInitialComPosition(const Vec3d& t_p0);
 
   void reset() final;

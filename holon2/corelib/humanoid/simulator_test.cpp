@@ -29,9 +29,9 @@ namespace {
 class SimulatorTest : public Simulator {
  public:
   virtual ~SimulatorTest() = default;
-  void reset() override { return resetTime(); }
-  bool update() override { return update(time_step()); }
-  bool update(double dt) override {
+  void reset() final { return resetTime(); }
+  bool update() final { return update(time_step()); }
+  bool update(double dt) final {
     updateTime(dt);
     return true;
   }

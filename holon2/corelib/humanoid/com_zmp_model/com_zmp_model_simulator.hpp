@@ -49,9 +49,9 @@ class ComZmpModelSimulator : public Simulator {
   ComZmpModelSimulator& operator=(ComZmpModelSimulator&&);
   virtual ~ComZmpModelSimulator();
 
-  void reset() override { resetTime(); }
-  bool update() override { return update(time_step()); }
-  bool update(double dt) override {
+  void reset() final { resetTime(); }
+  bool update() final { return update(time_step()); }
+  bool update(double dt) final {
     updateTime(dt);
     return true;
   }

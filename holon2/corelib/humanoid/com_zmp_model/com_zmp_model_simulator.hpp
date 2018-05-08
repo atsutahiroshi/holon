@@ -70,6 +70,21 @@ class ComZmpModelSimulator : public Simulator {
   ComZmpModelSimulator& setCtrlInputType(CtrlInputType t_type);
   ComZmpModelSimulator& setInitialComPosition(const Vec3d& t_p0);
 
+  // computations
+  Vec3d getComAccel(const Vec3d& p, const Vec3d& v, const double t) const;
+  Vec3d getZmpPosition(const Vec3d& p, const Vec3d& v, const double t) const;
+  Vec3d getReactForce(const Vec3d& p, const Vec3d& v, const double t) const;
+  Vec3d getExtForce(const Vec3d& p, const Vec3d& v, const double t) const;
+
+  // set functors
+  ComZmpModelSimulator& setZmpPosition(Functor t_functor);
+  ComZmpModelSimulator& setZmpPosition(const Vec3d& t_pz);
+  ComZmpModelSimulator& setReactForce(Functor t_functor);
+  ComZmpModelSimulator& setReactForce(const Vec3d& t_f);
+  ComZmpModelSimulator& setExtForce(Functor t_functor);
+  ComZmpModelSimulator& setExtForce(const Vec3d& t_ef);
+
+  // update
   void reset() final;
   bool update() final;
   bool update(double dt) final;

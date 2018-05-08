@@ -20,6 +20,7 @@
 
 #include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_simulator.hpp"
 #include "holon2/corelib/humanoid/com_zmp_model.hpp"
+#include "holon2/corelib/humanoid/const_defs.hpp"
 
 #include "third_party/catch/catch.hpp"
 
@@ -84,8 +85,95 @@ TEST_CASE("com_zmp_model_simulator: set control input type",
   }
 }
 
-TEST_CASE("com_zmp_model_simulator: get COM accel. under specific pos/vel",
-          "[ComZmpModel][ComZmpModelSimulator]") {}
+TEST_CASE("com_zmp_model_simulator: set ZMP position functor",
+          "[ComZmpModel][ComZmpModelSimulator]") {
+  double vhp = Random<double>(0, 1).get();
+  Vec3d p0 = Random<Vec3d>(-1, 1).get();
+  p0[2] += 2;  // make COM height be larger than vhp
+  auto model = ComZmpModelBuilder()
+                   .setVirtualHorizontalPlane(vhp)
+                   .setComPosition(p0)
+                   .build();
+  ComZmpModelSimulator sim(model);
+  Vec3d p = Vec3d::Random();
+  Vec3d v = Vec3d::Random();
+
+  SECTION("default ZMP position") {
+    CHECK(sim.getZmpPosition(p, v, 0) == Vec3d(p0[0], p0[1], vhp));
+  }
+  SECTION("set constant ZMP position") {
+    Vec3d pz = Vec3d::Random();
+    pz[2] = 0;
+    sim.setZmpPosition(pz);
+    CHECK(sim.getZmpPosition(p, v, 0) == pz);
+  }
+  SECTION("set ZMP position functor") {
+    auto pz_f = [](const Vec3d& t_p, const Vec3d& t_v, const double) {
+      return t_p - 0.5 * t_v;
+    };
+    sim.setZmpPosition(pz_f);
+    Vec3d pz = p - 0.5 * v;
+    CHECK(sim.getZmpPosition(p, v, 0) == pz);
+  }
+}
+
+TEST_CASE("com_zmp_model_simulator: set reaction force functor",
+          "[ComZmpModel][ComZmpModelSimulator]") {
+  double mass = Random<double>(0, 2).get();
+  auto model = ComZmpModelBuilder().setMass(mass).build();
+  ComZmpModelSimulator sim(model);
+  Vec3d p = Vec3d::Random();
+  Vec3d v = Vec3d::Random();
+
+  SECTION("default reaction force") {
+    CHECK(sim.getReactForce(p, v, 0) == Vec3d(0, 0, mass * kGravAccel));
+  }
+  SECTION("set constant reaction force") {
+    Vec3d f = Vec3d::Random();
+    sim.setReactForce(f);
+    CHECK(sim.getReactForce(p, v, 0) == f);
+  }
+  SECTION("set reaction force functor") {
+    auto f_f = [](const Vec3d& t_p, const Vec3d& t_v, const double) {
+      return Vec3d(0, 0, t_p.z() - 0.5 * t_v.z());
+    };
+    sim.setReactForce(f_f);
+    Vec3d f = Vec3d::Zero();
+    f.z() = p.z() - 0.5 * v.z();
+    CHECK(sim.getReactForce(p, v, 0) == f);
+  }
+}
+
+TEST_CASE("com_zmp_model_simulator: set external force functor",
+          "[ComZmpModel][ComZmpModelSimulator]") {
+  auto model = ComZmpModelBuilder().build();
+  ComZmpModelSimulator sim(model);
+  Vec3d p = Vec3d::Random();
+  Vec3d v = Vec3d::Random();
+
+  SECTION("default external force") {
+    CHECK(sim.getExtForce(p, v, 0) == kVec3dZero);
+  }
+  SECTION("set constant external force") {
+    Vec3d ef = Vec3d::Random();
+    sim.setExtForce(ef);
+    CHECK(sim.getExtForce(p, v, 0) == ef);
+  }
+  SECTION("set external force functor") {
+    auto ef_f = [](const Vec3d& t_p, const Vec3d& t_v,
+                   const double t) -> Vec3d {
+      if (t > 0.5 && t < 0.7) {
+        return t_p + t_v;
+      } else {
+        return kVec3dZero;
+      }
+    };
+    sim.setExtForce(ef_f);
+    CHECK(sim.getExtForce(p, v, 0) == kVec3dZero);
+    CHECK(sim.getExtForce(p, v, 0.6) == p + v);
+    CHECK(sim.getExtForce(p, v, 1) == kVec3dZero);
+  }
+}
 
 TEST_CASE("com_zmp_model_simulator: ", "[ComZmpModel][ComZmpModelSimulator]") {}
 

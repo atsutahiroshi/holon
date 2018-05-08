@@ -271,6 +271,62 @@ SCENARIO(
   }
 }
 
+SCENARIO(
+    "com_zmp_model_simulator: compute COM accel. when react force is given",
+    "[ComZmpModel][ComZmpModelSimulator]") {
+  GIVEN("simulator in which reaction force is set as input") {
+    auto model = getRandomModel();
+    double mass = model.mass();
+    Vec3d p = model.com_position();
+    Vec3d v = model.com_velocity();
+    ComZmpModelSimulator sim(model);
+    sim.setReactForceAsInput();
+
+    WHEN("Nothing is given") {
+      THEN("COM accel. should be zero") {
+        CHECK_THAT(sim.getComAccel(p, v, 0), ApproxEquals(kVec3dZero, kTOL));
+      }
+    }
+
+    WHEN("reaction force is given") {
+      sim.setReactForce(calculateReactForceExample);
+      THEN("COM accel. along z-axis should be generated") {
+        Vec3d f = calculateReactForceExample(p, v, 0);
+        Vec3d expected_acc = cz::comAccel(f, mass);
+        REQUIRE(sim.getComAccel(p, v, 0).z() > -kGravAccel);
+        CHECK_THAT(sim.getComAccel(p, v, 0), ApproxEquals(expected_acc, kTOL));
+      }
+    }
+
+    WHEN("ZMP is also given") {
+      sim.setReactForce(calculateReactForceExample);
+      sim.setZmpPosition(calculateZmpExample);
+      THEN("ZMP should be ignored") {
+        Vec3d f = calculateReactForceExample(p, v, 0);
+        Vec3d pz = calculateZmpExample(p, v, 0);
+        Vec3d wrong_acc = cz::comAccel(p, pz, f, mass);
+        Vec3d expected_acc = cz::comAccel(f, mass);
+        REQUIRE(sim.getComAccel(p, v, 0).z() > -kGravAccel);
+        REQUIRE_THAT(sim.getComAccel(p, v, 0), !ApproxEquals(wrong_acc));
+        CHECK_THAT(sim.getComAccel(p, v, 0), ApproxEquals(expected_acc, kTOL));
+      }
+    }
+
+    WHEN("Additionally, external force is given") {
+      sim.setReactForce(calculateReactForceExample);
+      sim.setExtForce(calculateExtForceExample);
+      THEN("COM accel. should be generated") {
+        Vec3d f = calculateReactForceExample(p, v, 0.5);
+        Vec3d ef = calculateExtForceExample(p, v, 0.5);
+        Vec3d expected_acc = cz::comAccel(f, mass);
+        REQUIRE_THAT(sim.getComAccel(p, v, 0.5), !ApproxEquals(expected_acc));
+        CHECK_THAT(sim.getComAccel(p, v, 0.5),
+                   ApproxEquals(expected_acc + ef / mass, kTOL));
+      }
+    }
+  }
+}
+
 TEST_CASE("com_zmp_model_simulator: ", "[ComZmpModel][ComZmpModelSimulator]") {}
 
 }  // namespace

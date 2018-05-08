@@ -46,7 +46,20 @@ class ComZmpModelSimulator::Impl {
   InputType getInputType() const { return m_input_type; }
   Vec3d getInitialComPosition() const { return m_initial_com_position; }
 
-  void setInputType(InputType t_type) { m_input_type = t_type; }
+  void setInputType(InputType t_type) {
+    m_input_type = t_type;
+    switch (t_type) {
+      case InputType::kReactionForce:
+        setComAccelWhenInputTypeIsReactForce();
+        break;
+      case InputType::kZmpPosition:
+        setComAccelWhenInputTypeIsZmpPos();
+        break;
+      default:
+        setDefaultComAccel();
+        break;
+    }
+  }
   void setInitialComPosition(const Vec3d& t_p0) {
     m_initial_com_position = t_p0;
   }
@@ -83,7 +96,14 @@ class ComZmpModelSimulator::Impl {
     return [v](const Vec3d&, const Vec3d&, const double) { return v; };
   }
 
-  void setDefaultComAccel() {
+  void setDefaultComAccel() { setComAccel(returnConstVecFunctor(kVec3dZero)); }
+  void setComAccelWhenInputTypeIsReactForce() {
+    setComAccel([this](const Vec3d& p, const Vec3d& v, const double t) {
+      return cz::comAccel(getReactForce(p, v, t), m_model.mass(),
+                          getExtForce(p, v, t));
+    });
+  }
+  void setComAccelWhenInputTypeIsZmpPos() {
     setComAccel([this](const Vec3d& p, const Vec3d& v, const double t) {
       return cz::comAccel(p, getZmpPosition(p, v, t), getReactForce(p, v, t),
                           m_model.mass(), getExtForce(p, v, t));

@@ -74,6 +74,7 @@ class ComZmpModel {
   }
 
   double mass() const noexcept { return params().mass; }
+  double vhp() const noexcept { return params().vhp; }
   Vec3d com_position() const noexcept { return states().com_position; }
   Vec3d com_velocity() const noexcept { return states().com_velocity; }
   Vec3d com_acceleration() const noexcept { return states().com_acceleration; }

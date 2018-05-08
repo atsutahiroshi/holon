@@ -57,6 +57,13 @@ TEST_CASE("com_zmp_model: accessor to mass", "[ComZmpModel]") {
   CHECK(model.mass() == m);
 }
 
+TEST_CASE("com_zmp_model: accessor to vhp", "[ComZmpModel]") {
+  double m = Random<double>().get();
+  ComZmpModel model;
+  model.params().vhp = m;
+  CHECK(model.vhp() == m);
+}
+
 TEST_CASE("com_zmp_model: accessor to COM position", "[ComZmpModel]") {
   Vec3d v = Random<Vec3d>().get();
   ComZmpModel model;

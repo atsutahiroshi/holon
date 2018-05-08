@@ -36,10 +36,10 @@ class ComZmpModelSimulator::Impl {
       : m_model(t_data),
         m_input_type(InputType::kNotDetermined),
         m_initial_com_position(model().com_position()) {
-    setDefaultExtForce();
-    setDefaultReactForce();
-    setDefaultZmpPosition();
-    setDefaultComAccel();
+    setExtForceDefault();
+    setReactForceDefault();
+    setZmpPositionDefault();
+    setComAccelDefault();
   }
 
   const Model& model() const { return m_model; }
@@ -56,7 +56,7 @@ class ComZmpModelSimulator::Impl {
         setComAccelWhenInputTypeIsZmpPos();
         break;
       default:
-        setDefaultComAccel();
+        setComAccelDefault();
         break;
     }
   }
@@ -96,7 +96,7 @@ class ComZmpModelSimulator::Impl {
     return [v](const Vec3d&, const Vec3d&, const double) { return v; };
   }
 
-  void setDefaultComAccel() { setComAccel(returnConstVecFunctor(kVec3dZero)); }
+  void setComAccelDefault() { setComAccel(returnConstVecFunctor(kVec3dZero)); }
   void setComAccelWhenInputTypeIsReactForce() {
     setComAccel([this](const Vec3d& p, const Vec3d& v, const double t) {
       return cz::comAccel(getReactForce(p, v, t), m_model.mass(),
@@ -109,19 +109,19 @@ class ComZmpModelSimulator::Impl {
                           m_model.mass(), getExtForce(p, v, t));
     });
   }
-  void setDefaultZmpPosition() {
+  void setZmpPositionDefault() {
     setZmpPosition([this](const Vec3d&, const Vec3d&, const double) {
       Vec3d ret = m_model.com_position();
       ret.z() = m_model.vhp();
       return ret;
     });
   }
-  void setDefaultReactForce() {
+  void setReactForceDefault() {
     setReactForce([this](const Vec3d&, const Vec3d&, const double) {
       return Vec3d(0, 0, m_model.mass() * kGravAccel);
     });
   }
-  void setDefaultExtForce() { setExtForce(returnConstVecFunctor(kVec3dZero)); }
+  void setExtForceDefault() { setExtForce(returnConstVecFunctor(kVec3dZero)); }
 
  private:
   Model m_model;

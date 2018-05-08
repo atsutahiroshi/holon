@@ -19,13 +19,24 @@
  */
 
 #include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_simulator.hpp"
+
 #include <memory>
 #include "holon2/corelib/humanoid/com_zmp_model.hpp"
 #include "holon2/corelib/humanoid/const_defs.hpp"
 
 namespace holon {
 
-class ComZmpModelSimulator::Impl {};
+class ComZmpModelSimulator::Impl {
+ public:
+  Impl() : m_model(ComZmpModelBuilder().build()) {}
+  // explicit Impl(Data t_data) {}
+  // explicit Impl(const Model& t_model) {}
+
+  const Model& model() const { return m_model; }
+
+ private:
+  Model m_model;
+};
 
 ComZmpModelSimulator::ComZmpModelSimulator() : m_impl(new Impl) {}
 
@@ -33,5 +44,16 @@ ComZmpModelSimulator::ComZmpModelSimulator(ComZmpModelSimulator&&) = default;
 ComZmpModelSimulator& ComZmpModelSimulator::operator=(ComZmpModelSimulator&&) =
     default;
 ComZmpModelSimulator::~ComZmpModelSimulator() = default;
+
+const ComZmpModel& ComZmpModelSimulator::model() const {
+  return m_impl->model();
+}
+
+void ComZmpModelSimulator::reset() { resetTime(); }
+bool ComZmpModelSimulator::update() { return update(time_step()); }
+bool ComZmpModelSimulator::update(double dt) {
+  updateTime(dt);
+  return true;
+}
 
 }  // namespace holon

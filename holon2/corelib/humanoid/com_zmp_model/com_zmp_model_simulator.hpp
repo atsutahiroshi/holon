@@ -39,8 +39,8 @@ class ComZmpModelSimulator : public Simulator {
  public:
   // constructors
   ComZmpModelSimulator();
-  ComZmpModelSimulator(Data t_data);
-  ComZmpModelSimulator(const Model& t_model);
+  explicit ComZmpModelSimulator(Data t_data);
+  explicit ComZmpModelSimulator(const Model& t_model);
 
   // special member functions
   ComZmpModelSimulator(const ComZmpModelSimulator&) = delete;
@@ -49,12 +49,12 @@ class ComZmpModelSimulator : public Simulator {
   ComZmpModelSimulator& operator=(ComZmpModelSimulator&&);
   virtual ~ComZmpModelSimulator();
 
-  void reset() final { resetTime(); }
-  bool update() final { return update(time_step()); }
-  bool update(double dt) final {
-    updateTime(dt);
-    return true;
-  }
+  // accessors
+  const Model& model() const;
+
+  void reset() final;
+  bool update() final;
+  bool update(double dt) final;
 
  private:
   class Impl;

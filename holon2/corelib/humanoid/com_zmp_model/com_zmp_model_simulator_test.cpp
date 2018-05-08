@@ -19,6 +19,7 @@
  */
 
 #include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_simulator.hpp"
+#include "holon2/corelib/humanoid/com_zmp_model.hpp"
 
 #include "third_party/catch/catch.hpp"
 
@@ -26,6 +27,7 @@ namespace holon {
 namespace {
 
 const double kDefaultTimeStep = 0.001;
+const Vec3d kDefaultComPosition = Vec3d(0, 0, 1);
 
 TEST_CASE("com_zmp_model_simulator: check c'tors",
           "[ComZmpModel][ComZmpModelSimulator]") {
@@ -34,6 +36,7 @@ TEST_CASE("com_zmp_model_simulator: check c'tors",
     // CHECK(sim.getInitialComPosition() == sim.model().com_position());
     CHECK(sim.time() == 0.0);
     CHECK(sim.time_step() == kDefaultTimeStep);
+    CHECK(sim.model().com_position() == kDefaultComPosition);
   }
   SECTION("overloaded c'tor 1") {}
   SECTION("overloaded c'tor 2") {}

@@ -26,7 +26,16 @@
 namespace holon {
 namespace {
 
-class SimulatorTest : public Simulator {};
+class SimulatorTest : public Simulator {
+ public:
+  virtual ~SimulatorTest() = default;
+  void reset() override { return resetTime(); }
+  bool update() override { return update(time_step()); }
+  bool update(double dt) override {
+    updateTime(dt);
+    return true;
+  }
+};
 
 const double kDefaultTimeStep = 0.001;
 
@@ -42,7 +51,7 @@ TEST_CASE("simulator: check c'tors", "[Simulator]") {
 }
 
 TEST_CASE("simulator: set time step", "[Simulator]") {
-  Simulator sim;
+  SimulatorTest sim;
   REQUIRE(sim.time_step() == kDefaultTimeStep);
   auto dt = Random<double>(0, 0.01).get();
   sim.setTimeStep(dt);
@@ -50,7 +59,7 @@ TEST_CASE("simulator: set time step", "[Simulator]") {
 }
 
 TEST_CASE("simulator: update current time", "[Simulator]") {
-  Simulator sim;
+  SimulatorTest sim;
   Random<double> rnd(0, 0.01);
   SECTION("update with default time step") {
     REQUIRE(sim.time() == 0.0);
@@ -79,6 +88,14 @@ TEST_CASE("simulator: update current time", "[Simulator]") {
     CHECK(sim.time() == dt1 + dt2);
     CHECK(sim.time_step() == kDefaultTimeStep);
   }
+}
+
+TEST_CASE("simulator: reset time", "[Simulator]") {
+  SimulatorTest sim;
+  sim.update();
+  REQUIRE(sim.time() != 0.0);
+  sim.reset();
+  CHECK(sim.time() == 0.0);
 }
 
 TEST_CASE("simulator: ", "[Simulator]") {}

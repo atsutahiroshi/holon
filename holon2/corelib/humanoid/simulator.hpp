@@ -34,18 +34,25 @@ class Simulator {
   double time() const { return m_time; }
   double time_step() const { return m_time_step; }
 
+  double getTime() const { return time(); }
+  double getTimeStep() const { return time_step(); }
+
   // mutators
   Simulator& setTimeStep(double t_time_step) {
     m_time_step = t_time_step;
     return *this;
   }
 
+  // reset
+  virtual void reset() = 0;
+
   // update
-  virtual bool update() { return update(m_time_step); }
-  virtual bool update(double t_time_step) {
-    m_time += t_time_step;
-    return true;
-  }
+  virtual bool update() = 0;
+  virtual bool update(double t_time_step) = 0;
+
+ protected:
+  void resetTime() { m_time = 0.0; }
+  void updateTime(double t_time_step) { m_time += t_time_step; }
 
  private:
   double m_time;

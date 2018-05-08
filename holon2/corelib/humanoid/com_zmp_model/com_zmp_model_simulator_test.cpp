@@ -70,16 +70,32 @@ TEST_CASE("com_zmp_model_simulator: set initial COM position",
   CHECK(sim.getInitialComPosition() == p0);
 }
 
-TEST_CASE("com_zmp_model_simulator: set control input type",
+TEST_CASE("com_zmp_model_simulator: set ZMP position as input",
           "[ComZmpModel][ComZmpModelSimulator]") {
   ComZmpModelSimulator sim;
   using Type = ComZmpModelSimulator::InputType;
-  SECTION("set ZMP position as control input") {
+  REQUIRE(sim.getInputType() == Type::kNotDetermined);
+  SECTION("method 1") {
     sim.setInputType(Type::kZmpPosition);
     CHECK(sim.getInputType() == Type::kZmpPosition);
   }
-  SECTION("set reaction force as control input") {
+  SECTION("method 2") {
+    sim.setZmpPosAsInput();
+    CHECK(sim.getInputType() == Type::kZmpPosition);
+  }
+}
+
+TEST_CASE("com_zmp_model_simulator: set reaction force as input",
+          "[ComZmpModel][ComZmpModelSimulator]") {
+  ComZmpModelSimulator sim;
+  using Type = ComZmpModelSimulator::InputType;
+  REQUIRE(sim.getInputType() == Type::kNotDetermined);
+  SECTION("method 1") {
     sim.setInputType(Type::kReactionForce);
+    CHECK(sim.getInputType() == Type::kReactionForce);
+  }
+  SECTION("method 2") {
+    sim.setReactForceAsInput();
     CHECK(sim.getInputType() == Type::kReactionForce);
   }
 }
@@ -183,6 +199,7 @@ TEST_CASE("com_zmp_model_simulator: clear external force",
   sim.clearExtForce();
   CHECK(sim.getExtForce(kVec3dZero, kVec3dZero, 0) == kVec3dZero);
 }
+
 TEST_CASE("com_zmp_model_simulator: ", "[ComZmpModel][ComZmpModelSimulator]") {}
 
 }  // namespace

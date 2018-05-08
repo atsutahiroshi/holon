@@ -134,6 +134,14 @@ ComZmpModelSimulator& ComZmpModelSimulator::setInputType(InputType t_type) {
   return *this;
 }
 
+ComZmpModelSimulator& ComZmpModelSimulator::setZmpPosAsInput() {
+  return setInputType(InputType::kZmpPosition);
+}
+
+ComZmpModelSimulator& ComZmpModelSimulator::setReactForceAsInput() {
+  return setInputType(InputType::kReactionForce);
+}
+
 ComZmpModelSimulator& ComZmpModelSimulator::setInitialComPosition(
     const Vec3d& t_p0) {
   m_impl->setInitialComPosition(t_p0);

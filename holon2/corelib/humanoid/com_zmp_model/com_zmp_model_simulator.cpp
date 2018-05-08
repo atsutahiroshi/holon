@@ -28,14 +28,25 @@ namespace holon {
 
 class ComZmpModelSimulator::Impl {
  public:
-  Impl() : m_model(ComZmpModelBuilder().build()) {}
-  explicit Impl(Data t_data) : m_model(t_data) {}
-  explicit Impl(const Model& t_model) : m_model(t_model.clone()) {}
+  Impl()
+      : m_model(ComZmpModelBuilder().build()),
+        m_initial_com_position(model().com_position()) {}
+  explicit Impl(Data t_data)
+      : m_model(t_data), m_initial_com_position(model().com_position()) {}
+  explicit Impl(const Model& t_model)
+      : m_model(t_model.clone()),
+        m_initial_com_position(model().com_position()) {}
 
   const Model& model() const { return m_model; }
+  Vec3d getInitialComPosition() const { return m_initial_com_position; }
+
+  void setInitialComPosition(const Vec3d& t_p0) {
+    m_initial_com_position = t_p0;
+  }
 
  private:
   Model m_model;
+  Vec3d m_initial_com_position;
 };
 
 ComZmpModelSimulator::ComZmpModelSimulator() : m_impl(new Impl) {}
@@ -51,6 +62,16 @@ ComZmpModelSimulator::~ComZmpModelSimulator() = default;
 
 const ComZmpModel& ComZmpModelSimulator::model() const {
   return m_impl->model();
+}
+Vec3d ComZmpModelSimulator::getInitialComPosition() const {
+  return m_impl->getInitialComPosition();
+}
+
+// mutators
+ComZmpModelSimulator& ComZmpModelSimulator::setInitialComPosition(
+    const Vec3d& t_p0) {
+  m_impl->setInitialComPosition(t_p0);
+  return *this;
 }
 
 void ComZmpModelSimulator::reset() { resetTime(); }

@@ -24,6 +24,7 @@
 #include <memory>
 #include "holon2/corelib/dataset/dataset.hpp"
 #include "holon2/corelib/humanoid/simulator.hpp"
+#include "holon2/corelib/math/vec.hpp"
 
 namespace holon {
 
@@ -33,6 +34,7 @@ using ComZmpModelData = Dataset<ComZmpModelParams, ComZmpModelStates>;
 class ComZmpModel;
 
 class ComZmpModelSimulator : public Simulator {
+  using Self = ComZmpModelSimulator;
   using Data = ComZmpModelData;
   using Model = ComZmpModel;
 
@@ -51,6 +53,11 @@ class ComZmpModelSimulator : public Simulator {
 
   // accessors
   const Model& model() const;
+
+  Vec3d getInitialComPosition() const;
+
+  // mutators
+  ComZmpModelSimulator& setInitialComPosition(const Vec3d& t_p0);
 
   void reset() final;
   bool update() final;

@@ -33,6 +33,7 @@ void checkCtor(const ComZmpModelSimulator& sim, const Vec3d& expected_pg) {
   CHECK(sim.time() == 0.0);
   CHECK(sim.time_step() == kDefaultTimeStep);
   CHECK(sim.model().com_position() == expected_pg);
+  CHECK(sim.getInitialComPosition() == expected_pg);
 }
 TEST_CASE("com_zmp_model_simulator: check c'tors",
           "[ComZmpModel][ComZmpModelSimulator]") {
@@ -57,6 +58,17 @@ TEST_CASE("com_zmp_model_simulator: check c'tors",
     CHECK(sim.model().data() != model.data());
   }
 }
+
+TEST_CASE("com_zmp_model_simulator: set initial COM position",
+          "[ComZmpModel][ComZmpModelSimulator]") {
+  Random<Vec3d> rnd;
+  ComZmpModelSimulator sim;
+  Vec3d p0 = rnd();
+  sim.setInitialComPosition(p0);
+  CHECK(sim.getInitialComPosition() == p0);
+}
+
+TEST_CASE("com_zmp_model_simulator: ", "[ComZmpModel][ComZmpModelSimulator]") {}
 
 }  // namespace
 }  // namespace holon

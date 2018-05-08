@@ -42,7 +42,7 @@ class ComZmpModelSimulator : public Simulator {
       std::function<Vec3d(const Vec3d&, const Vec3d&, const double)>;
 
  public:
-  enum class CtrlInputType {
+  enum class InputType {
     kNotDetermined,
     kReactionForce,
     kZmpPosition,
@@ -63,11 +63,11 @@ class ComZmpModelSimulator : public Simulator {
 
   // accessors
   const Model& model() const;
-  CtrlInputType getCtrlInputType() const;
+  InputType getInputType() const;
   Vec3d getInitialComPosition() const;
 
   // mutators
-  ComZmpModelSimulator& setCtrlInputType(CtrlInputType t_type);
+  ComZmpModelSimulator& setInputType(InputType t_type);
   ComZmpModelSimulator& setInitialComPosition(const Vec3d& t_p0);
 
   // computations

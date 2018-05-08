@@ -32,7 +32,7 @@ class ComZmpModelSimulator::Impl {
   explicit Impl(const Model& t_model) : Impl(t_model.clone().data()) {}
   explicit Impl(Data t_data)
       : m_model(t_data),
-        m_ctrl_input_type(CtrlInputType::kNotDetermined),
+        m_input_type(InputType::kNotDetermined),
         m_initial_com_position(model().com_position()) {
     setDefaultExtForce();
     setDefaultReactForce();
@@ -41,10 +41,10 @@ class ComZmpModelSimulator::Impl {
   }
 
   const Model& model() const { return m_model; }
-  CtrlInputType getCtrlInputType() const { return m_ctrl_input_type; }
+  InputType getInputType() const { return m_input_type; }
   Vec3d getInitialComPosition() const { return m_initial_com_position; }
 
-  void setCtrlInputType(CtrlInputType t_type) { m_ctrl_input_type = t_type; }
+  void setInputType(InputType t_type) { m_input_type = t_type; }
   void setInitialComPosition(const Vec3d& t_p0) {
     m_initial_com_position = t_p0;
   }
@@ -98,7 +98,7 @@ class ComZmpModelSimulator::Impl {
 
  private:
   Model m_model;
-  CtrlInputType m_ctrl_input_type;
+  InputType m_input_type;
   Vec3d m_initial_com_position;
   Functor m_com_accel_functor;
   Functor m_zmp_position_functor;
@@ -121,18 +121,16 @@ const ComZmpModel& ComZmpModelSimulator::model() const {
   return m_impl->model();
 }
 
-ComZmpModelSimulator::CtrlInputType ComZmpModelSimulator::getCtrlInputType()
-    const {
-  return m_impl->getCtrlInputType();
+ComZmpModelSimulator::InputType ComZmpModelSimulator::getInputType() const {
+  return m_impl->getInputType();
 }
 
 Vec3d ComZmpModelSimulator::getInitialComPosition() const {
   return m_impl->getInitialComPosition();
 }
 
-ComZmpModelSimulator& ComZmpModelSimulator::setCtrlInputType(
-    CtrlInputType t_type) {
-  m_impl->setCtrlInputType(t_type);
+ComZmpModelSimulator& ComZmpModelSimulator::setInputType(InputType t_type) {
+  m_impl->setInputType(t_type);
   return *this;
 }
 

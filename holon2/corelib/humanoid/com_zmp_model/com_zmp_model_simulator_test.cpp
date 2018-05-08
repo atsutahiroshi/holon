@@ -29,6 +29,8 @@ namespace {
 
 const double kDefaultTimeStep = 0.001;
 const Vec3d kDefaultComPosition = Vec3d(0, 0, 1);
+using ::Catch::Matchers::ApproxEquals;
+namespace cz = com_zmp_model_formula;
 
 void checkCtor(const ComZmpModelSimulator& sim, const Vec3d& expected_pg) {
   CHECK(sim.time() == 0.0);
@@ -100,26 +102,34 @@ TEST_CASE("com_zmp_model_simulator: set reaction force as input",
   }
 }
 
+ComZmpModel getRandomModel() {
+  double mass = Random<double>(0, 2).get();
+  double vhp = Random<double>(0, 1).get();
+  Vec3d p0 = Random<Vec3d>(-1, 1).get();
+  p0[2] += 2;  // make COM height be larger than vhp
+  ComZmpModelBuilder b;
+  b.setMass(mass).setVirtualHorizontalPlane(vhp).setComPosition(p0);
+  return b.build();
+}
+
 Vec3d calculateZmpExample(const Vec3d& p, const Vec3d& v,
                           const double /* t */) {
   double k1 = 10;
   double k2 = 0.1;
-  return p + k1 * p + k2 * v;
+  Vec3d pz = p + k1 * p + k2 * v;
+  pz.z() = 0;
+  return pz;
 }
 TEST_CASE("com_zmp_model_simulator: set ZMP position functor",
           "[ComZmpModel][ComZmpModelSimulator]") {
-  double vhp = Random<double>(0, 1).get();
-  Vec3d p0 = Random<Vec3d>(-1, 1).get();
-  p0[2] += 2;  // make COM height be larger than vhp
-  auto model = ComZmpModelBuilder()
-                   .setVirtualHorizontalPlane(vhp)
-                   .setComPosition(p0)
-                   .build();
+  auto model = getRandomModel();
   ComZmpModelSimulator sim(model);
   Vec3d p = Vec3d::Random();
   Vec3d v = Vec3d::Random();
 
   SECTION("default ZMP position") {
+    Vec3d p0 = model.com_position();
+    double vhp = model.vhp();
     CHECK(sim.getZmpPosition(p, v, 0) == Vec3d(p0[0], p0[1], vhp));
   }
   SECTION("set constant ZMP position") {
@@ -167,7 +177,7 @@ TEST_CASE("com_zmp_model_simulator: set reaction force functor",
 }
 
 Vec3d calculateExtForceExample(const Vec3d& p, const Vec3d& v, const double t) {
-  if (t > 0.5 && t < 0.7)
+  if (t > 0.4 && t < 0.6)
     return p + v;
   else
     return kVec3dZero;
@@ -190,7 +200,7 @@ TEST_CASE("com_zmp_model_simulator: set external force functor",
   SECTION("set external force functor") {
     sim.setExtForce(calculateExtForceExample);
     CHECK(sim.getExtForce(p, v, 0) == kVec3dZero);
-    CHECK(sim.getExtForce(p, v, 0.6) == p + v);
+    CHECK(sim.getExtForce(p, v, 0.5) == p + v);
     CHECK(sim.getExtForce(p, v, 1) == kVec3dZero);
   }
 }
@@ -203,6 +213,63 @@ TEST_CASE("com_zmp_model_simulator: clear external force",
   REQUIRE(sim.getExtForce(kVec3dZero, kVec3dZero, 0) != kVec3dZero);
   sim.clearExtForce();
   CHECK(sim.getExtForce(kVec3dZero, kVec3dZero, 0) == kVec3dZero);
+}
+
+SCENARIO(
+    "com_zmp_model_simulator: compute COM accel. when ZMP is treated as input",
+    "[ComZmpModel][ComZmpModelSimulator]") {
+  GIVEN("simulator in which ZMP is set as input") {
+    auto model = getRandomModel();
+    double mass = model.mass();
+    Vec3d p = model.com_position();
+    Vec3d v = model.com_velocity();
+    ComZmpModelSimulator sim(model);
+    sim.setZmpPosAsInput();
+
+    WHEN("ZMP is not given") {
+      THEN("COM accel. should be zero") {
+        CHECK_THAT(sim.getComAccel(p, v, 0), ApproxEquals(kVec3dZero));
+      }
+    }
+
+    WHEN("ZMP given, but not vertical reaction force") {
+      sim.setZmpPosition(calculateZmpExample);
+      THEN("COM accel. along z-axis should be zero") {
+        Vec3d f = Vec3d(0, 0, mass * kGravAccel);
+        Vec3d pz = calculateZmpExample(p, v, 0);
+        Vec3d expected_acc = cz::comAccel(p, pz, f, mass);
+        REQUIRE(sim.getComAccel(p, v, 0).z() == 0.0);
+        CHECK_THAT(sim.getComAccel(p, v, 0), ApproxEquals(expected_acc));
+      }
+    }
+
+    WHEN("ZMP and vertical reaction force are given") {
+      sim.setReactForce(calculateReactForceExample);
+      sim.setZmpPosition(calculateZmpExample);
+      THEN("COM accel. should be generated") {
+        Vec3d f = calculateReactForceExample(p, v, 0);
+        Vec3d pz = calculateZmpExample(p, v, 0);
+        Vec3d expected_acc = cz::comAccel(p, pz, f, mass);
+        REQUIRE(sim.getComAccel(p, v, 0).z() > 0.0);
+        CHECK_THAT(sim.getComAccel(p, v, 0), ApproxEquals(expected_acc));
+      }
+    }
+
+    WHEN("Additionally, external force is given") {
+      sim.setReactForce(calculateReactForceExample);
+      sim.setZmpPosition(calculateZmpExample);
+      sim.setExtForce(calculateExtForceExample);
+      THEN("COM accel. should be generated") {
+        Vec3d f = calculateReactForceExample(p, v, 0.5);
+        Vec3d ef = calculateExtForceExample(p, v, 0.5);
+        Vec3d pz = calculateZmpExample(p, v, 0.5);
+        Vec3d expected_acc = cz::comAccel(p, pz, f, mass);
+        REQUIRE_THAT(sim.getComAccel(p, v, 0.5), !ApproxEquals(expected_acc));
+        CHECK_THAT(sim.getComAccel(p, v, 0.5),
+                   ApproxEquals(expected_acc + ef / mass));
+      }
+    }
+  }
 }
 
 TEST_CASE("com_zmp_model_simulator: ", "[ComZmpModel][ComZmpModelSimulator]") {}

@@ -26,6 +26,8 @@
 
 namespace holon {
 
+namespace cz = com_zmp_model_formula;
+
 class ComZmpModelSimulator::Impl {
  public:
   Impl() : Impl(ComZmpModelBuilder().build().data()) {}
@@ -81,7 +83,12 @@ class ComZmpModelSimulator::Impl {
     return [v](const Vec3d&, const Vec3d&, const double) { return v; };
   }
 
-  void setDefaultComAccel() { setComAccel(returnConstVecFunctor(kVec3dZero)); }
+  void setDefaultComAccel() {
+    setComAccel([this](const Vec3d& p, const Vec3d& v, const double t) {
+      return cz::comAccel(p, getZmpPosition(p, v, t), getReactForce(p, v, t),
+                          m_model.mass(), getExtForce(p, v, t));
+    });
+  }
   void setDefaultZmpPosition() {
     setZmpPosition([this](const Vec3d&, const Vec3d&, const double) {
       Vec3d ret = m_model.com_position();

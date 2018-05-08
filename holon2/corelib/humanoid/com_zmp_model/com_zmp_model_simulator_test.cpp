@@ -29,6 +29,7 @@ namespace {
 
 const double kDefaultTimeStep = 0.001;
 const Vec3d kDefaultComPosition = Vec3d(0, 0, 1);
+const double kTOL = 1e-10;
 using ::Catch::Matchers::ApproxEquals;
 namespace cz = com_zmp_model_formula;
 
@@ -149,9 +150,7 @@ Vec3d calculateReactForceExample(const Vec3d& p, const Vec3d& v,
                                  const double /* t */) {
   double k1 = 10;
   double k2 = 0.1;
-  Vec3d f = Vec3d::Zero();
-  f.z() = k1 * p.z() + k2 * v.z();
-  return f;
+  return k1 * p + k2 * v;
 }
 TEST_CASE("com_zmp_model_simulator: set reaction force functor",
           "[ComZmpModel][ComZmpModelSimulator]") {
@@ -228,7 +227,7 @@ SCENARIO(
 
     WHEN("ZMP is not given") {
       THEN("COM accel. should be zero") {
-        CHECK_THAT(sim.getComAccel(p, v, 0), ApproxEquals(kVec3dZero));
+        CHECK_THAT(sim.getComAccel(p, v, 0), ApproxEquals(kVec3dZero, kTOL));
       }
     }
 
@@ -238,8 +237,8 @@ SCENARIO(
         Vec3d f = Vec3d(0, 0, mass * kGravAccel);
         Vec3d pz = calculateZmpExample(p, v, 0);
         Vec3d expected_acc = cz::comAccel(p, pz, f, mass);
-        REQUIRE(sim.getComAccel(p, v, 0).z() == 0.0);
-        CHECK_THAT(sim.getComAccel(p, v, 0), ApproxEquals(expected_acc));
+        REQUIRE(sim.getComAccel(p, v, 0).z() == Approx(0.0).margin(kTOL));
+        CHECK_THAT(sim.getComAccel(p, v, 0), ApproxEquals(expected_acc, kTOL));
       }
     }
 
@@ -250,8 +249,8 @@ SCENARIO(
         Vec3d f = calculateReactForceExample(p, v, 0);
         Vec3d pz = calculateZmpExample(p, v, 0);
         Vec3d expected_acc = cz::comAccel(p, pz, f, mass);
-        REQUIRE(sim.getComAccel(p, v, 0).z() > 0.0);
-        CHECK_THAT(sim.getComAccel(p, v, 0), ApproxEquals(expected_acc));
+        REQUIRE(sim.getComAccel(p, v, 0).z() > -kGravAccel);
+        CHECK_THAT(sim.getComAccel(p, v, 0), ApproxEquals(expected_acc, kTOL));
       }
     }
 
@@ -266,7 +265,7 @@ SCENARIO(
         Vec3d expected_acc = cz::comAccel(p, pz, f, mass);
         REQUIRE_THAT(sim.getComAccel(p, v, 0.5), !ApproxEquals(expected_acc));
         CHECK_THAT(sim.getComAccel(p, v, 0.5),
-                   ApproxEquals(expected_acc + ef / mass));
+                   ApproxEquals(expected_acc + ef / mass, kTOL));
       }
     }
   }

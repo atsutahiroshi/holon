@@ -100,6 +100,12 @@ TEST_CASE("com_zmp_model_simulator: set reaction force as input",
   }
 }
 
+Vec3d calculateZmpExample(const Vec3d& p, const Vec3d& v,
+                          const double /* t */) {
+  double k1 = 10;
+  double k2 = 0.1;
+  return p + k1 * p + k2 * v;
+}
 TEST_CASE("com_zmp_model_simulator: set ZMP position functor",
           "[ComZmpModel][ComZmpModelSimulator]") {
   double vhp = Random<double>(0, 1).get();
@@ -123,15 +129,20 @@ TEST_CASE("com_zmp_model_simulator: set ZMP position functor",
     CHECK(sim.getZmpPosition(p, v, 0) == pz);
   }
   SECTION("set ZMP position functor") {
-    auto pz_f = [](const Vec3d& t_p, const Vec3d& t_v, const double) {
-      return t_p - 0.5 * t_v;
-    };
-    sim.setZmpPosition(pz_f);
-    Vec3d pz = p - 0.5 * v;
+    sim.setZmpPosition(calculateZmpExample);
+    Vec3d pz = calculateZmpExample(p, v, 0);
     CHECK(sim.getZmpPosition(p, v, 0) == pz);
   }
 }
 
+Vec3d calculateReactForceExample(const Vec3d& p, const Vec3d& v,
+                                 const double /* t */) {
+  double k1 = 10;
+  double k2 = 0.1;
+  Vec3d f = Vec3d::Zero();
+  f.z() = k1 * p.z() + k2 * v.z();
+  return f;
+}
 TEST_CASE("com_zmp_model_simulator: set reaction force functor",
           "[ComZmpModel][ComZmpModelSimulator]") {
   double mass = Random<double>(0, 2).get();
@@ -149,16 +160,18 @@ TEST_CASE("com_zmp_model_simulator: set reaction force functor",
     CHECK(sim.getReactForce(p, v, 0) == f);
   }
   SECTION("set reaction force functor") {
-    auto f_f = [](const Vec3d& t_p, const Vec3d& t_v, const double) {
-      return Vec3d(0, 0, t_p.z() - 0.5 * t_v.z());
-    };
-    sim.setReactForce(f_f);
-    Vec3d f = Vec3d::Zero();
-    f.z() = p.z() - 0.5 * v.z();
+    sim.setReactForce(calculateReactForceExample);
+    Vec3d f = calculateReactForceExample(p, v, 0);
     CHECK(sim.getReactForce(p, v, 0) == f);
   }
 }
 
+Vec3d calculateExtForceExample(const Vec3d& p, const Vec3d& v, const double t) {
+  if (t > 0.5 && t < 0.7)
+    return p + v;
+  else
+    return kVec3dZero;
+}
 TEST_CASE("com_zmp_model_simulator: set external force functor",
           "[ComZmpModel][ComZmpModelSimulator]") {
   auto model = ComZmpModelBuilder().build();
@@ -175,15 +188,7 @@ TEST_CASE("com_zmp_model_simulator: set external force functor",
     CHECK(sim.getExtForce(p, v, 0) == ef);
   }
   SECTION("set external force functor") {
-    auto ef_f = [](const Vec3d& t_p, const Vec3d& t_v,
-                   const double t) -> Vec3d {
-      if (t > 0.5 && t < 0.7) {
-        return t_p + t_v;
-      } else {
-        return kVec3dZero;
-      }
-    };
-    sim.setExtForce(ef_f);
+    sim.setExtForce(calculateExtForceExample);
     CHECK(sim.getExtForce(p, v, 0) == kVec3dZero);
     CHECK(sim.getExtForce(p, v, 0.6) == p + v);
     CHECK(sim.getExtForce(p, v, 1) == kVec3dZero);

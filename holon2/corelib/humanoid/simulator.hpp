@@ -24,11 +24,28 @@
 namespace holon {
 
 class Simulator {
-  static const double default_time_step;
+  static constexpr double default_time_step = 0.001;
 
  public:
-  Simulator() {}
+  Simulator() : m_time(0.0), m_time_step(default_time_step) {}
   virtual ~Simulator() = default;
+
+  // accessors
+  double time() const { return m_time; }
+  double time_step() const { return m_time_step; }
+
+  // mutators
+  Simulator& setTimeStep(double t_time_step) {
+    m_time_step = t_time_step;
+    return *this;
+  }
+
+  // update
+  virtual bool update() { return update(m_time_step); }
+  virtual bool update(double t_time_step) {
+    m_time += t_time_step;
+    return true;
+  }
 
  private:
   double m_time;

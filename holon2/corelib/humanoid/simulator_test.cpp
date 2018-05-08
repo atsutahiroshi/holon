@@ -20,12 +20,66 @@
 
 #include "holon2/corelib/humanoid/simulator.hpp"
 
+#include "holon2/corelib/common/random.hpp"
 #include "third_party/catch/catch.hpp"
 
 namespace holon {
 namespace {
 
 class SimulatorTest : public Simulator {};
+
+const double kDefaultTimeStep = 0.001;
+
+void checkCtor(const SimulatorTest& sim) {
+  CHECK(sim.time() == 0.0);
+  CHECK(sim.time_step() == kDefaultTimeStep);
+}
+TEST_CASE("simulator: check c'tors", "[Simulator]") {
+  SECTION("default c'tor") {
+    SimulatorTest sim;
+    checkCtor(sim);
+  }
+}
+
+TEST_CASE("simulator: set time step", "[Simulator]") {
+  Simulator sim;
+  REQUIRE(sim.time_step() == kDefaultTimeStep);
+  auto dt = Random<double>(0, 0.01).get();
+  sim.setTimeStep(dt);
+  CHECK(sim.time_step() == dt);
+}
+
+TEST_CASE("simulator: update current time", "[Simulator]") {
+  Simulator sim;
+  Random<double> rnd(0, 0.01);
+  SECTION("update with default time step") {
+    REQUIRE(sim.time() == 0.0);
+    sim.update();
+    CHECK(sim.time() == kDefaultTimeStep);
+    sim.update();
+    CHECK(sim.time() == 2 * kDefaultTimeStep);
+  }
+  SECTION("modify time step") {
+    auto dt = rnd();
+    REQUIRE(sim.time() == 0.0);
+    sim.setTimeStep(dt);
+    sim.update();
+    CHECK(sim.time() == dt);
+    sim.update();
+    CHECK(sim.time() == 2 * dt);
+  }
+  SECTION("modify time step temporariliy") {
+    auto dt1 = rnd();
+    REQUIRE(sim.time() == 0.0);
+    sim.update(dt1);
+    CHECK(sim.time() == dt1);
+    CHECK(sim.time_step() == kDefaultTimeStep);
+    auto dt2 = rnd();
+    sim.update(dt2);
+    CHECK(sim.time() == dt1 + dt2);
+    CHECK(sim.time_step() == kDefaultTimeStep);
+  }
+}
 
 TEST_CASE("simulator: ", "[Simulator]") {}
 

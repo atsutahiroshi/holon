@@ -106,5 +106,16 @@ TEST_CASE("com_zmp_model: accessor to total force", "[ComZmpModel]") {
   CHECK(model.total_force() == v);
 }
 
+TEST_CASE("com_zmp_model: clone model instance", "[ComZmpModel]") {
+  Random<double> m;
+  Random<Vec3d> v;
+  auto model = ComZmpModelBuilder().setComPosition(v()).setMass(m()).build();
+  auto cln = model.clone();
+  CHECK(cln.mass() == model.mass());
+  CHECK(cln.com_position() == model.com_position());
+  CHECK(cln.data() != model.data());
+}
+TEST_CASE("com_zmp_model: ", "[ComZmpModel]") {}
+
 }  // namespace
 }  // namespace holon

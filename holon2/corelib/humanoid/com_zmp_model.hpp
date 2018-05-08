@@ -82,6 +82,8 @@ class ComZmpModel {
   Vec3d external_force() const noexcept { return states().external_force; }
   Vec3d total_force() const noexcept { return states().total_force; }
 
+  ComZmpModel clone() const { return ComZmpModel(data().clone()); }
+
  private:
   Data m_data;
 };

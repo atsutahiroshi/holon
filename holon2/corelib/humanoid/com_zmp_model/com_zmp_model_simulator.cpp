@@ -28,16 +28,10 @@ namespace holon {
 
 class ComZmpModelSimulator::Impl {
  public:
-  Impl()
-      : m_model(ComZmpModelBuilder().build()),
-        m_ctrl_input_type(CtrlInputType::kNotDetermined),
-        m_initial_com_position(model().com_position()) {}
+  Impl() : Impl(ComZmpModelBuilder().build().data()) {}
+  explicit Impl(const Model& t_model) : Impl(t_model.clone().data()) {}
   explicit Impl(Data t_data)
       : m_model(t_data),
-        m_ctrl_input_type(CtrlInputType::kNotDetermined),
-        m_initial_com_position(model().com_position()) {}
-  explicit Impl(const Model& t_model)
-      : m_model(t_model.clone()),
         m_ctrl_input_type(CtrlInputType::kNotDetermined),
         m_initial_com_position(model().com_position()) {}
 

@@ -83,6 +83,7 @@ class ComZmpModelSimulator : public Simulator {
   ComZmpModelSimulator& setReactForce(const Vec3d& t_f);
   ComZmpModelSimulator& setExtForce(Functor t_functor);
   ComZmpModelSimulator& setExtForce(const Vec3d& t_ef);
+  ComZmpModelSimulator& clearExtForce();
 
   // update
   void reset() final;

@@ -175,6 +175,15 @@ TEST_CASE("com_zmp_model_simulator: set external force functor",
   }
 }
 
+TEST_CASE("com_zmp_model_simulator: clear external force",
+          "[ComZmpModel][ComZmpModelSimulator]") {
+  ComZmpModelSimulator sim;
+  Vec3d ef = Vec3d::Random();
+  sim.setExtForce(ef);
+  REQUIRE(sim.getExtForce(kVec3dZero, kVec3dZero, 0) != kVec3dZero);
+  sim.clearExtForce();
+  CHECK(sim.getExtForce(kVec3dZero, kVec3dZero, 0) == kVec3dZero);
+}
 TEST_CASE("com_zmp_model_simulator: ", "[ComZmpModel][ComZmpModelSimulator]") {}
 
 }  // namespace

@@ -192,6 +192,11 @@ ComZmpModelSimulator& ComZmpModelSimulator::setExtForce(const Vec3d& t_ef) {
   return *this;
 }
 
+ComZmpModelSimulator& ComZmpModelSimulator::clearExtForce() {
+  m_impl->setExtForce(kVec3dZero);
+  return *this;
+}
+
 void ComZmpModelSimulator::reset() { resetTime(); }
 bool ComZmpModelSimulator::update() { return update(time_step()); }
 bool ComZmpModelSimulator::update(double dt) {

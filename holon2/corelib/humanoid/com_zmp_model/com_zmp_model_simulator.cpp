@@ -29,8 +29,8 @@ namespace holon {
 class ComZmpModelSimulator::Impl {
  public:
   Impl() : m_model(ComZmpModelBuilder().build()) {}
-  // explicit Impl(Data t_data) {}
-  // explicit Impl(const Model& t_model) {}
+  explicit Impl(Data t_data) : m_model(t_data) {}
+  explicit Impl(const Model& t_model) : m_model(t_model.clone()) {}
 
   const Model& model() const { return m_model; }
 
@@ -39,6 +39,10 @@ class ComZmpModelSimulator::Impl {
 };
 
 ComZmpModelSimulator::ComZmpModelSimulator() : m_impl(new Impl) {}
+ComZmpModelSimulator::ComZmpModelSimulator(Data t_data)
+    : m_impl(new Impl(t_data)) {}
+ComZmpModelSimulator::ComZmpModelSimulator(const Model& t_model)
+    : m_impl(new Impl(t_model)) {}
 
 ComZmpModelSimulator::ComZmpModelSimulator(ComZmpModelSimulator&&) = default;
 ComZmpModelSimulator& ComZmpModelSimulator::operator=(ComZmpModelSimulator&&) =

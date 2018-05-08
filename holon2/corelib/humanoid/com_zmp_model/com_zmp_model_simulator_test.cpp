@@ -29,17 +29,33 @@ namespace {
 const double kDefaultTimeStep = 0.001;
 const Vec3d kDefaultComPosition = Vec3d(0, 0, 1);
 
+void checkCtor(const ComZmpModelSimulator& sim, const Vec3d& expected_pg) {
+  CHECK(sim.time() == 0.0);
+  CHECK(sim.time_step() == kDefaultTimeStep);
+  CHECK(sim.model().com_position() == expected_pg);
+}
 TEST_CASE("com_zmp_model_simulator: check c'tors",
           "[ComZmpModel][ComZmpModelSimulator]") {
+  Random<Vec3d> rnd;
   SECTION("default c'tor") {
     ComZmpModelSimulator sim;
-    // CHECK(sim.getInitialComPosition() == sim.model().com_position());
-    CHECK(sim.time() == 0.0);
-    CHECK(sim.time_step() == kDefaultTimeStep);
-    CHECK(sim.model().com_position() == kDefaultComPosition);
+    checkCtor(sim, kDefaultComPosition);
   }
-  SECTION("overloaded c'tor 1") {}
-  SECTION("overloaded c'tor 2") {}
+  SECTION("overloaded c'tor 1: with Data instance") {
+    ComZmpModelData data;
+    Vec3d v = rnd();
+    data.get<1>().com_position = v;
+    ComZmpModelSimulator sim(data);
+    checkCtor(sim, v);
+    CHECK(sim.model().data() == data);
+  }
+  SECTION("overloaded c'tor 2: with Model instance") {
+    Vec3d v = rnd();
+    auto model = ComZmpModelBuilder().setComPosition(v).build();
+    ComZmpModelSimulator sim(model);
+    checkCtor(sim, v);
+    CHECK(sim.model().data() != model.data());
+  }
 }
 
 }  // namespace

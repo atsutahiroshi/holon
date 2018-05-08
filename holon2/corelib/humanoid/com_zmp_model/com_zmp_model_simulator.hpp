@@ -23,6 +23,7 @@
 
 #include <memory>
 #include "holon2/corelib/dataset/dataset.hpp"
+#include "holon2/corelib/humanoid/simulator.hpp"
 
 namespace holon {
 
@@ -31,7 +32,7 @@ struct ComZmpModelStates;
 using ComZmpModelData = Dataset<ComZmpModelParams, ComZmpModelStates>;
 class ComZmpModel;
 
-class ComZmpModelSimulator {
+class ComZmpModelSimulator : public Simulator {
   using Data = ComZmpModelData;
   using Model = ComZmpModel;
 
@@ -48,9 +49,16 @@ class ComZmpModelSimulator {
   ComZmpModelSimulator& operator=(ComZmpModelSimulator&&);
   virtual ~ComZmpModelSimulator();
 
+  void reset() override { resetTime(); }
+  bool update() override { return update(time_step()); }
+  bool update(double dt) override {
+    updateTime(dt);
+    return true;
+  }
+
  private:
   class Impl;
-  std::unique_ptr<Impl> pimpl;
+  std::unique_ptr<Impl> m_impl;
 };
 
 }  // namespace holon

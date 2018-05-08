@@ -19,15 +19,25 @@
  */
 
 #include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_simulator.hpp"
-#include "holon2/corelib/humanoid/com_zmp_model.hpp"
-#include "holon2/corelib/humanoid/const_defs.hpp"
 
 #include "third_party/catch/catch.hpp"
 
 namespace holon {
 namespace {
 
-TEST_CASE("com_zmp_model_simulator: ", "[ComZmpModel][ComZmpModelSimulator]") {}
+const double kDefaultTimeStep = 0.001;
+
+TEST_CASE("com_zmp_model_simulator: check c'tors",
+          "[ComZmpModel][ComZmpModelSimulator]") {
+  SECTION("default c'tor") {
+    ComZmpModelSimulator sim;
+    // CHECK(sim.getInitialComPosition() == sim.model().com_position());
+    CHECK(sim.time() == 0.0);
+    CHECK(sim.time_step() == kDefaultTimeStep);
+  }
+  SECTION("overloaded c'tor 1") {}
+  SECTION("overloaded c'tor 2") {}
+}
 
 }  // namespace
 }  // namespace holon

@@ -19,11 +19,19 @@
  */
 
 #include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_simulator.hpp"
+#include <memory>
 #include "holon2/corelib/humanoid/com_zmp_model.hpp"
 #include "holon2/corelib/humanoid/const_defs.hpp"
 
 namespace holon {
 
-//
+class ComZmpModelSimulator::Impl {};
+
+ComZmpModelSimulator::ComZmpModelSimulator() : m_impl(new Impl) {}
+
+ComZmpModelSimulator::ComZmpModelSimulator(ComZmpModelSimulator&&) = default;
+ComZmpModelSimulator& ComZmpModelSimulator::operator=(ComZmpModelSimulator&&) =
+    default;
+ComZmpModelSimulator::~ComZmpModelSimulator() = default;
 
 }  // namespace holon

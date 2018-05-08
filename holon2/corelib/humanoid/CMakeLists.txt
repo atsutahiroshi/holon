@@ -4,6 +4,7 @@ set(sources
   )
 set(test_sources
   com_zmp_model_test.cpp
+  simulator_test.cpp
   )
 holon_add_corelib_module(
   humanoid

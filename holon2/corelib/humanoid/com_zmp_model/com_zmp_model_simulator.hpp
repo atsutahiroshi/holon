@@ -36,6 +36,8 @@ class ComZmpModel;
 
 class ComZmpModelSimulator : public Simulator {
   using Self = ComZmpModelSimulator;
+
+ public:
   using Data = ComZmpModelData;
   using Model = ComZmpModel;
   using Functor =

@@ -25,6 +25,18 @@ typename std::enable_if<(I < sizeof...(Ts)), void>::type copyDataset_impl(
   copyDataset_impl<I + 1, Ts...>(t_src, t_dst);
 }
 
+template <std::size_t I, typename Tuple, typename... Unpacked>
+struct DatasetFromTuple_impl {
+  using DataUnit = typename std::tuple_element<I - 1, Tuple>::type;
+  using type =
+      typename DatasetFromTuple_impl<I - 1, Tuple, DataUnit, Unpacked...>::type;
+};
+
+template <typename Tuple, typename... Unpacked>
+struct DatasetFromTuple_impl<0, Tuple, Unpacked...> {
+  using type = Dataset<Unpacked...>;
+};
+
 }  // namespace dataset_detail
 }  // namespace holon
 

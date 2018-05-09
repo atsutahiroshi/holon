@@ -43,10 +43,10 @@ class Dataset {
  protected:
   static constexpr std::size_t kDataUnitNum = sizeof...(DataUnitTypes);
   using Self = Dataset<DataUnitTypes...>;
-  using DataUnitTuple = std::tuple<DataUnitTypes...>;
-  using DataUnitPtrTuple = std::tuple<std::shared_ptr<DataUnitTypes>...>;
 
  public:
+  using DataUnitTuple = std::tuple<DataUnitTypes...>;
+  using DataUnitPtrTuple = std::tuple<std::shared_ptr<DataUnitTypes>...>;
   template <std::size_t I>
   using DataUnitType = typename std::tuple_element<I, DataUnitTuple>::type;
   template <std::size_t I>
@@ -72,7 +72,7 @@ class Dataset {
   Self& operator=(Self&&) = default;
   virtual ~Dataset() = default;
 
-  constexpr std::size_t size() const { return this->kDataUnitNum; }
+  static constexpr std::size_t size() { return kDataUnitNum; }
 
   template <std::size_t I = 0>
   const DataUnitPtrType<I>& getptr() const {
@@ -179,6 +179,20 @@ std::ostream& operator<<(std::ostream& os, const Dataset<Ts...>& data) {
   printTuple(os, data.tuple(), makeIndexSeq<sizeof...(Ts)>());
   return os << "}";
 }
+
+// make Dataset from std::tuple
+template <typename Tuple>
+using DatasetFromTuple = typename dataset_detail::DatasetFromTuple_impl<
+    std::tuple_size<Tuple>::value, Tuple>::type;
+
+// concatenate all Dataset in args
+template <typename... Datasets>
+struct DatasetCatHelper {
+  using tuple = decltype(std::tuple_cat(typename Datasets::DataUnitTuple{}...));
+  using type = DatasetFromTuple<tuple>;
+};
+template <typename... Datasets>
+using DatasetCat = typename DatasetCatHelper<Datasets...>::type;
 
 }  // namespace holon
 

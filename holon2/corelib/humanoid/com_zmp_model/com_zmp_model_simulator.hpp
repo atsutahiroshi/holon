@@ -66,6 +66,10 @@ class ComZmpModelSimulator : public Simulator {
   InputType getInputType() const;
   Vec3d getInitialComPosition() const;
 
+  // boolean
+  bool isZmpPosAsInput() const;
+  bool isReactForceAsInput() const;
+
   // mutators
   ComZmpModelSimulator& setInputType(InputType t_type);
   ComZmpModelSimulator& setZmpPosAsInput();

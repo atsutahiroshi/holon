@@ -78,13 +78,19 @@ TEST_CASE("com_zmp_model_simulator: set ZMP position as input",
   ComZmpModelSimulator sim;
   using Type = ComZmpModelSimulator::InputType;
   REQUIRE(sim.getInputType() == Type::kNotDetermined);
+  REQUIRE_FALSE(sim.isZmpPosAsInput());
+  REQUIRE_FALSE(sim.isReactForceAsInput());
   SECTION("method 1") {
     sim.setInputType(Type::kZmpPosition);
     CHECK(sim.getInputType() == Type::kZmpPosition);
+    CHECK(sim.isZmpPosAsInput());
+    CHECK_FALSE(sim.isReactForceAsInput());
   }
   SECTION("method 2") {
     sim.setZmpPosAsInput();
     CHECK(sim.getInputType() == Type::kZmpPosition);
+    CHECK(sim.isZmpPosAsInput());
+    CHECK_FALSE(sim.isReactForceAsInput());
   }
 }
 
@@ -93,13 +99,19 @@ TEST_CASE("com_zmp_model_simulator: set reaction force as input",
   ComZmpModelSimulator sim;
   using Type = ComZmpModelSimulator::InputType;
   REQUIRE(sim.getInputType() == Type::kNotDetermined);
+  REQUIRE_FALSE(sim.isZmpPosAsInput());
+  REQUIRE_FALSE(sim.isReactForceAsInput());
   SECTION("method 1") {
     sim.setInputType(Type::kReactionForce);
     CHECK(sim.getInputType() == Type::kReactionForce);
+    CHECK(sim.isReactForceAsInput());
+    CHECK_FALSE(sim.isZmpPosAsInput());
   }
   SECTION("method 2") {
     sim.setReactForceAsInput();
     CHECK(sim.getInputType() == Type::kReactionForce);
+    CHECK(sim.isReactForceAsInput());
+    CHECK_FALSE(sim.isZmpPosAsInput());
   }
 }
 

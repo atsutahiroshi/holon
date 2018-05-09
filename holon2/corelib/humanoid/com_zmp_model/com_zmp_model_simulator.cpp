@@ -46,6 +46,13 @@ class ComZmpModelSimulator::Impl {
   InputType getInputType() const { return m_input_type; }
   Vec3d getInitialComPosition() const { return m_initial_com_position; }
 
+  bool isZmpPosAsInput() const {
+    return getInputType() == InputType::kZmpPosition;
+  }
+  bool isReactForceAsInput() const {
+    return getInputType() == InputType::kReactionForce;
+  }
+
   void setInputType(InputType t_type) {
     m_input_type = t_type;
     switch (t_type) {
@@ -154,6 +161,13 @@ ComZmpModelSimulator::InputType ComZmpModelSimulator::getInputType() const {
 
 Vec3d ComZmpModelSimulator::getInitialComPosition() const {
   return m_impl->getInitialComPosition();
+}
+
+bool ComZmpModelSimulator::isZmpPosAsInput() const {
+  return m_impl->isZmpPosAsInput();
+}
+bool ComZmpModelSimulator::isReactForceAsInput() const {
+  return m_impl->isReactForceAsInput();
 }
 
 ComZmpModelSimulator& ComZmpModelSimulator::setInputType(InputType t_type) {

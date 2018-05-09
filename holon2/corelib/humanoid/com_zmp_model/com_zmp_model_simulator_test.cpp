@@ -339,6 +339,115 @@ SCENARIO(
   }
 }
 
+TEST_CASE(
+    "com_zmp_model_simulator: check consistency between ZMP and react force",
+    "[ComZmpModel][ComZmpModelSimulator]") {
+  // setup
+  auto model = getRandomModel();
+  ComZmpModelSimulator sim(model);
+  sim.setZmpPosAsInput();
+  // let COM move left-forward and upward by setting ZMP and fz
+  Vec3d p0 = model.com_position();
+  double input_fz = (0.01 + model.mass()) * kGravAccel;
+  Vec3d input_zmp(p0.x() - 0.1, p0.y() - 0.1, 0);
+  sim.setReactForce(Vec3d(0, 0, input_fz));
+  sim.setZmpPosition(input_zmp);
+  // calculate expected ZMP, reaction force and COM accel.
+  Vec3d expected_zmp = input_zmp;
+  Vec3d expected_f = cz::reactForce(p0, input_zmp, input_fz);
+  Vec3d expected_acc =
+      cz::comAccel(p0, input_zmp, Vec3d(0, 0, input_fz), model.mass());
+  // execute update
+  sim.update();
+  // check
+  CHECK_THAT(sim.model().zmp_position(), ApproxEquals(expected_zmp, kTOL));
+  CHECK_THAT(sim.model().reaction_force(), ApproxEquals(expected_f, kTOL));
+  CHECK_THAT(sim.model().com_acceleration(), ApproxEquals(expected_acc, kTOL));
+}
+
+TEST_CASE(
+    "com_zmp_model_simulator: check consistency between accel. and total force",
+    "[ComZmpModel][ComZmpModelSimulator]") {
+  // setup
+  auto model = getRandomModel();
+  ComZmpModelSimulator sim(model);
+  sim.setZmpPosAsInput();
+  // let COM move left-forward and upward by setting ZMP and fz
+  Vec3d p0 = model.com_position();
+  double input_fz = (0.01 + model.mass()) * kGravAccel;
+  Vec3d input_zmp(p0.x() - 0.1, p0.y() - 0.1, 0);
+  sim.setReactForce(Vec3d(0, 0, input_fz));
+  sim.setZmpPosition(input_zmp);
+  // additionally, external force is applied
+  Vec3d ef = Random<Vec3d>(-0.01, 0.01).get();
+  sim.setExtForce(ef);
+  // calculate expected ZMP, reaction/total force and COM accel.
+  Vec3d expected_zmp = input_zmp;
+  Vec3d expected_rf = cz::reactForce(p0, input_zmp, input_fz);
+  Vec3d expected_ef = ef;
+  Vec3d expected_tf = expected_rf + expected_ef;
+  Vec3d expected_acc =
+      cz::comAccel(p0, input_zmp, Vec3d(0, 0, input_fz), model.mass(), ef);
+  // execute update
+  sim.update();
+  // check
+  CHECK_THAT(sim.model().zmp_position(), ApproxEquals(expected_zmp, kTOL));
+  CHECK_THAT(sim.model().reaction_force(), ApproxEquals(expected_rf, kTOL));
+  CHECK_THAT(sim.model().external_force(), ApproxEquals(expected_ef, kTOL));
+  CHECK_THAT(sim.model().total_force(), ApproxEquals(expected_tf, kTOL));
+  CHECK_THAT(sim.model().com_acceleration(), ApproxEquals(expected_acc, kTOL));
+}
+
+SCENARIO("com_zmp_model_simulator: check if COM move after update",
+         "[ComZmpModel][ComZmpModelSimulator]") {
+  // prepare COM-ZMP model in which COM resides at (0, 0, 1)
+  auto model = ComZmpModelBuilder().build();
+  ComZmpModelSimulator sim(model);
+  sim.setZmpPosAsInput();
+
+  GIVEN("let COM move left-forward and upward") {
+    const Vec3d input_zmp(-0.1, -0.1, 0);
+    const double input_fz = 1.01 * kGravAccel;
+    sim.setReactForce(Vec3d(0, 0, input_fz));
+    sim.setZmpPosition(input_zmp);
+    REQUIRE_THAT(sim.model().com_position(), ApproxEquals(kVec3dZ, kTOL));
+    REQUIRE_THAT(sim.model().com_velocity(), ApproxEquals(kVec3dZero, kTOL));
+
+    WHEN("update once") {
+      sim.update();
+
+      THEN("COM velocity should be modified towards left-forward and upward") {
+        const Vec3d v = sim.model().com_velocity();
+        CHECK(v.x() > 0.0);
+        CHECK(v.y() > 0.0);
+        CHECK(v.z() > 0.0);
+      }
+      THEN("but COM should still remain at the initial position") {
+        const Vec3d p = sim.model().com_position();
+        CHECK(p.x() == Approx(0.0).margin(1e-5));
+        CHECK(p.y() == Approx(0.0).margin(1e-5));
+        CHECK(p.z() == Approx(1.0).margin(1e-5));
+      }
+    }
+    WHEN("update once more") {
+      sim.update();
+
+      THEN("COM velocity should be left-forward and upward") {
+        const Vec3d v = sim.model().com_velocity();
+        CHECK(v.x() > 0.0);
+        CHECK(v.y() > 0.0);
+        CHECK(v.z() > 0.0);
+      }
+      THEN("and COM should also move left-forward and upward") {
+        const Vec3d p = sim.model().com_position();
+        CHECK(p.x() > 0.0);
+        CHECK(p.y() > 0.0);
+        CHECK(p.z() > 1.0);
+      }
+    }
+  }
+}
+
 TEST_CASE("com_zmp_model_simulator: ", "[ComZmpModel][ComZmpModelSimulator]") {}
 
 }  // namespace

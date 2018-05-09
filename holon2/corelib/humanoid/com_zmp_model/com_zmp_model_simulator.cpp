@@ -20,26 +20,34 @@
 
 #include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_simulator.hpp"
 
+#include <array>
 #include <memory>
 #include "holon2/corelib/humanoid/com_zmp_model.hpp"
 #include "holon2/corelib/humanoid/const_defs.hpp"
+#include "holon2/corelib/math/ode_runge_kutta4.hpp"
 
 namespace holon {
 
 namespace cz = com_zmp_model_formula;
 
 class ComZmpModelSimulator::Impl {
+  using State = std::array<Vec3d, 2>;
+  using Solver = RungeKutta4<State>;
+  using System = std::function<State(const State, const double)>;
+
  public:
   Impl() : Impl(ComZmpModelBuilder().build().data()) {}
   explicit Impl(const Model& t_model) : Impl(t_model.clone().data()) {}
   explicit Impl(Data t_data)
       : m_model(t_data),
         m_input_type(InputType::kNotDetermined),
-        m_initial_com_position(model().com_position()) {
+        m_initial_com_position(model().com_position()),
+        m_solver() {
     setExtForceDefault();
     setReactForceDefault();
     setZmpPositionDefault();
     setComAccelDefault();
+    setSystem();
   }
 
   const Model& model() const { return m_model; }
@@ -98,6 +106,25 @@ class ComZmpModelSimulator::Impl {
     setExtForce(returnConstVecFunctor(t_ef));
   }
 
+  bool update(const Vec3d& p, const Vec3d& v, const double t, const double dt) {
+    auto state = m_solver.update(m_system, State{{p, v}}, t, dt);
+    m_model.states().com_position = state[0];
+    m_model.states().com_velocity = state[1];
+    m_model.states().com_acceleration = getComAccel(p, v, t);
+    if (isZmpPosAsInput()) {
+      m_model.states().zmp_position = getZmpPosition(p, v, t);
+      double fz = getReactForce(p, v, t).z();
+      m_model.states().reaction_force =
+          cz::reactForce(p, m_model.zmp_position(), fz);
+    } else if (isReactForceAsInput()) {
+      m_model.states().reaction_force = getReactForce(p, v, t);
+    }
+    m_model.states().external_force = getExtForce(p, v, t);
+    m_model.states().total_force =
+        m_model.reaction_force() + m_model.external_force();
+    return true;
+  }
+
  private:
   Functor returnConstVecFunctor(const Vec3d& v) {
     return [v](const Vec3d&, const Vec3d&, const double) { return v; };
@@ -129,6 +156,14 @@ class ComZmpModelSimulator::Impl {
     });
   }
   void setExtForceDefault() { setExtForce(returnConstVecFunctor(kVec3dZero)); }
+  void setSystem() {
+    m_system = [this](const State state, const double t) -> State {
+      State dxdt;
+      dxdt[0] = state[1];
+      dxdt[1] = getComAccel(state[0], state[1], t);
+      return dxdt;
+    };
+  }
 
  private:
   Model m_model;
@@ -138,6 +173,8 @@ class ComZmpModelSimulator::Impl {
   Functor m_zmp_position_functor;
   Functor m_react_force_functor;
   Functor m_ext_force_functor;
+  Solver m_solver;
+  System m_system;
 };
 
 ComZmpModelSimulator::ComZmpModelSimulator() : m_impl(new Impl) {}
@@ -247,6 +284,7 @@ ComZmpModelSimulator& ComZmpModelSimulator::clearExtForce() {
 void ComZmpModelSimulator::reset() { resetTime(); }
 bool ComZmpModelSimulator::update() { return update(time_step()); }
 bool ComZmpModelSimulator::update(double dt) {
+  m_impl->update(model().com_position(), model().com_velocity(), time(), dt);
   updateTime(dt);
   return true;
 }

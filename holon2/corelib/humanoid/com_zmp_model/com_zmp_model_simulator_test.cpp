@@ -339,6 +339,48 @@ SCENARIO(
   }
 }
 
+TEST_CASE("com_zmp_model_simulator: update current time",
+          "[ComZmpModel][ComZmpModelSimulator]") {
+  ComZmpModelSimulator sim;
+  Random<double> rnd(0, 0.01);
+  SECTION("update with default time step") {
+    REQUIRE(sim.time() == 0.0);
+    sim.update();
+    CHECK(sim.time() == kDefaultTimeStep);
+    sim.update();
+    CHECK(sim.time() == 2 * kDefaultTimeStep);
+  }
+  SECTION("modify time step") {
+    auto dt = rnd();
+    REQUIRE(sim.time() == 0.0);
+    sim.setTimeStep(dt);
+    sim.update();
+    CHECK(sim.time() == dt);
+    sim.update();
+    CHECK(sim.time() == 2 * dt);
+  }
+  SECTION("modify time step temporariliy") {
+    auto dt1 = rnd();
+    REQUIRE(sim.time() == 0.0);
+    sim.update(dt1);
+    CHECK(sim.time() == dt1);
+    CHECK(sim.time_step() == kDefaultTimeStep);
+    auto dt2 = rnd();
+    sim.update(dt2);
+    CHECK(sim.time() == dt1 + dt2);
+    CHECK(sim.time_step() == kDefaultTimeStep);
+  }
+}
+
+TEST_CASE("com_zmp_model_simulator: reset time",
+          "[ComZmpModel][ComZmpModelSimulator]") {
+  ComZmpModelSimulator sim;
+  sim.update();
+  REQUIRE(sim.time() != 0.0);
+  sim.reset();
+  CHECK(sim.time() == 0.0);
+}
+
 TEST_CASE(
     "com_zmp_model_simulator: check consistency between ZMP and react force",
     "[ComZmpModel][ComZmpModelSimulator]") {

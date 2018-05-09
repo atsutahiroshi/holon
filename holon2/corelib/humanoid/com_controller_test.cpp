@@ -25,6 +25,35 @@
 namespace holon {
 namespace {
 
+ComZmpModel getRandomModel() {
+  double mass = Random<double>(0, 2).get();
+  double vhp = Random<double>(0, 1).get();
+  Vec3d p0 = Random<Vec3d>(-1, 1).get();
+  p0[2] += 2;  // make COM height be larger than vhp
+  ComZmpModelBuilder b;
+  b.setMass(mass).setVirtualHorizontalPlane(vhp).setComPosition(p0);
+  return b.build();
+}
+TEST_CASE("com_controller: check c'tors", "[ComController]") {
+  SECTION("default c'tor") {
+    ComController ctrl;
+    CHECK(ctrl.data().subdata<0, 1>() == ctrl.model().data());
+  }
+  SECTION("overloaded c'tor: with Data") {
+    ComControllerData data;
+    ComController ctrl(data);
+    CHECK(ctrl.data() == data);
+    CHECK(ctrl.data().subdata<0, 1>() == ctrl.model().data());
+  }
+  SECTION("overloaded c'tor: with Model") {
+    auto model = getRandomModel();
+    ComController ctrl(model);
+    CHECK(ctrl.data().subdata<0, 1>() != model.data());
+    CHECK(ctrl.model().mass() == model.mass());
+    CHECK(ctrl.model().com_position() == model.com_position());
+  }
+}
+
 TEST_CASE("com_controller: ", "[ComController]") {}
 
 }  // namespace

@@ -19,3 +19,18 @@
  */
 
 #include "holon2/corelib/humanoid/com_controller.hpp"
+
+namespace holon {
+
+ComController::ComController() : ComController(Data()) {}
+ComController::ComController(Data t_data)
+    : m_data(t_data), m_sim(m_data.subdata<0, 1>()) {}
+ComController::ComController(const Model& t_model) : ComController() {
+  copyModelData(t_model);
+}
+
+void ComController::copyModelData(const Model& t_model) {
+  m_data.copy(t_model.data(), IndexSeq<0, 1>(), IndexSeq<0, 1>());
+}
+
+}  // namespace holon

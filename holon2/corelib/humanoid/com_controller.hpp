@@ -41,8 +41,9 @@ struct ComControllerOutputs {
   Vec3d zmp_position;
   Vec3d reaction_force;
 };
-using ComControllerData = Dataset<ComZmpModelParams, ComZmpModelStates,
-                                  ComControllerParams, ComControllerOutputs>;
+using ComControllerData =
+    DatasetCat<ComZmpModelData,
+               Dataset<ComControllerParams, ComControllerOutputs>>;
 
 class ComController {
   using Self = ComController;
@@ -60,15 +61,15 @@ class ComController {
   ComController(const Model& t_model);
 
   // special member functions
-  ComController(const ComController& other) = delete;
-  ComController(ComController&& other) = delete;
-  ComController& operator=(const ComController& other) = delete;
-  ComController& operator=(ComController&& other) = delete;
+  ComController(const ComController&) = delete;
+  ComController(ComController&&) = delete;
+  ComController& operator=(const ComController&) = delete;
+  ComController& operator=(ComController&&) = delete;
   virtual ~ComController() = default;
 
   // accessors
-  const Data& data() const;
-  const Model& model() const;
+  const Data& data() const { return m_data; }
+  const Model& model() const { return m_sim.model(); }
   const Params& params() const;
   const Outputs& outputs() const;
 
@@ -91,7 +92,9 @@ class ComController {
 
  private:
   Data m_data;
-  ComZmpModelSimulator m_model;
+  ComZmpModelSimulator m_sim;
+
+  void copyModelData(const Model& t_model);
 };
 
 }  // namespace holon

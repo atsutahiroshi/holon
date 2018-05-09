@@ -381,6 +381,36 @@ TEST_CASE("com_zmp_model_simulator: reset time",
   CHECK(sim.time() == 0.0);
 }
 
+TEST_CASE("com_zmp_model_simulator: reset COM position at initial one",
+          "[ComZmpModel][ComZmpModelSimulator]") {
+  auto model = getRandomModel();
+  const Vec3d p0 = model.com_position();
+  ComZmpModelSimulator sim(model);
+  sim.setReactForceAsInput();
+  sim.setReactForce(Vec3d(1, 1, 1));
+  while (sim.time() < 1) sim.update();
+  REQUIRE(sim.model().com_position() != p0);
+  REQUIRE(sim.model().com_velocity() != kVec3dZero);
+  sim.reset();
+  CHECK(sim.model().com_position() == p0);
+  CHECK(sim.model().com_velocity() == kVec3dZero);
+}
+
+TEST_CASE("com_zmp_model_simulator: reset COM position at specific one",
+          "[ComZmpModel][ComZmpModelSimulator]") {
+  auto model = getRandomModel();
+  const Vec3d p = Vec3d::Random();
+  ComZmpModelSimulator sim(model);
+  sim.setReactForceAsInput();
+  sim.setReactForce(Vec3d(1, 1, 1));
+  while (sim.time() < 1) sim.update();
+  REQUIRE(sim.model().com_position() != p);
+  REQUIRE(sim.model().com_velocity() != kVec3dZero);
+  sim.reset(p);
+  CHECK(sim.model().com_position() == p);
+  CHECK(sim.model().com_velocity() == kVec3dZero);
+}
+
 TEST_CASE(
     "com_zmp_model_simulator: check consistency between ZMP and react force",
     "[ComZmpModel][ComZmpModelSimulator]") {

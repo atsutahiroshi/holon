@@ -92,7 +92,8 @@ class ComZmpModelSimulator : public Simulator {
   ComZmpModelSimulator& clearExtForce();
 
   // update
-  void reset() final;
+  ComZmpModelSimulator& reset() final;
+  ComZmpModelSimulator& reset(const Vec3d& t_com_position);
   bool update() final;
   bool update(double dt) final;
 

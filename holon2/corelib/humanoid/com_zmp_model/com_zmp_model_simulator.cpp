@@ -106,6 +106,11 @@ class ComZmpModelSimulator::Impl {
     setExtForce(returnConstVecFunctor(t_ef));
   }
 
+  void reset() {
+    m_model.states().com_position = getInitialComPosition();
+    m_model.states().com_velocity.setZero();
+  }
+
   bool update(const Vec3d& p, const Vec3d& v, const double t, const double dt) {
     auto state = m_solver.update(m_system, State{{p, v}}, t, dt);
     m_model.states().com_position = state[0];
@@ -281,8 +286,19 @@ ComZmpModelSimulator& ComZmpModelSimulator::clearExtForce() {
   return *this;
 }
 
-void ComZmpModelSimulator::reset() { resetTime(); }
+ComZmpModelSimulator& ComZmpModelSimulator::reset() {
+  m_impl->reset();
+  resetTime();
+  return *this;
+}
+
+ComZmpModelSimulator& ComZmpModelSimulator::reset(const Vec3d& t_com_position) {
+  setInitialComPosition(t_com_position);
+  return reset();
+}
+
 bool ComZmpModelSimulator::update() { return update(time_step()); }
+
 bool ComZmpModelSimulator::update(double dt) {
   m_impl->update(model().com_position(), model().com_velocity(), time(), dt);
   updateTime(dt);

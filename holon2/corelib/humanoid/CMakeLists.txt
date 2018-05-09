@@ -1,8 +1,10 @@
 set(sources
+  com_controller.cpp
   com_zmp_model.cpp
   const_defs.cpp
   )
 set(test_sources
+  com_controller_test.cpp
   com_zmp_model_test.cpp
   simulator_test.cpp
   )

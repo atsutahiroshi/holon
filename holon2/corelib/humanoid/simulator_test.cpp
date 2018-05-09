@@ -29,7 +29,10 @@ namespace {
 class SimulatorTest : public Simulator {
  public:
   virtual ~SimulatorTest() = default;
-  void reset() final { return resetTime(); }
+  SimulatorTest& reset() final {
+    resetTime();
+    return *this;
+  }
   bool update() final { return update(time_step()); }
   bool update(double dt) final {
     updateTime(dt);

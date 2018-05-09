@@ -44,7 +44,7 @@ class Simulator {
   }
 
   // reset
-  virtual void reset() = 0;
+  virtual Simulator& reset() = 0;
 
   // update
   virtual bool update() = 0;

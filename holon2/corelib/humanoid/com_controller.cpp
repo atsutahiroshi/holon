@@ -60,7 +60,10 @@ ComController& ComController::reset() {
   m_sim.reset();
   return *this;
 }
-// ComController& ComController::reset(const Vec3d& t_com_position);
+ComController& ComController::reset(const Vec3d& t_com_position) {
+  m_sim.reset(t_com_position);
+  return *this;
+}
 
 // ComController& ComController::feedback(const Model& t_model);
 // ComController& ComController::feedback(ComZmpModelData t_model_data);

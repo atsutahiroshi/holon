@@ -407,6 +407,7 @@ TEST_CASE("com_zmp_model_simulator: reset COM position at initial one",
   sim.reset();
   CHECK(sim.model().com_position() == p0);
   CHECK(sim.model().com_velocity() == kVec3dZero);
+  CHECK(sim.getInitialComPosition() == p0);
 }
 
 TEST_CASE("com_zmp_model_simulator: reset COM position at specific one",
@@ -422,6 +423,7 @@ TEST_CASE("com_zmp_model_simulator: reset COM position at specific one",
   sim.reset(p);
   CHECK(sim.model().com_position() == p);
   CHECK(sim.model().com_velocity() == kVec3dZero);
+  CHECK(sim.getInitialComPosition() == p);
 }
 
 TEST_CASE(

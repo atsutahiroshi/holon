@@ -176,6 +176,38 @@ TEST_CASE("com_controller: reset time", "[ComController]") {
   CHECK(ctrl.time() == 0.0);
 }
 
+TEST_CASE("com_controller: reset COM position at initial one",
+          "[ComController]") {
+  auto model = getRandomModel();
+  const Vec3d p0 = model.com_position();
+  Random<Vec3d> rnd(-0.1, 0.1);
+  ComController ctrl(model);
+  auto& states = const_cast<ComZmpModelStates&>(ctrl.states());
+  states.com_position = p0 + rnd();
+  states.com_velocity = rnd();
+  REQUIRE(ctrl.model().com_position() != p0);
+  REQUIRE(ctrl.model().com_velocity() != kVec3dZero);
+  ctrl.reset();
+  CHECK(ctrl.model().com_position() == p0);
+  CHECK(ctrl.model().com_velocity() == kVec3dZero);
+  CHECK(ctrl.getInitialComPosition() == p0);
+}
+
+TEST_CASE("com_controller: reset COM position at a specific one",
+          "[ComController]") {
+  auto model = getRandomModel();
+  const Vec3d p = Vec3d::Random();
+  ComController ctrl(model);
+  auto& states = const_cast<ComZmpModelStates&>(ctrl.states());
+  states.com_velocity = Vec3d::Random();
+  REQUIRE(ctrl.model().com_position() != p);
+  REQUIRE(ctrl.model().com_velocity() != kVec3dZero);
+  ctrl.reset(p);
+  CHECK(ctrl.model().com_position() == p);
+  CHECK(ctrl.model().com_velocity() == kVec3dZero);
+  CHECK(ctrl.getInitialComPosition() == p);
+}
+
 TEST_CASE("com_controller: ", "[ComController]") {}
 
 }  // namespace

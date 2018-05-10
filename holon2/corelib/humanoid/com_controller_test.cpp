@@ -36,24 +36,38 @@ ComZmpModel getRandomModel() {
   b.setMass(mass).setVirtualHorizontalPlane(vhp).setComPosition(p0);
   return b.build();
 }
+
+void checkCtor(const ComController& ctrl, const double expected_mass,
+               const Vec3d& expected_com_position) {
+  CHECK(ctrl.data().subdata<0, 1>() == ctrl.model().data());
+  CHECK(ctrl.mass() == expected_mass);
+  CHECK(ctrl.params().com_position == expected_com_position);
+  CHECK(ctrl.params().com_velocity == kVec3dZero);
+  for (auto i = 0; i < 3; ++i) {
+    CHECK(ctrl.params().q1[i] == ComController::default_q1[i]);
+    CHECK(ctrl.params().q2[i] == ComController::default_q2[i]);
+  }
+  CHECK(ctrl.params().rho == ComController::default_rho);
+  CHECK(ctrl.params().dist == ComController::default_dist);
+  CHECK(ctrl.params().kr == ComController::default_kr);
+}
 TEST_CASE("com_controller: check c'tors", "[ComController]") {
+  using CZ = ComZmpModelBuilder;
   SECTION("default c'tor") {
     ComController ctrl;
-    CHECK(ctrl.data().subdata<0, 1>() == ctrl.model().data());
+    checkCtor(ctrl, CZ::default_mass, CZ::default_com_position);
   }
   SECTION("overloaded c'tor: with Data") {
     ComControllerData data;
     ComController ctrl(data);
+    checkCtor(ctrl, CZ::default_mass, CZ::default_com_position);
     CHECK(ctrl.data() == data);
-    CHECK(ctrl.data().subdata<0, 1>() == ctrl.model().data());
   }
   SECTION("overloaded c'tor: with Model") {
-    auto model = getRandomModel();
+    const auto model = getRandomModel();
     ComController ctrl(model);
-    CHECK(ctrl.data().subdata<0, 1>() == ctrl.model().data());
+    checkCtor(ctrl, model.mass(), model.com_position());
     CHECK(ctrl.data().subdata<0, 1>() != model.data());
-    CHECK(ctrl.model().mass() == model.mass());
-    CHECK(ctrl.model().com_position() == model.com_position());
   }
 }
 
@@ -91,7 +105,7 @@ TEST_CASE("com_controller: accessor to control parameters", "[ComController]") {
   Random<double> rnd;
   params.q1 = {rnd(), rnd(), rnd()};
   params.q2 = {rnd(), rnd(), rnd()};
-  ComController ctrl(data);
+  const ComController ctrl(data);
   for (auto i = 0; i < 3; ++i) {
     CHECK(ctrl.params().q1[i] == params.q1[i]);
     CHECK(ctrl.params().q2[i] == params.q2[i]);

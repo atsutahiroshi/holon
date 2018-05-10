@@ -22,11 +22,27 @@
 
 namespace holon {
 
+const Array3d ComController::default_q1 = {{1, 1, 1}};
+const Array3d ComController::default_q2 = {{1, 1, 1}};
+const double ComController::default_rho = 0;
+const double ComController::default_dist = 0;
+const double ComController::default_kr = 1;
+
 ComController::ComController() : ComController(Data()) {}
 ComController::ComController(Data t_data)
-    : m_data(t_data), m_sim(m_data.subdata<0, 1>()) {}
+    : m_data(t_data), m_sim(m_data.subdata<0, 1>()) {
+  ComZmpModelBuilder().build(m_data.subdata<0, 1>());
+  params().com_position = states().com_position;
+  params().com_velocity = kVec3dZero;
+  params().q1 = default_q1;
+  params().q2 = default_q2;
+  params().rho = default_rho;
+  params().dist = default_dist;
+  params().kr = default_kr;
+}
 ComController::ComController(const Model& t_model) : ComController() {
   copyModelData(t_model);
+  params().com_position = states().com_position;
 }
 
 void ComController::copyModelData(const Model& t_model) {

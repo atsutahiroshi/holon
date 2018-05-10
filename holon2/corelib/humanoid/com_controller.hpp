@@ -57,6 +57,13 @@ class ComController {
   using Functor = ComZmpModelSimulator::Functor;
 
  public:
+  static const Array3d default_q1;
+  static const Array3d default_q2;
+  static const double default_rho;
+  static const double default_dist;
+  static const double default_kr;
+
+ public:
   ComController();
   ComController(Data t_data);
   ComController(const Model& t_model);
@@ -99,11 +106,16 @@ class ComController {
   Functor getReactForceFunctor() const;
   Functor getZmpPositionFunctor() const;
 
+ protected:
+  Params& params() {
+    return const_cast<Params&>(
+        static_cast<const ComController&>(*this).params());
+  }
+  void copyModelData(const Model& t_model);
+
  private:
   Data m_data;
   ComZmpModelSimulator m_sim;
-
-  void copyModelData(const Model& t_model);
 };
 
 }  // namespace holon

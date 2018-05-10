@@ -121,7 +121,7 @@ TEST_CASE("com_controller: accessor to control outputs", "[ComController]") {
   outputs.com_velocity = rnd();
   outputs.zmp_position = rnd();
   outputs.contact_force = rnd();
-  ComController ctrl(data);
+  const ComController ctrl(data);
   CHECK(ctrl.outputs().com_position == outputs.com_position);
   CHECK(ctrl.outputs().com_velocity == outputs.com_velocity);
   CHECK(ctrl.outputs().zmp_position == outputs.zmp_position);
@@ -232,6 +232,20 @@ TEST_CASE("com_controller: feedback states", "[ComController]") {
     CHECK(ctrl.model().com_position() == p);
     CHECK(ctrl.model().com_velocity() == v);
   }
+}
+
+TEST_CASE(
+    "com_controller: check consistency between states and update after udpate",
+    "[ComController]") {
+  const auto model = getRandomModel();
+  ComController ctrl(model);
+  while (ctrl.time() < 0.1) ctrl.update();
+  const auto& c = ctrl;
+  CHECK(c.outputs().com_position == ctrl.model().com_position());
+  CHECK(c.outputs().com_velocity == ctrl.model().com_velocity());
+  CHECK(c.outputs().com_acceleration == ctrl.model().com_acceleration());
+  CHECK(c.outputs().zmp_position == ctrl.model().zmp_position());
+  CHECK(c.outputs().contact_force == ctrl.model().contact_force());
 }
 
 TEST_CASE("com_controller: ", "[ComController]") {}

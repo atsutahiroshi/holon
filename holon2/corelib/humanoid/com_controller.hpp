@@ -115,7 +115,13 @@ class ComController {
   Params& params() {
     return const_cast<Params&>(static_cast<const Self&>(*this).params());
   }
+  Outputs& outputs() {
+    return const_cast<Outputs&>(static_cast<const Self&>(*this).outputs());
+  }
   void copyModelData(const Model& t_model);
+
+ private:
+  void updateOutputs();
 
  private:
   Data m_data;

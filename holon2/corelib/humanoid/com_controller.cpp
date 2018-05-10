@@ -76,13 +76,19 @@ ComController& ComController::feedback(const ComZmpModelData& t_model_data) {
   return *this;
 }
 
-bool ComController::update() {
-  m_sim.update();
-  return true;
+void ComController::updateOutputs() {
+  outputs().com_position = states().com_position;
+  outputs().com_velocity = states().com_velocity;
+  outputs().com_acceleration = states().com_acceleration;
+  outputs().zmp_position = states().zmp_position;
+  outputs().contact_force = states().contact_force;
 }
+
+bool ComController::update() { return update(time_step()); }
 
 bool ComController::update(double t_time_step) {
   m_sim.update(t_time_step);
+  updateOutputs();
   return true;
 }
 

@@ -42,8 +42,8 @@ struct ComControllerOutputs {
   Vec3d reaction_force;
 };
 using ComControllerData =
-    DatasetCat<ComZmpModelData,
-               Dataset<ComControllerParams, ComControllerOutputs>>;
+    MultiDataset<ComZmpModelData,
+                 Dataset<ComControllerParams, ComControllerOutputs>>;
 
 class ComController {
   using Self = ComController;

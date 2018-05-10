@@ -187,12 +187,12 @@ using DatasetFromTuple = typename dataset_detail::DatasetFromTuple_impl<
 
 // concatenate all Dataset in args
 template <typename... Datasets>
-struct DatasetCatHelper {
+struct MultiDatasetHelper {
   using tuple = decltype(std::tuple_cat(typename Datasets::DataUnitTuple{}...));
   using type = DatasetFromTuple<tuple>;
 };
 template <typename... Datasets>
-using DatasetCat = typename DatasetCatHelper<Datasets...>::type;
+using MultiDataset = typename MultiDatasetHelper<Datasets...>::type;
 
 }  // namespace holon
 

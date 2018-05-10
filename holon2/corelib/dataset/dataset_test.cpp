@@ -302,14 +302,14 @@ TEST_CASE("dataset: make dataset from std::tuple") {
   CHECK(std::is_same<DatasetFromTuple<tuple3>, Dataset<A, B>>::value);
 }
 
-TEST_CASE("dataset: DatasetCat", "[Dataset]") {
+TEST_CASE("dataset: MultiDataset", "[Dataset]") {
   using Dataset1 = Dataset<A, B>;
   using Dataset2 = Dataset<C, D>;
   using Dataset3 = Dataset<E>;
-  CHECK(std::is_same<DatasetCat<Dataset1>, Dataset<A, B>>::value);
-  CHECK(
-      std::is_same<DatasetCat<Dataset1, Dataset2>, Dataset<A, B, C, D>>::value);
-  CHECK(std::is_same<DatasetCat<Dataset1, Dataset2, Dataset3>,
+  CHECK(std::is_same<MultiDataset<Dataset1>, Dataset<A, B>>::value);
+  CHECK(std::is_same<MultiDataset<Dataset1, Dataset2>,
+                     Dataset<A, B, C, D>>::value);
+  CHECK(std::is_same<MultiDataset<Dataset1, Dataset2, Dataset3>,
                      Dataset<A, B, C, D, E>>::value);
 }
 

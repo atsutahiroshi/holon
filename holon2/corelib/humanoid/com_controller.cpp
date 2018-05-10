@@ -39,10 +39,12 @@ ComController::ComController(Data t_data)
   params().rho = default_rho;
   params().dist = default_dist;
   params().kr = default_kr;
+  m_sim.setInitialComPosition();
 }
 ComController::ComController(const Model& t_model) : ComController() {
   copyModelData(t_model);
   params().com_position = states().com_position;
+  m_sim.setInitialComPosition();
 }
 
 void ComController::copyModelData(const Model& t_model) {

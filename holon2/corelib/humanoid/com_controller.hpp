@@ -83,8 +83,11 @@ class ComController {
   const States& states() const { return model().states(); }
   const Params& params() const { return m_data.get<2>(); }
   const Outputs& outputs() const { return m_data.get<3>(); }
+
+  // accessors to simulator
   double time() const { return m_sim.time(); }
   double time_step() const { return m_sim.time_step(); }
+  Vec3d getInitialComPosition() const { return m_sim.getInitialComPosition(); }
 
   // mutators
   Self& setTimeStep(double t_time_step);

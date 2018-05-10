@@ -50,6 +50,7 @@ void checkCtor(const ComController& ctrl, const double expected_mass,
   CHECK(ctrl.params().rho == ComController::default_rho);
   CHECK(ctrl.params().dist == ComController::default_dist);
   CHECK(ctrl.params().kr == ComController::default_kr);
+  CHECK(ctrl.getInitialComPosition() == expected_com_position);
 }
 TEST_CASE("com_controller: check c'tors", "[ComController]") {
   using CZ = ComZmpModelBuilder;

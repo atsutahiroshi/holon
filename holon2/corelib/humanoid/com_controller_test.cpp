@@ -48,10 +48,67 @@ TEST_CASE("com_controller: check c'tors", "[ComController]") {
   SECTION("overloaded c'tor: with Model") {
     auto model = getRandomModel();
     ComController ctrl(model);
+    CHECK(ctrl.data().subdata<0, 1>() == ctrl.model().data());
     CHECK(ctrl.data().subdata<0, 1>() != model.data());
     CHECK(ctrl.model().mass() == model.mass());
     CHECK(ctrl.model().com_position() == model.com_position());
   }
+}
+
+TEST_CASE("com_controller: accessor to model parameters", "[ComController]") {
+  ComControllerData data;
+  auto& params = data.get<0>();
+  Random<double> rnd;
+  params.mass = rnd();
+  params.vhp = rnd();
+  ComController ctrl(data);
+  CHECK(ctrl.mass() == params.mass);
+  CHECK(ctrl.vhp() == params.vhp);
+}
+
+TEST_CASE("com_controller: accessor to model states", "[ComController]") {
+  ComControllerData data;
+  auto& states = data.get<1>();
+  Random<Vec3d> rnd;
+  states.com_position = rnd();
+  states.com_velocity = rnd();
+  states.zmp_position = rnd();
+  states.reaction_force = rnd();
+  states.total_force = rnd();
+  ComController ctrl(data);
+  CHECK(ctrl.states().com_position == states.com_position);
+  CHECK(ctrl.states().com_velocity == states.com_velocity);
+  CHECK(ctrl.states().zmp_position == states.zmp_position);
+  CHECK(ctrl.states().reaction_force == states.reaction_force);
+  CHECK(ctrl.states().total_force == states.total_force);
+}
+
+TEST_CASE("com_controller: accessor to control parameters", "[ComController]") {
+  ComControllerData data;
+  auto& params = data.get<2>();
+  Random<double> rnd;
+  params.q1 = {rnd(), rnd(), rnd()};
+  params.q2 = {rnd(), rnd(), rnd()};
+  ComController ctrl(data);
+  for (auto i = 0; i < 3; ++i) {
+    CHECK(ctrl.params().q1[i] == params.q1[i]);
+    CHECK(ctrl.params().q2[i] == params.q2[i]);
+  }
+}
+
+TEST_CASE("com_controller: accessor to control outputs", "[ComController]") {
+  ComControllerData data;
+  auto& outputs = data.get<3>();
+  Random<Vec3d> rnd;
+  outputs.com_position = rnd();
+  outputs.com_velocity = rnd();
+  outputs.zmp_position = rnd();
+  outputs.reaction_force = rnd();
+  ComController ctrl(data);
+  CHECK(ctrl.outputs().com_position == outputs.com_position);
+  CHECK(ctrl.outputs().com_velocity == outputs.com_velocity);
+  CHECK(ctrl.outputs().zmp_position == outputs.zmp_position);
+  CHECK(ctrl.outputs().reaction_force == outputs.reaction_force);
 }
 
 TEST_CASE("com_controller: ", "[ComController]") {}

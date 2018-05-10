@@ -47,6 +47,7 @@ using ComControllerData =
 
 class ComController {
   using Self = ComController;
+  using States = ComZmpModelStates;
   using Params = ComControllerParams;
   using Outputs = ComControllerOutputs;
 
@@ -70,8 +71,11 @@ class ComController {
   // accessors
   const Data& data() const { return m_data; }
   const Model& model() const { return m_sim.model(); }
-  const Params& params() const;
-  const Outputs& outputs() const;
+  double mass() const { return model().mass(); }
+  double vhp() const { return model().vhp(); }
+  const States& states() const { return model().states(); }
+  const Params& params() const { return m_data.get<2>(); }
+  const Outputs& outputs() const { return m_data.get<3>(); }
 
   // reset functions
   Self& reset();

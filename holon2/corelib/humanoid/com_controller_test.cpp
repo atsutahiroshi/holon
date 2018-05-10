@@ -25,6 +25,8 @@
 namespace holon {
 namespace {
 
+const double kDefaultTimeStep = 0.001;
+
 ComZmpModel getRandomModel() {
   double mass = Random<double>(0, 2).get();
   double vhp = Random<double>(0, 1).get();
@@ -109,6 +111,54 @@ TEST_CASE("com_controller: accessor to control outputs", "[ComController]") {
   CHECK(ctrl.outputs().com_velocity == outputs.com_velocity);
   CHECK(ctrl.outputs().zmp_position == outputs.zmp_position);
   CHECK(ctrl.outputs().reaction_force == outputs.reaction_force);
+}
+
+TEST_CASE("com_controller: set time step", "[ComController]") {
+  ComController ctrl;
+  REQUIRE(ctrl.time_step() == kDefaultTimeStep);
+  auto dt = Random<double>(0, 0.01).get();
+  ctrl.setTimeStep(dt);
+  CHECK(ctrl.time_step() == dt);
+}
+
+TEST_CASE("com_controller: update current time", "[ComController]") {
+  ComController ctrl;
+  Random<double> rnd(0, 0.01);
+  SECTION("update with default time step") {
+    REQUIRE(ctrl.time() == 0.0);
+    ctrl.update();
+    CHECK(ctrl.time() == kDefaultTimeStep);
+    ctrl.update();
+    CHECK(ctrl.time() == 2 * kDefaultTimeStep);
+  }
+  SECTION("modify time step") {
+    auto dt = rnd();
+    REQUIRE(ctrl.time() == 0.0);
+    ctrl.setTimeStep(dt);
+    ctrl.update();
+    CHECK(ctrl.time() == dt);
+    ctrl.update();
+    CHECK(ctrl.time() == 2 * dt);
+  }
+  SECTION("modify time step temporariliy") {
+    auto dt1 = rnd();
+    REQUIRE(ctrl.time() == 0.0);
+    ctrl.update(dt1);
+    CHECK(ctrl.time() == dt1);
+    CHECK(ctrl.time_step() == kDefaultTimeStep);
+    auto dt2 = rnd();
+    ctrl.update(dt2);
+    CHECK(ctrl.time() == dt1 + dt2);
+    CHECK(ctrl.time_step() == kDefaultTimeStep);
+  }
+}
+
+TEST_CASE("com_controller: reset time", "[ComController]") {
+  ComController ctrl;
+  ctrl.update();
+  REQUIRE(ctrl.time() != 0.0);
+  ctrl.reset();
+  CHECK(ctrl.time() == 0.0);
 }
 
 TEST_CASE("com_controller: ", "[ComController]") {}

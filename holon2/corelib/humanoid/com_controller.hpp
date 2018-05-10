@@ -76,6 +76,11 @@ class ComController {
   const States& states() const { return model().states(); }
   const Params& params() const { return m_data.get<2>(); }
   const Outputs& outputs() const { return m_data.get<3>(); }
+  double time() const { return m_sim.time(); }
+  double time_step() const { return m_sim.time_step(); }
+
+  // mutators
+  Self& setTimeStep(double t_time_step);
 
   // reset functions
   Self& reset();

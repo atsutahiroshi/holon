@@ -33,4 +33,33 @@ void ComController::copyModelData(const Model& t_model) {
   m_data.copy(t_model.data(), IndexSeq<0, 1>(), IndexSeq<0, 1>());
 }
 
+ComController& ComController::setTimeStep(double t_time_step) {
+  m_sim.setTimeStep(t_time_step);
+  return *this;
+}
+
+ComController& ComController::reset() {
+  m_sim.reset();
+  return *this;
+}
+// ComController& ComController::reset(const Vec3d& t_com_position);
+
+// ComController& ComController::feedback(const Model& t_model);
+// ComController& ComController::feedback(ComZmpModelData t_model_data);
+// ComController& ComController::feedback(const Vec3d& t_com_position,
+//                                        const Vec3d& t_com_velocity);
+
+bool ComController::update() {
+  m_sim.update();
+  return true;
+}
+
+bool ComController::update(double t_time_step) {
+  m_sim.update(t_time_step);
+  return true;
+}
+
+// ComController::Functor ComController::getReactForceFunctor() const;
+// ComController::Functor ComController::getZmpPositionFunctor() const;
+
 }  // namespace holon

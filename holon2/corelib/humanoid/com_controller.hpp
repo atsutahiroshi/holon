@@ -21,29 +21,10 @@
 #ifndef HOLON_HUMANOID_COM_CONTROLLER_HPP_
 #define HOLON_HUMANOID_COM_CONTROLLER_HPP_
 
-#include "holon2/corelib/common/types.hpp"
-#include "holon2/corelib/dataset/dataset.hpp"
+#include "holon2/corelib/humanoid/com_controller/com_controller_data.hpp"
 #include "holon2/corelib/humanoid/com_zmp_model.hpp"
-#include "holon2/corelib/math/vec.hpp"
 
 namespace holon {
-
-struct ComControllerParams {
-  Vec3d com_position;
-  Vec3d com_velocity;
-  Array3d q1, q2;
-  double rho, dist, kr;
-};
-struct ComControllerOutputs {
-  Vec3d com_position;
-  Vec3d com_velocity;
-  Vec3d com_acceleration;
-  Vec3d zmp_position;
-  Vec3d contact_force;
-};
-using ComControllerData =
-    MultiDataset<ComZmpModelData,
-                 Dataset<ComControllerParams, ComControllerOutputs>>;
 
 class ComController {
   using Self = ComController;

@@ -23,15 +23,12 @@
 
 #include <functional>
 #include <memory>
-#include "holon2/corelib/dataset/dataset.hpp"
+#include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_data.hpp"
 #include "holon2/corelib/humanoid/simulator.hpp"
 #include "holon2/corelib/math/vec.hpp"
 
 namespace holon {
 
-struct ComZmpModelParams;
-struct ComZmpModelStates;
-using ComZmpModelData = Dataset<ComZmpModelParams, ComZmpModelStates>;
 class ComZmpModel;
 
 class ComZmpModelSimulator : public Simulator {

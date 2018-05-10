@@ -22,26 +22,11 @@
 #define HOLON_HUMANOID_COM_ZMP_MODEL_HPP_
 
 #include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_builder.hpp"
+#include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_data.hpp"
 #include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_formula.hpp"
 #include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_simulator.hpp"
 
 namespace holon {
-
-struct ComZmpModelParams {
-  double mass;
-  Vec3d nu;
-  double vhp;
-};
-struct ComZmpModelStates {
-  Vec3d com_position;
-  Vec3d com_velocity;
-  Vec3d com_acceleration;
-  Vec3d zmp_position;
-  Vec3d contact_force;
-  Vec3d external_force;
-  Vec3d reaction_force;
-};
-using ComZmpModelData = Dataset<ComZmpModelParams, ComZmpModelStates>;
 
 class ComZmpModel {
   using Params = ComZmpModelParams;

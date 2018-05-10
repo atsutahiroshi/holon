@@ -49,6 +49,7 @@ class ComZmpModelBuilder {
   Self& setMass(const double t_mass);
   Self& setVirtualHorizontalPlane(const double t_vhp);
   Self& setComPosition(const Vec3d& t_com_position);
+  Self& setComVelocity(const Vec3d& t_com_velocity);
 
   Model build();
   Model build(Data t_data);
@@ -57,6 +58,7 @@ class ComZmpModelBuilder {
   double m_mass;
   double m_vhp;
   Vec3d m_com_position;
+  Vec3d m_com_velocity;
 };
 
 }  // namespace holon

@@ -29,16 +29,17 @@ namespace holon {
 namespace {
 
 void checkModel(const ComZmpModel& model, const double expected_mass,
-                const double expected_vhp, const Vec3d& expected_pg) {
+                const double expected_vhp, const Vec3d& expected_p0,
+                const Vec3d& expected_v0) {
   // params
   CHECK(model.params().mass == expected_mass);
   CHECK(model.params().nu == kVec3dZ);
   CHECK(model.params().vhp == expected_vhp);
   // inputs
-  Vec3d expected_pz(expected_pg[0], expected_pg[1], expected_vhp);
+  Vec3d expected_pz(expected_p0[0], expected_p0[1], expected_vhp);
   Vec3d expected_f(0, 0, expected_mass * kGravAccel);
-  CHECK(model.states().com_position == expected_pg);
-  CHECK(model.states().com_velocity == kVec3dZero);
+  CHECK(model.states().com_position == expected_p0);
+  CHECK(model.states().com_velocity == expected_v0);
   CHECK(model.states().com_acceleration == kVec3dZero);
   CHECK(model.states().zmp_position == expected_pz);
   CHECK(model.states().reaction_force == expected_f);
@@ -49,36 +50,40 @@ void checkModel(const ComZmpModel& model, const double expected_mass,
 TEST_CASE("com_zmp_model_builder: check model builder (default)",
           "[ComZmpModel][ComZmpModelBuilder]") {
   auto model = ComZmpModelBuilder().build();
-  checkModel(model, 1.0, 0.0, {0, 0, 1});
+  checkModel(model, 1.0, 0.0, {0, 0, 1}, {0, 0, 0});
 }
 
 TEST_CASE("com_zmp_model_builder: check model builder (set parameters)",
           "[ComZmpModel][ComZmpModelBuilder]") {
   Random<double> rnd(0, 1);
-  auto m = rnd();
-  auto vhp = rnd();
-  Vec3d pg(rnd(), rnd(), rnd());
+  const auto m = rnd();
+  const auto vhp = rnd();
+  const Vec3d p0(rnd(), rnd(), rnd());
+  const Vec3d v0 = Vec3d::Random();
   auto model = ComZmpModelBuilder()
                    .setMass(m)
                    .setVirtualHorizontalPlane(vhp)
-                   .setComPosition(pg)
+                   .setComPosition(p0)
+                   .setComVelocity(v0)
                    .build();
-  checkModel(model, m, vhp, pg);
+  checkModel(model, m, vhp, p0, v0);
 }
 
 TEST_CASE("com_zmp_model_builder: check model builder (give external dataset)",
           "[ComZmpModel][ComZmpModelBuilder]") {
   Random<double> rnd(0, 1);
-  auto m = rnd();
-  auto vhp = rnd();
-  Vec3d pg(rnd(), rnd(), rnd());
+  const auto m = rnd();
+  const auto vhp = rnd();
+  const Vec3d p0(rnd(), rnd(), rnd());
+  const Vec3d v0 = Vec3d::Random();
   ComZmpModelData data;
   auto model = ComZmpModelBuilder()
                    .setMass(m)
                    .setVirtualHorizontalPlane(vhp)
-                   .setComPosition(pg)
+                   .setComPosition(p0)
+                   .setComVelocity(v0)
                    .build(data);
-  checkModel(model, m, vhp, pg);
+  checkModel(model, m, vhp, p0, v0);
 }
 
 }  // namespace

@@ -31,7 +31,8 @@ const Vec3d ComZmpModelBuilder::default_com_position = {0.0, 0.0, 1.0};
 ComZmpModelBuilder::ComZmpModelBuilder()
     : m_mass(default_mass),
       m_vhp(default_vhp),
-      m_com_position(default_com_position) {}
+      m_com_position(default_com_position),
+      m_com_velocity(kVec3dZero) {}
 
 ComZmpModelBuilder& ComZmpModelBuilder::setMass(const double t_mass) {
   m_mass = t_mass;
@@ -50,6 +51,12 @@ ComZmpModelBuilder& ComZmpModelBuilder::setComPosition(
   return *this;
 }
 
+ComZmpModelBuilder& ComZmpModelBuilder::setComVelocity(
+    const Vec3d& t_com_velocity) {
+  m_com_velocity = t_com_velocity;
+  return *this;
+}
+
 ComZmpModel ComZmpModelBuilder::build() {
   Data data;
   return this->build(data);
@@ -65,7 +72,7 @@ ComZmpModel ComZmpModelBuilder::build(Data t_data) {
   };
   States states{
       m_com_position,  // COM position
-      kVec3dZero,      // COM velocity
+      m_com_velocity,  // COM velocity
       kVec3dZero,      // COM accel.
       zmp_position,    // ZMP position
       reaction_force,  // reaction force

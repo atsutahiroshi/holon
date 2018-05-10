@@ -26,6 +26,8 @@ namespace holon {
 namespace {
 
 const double kDefaultTimeStep = 0.001;
+const double kTOL = 1e-10;
+using ::Catch::Matchers::ApproxEquals;
 
 ComZmpModel getRandomModel() {
   double mass = Random<double>(0, 2).get();
@@ -246,6 +248,26 @@ TEST_CASE(
   CHECK(c.outputs().com_acceleration == ctrl.model().com_acceleration());
   CHECK(c.outputs().zmp_position == ctrl.model().zmp_position());
   CHECK(c.outputs().contact_force == ctrl.model().contact_force());
+}
+
+SCENARIO("com_controller: regulate COM position", "[ComController][.]") {
+  GIVEN("initial position is (1, 1, 1.5)") {
+    ComController ctrl;
+    ctrl.reset(Vec3d(1, 1, 1.5));
+
+    WHEN("desired position is given at (0, 0, 1) and update for 5 sec") {
+      const Vec3d pd(0, 0, 1);
+      auto& params = const_cast<ComControllerParams&>(
+          static_cast<const ComController&>(ctrl).params());
+      params.com_position = pd;
+      while (ctrl.time() < 5) ctrl.update();
+
+      THEN("COM moves and converges at the desired position") {
+        CHECK_THAT(ctrl.model().com_position(), ApproxEquals(pd, kTOL));
+        CHECK_THAT(ctrl.model().com_velocity(), ApproxEquals(kVec3dZero, kTOL));
+      }
+    }
+  }
 }
 
 TEST_CASE("com_controller: ", "[ComController]") {}

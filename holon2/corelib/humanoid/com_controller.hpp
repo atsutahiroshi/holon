@@ -98,8 +98,7 @@ class ComController {
 
   // feedback functions
   Self& feedback(const Model& t_model);
-  Self& feedback(ComZmpModelData t_model_data);
-  Self& feedback(const Vec3d& t_com_position, const Vec3d& t_com_velocity);
+  Self& feedback(const ComZmpModelData& t_model_data);
 
   // update functions
   bool update();
@@ -110,9 +109,11 @@ class ComController {
   Functor getZmpPositionFunctor() const;
 
  protected:
+  States& states() {
+    return const_cast<States&>(static_cast<const Self&>(*this).states());
+  }
   Params& params() {
-    return const_cast<Params&>(
-        static_cast<const ComController&>(*this).params());
+    return const_cast<Params&>(static_cast<const Self&>(*this).params());
   }
   void copyModelData(const Model& t_model);
 

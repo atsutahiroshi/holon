@@ -60,15 +60,21 @@ ComController& ComController::reset() {
   m_sim.reset();
   return *this;
 }
+
 ComController& ComController::reset(const Vec3d& t_com_position) {
   m_sim.reset(t_com_position);
   return *this;
 }
 
-// ComController& ComController::feedback(const Model& t_model);
-// ComController& ComController::feedback(ComZmpModelData t_model_data);
-// ComController& ComController::feedback(const Vec3d& t_com_position,
-//                                        const Vec3d& t_com_velocity);
+ComController& ComController::feedback(const Model& t_model) {
+  return feedback(t_model.data());
+}
+
+ComController& ComController::feedback(const ComZmpModelData& t_model_data) {
+  states().com_position = t_model_data.get<1>().com_position;
+  states().com_velocity = t_model_data.get<1>().com_velocity;
+  return *this;
+}
 
 bool ComController::update() {
   m_sim.update();

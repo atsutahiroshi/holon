@@ -92,7 +92,7 @@ TEST_CASE("com_controller: accessor to model states", "[ComController]") {
   states.zmp_position = rnd();
   states.reaction_force = rnd();
   states.total_force = rnd();
-  ComController ctrl(data);
+  const ComController ctrl(data);
   CHECK(ctrl.states().com_position == states.com_position);
   CHECK(ctrl.states().com_velocity == states.com_velocity);
   CHECK(ctrl.states().zmp_position == states.zmp_position);
@@ -182,7 +182,8 @@ TEST_CASE("com_controller: reset COM position at initial one",
   const Vec3d p0 = model.com_position();
   Random<Vec3d> rnd(-0.1, 0.1);
   ComController ctrl(model);
-  auto& states = const_cast<ComZmpModelStates&>(ctrl.states());
+  auto& states = const_cast<ComZmpModelStates&>(
+      static_cast<const ComController&>(ctrl).states());
   states.com_position = p0 + rnd();
   states.com_velocity = rnd();
   REQUIRE(ctrl.model().com_position() != p0);
@@ -198,7 +199,8 @@ TEST_CASE("com_controller: reset COM position at a specific one",
   auto model = getRandomModel();
   const Vec3d p = Vec3d::Random();
   ComController ctrl(model);
-  auto& states = const_cast<ComZmpModelStates&>(ctrl.states());
+  auto& states = const_cast<ComZmpModelStates&>(
+      static_cast<const ComController&>(ctrl).states());
   states.com_velocity = Vec3d::Random();
   REQUIRE(ctrl.model().com_position() != p);
   REQUIRE(ctrl.model().com_velocity() != kVec3dZero);
@@ -206,6 +208,30 @@ TEST_CASE("com_controller: reset COM position at a specific one",
   CHECK(ctrl.model().com_position() == p);
   CHECK(ctrl.model().com_velocity() == kVec3dZero);
   CHECK(ctrl.getInitialComPosition() == p);
+}
+
+TEST_CASE("com_controller: feedback states", "[ComController]") {
+  Random<Vec3d> rnd(-0.1, 0.1);
+  ComController ctrl;
+  const Vec3d p = ctrl.model().com_position() + rnd();
+  const Vec3d v = rnd();
+  REQUIRE(ctrl.model().com_position() != p);
+  REQUIRE(ctrl.model().com_velocity() != v);
+  SECTION("overloaded function 1: with Model instance") {
+    auto model =
+        ComZmpModelBuilder().setComPosition(p).setComVelocity(v).build();
+    ctrl.feedback(model);
+    CHECK(ctrl.model().com_position() == p);
+    CHECK(ctrl.model().com_velocity() == v);
+  }
+  SECTION("overloaded function 2: with Model data") {
+    ComZmpModelData data;
+    data.get<1>().com_position = p;
+    data.get<1>().com_velocity = v;
+    ctrl.feedback(data);
+    CHECK(ctrl.model().com_position() == p);
+    CHECK(ctrl.model().com_velocity() == v);
+  }
 }
 
 TEST_CASE("com_controller: ", "[ComController]") {}

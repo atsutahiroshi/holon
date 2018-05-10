@@ -90,14 +90,14 @@ TEST_CASE("com_controller: accessor to model states", "[ComController]") {
   states.com_position = rnd();
   states.com_velocity = rnd();
   states.zmp_position = rnd();
+  states.contact_force = rnd();
   states.reaction_force = rnd();
-  states.total_force = rnd();
   const ComController ctrl(data);
   CHECK(ctrl.states().com_position == states.com_position);
   CHECK(ctrl.states().com_velocity == states.com_velocity);
   CHECK(ctrl.states().zmp_position == states.zmp_position);
+  CHECK(ctrl.states().contact_force == states.contact_force);
   CHECK(ctrl.states().reaction_force == states.reaction_force);
-  CHECK(ctrl.states().total_force == states.total_force);
 }
 
 TEST_CASE("com_controller: accessor to control parameters", "[ComController]") {
@@ -120,12 +120,12 @@ TEST_CASE("com_controller: accessor to control outputs", "[ComController]") {
   outputs.com_position = rnd();
   outputs.com_velocity = rnd();
   outputs.zmp_position = rnd();
-  outputs.reaction_force = rnd();
+  outputs.contact_force = rnd();
   ComController ctrl(data);
   CHECK(ctrl.outputs().com_position == outputs.com_position);
   CHECK(ctrl.outputs().com_velocity == outputs.com_velocity);
   CHECK(ctrl.outputs().zmp_position == outputs.zmp_position);
-  CHECK(ctrl.outputs().reaction_force == outputs.reaction_force);
+  CHECK(ctrl.outputs().contact_force == outputs.contact_force);
 }
 
 TEST_CASE("com_controller: set time step", "[ComController]") {

@@ -37,9 +37,9 @@ struct ComZmpModelStates {
   Vec3d com_velocity;
   Vec3d com_acceleration;
   Vec3d zmp_position;
-  Vec3d reaction_force;
+  Vec3d contact_force;
   Vec3d external_force;
-  Vec3d total_force;
+  Vec3d reaction_force;
 };
 using ComZmpModelData = Dataset<ComZmpModelParams, ComZmpModelStates>;
 
@@ -79,9 +79,9 @@ class ComZmpModel {
   Vec3d com_velocity() const noexcept { return states().com_velocity; }
   Vec3d com_acceleration() const noexcept { return states().com_acceleration; }
   Vec3d zmp_position() const noexcept { return states().zmp_position; }
-  Vec3d reaction_force() const noexcept { return states().reaction_force; }
+  Vec3d contact_force() const noexcept { return states().contact_force; }
   Vec3d external_force() const noexcept { return states().external_force; }
-  Vec3d total_force() const noexcept { return states().total_force; }
+  Vec3d reaction_force() const noexcept { return states().reaction_force; }
 
   ComZmpModel clone() const { return ComZmpModel(data().clone()); }
 

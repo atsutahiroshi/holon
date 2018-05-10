@@ -86,7 +86,7 @@ bool ComController::update(double t_time_step) {
   return true;
 }
 
-// ComController::Functor ComController::getReactForceFunctor() const;
+// ComController::Functor ComController::getContactForceFunctor() const;
 // ComController::Functor ComController::getZmpPositionFunctor() const;
 
 }  // namespace holon

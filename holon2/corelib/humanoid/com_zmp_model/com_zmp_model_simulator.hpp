@@ -46,7 +46,7 @@ class ComZmpModelSimulator : public Simulator {
  public:
   enum class InputType {
     kNotDetermined,
-    kReactionForce,
+    kContactForce,
     kZmpPosition,
   };
 
@@ -70,26 +70,26 @@ class ComZmpModelSimulator : public Simulator {
 
   // boolean
   bool isZmpPosAsInput() const;
-  bool isReactForceAsInput() const;
+  bool isContactForceAsInput() const;
 
   // mutators
   ComZmpModelSimulator& setInputType(InputType t_type);
   ComZmpModelSimulator& setZmpPosAsInput();
-  ComZmpModelSimulator& setReactForceAsInput();
+  ComZmpModelSimulator& setContactForceAsInput();
   ComZmpModelSimulator& setInitialComPosition();
   ComZmpModelSimulator& setInitialComPosition(const Vec3d& t_p0);
 
   // computations
   Vec3d getComAccel(const Vec3d& p, const Vec3d& v, const double t) const;
   Vec3d getZmpPosition(const Vec3d& p, const Vec3d& v, const double t) const;
-  Vec3d getReactForce(const Vec3d& p, const Vec3d& v, const double t) const;
+  Vec3d getContactForce(const Vec3d& p, const Vec3d& v, const double t) const;
   Vec3d getExtForce(const Vec3d& p, const Vec3d& v, const double t) const;
 
   // set functors
   ComZmpModelSimulator& setZmpPosition(Functor t_functor);
   ComZmpModelSimulator& setZmpPosition(const Vec3d& t_pz);
-  ComZmpModelSimulator& setReactForce(Functor t_functor);
-  ComZmpModelSimulator& setReactForce(const Vec3d& t_f);
+  ComZmpModelSimulator& setContactForce(Functor t_functor);
+  ComZmpModelSimulator& setContactForce(const Vec3d& t_f);
   ComZmpModelSimulator& setExtForce(Functor t_functor);
   ComZmpModelSimulator& setExtForce(const Vec3d& t_ef);
   ComZmpModelSimulator& clearExtForce();

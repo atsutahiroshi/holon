@@ -42,9 +42,9 @@ void checkModel(const ComZmpModel& model, const double expected_mass,
   CHECK(model.states().com_velocity == expected_v0);
   CHECK(model.states().com_acceleration == kVec3dZero);
   CHECK(model.states().zmp_position == expected_pz);
-  CHECK(model.states().reaction_force == expected_f);
+  CHECK(model.states().contact_force == expected_f);
   CHECK(model.states().external_force == kVec3dZero);
-  CHECK(model.states().total_force == expected_f);
+  CHECK(model.states().reaction_force == expected_f);
 }
 
 TEST_CASE("com_zmp_model_builder: check model builder (default)",

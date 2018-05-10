@@ -39,7 +39,7 @@ struct ComControllerOutputs {
   Vec3d com_velocity;
   Vec3d com_acceleration;
   Vec3d zmp_position;
-  Vec3d reaction_force;
+  Vec3d contact_force;
 };
 using ComControllerData =
     MultiDataset<ComZmpModelData,
@@ -105,7 +105,7 @@ class ComController {
   bool update(double t_time_step);
 
   // functor getter functions
-  Functor getReactForceFunctor() const;
+  Functor getContactForceFunctor() const;
   Functor getZmpPositionFunctor() const;
 
  protected:

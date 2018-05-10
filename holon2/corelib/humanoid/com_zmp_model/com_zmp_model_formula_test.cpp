@@ -141,37 +141,37 @@ void checkZeta_2(const testcase_t& testcases) {
     CHECK(zeta(p, pz, fz, tc.m) == sqrt(tc.expected_zeta_sqr));
   }
 }
-TEST_CASE("com_zmp_model_formula: compute zeta from reaction force: case 1",
+TEST_CASE("com_zmp_model_formula: compute zeta from contact force: case 1",
           "[com_zmp_model_formula][zeta][zetaSqr]") {
   SECTION("overloaded function 1") { checkZeta_1(testcases1); }
   SECTION("overloaded function 2") { checkZeta_2(testcases1); }
 }
-TEST_CASE("com_zmp_model_formula: compute zeta from reaction force: case 2",
+TEST_CASE("com_zmp_model_formula: compute zeta from contact force: case 2",
           "[com_zmp_model_formula][zeta][zetaSqr]") {
   SECTION("overloaded function 1") { checkZeta_1(testcases2); }
   SECTION("overloaded function 2") { checkZeta_2(testcases2); }
 }
-TEST_CASE("com_zmp_model_formula: compute zeta from reaction force: case 3",
+TEST_CASE("com_zmp_model_formula: compute zeta from contact force: case 3",
           "[com_zmp_model_formula][zeta][zetaSqr]") {
   SECTION("overloaded function 1") { checkZeta_1(testcases3); }
   SECTION("overloaded function 2") { checkZeta_2(testcases3); }
 }
-TEST_CASE("com_zmp_model_formula: compute zeta from reaction force: case 4",
+TEST_CASE("com_zmp_model_formula: compute zeta from contact force: case 4",
           "[com_zmp_model_formula][zeta][zetaSqr]") {
   SECTION("overloaded function 1") { checkZeta_1(testcases4); }
   SECTION("overloaded function 2") { checkZeta_2(testcases4); }
 }
-TEST_CASE("com_zmp_model_formula: compute zeta from reaction force: case 5",
+TEST_CASE("com_zmp_model_formula: compute zeta from contact force: case 5",
           "[com_zmp_model_formula][zeta][zetaSqr]") {
   SECTION("overloaded function 1") { checkZeta_1(testcases5); }
   SECTION("overloaded function 2") { checkZeta_2(testcases5); }
 }
-TEST_CASE("com_zmp_model_formula: compute zeta from reaction force: case 6",
+TEST_CASE("com_zmp_model_formula: compute zeta from contact force: case 6",
           "[com_zmp_model_formula][zeta][zetaSqr]") {
   SECTION("overloaded function 1") { checkZeta_1(testcases6); }
   SECTION("overloaded function 2") { checkZeta_2(testcases6); }
 }
-TEST_CASE("com_zmp_model_formula: compute zeta from reaction force: case 7",
+TEST_CASE("com_zmp_model_formula: compute zeta from contact force: case 7",
           "[com_zmp_model_formula][zeta][zetaSqr]") {
   SECTION("overloaded function 1") { checkZeta_1(testcases7); }
   SECTION("overloaded function 2") { checkZeta_2(testcases7); }
@@ -179,7 +179,7 @@ TEST_CASE("com_zmp_model_formula: compute zeta from reaction force: case 7",
 
 }  // namespace zeta_test_2
 
-namespace reaction_force_1 {
+namespace contact_force_1 {
 struct testcase_t {
   Vec3d ddp;
   double mass;
@@ -192,24 +192,22 @@ testcase_t testcases2[] = {{{-1, 1, -0.5 * G}, 1, {-1, 1, 0.5 * G}},
                            {{-1, 1, -0.5 * G}, 3, {-3, 3, 1.5 * G}},
                            {{-1, 1, -0.5 * G}, 5, {-5, 5, 2.5 * G}}};
 template <class testcase_t>
-void checkReactForce(const testcase_t& testcases) {
+void checkContactForce(const testcase_t& testcases) {
   for (const auto& tc : testcases) {
-    CHECK_THAT(reactForce(tc.ddp, tc.mass), ApproxEquals(tc.expected_f));
+    CHECK_THAT(contactForce(tc.ddp, tc.mass), ApproxEquals(tc.expected_f));
   }
 }
-TEST_CASE(
-    "com_zmp_model_formula: compute reaction force from COM accel: case 1",
-    "[com_zmp_model_formula][reactForce]") {
-  checkReactForce(testcases1);
+TEST_CASE("com_zmp_model_formula: compute contact force from COM accel: case 1",
+          "[com_zmp_model_formula][contactForce]") {
+  checkContactForce(testcases1);
 }
-TEST_CASE(
-    "com_zmp_model_formula: compute reaction force from COM accel: case 2",
-    "[com_zmp_model_formula][reactForce]") {
-  checkReactForce(testcases2);
+TEST_CASE("com_zmp_model_formula: compute contact force from COM accel: case 2",
+          "[com_zmp_model_formula][contactForce]") {
+  checkContactForce(testcases2);
 }
-}  // namespace reaction_force_1
+}  // namespace contact_force_1
 
-namespace reaction_force_2 {
+namespace contact_force_2 {
 struct testcase_t {
   Vec3d p;
   Vec3d pz;
@@ -226,25 +224,25 @@ testcase_t testcases2[] = {
     {{1, -1, 1}, {0, 0, 0}, 0.5, 1, {0.5, -0.5, 0.5}},
     {{1, -1, 1}, {0, 0, 0}, 3, G, {3 * G, -3 * G, 3 * G}}};
 template <class testcase_t>
-void checkReactForce(const testcase_t& testcases) {
+void checkContactForce(const testcase_t& testcases) {
   for (const auto& tc : testcases) {
-    CHECK_THAT(reactForce(tc.p, tc.pz, tc.zeta2, tc.mass),
+    CHECK_THAT(contactForce(tc.p, tc.pz, tc.zeta2, tc.mass),
                ApproxEquals(tc.expected_f));
   }
 }
 TEST_CASE(
-    "com_zmp_model_formula: compute reaction force from COM/ZMP, zeta: case 1",
-    "[com_zmp_model_formula][reactForce]") {
-  checkReactForce(testcases1);
+    "com_zmp_model_formula: compute contact force from COM/ZMP, zeta: case 1",
+    "[com_zmp_model_formula][contactForce]") {
+  checkContactForce(testcases1);
 }
 TEST_CASE(
-    "com_zmp_model_formula: compute reaction force from COM/ZMP, zeta: case 2",
-    "[com_zmp_model_formula][reactForce]") {
-  checkReactForce(testcases2);
+    "com_zmp_model_formula: compute contact force from COM/ZMP, zeta: case 2",
+    "[com_zmp_model_formula][contactForce]") {
+  checkContactForce(testcases2);
 }
-}  // namespace reaction_force_2
+}  // namespace contact_force_2
 
-namespace reaction_force_3 {
+namespace contact_force_3 {
 struct testcase_t {
   Vec3d p;
   Vec3d pz;
@@ -257,20 +255,20 @@ testcase_t testcases1[] = {
     {{1, 2, 2}, {0, -1, 0}, {1, 0, G}, 1, {G, 3. * G, 2. * G}},
     {{-1, 0.5, 2}, {1, 1, 0.5}, {0, 0, -0.5 * G}, 2, {-4. * G / 3, -G / 3, G}}};
 template <class testcase_t>
-void checkReactForce(const testcase_t& testcases) {
+void checkContactForce(const testcase_t& testcases) {
   for (const auto& tc : testcases) {
-    CHECK_THAT(reactForce(tc.p, tc.pz, tc.ddp, tc.mass),
+    CHECK_THAT(contactForce(tc.p, tc.pz, tc.ddp, tc.mass),
                ApproxEquals(tc.expected_f));
   }
 }
 TEST_CASE(
-    "com_zmp_model_formula: compute reaction force from COM/ZMP, accel: case 1",
-    "[com_zmp_model_formula][reactForce]") {
-  checkReactForce(testcases1);
+    "com_zmp_model_formula: compute contact force from COM/ZMP, accel: case 1",
+    "[com_zmp_model_formula][contactForce]") {
+  checkContactForce(testcases1);
 }
-}  // namespace reaction_force_3
+}  // namespace contact_force_3
 
-namespace reaction_force_4 {
+namespace contact_force_4 {
 struct testcase_t {
   Vec3d p;
   Vec3d pz;
@@ -285,17 +283,17 @@ testcase_t testcases1[] = {
     {{-0.5, 1.9, 1.4}, {1, -1.1, -0.1}, 1, {-1, 2, 1}},
     {{-0.5, 1.9, 1.4}, {1, -1.1, -0.1}, 10, {-10, 20, 10}}};
 template <class testcase_t>
-void checkReactForce(const testcase_t& testcases) {
+void checkContactForce(const testcase_t& testcases) {
   for (const auto& tc : testcases) {
-    CHECK_THAT(reactForce(tc.p, tc.pz, tc.fz), ApproxEquals(tc.expected_f));
+    CHECK_THAT(contactForce(tc.p, tc.pz, tc.fz), ApproxEquals(tc.expected_f));
   }
 }
 TEST_CASE(
-    "com_zmp_model_formula: compute reaction force from vertical force: case 1",
-    "[com_zmp_model_formula][reactForce]") {
-  checkReactForce(testcases1);
+    "com_zmp_model_formula: compute contact force from vertical force: case 1",
+    "[com_zmp_model_formula][contactForce]") {
+  checkContactForce(testcases1);
 }
-}  // namespace reaction_force_4
+}  // namespace contact_force_4
 
 namespace com_acceleration_1 {
 struct testcase_t {
@@ -324,12 +322,14 @@ void checkComAccel_2(const testcase_t& testcases) {
     CHECK_THAT(comAccel(tc.f, tc.mass, tc.ef), ApproxEquals(tc.expected_ddp));
   }
 }
-TEST_CASE("com_zmp_model_formula: compute COM accel. from react force: case 1",
-          "[com_zmp_model_formula][comAccel]") {
+TEST_CASE(
+    "com_zmp_model_formula: compute COM accel. from contact force: case 1",
+    "[com_zmp_model_formula][comAccel]") {
   checkComAccel_1(testcases1);
 }
-TEST_CASE("com_zmp_model_formula: compute COM accel. from react force: case 2",
-          "[com_zmp_model_formula][comAccel]") {
+TEST_CASE(
+    "com_zmp_model_formula: compute COM accel. from contact force: case 2",
+    "[com_zmp_model_formula][comAccel]") {
   checkComAccel_2(testcases2);
 }
 }  // namespace com_acceleration_1

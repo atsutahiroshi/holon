@@ -92,11 +92,11 @@ TEST_CASE("com_zmp_model: accessor to ZMP position", "[ComZmpModel]") {
   CHECK(model.zmp_position() == v);
 }
 
-TEST_CASE("com_zmp_model: accessor to reaction force", "[ComZmpModel]") {
+TEST_CASE("com_zmp_model: accessor to contact force", "[ComZmpModel]") {
   Vec3d v = Random<Vec3d>().get();
   ComZmpModel model;
-  model.states().reaction_force = v;
-  CHECK(model.reaction_force() == v);
+  model.states().contact_force = v;
+  CHECK(model.contact_force() == v);
 }
 
 TEST_CASE("com_zmp_model: accessor to external force", "[ComZmpModel]") {
@@ -106,11 +106,11 @@ TEST_CASE("com_zmp_model: accessor to external force", "[ComZmpModel]") {
   CHECK(model.external_force() == v);
 }
 
-TEST_CASE("com_zmp_model: accessor to total force", "[ComZmpModel]") {
+TEST_CASE("com_zmp_model: accessor to reaction force", "[ComZmpModel]") {
   Vec3d v = Random<Vec3d>().get();
   ComZmpModel model;
-  model.states().total_force = v;
-  CHECK(model.total_force() == v);
+  model.states().reaction_force = v;
+  CHECK(model.reaction_force() == v);
 }
 
 TEST_CASE("com_zmp_model: clone model instance", "[ComZmpModel]") {

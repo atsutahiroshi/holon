@@ -44,7 +44,7 @@ class ComZmpModelSimulator::Impl {
         m_initial_com_position(model().com_position()),
         m_solver() {
     setExtForceDefault();
-    setReactForceDefault();
+    setContactForceDefault();
     setZmpPositionDefault();
     setComAccelDefault();
     setSystem();
@@ -57,15 +57,15 @@ class ComZmpModelSimulator::Impl {
   bool isZmpPosAsInput() const {
     return getInputType() == InputType::kZmpPosition;
   }
-  bool isReactForceAsInput() const {
-    return getInputType() == InputType::kReactionForce;
+  bool isContactForceAsInput() const {
+    return getInputType() == InputType::kContactForce;
   }
 
   void setInputType(InputType t_type) {
     m_input_type = t_type;
     switch (t_type) {
-      case InputType::kReactionForce:
-        setComAccelWhenInputTypeIsReactForce();
+      case InputType::kContactForce:
+        setComAccelWhenInputTypeIsContactForce();
         break;
       case InputType::kZmpPosition:
         setComAccelWhenInputTypeIsZmpPos();
@@ -86,8 +86,8 @@ class ComZmpModelSimulator::Impl {
   Vec3d getZmpPosition(const Vec3d& p, const Vec3d& v, const double t) const {
     return m_zmp_position_functor(p, v, t);
   }
-  Vec3d getReactForce(const Vec3d& p, const Vec3d& v, const double t) const {
-    return m_react_force_functor(p, v, t);
+  Vec3d getContactForce(const Vec3d& p, const Vec3d& v, const double t) const {
+    return m_contact_force_functor(p, v, t);
   }
   Vec3d getExtForce(const Vec3d& p, const Vec3d& v, const double t) const {
     return m_ext_force_functor(p, v, t);
@@ -98,9 +98,11 @@ class ComZmpModelSimulator::Impl {
   void setZmpPosition(const Vec3d& t_pz) {
     setZmpPosition(returnConstVecFunctor(t_pz));
   }
-  void setReactForce(Functor t_functor) { m_react_force_functor = t_functor; }
-  void setReactForce(const Vec3d& t_f) {
-    setReactForce(returnConstVecFunctor(t_f));
+  void setContactForce(Functor t_functor) {
+    m_contact_force_functor = t_functor;
+  }
+  void setContactForce(const Vec3d& t_f) {
+    setContactForce(returnConstVecFunctor(t_f));
   }
   void setExtForce(Functor t_functor) { m_ext_force_functor = t_functor; }
   void setExtForce(const Vec3d& t_ef) {
@@ -119,15 +121,15 @@ class ComZmpModelSimulator::Impl {
     m_model.states().com_acceleration = getComAccel(p, v, t);
     if (isZmpPosAsInput()) {
       m_model.states().zmp_position = getZmpPosition(p, v, t);
-      double fz = getReactForce(p, v, t).z();
-      m_model.states().reaction_force =
-          cz::reactForce(p, m_model.zmp_position(), fz);
-    } else if (isReactForceAsInput()) {
-      m_model.states().reaction_force = getReactForce(p, v, t);
+      double fz = getContactForce(p, v, t).z();
+      m_model.states().contact_force =
+          cz::contactForce(p, m_model.zmp_position(), fz);
+    } else if (isContactForceAsInput()) {
+      m_model.states().contact_force = getContactForce(p, v, t);
     }
     m_model.states().external_force = getExtForce(p, v, t);
-    m_model.states().total_force =
-        m_model.reaction_force() + m_model.external_force();
+    m_model.states().reaction_force =
+        m_model.contact_force() + m_model.external_force();
     return true;
   }
 
@@ -137,15 +139,15 @@ class ComZmpModelSimulator::Impl {
   }
 
   void setComAccelDefault() { setComAccel(returnConstVecFunctor(kVec3dZero)); }
-  void setComAccelWhenInputTypeIsReactForce() {
+  void setComAccelWhenInputTypeIsContactForce() {
     setComAccel([this](const Vec3d& p, const Vec3d& v, const double t) {
-      return cz::comAccel(getReactForce(p, v, t), m_model.mass(),
+      return cz::comAccel(getContactForce(p, v, t), m_model.mass(),
                           getExtForce(p, v, t));
     });
   }
   void setComAccelWhenInputTypeIsZmpPos() {
     setComAccel([this](const Vec3d& p, const Vec3d& v, const double t) {
-      return cz::comAccel(p, getZmpPosition(p, v, t), getReactForce(p, v, t),
+      return cz::comAccel(p, getZmpPosition(p, v, t), getContactForce(p, v, t),
                           m_model.mass(), getExtForce(p, v, t));
     });
   }
@@ -156,8 +158,8 @@ class ComZmpModelSimulator::Impl {
       return ret;
     });
   }
-  void setReactForceDefault() {
-    setReactForce([this](const Vec3d&, const Vec3d&, const double) {
+  void setContactForceDefault() {
+    setContactForce([this](const Vec3d&, const Vec3d&, const double) {
       return Vec3d(0, 0, m_model.mass() * kGravAccel);
     });
   }
@@ -177,7 +179,7 @@ class ComZmpModelSimulator::Impl {
   Vec3d m_initial_com_position;
   Functor m_com_accel_functor;
   Functor m_zmp_position_functor;
-  Functor m_react_force_functor;
+  Functor m_contact_force_functor;
   Functor m_ext_force_functor;
   Solver m_solver;
   System m_system;
@@ -209,8 +211,8 @@ Vec3d ComZmpModelSimulator::getInitialComPosition() const {
 bool ComZmpModelSimulator::isZmpPosAsInput() const {
   return m_impl->isZmpPosAsInput();
 }
-bool ComZmpModelSimulator::isReactForceAsInput() const {
-  return m_impl->isReactForceAsInput();
+bool ComZmpModelSimulator::isContactForceAsInput() const {
+  return m_impl->isContactForceAsInput();
 }
 
 ComZmpModelSimulator& ComZmpModelSimulator::setInputType(InputType t_type) {
@@ -222,8 +224,8 @@ ComZmpModelSimulator& ComZmpModelSimulator::setZmpPosAsInput() {
   return setInputType(InputType::kZmpPosition);
 }
 
-ComZmpModelSimulator& ComZmpModelSimulator::setReactForceAsInput() {
-  return setInputType(InputType::kReactionForce);
+ComZmpModelSimulator& ComZmpModelSimulator::setContactForceAsInput() {
+  return setInputType(InputType::kContactForce);
 }
 
 ComZmpModelSimulator& ComZmpModelSimulator::setInitialComPosition() {
@@ -246,9 +248,9 @@ Vec3d ComZmpModelSimulator::getZmpPosition(const Vec3d& p, const Vec3d& v,
   return m_impl->getZmpPosition(p, v, t);
 }
 
-Vec3d ComZmpModelSimulator::getReactForce(const Vec3d& p, const Vec3d& v,
-                                          const double t) const {
-  return m_impl->getReactForce(p, v, t);
+Vec3d ComZmpModelSimulator::getContactForce(const Vec3d& p, const Vec3d& v,
+                                            const double t) const {
+  return m_impl->getContactForce(p, v, t);
 }
 
 Vec3d ComZmpModelSimulator::getExtForce(const Vec3d& p, const Vec3d& v,
@@ -266,13 +268,13 @@ ComZmpModelSimulator& ComZmpModelSimulator::setZmpPosition(const Vec3d& t_pz) {
   return *this;
 }
 
-ComZmpModelSimulator& ComZmpModelSimulator::setReactForce(Functor t_functor) {
-  m_impl->setReactForce(t_functor);
+ComZmpModelSimulator& ComZmpModelSimulator::setContactForce(Functor t_functor) {
+  m_impl->setContactForce(t_functor);
   return *this;
 }
 
-ComZmpModelSimulator& ComZmpModelSimulator::setReactForce(const Vec3d& t_f) {
-  m_impl->setReactForce(t_f);
+ComZmpModelSimulator& ComZmpModelSimulator::setContactForce(const Vec3d& t_f) {
+  m_impl->setContactForce(t_f);
   return *this;
 }
 

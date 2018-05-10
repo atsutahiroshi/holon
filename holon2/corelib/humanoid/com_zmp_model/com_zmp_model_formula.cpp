@@ -59,23 +59,23 @@ bool isComZmpDiffValid(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
   return true;
 }
 
-bool isReactionForceValid(double t_reaction_force_z) {
-  if (t_reaction_force_z < 0.0) {
-    // ZRUNWARN("The reaction force must be positive. (given %g)",
-    //          t_reaction_force_z);
+bool isContactForceValid(double t_contact_force_z) {
+  if (t_contact_force_z < 0.0) {
+    // ZRUNWARN("The contact force must be positive. (given %g)",
+    //          t_contact_force_z);
     return false;
   }
   return true;
 }
 
-bool isReactionForceValid(const Vec3d& t_reaction_force,
-                          const Vec3d& t_nu = kVec3dZ) {
-  double react_force = t_nu.dot(t_reaction_force);
-  if (react_force < 0.0) {
+bool isContactForceValid(const Vec3d& t_contact_force,
+                         const Vec3d& t_nu = kVec3dZ) {
+  double contact_force = t_nu.dot(t_contact_force);
+  if (contact_force < 0.0) {
     // ZRUNWARN(
-    //     "The reaction force must be positive. "
+    //     "The contact force must be positive. "
     //     "(force: %s, nu: %s)",
-    //     t_reaction_force.str().c_str(), t_nu.str().c_str());
+    //     t_contact_force.str().c_str(), t_nu.str().c_str());
     return false;
   }
   return true;
@@ -115,14 +115,14 @@ double zetaSqr(double t_com_position_z, double t_zmp_position_z,
 }
 
 double zetaSqr(double t_com_position_z, double t_zmp_position_z,
-               double t_reaction_force_z, double t_mass) {
+               double t_contact_force_z, double t_mass) {
   if (!isMassValid(t_mass) ||
       !isComZmpDiffValid(t_com_position_z, t_zmp_position_z) ||
-      !isReactionForceValid(t_reaction_force_z)) {
+      !isContactForceValid(t_contact_force_z)) {
     return 0.0;
   }
   double denom = (t_com_position_z - t_zmp_position_z) * t_mass;
-  return t_reaction_force_z / denom;
+  return t_contact_force_z / denom;
 }
 
 double zetaSqr(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
@@ -137,14 +137,13 @@ double zetaSqr(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
 }
 
 double zetaSqr(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
-               const Vec3d& t_reaction_force, double t_mass,
-               const Vec3d& t_nu) {
+               const Vec3d& t_contact_force, double t_mass, const Vec3d& t_nu) {
   if (!isMassValid(t_mass) ||
       !isComZmpDiffValid(t_com_position, t_zmp_position) ||
-      !isReactionForceValid(t_reaction_force)) {
+      !isContactForceValid(t_contact_force)) {
     return 0.0;
   }
-  double numer = t_nu.dot(t_reaction_force);
+  double numer = t_nu.dot(t_contact_force);
   double denom = t_nu.dot(t_com_position - t_zmp_position) * t_mass;
   return numer / denom;
 }
@@ -168,40 +167,40 @@ double zeta(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
 }
 
 double zeta(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
-            const Vec3d& t_reaction_force, double t_mass, const Vec3d& t_nu) {
+            const Vec3d& t_contact_force, double t_mass, const Vec3d& t_nu) {
   return sqrt(
-      zetaSqr(t_com_position, t_zmp_position, t_reaction_force, t_mass, t_nu));
+      zetaSqr(t_com_position, t_zmp_position, t_contact_force, t_mass, t_nu));
 }
 
-Vec3d reactForce(const Vec3d& t_com_acceleration, double t_mass) {
+Vec3d contactForce(const Vec3d& t_com_acceleration, double t_mass) {
   return t_mass * (t_com_acceleration + kGravAccel3d);
 }
 
-Vec3d reactForce(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
-                 double t_zeta_sqr, double t_mass) {
+Vec3d contactForce(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
+                   double t_zeta_sqr, double t_mass) {
   return t_mass * t_zeta_sqr * (t_com_position - t_zmp_position);
 }
 
-Vec3d reactForce(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
-                 const Vec3d& t_com_acceleration, double t_mass,
-                 const Vec3d& t_nu) {
+Vec3d contactForce(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
+                   const Vec3d& t_com_acceleration, double t_mass,
+                   const Vec3d& t_nu) {
   double zeta_sqr =
       zetaSqr(t_com_position, t_zmp_position, t_com_acceleration, t_nu);
-  return reactForce(t_com_position, t_zmp_position, zeta_sqr, t_mass);
+  return contactForce(t_com_position, t_zmp_position, zeta_sqr, t_mass);
 }
 
-Vec3d reactForce(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
-                 double t_reaction_force_z) {
+Vec3d contactForce(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
+                   double t_contact_force_z) {
   if (!isComZmpDiffValid(t_com_position, t_zmp_position))
-    return Vec3d(0, 0, t_reaction_force_z);
+    return Vec3d(0, 0, t_contact_force_z);
   double m_zeta_sqr =
-      t_reaction_force_z / (t_com_position.z() - t_zmp_position.z());
+      t_contact_force_z / (t_com_position.z() - t_zmp_position.z());
   return m_zeta_sqr * (t_com_position - t_zmp_position);
 }
 
-Vec3d comAccel(const Vec3d& t_reaction_force, double t_mass,
+Vec3d comAccel(const Vec3d& t_contact_force, double t_mass,
                const Vec3d& t_external_force) {
-  return (t_reaction_force + t_external_force) / t_mass - kGravAccel3d;
+  return (t_contact_force + t_external_force) / t_mass - kGravAccel3d;
 }
 
 Vec3d comAccel(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
@@ -212,10 +211,10 @@ Vec3d comAccel(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
 }
 
 Vec3d comAccel(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
-               const Vec3d& t_reaction_force, double t_mass,
+               const Vec3d& t_contact_force, double t_mass,
                const Vec3d& t_external_force, const Vec3d& t_nu) {
   double zeta_sqr =
-      zetaSqr(t_com_position, t_zmp_position, t_reaction_force, t_mass, t_nu);
+      zetaSqr(t_com_position, t_zmp_position, t_contact_force, t_mass, t_nu);
   return comAccel(t_com_position, t_zmp_position, zeta_sqr, t_mass,
                   t_external_force);
 }

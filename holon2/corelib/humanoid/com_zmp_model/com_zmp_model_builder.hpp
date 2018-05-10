@@ -32,14 +32,16 @@ using ComZmpModelData = Dataset<ComZmpModelParams, ComZmpModelStates>;
 class ComZmpModel;
 
 class ComZmpModelBuilder {
-  static const double default_mass;
-  static const double default_vhp;
-  static const Vec3d default_com_position;
   using Self = ComZmpModelBuilder;
   using Params = ComZmpModelParams;
   using States = ComZmpModelStates;
   using Data = ComZmpModelData;
   using Model = ComZmpModel;
+
+ public:
+  static const double default_mass;
+  static const double default_vhp;
+  static const Vec3d default_com_position;
 
  public:
   ComZmpModelBuilder();

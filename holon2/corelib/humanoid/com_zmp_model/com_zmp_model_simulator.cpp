@@ -75,6 +75,7 @@ class ComZmpModelSimulator::Impl {
         break;
     }
   }
+
   void setInitialComPosition(const Vec3d& t_p0) {
     m_initial_com_position = t_p0;
   }
@@ -223,6 +224,10 @@ ComZmpModelSimulator& ComZmpModelSimulator::setZmpPosAsInput() {
 
 ComZmpModelSimulator& ComZmpModelSimulator::setReactForceAsInput() {
   return setInputType(InputType::kReactionForce);
+}
+
+ComZmpModelSimulator& ComZmpModelSimulator::setInitialComPosition() {
+  return setInitialComPosition(model().com_position());
 }
 
 ComZmpModelSimulator& ComZmpModelSimulator::setInitialComPosition(

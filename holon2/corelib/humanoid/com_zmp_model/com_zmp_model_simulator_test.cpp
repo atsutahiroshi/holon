@@ -64,7 +64,20 @@ TEST_CASE("com_zmp_model_simulator: check c'tors",
   }
 }
 
-TEST_CASE("com_zmp_model_simulator: set initial COM position",
+TEST_CASE(
+    "com_zmp_model_simulator: set initial COM position to the current one",
+    "[ComZmpModel][ComZmpModelSimulator]") {
+  ComZmpModelSimulator sim;
+  sim.setReactForceAsInput();
+  sim.setReactForce(Vec3d(1, 1, 1));
+  while (sim.time() < 1) sim.update();
+  Vec3d p = sim.model().com_position();
+  REQUIRE(sim.getInitialComPosition() != p);
+  sim.setInitialComPosition();
+  CHECK(sim.getInitialComPosition() == p);
+}
+
+TEST_CASE("com_zmp_model_simulator: set initial COM position to a specific one",
           "[ComZmpModel][ComZmpModelSimulator]") {
   Random<Vec3d> rnd;
   ComZmpModelSimulator sim;

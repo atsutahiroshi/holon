@@ -76,6 +76,7 @@ class ComZmpModelSimulator : public Simulator {
   ComZmpModelSimulator& setInputType(InputType t_type);
   ComZmpModelSimulator& setZmpPosAsInput();
   ComZmpModelSimulator& setReactForceAsInput();
+  ComZmpModelSimulator& setInitialComPosition();
   ComZmpModelSimulator& setInitialComPosition(const Vec3d& t_p0);
 
   // computations

@@ -45,7 +45,8 @@ double calculateXiSqr(double t_zd) {
 
 }  // namespace
 
-double ContactForceGenerator::calculateZ(const double t_z, const double t_v) {
+double ContactForceGenerator::calculateZ(const double t_z,
+                                         const double t_v) const {
   double xi2 = calculateXiSqr(params().com_position[2]);
   double xi = sqrt(xi2);
   double z = t_z - params().com_position[2];
@@ -57,7 +58,7 @@ double ContactForceGenerator::calculateZ(const double t_z, const double t_v) {
 }
 
 Vec3d ContactForceGenerator::calculate(const Vec3d& t_com_position,
-                                       const Vec3d& t_com_velocity) {
+                                       const Vec3d& t_com_velocity) const {
   auto fz = calculateZ(t_com_position.z(), t_com_velocity.z());
   return Vec3d(0, 0, fz);
 }

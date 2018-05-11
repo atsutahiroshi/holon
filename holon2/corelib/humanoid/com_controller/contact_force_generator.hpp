@@ -39,8 +39,9 @@ class ContactForceGenerator {
   double mass() const { return m_data.get<0>().mass; }
   Self& setData(const Data& t_data);
 
-  double calculateZ(const double t_z, const double t_v);
-  Vec3d calculate(const Vec3d& t_com_position, const Vec3d& t_com_velocity);
+  double calculateZ(const double t_z, const double t_v) const;
+  Vec3d calculate(const Vec3d& t_com_position,
+                  const Vec3d& t_com_velocity) const;
 
  private:
   Data m_data;

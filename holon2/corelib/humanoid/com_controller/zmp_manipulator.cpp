@@ -32,7 +32,7 @@ ZmpManipulator& ZmpManipulator::setData(const Data& t_data) {
 }
 
 double ZmpManipulator::calculateX(const double t_x, const double t_v,
-                                  const double t_zeta) {
+                                  const double t_zeta) const {
   if (isTiny(t_zeta) || t_zeta < 0) {
     // ZRUNERROR("ZETA should be positive. (given: %f)", t_zeta);
     return 0;
@@ -59,7 +59,7 @@ double calculateNonlinearDamping(double t_y, double t_v, double t_yd,
 }  // namespace
 
 double ZmpManipulator::calculateY(const double t_y, const double t_v,
-                                  const double t_zeta) {
+                                  const double t_zeta) const {
   if (isTiny(t_zeta) || t_zeta < 0) {
     // ZRUNERROR("ZETA should be positive. (given: %f)", t_zeta);
     return 0;
@@ -75,7 +75,7 @@ double ZmpManipulator::calculateY(const double t_y, const double t_v,
 
 Vec3d ZmpManipulator::calculate(const Vec3d& t_com_position,
                                 const Vec3d& t_com_velocity,
-                                const double t_zeta) {
+                                const double t_zeta) const {
   auto xz = calculateX(t_com_position.x(), t_com_velocity.x(), t_zeta);
   auto yz = calculateY(t_com_position.y(), t_com_velocity.y(), t_zeta);
   auto zz = vhp();

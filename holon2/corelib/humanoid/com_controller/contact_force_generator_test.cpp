@@ -25,6 +25,9 @@
 namespace holon {
 namespace {
 
+using ::Catch::Matchers::ApproxEquals;
+const double kTOL = 1e-10;
+
 TEST_CASE("contact_force_generator: check c'tor",
           "[ComController][ContactForceGenerator]") {
   ComControllerData data;
@@ -52,6 +55,25 @@ TEST_CASE("contact_force_generator: accessor to control parameters",
   for (auto i = 0; i < 3; ++i) {
     CHECK(cf.params().q1[i] == q1[i]);
   }
+}
+
+TEST_CASE("contact_force_generator: calculate desired contact force",
+          "[ComController][ContactForceGenerator]") {
+  Random<Vec3d> vec(0, 2);
+  Random<Array3d> arr(0, 1);
+  Random<double> rnd(0, 1);
+  Vec3d p = vec(), v = vec();
+  ComControllerData data;
+  auto& params = data.get<2>();
+  params.com_position = vec();
+  params.com_velocity = vec();
+  params.q1 = arr();
+  params.q2 = arr();
+  data.get<0>().mass = rnd();
+  ContactForceGenerator cf(data);
+  auto expected_fz = cf.calculateZ(p.z(), v.z());
+  Vec3d expected_cf(0, 0, expected_fz);
+  CHECK_THAT(cf.calculate(p, v), ApproxEquals(expected_cf, kTOL));
 }
 
 TEST_CASE("contact_force_generator: ",

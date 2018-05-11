@@ -315,6 +315,52 @@ SCENARIO("com_controller: oscillate COM sideward", "[ComController]") {
   }
 }
 
+SCENARIO("com_controller: moving longitudinally with oscillation",
+         "[ComController]") {
+  GIVEN("initial position is (0, 0, 0.42)") {
+    ComController ctrl;
+    auto& params = getParamsRef(ctrl);
+    const Vec3d p0(0, 0, 0.42);
+    const double dist = 0.4;
+    const double vxd = 0.1;
+    ctrl.reset(p0);
+    params.dist = dist;
+
+    WHEN("given referential velocity 0.1 and update for 0.1 sec") {
+      params.com_velocity[0] = vxd;
+      params.rho = 1;
+      params.q1[0] = 0;
+      while (ctrl.time() < 0.1) ctrl.update();
+      THEN("start moving forward") {
+        CHECK(ctrl.model().com_position().x() > 0.0);
+        CHECK(ctrl.model().com_velocity().x() > 0.0);
+        CHECK(ctrl.model().com_velocity().x() < vxd);
+      }
+
+      WHEN("update for 5 sec") {
+        while (ctrl.time() < 5) ctrl.update();
+        THEN("velocity converges at the referential one") {
+          CHECK(ctrl.model().com_position().x() > 0.0);
+          CHECK(ctrl.model().com_velocity().x() == Approx(vxd));
+        }
+
+        WHEN("referential velocity is set for 0 and update") {
+          params.com_velocity[0] = 0;
+          params.rho = 0;
+          params.q1[0] = 1;
+          const double x = ctrl.model().com_position()[0];
+          params.com_position[0] = x;
+          while (ctrl.time() < 10) ctrl.update();
+          THEN("velocity converges at the referential one") {
+            CHECK(ctrl.model().com_position().x() == Approx(x));
+            CHECK(ctrl.model().com_velocity().x() == Approx(0).margin(kTOL));
+          }
+        }
+      }
+    }
+  }
+}
+
 TEST_CASE("com_controller: ", "[ComController]") {}
 
 }  // namespace

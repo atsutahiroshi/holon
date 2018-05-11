@@ -4,6 +4,7 @@ set(sources
   )
 set(test_sources
   contact_force_generator_test.cpp
+  contact_force_generator_z_test.cpp
   zmp_manipulator_test.cpp
   zmp_manipulator_x_test.cpp
   zmp_manipulator_y_test.cpp

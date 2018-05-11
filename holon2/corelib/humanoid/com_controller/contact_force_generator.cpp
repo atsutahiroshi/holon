@@ -20,6 +20,9 @@
 
 #include "holon2/corelib/humanoid/com_controller/contact_force_generator.hpp"
 
+#include "holon2/corelib/humanoid/const_defs.hpp"
+#include "holon2/corelib/math/misc.hpp"
+
 namespace holon {
 
 ContactForceGenerator::ContactForceGenerator(const Data& t_data)
@@ -29,5 +32,31 @@ ContactForceGenerator& ContactForceGenerator::setData(const Data& t_data) {
   m_data = t_data;
   return *this;
 }
+
+namespace {
+
+double calculateXiSqr(double t_zd) {
+  if (isTiny(t_zd) || t_zd < 0) {
+    // ZRUNERROR("Desired COM height should be positive. (given: %f)", t_zd);
+    return 0;
+  }
+  return kGravAccel / t_zd;
+}
+
+}  // namespace
+
+double ContactForceGenerator::calculateZ(const double t_z, const double t_v) {
+  double xi2 = calculateXiSqr(params().com_position[2]);
+  double xi = sqrt(xi2);
+  double z = t_z - params().com_position[2];
+  double k1 = params().q1[2] * params().q2[2];
+  double k2 = params().q1[2] + params().q2[2];
+  double fz = -xi2 * k1 * z - xi * k2 * t_v + kGravAccel;
+  fz *= mass();
+  return std::max<double>(fz, 0);
+}
+
+Vec3d ContactForceGenerator::calculate(const Vec3d& t_com_position,
+                                       const Vec3d& t_com_velocity) {}
 
 }  // namespace holon

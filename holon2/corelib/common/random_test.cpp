@@ -58,5 +58,38 @@ TEST_CASE("random: limit the generating number within a specific range",
   }
 }
 
+template <std::size_t I>
+using array = std::array<double, I>;
+TEST_CASE("random: get array", "[Random]") {
+  SECTION("size 1") {
+    Random<array<1>> rnd;
+    auto arr = rnd();
+    REQUIRE(std::is_same<decltype(arr), std::array<double, 1>>::value);
+  }
+  SECTION("size 2") {
+    Random<array<2>> rnd;
+    auto arr = rnd();
+    REQUIRE(std::is_same<decltype(arr), std::array<double, 2>>::value);
+    CHECK(arr[0] != arr[1]);
+  }
+  SECTION("size 3") {
+    Random<array<3>> rnd;
+    auto arr = rnd();
+    REQUIRE(std::is_same<decltype(arr), std::array<double, 3>>::value);
+    CHECK(arr[0] != arr[1]);
+    CHECK(arr[0] != arr[2]);
+  }
+  SECTION("size 4") {
+    Random<array<4>> rnd;
+    auto arr = rnd();
+    REQUIRE(std::is_same<decltype(arr), std::array<double, 4>>::value);
+    CHECK(arr[0] != arr[1]);
+    CHECK(arr[0] != arr[2]);
+    CHECK(arr[0] != arr[3]);
+  }
+}
+
+TEST_CASE("random: ", "[Random]") {}
+
 }  // namespace
 }  // namespace holon

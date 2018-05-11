@@ -25,6 +25,7 @@
 #include <array>
 #include <random>
 #include <type_traits>
+#include "holon2/corelib/common/utility.hpp"
 
 namespace holon {
 
@@ -64,7 +65,6 @@ class Random {
 
   // member functions
   T operator()() { return this->get(); }
-  // T get() { return m_distribution(m_engine); }
   T get() { return m_adapter.get(m_engine, m_distribution); }
 
  private:
@@ -74,6 +74,30 @@ class Random {
   std::uniform_real_distribution<Float> m_distribution;
   RandomAdapter<T, std::mt19937, std::uniform_real_distribution<Float>>
       m_adapter;
+};
+
+template <typename Engine, typename Distribution>
+struct RandomArrayAdapter {
+  RandomArrayAdapter(Engine& e, Distribution& d) : eng(e), dist(d) {}
+
+  double rnd(std::size_t) { return dist(eng); }
+  template <std::size_t... Ints>
+  std::array<double, sizeof...(Ints)> get(IndexSeq<Ints...>) {
+    return std::array<double, sizeof...(Ints)>{rnd(Ints)...};
+  }
+
+ private:
+  Engine& eng;
+  Distribution& dist;
+};
+
+template <std::size_t I, typename Engine, typename Distribution>
+struct RandomAdapter<std::array<double, I>, Engine, Distribution> {
+  using type = std::array<double, I>;
+  type get(Engine& eng, Distribution& dist) {
+    return RandomArrayAdapter<Engine, Distribution>(eng, dist).get(
+        makeIndexSeq<I>());
+  }
 };
 
 }  // namespace holon

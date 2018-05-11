@@ -73,4 +73,13 @@ double ZmpManipulator::calculateY(const double t_y, const double t_v,
   return t_y + k1 * y + k2 * nd * t_v;
 }
 
+Vec3d ZmpManipulator::calculate(const Vec3d& t_com_position,
+                                const Vec3d& t_com_velocity,
+                                const double t_zeta) {
+  auto xz = calculateX(t_com_position.x(), t_com_velocity.x(), t_zeta);
+  auto yz = calculateY(t_com_position.y(), t_com_velocity.y(), t_zeta);
+  auto zz = vhp();
+  return Vec3d(xz, yz, zz);
+}
+
 }  // namespace holon

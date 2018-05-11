@@ -27,6 +27,9 @@
 namespace holon {
 namespace {
 
+using ::Catch::Matchers::ApproxEquals;
+const double kTOL = 1e-10;
+
 TEST_CASE("zmp_manipulator: check c'tor", "[ComController][ZmpManipulator]") {
   ComControllerData data;
   ZmpManipulator zmp(data);
@@ -53,6 +56,33 @@ TEST_CASE("zmp_manipulator: accessor to control parameters",
     CHECK(zmp.params().q1[i] == q1[i]);
   }
 }
+
+TEST_CASE("zmp_manipulator: calculate desired ZMP",
+          "[ComController][ZmpManipulator]") {
+  Random<Vec3d> vec(0, 2);
+  Random<Array3d> arr(0, 1);
+  Random<double> rnd(0, 1);
+  Vec3d p = vec(), v = vec();
+  ComControllerData data;
+  auto& params = data.get<2>();
+  params.com_position = vec();
+  params.com_velocity = vec();
+  params.q1 = arr();
+  params.q2 = arr();
+  params.rho = rnd();
+  params.dist = rnd();
+  params.kr = rnd();
+  data.get<0>().vhp = rnd();
+  double zeta = rnd();
+  ZmpManipulator zmp(data);
+  auto expected_xz = zmp.calculateX(p.x(), v.x(), zeta);
+  auto expected_yz = zmp.calculateY(p.y(), v.y(), zeta);
+  auto expected_zz = data.get<0>().vhp;
+  Vec3d expected_zmp(expected_xz, expected_yz, expected_zz);
+  CHECK_THAT(zmp.calculate(p, v, zeta), ApproxEquals(expected_zmp, kTOL));
+}
+
+TEST_CASE("zmp_manipulator: ", "[ComController][ZmpManipulator]") {}
 
 }  // namespace
 }  // namespace holon

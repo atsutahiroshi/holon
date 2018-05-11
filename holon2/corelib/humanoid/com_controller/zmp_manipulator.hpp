@@ -38,7 +38,7 @@ class ZmpManipulator {
   Self& setData(const Data& t_data);
 
   double calculateX(const double t_x, const double t_v, const double t_zeta);
-  double calculateY(const Vec3d& t_com_position, const Vec3d& t_com_velocity);
+  double calculateY(const double t_y, const double t_v, const double t_zeta);
   Vec3d calculate(const Vec3d& t_com_position, const Vec3d& t_com_velocity);
 
  private:

@@ -44,4 +44,33 @@ double ZmpManipulator::calculateX(const double t_x, const double t_v,
   return t_x + k1 * x + k2 * v;
 }
 
+namespace {
+
+double calculateNonlinearDamping(double t_y, double t_v, double t_yd,
+                                 double t_q1, double t_q2, double t_rho,
+                                 double t_dist, double t_kr, double t_zeta) {
+  if (isTiny(t_rho) || t_rho < 0.0) return 1.0;
+  if (isTiny(t_dist) || t_dist < 0.0) return 1.0;
+  double r2 = sqr(t_y - t_yd) + sqr(t_v / t_zeta) / (t_q1 * t_q2);
+  double rz = 0.5 * t_dist;
+  return 1.0 - t_rho * exp(t_kr * (1.0 - sqr((t_q1 * t_q2 + 1.0) / rz) * r2));
+}
+
+}  // namespace
+
+double ZmpManipulator::calculateY(const double t_y, const double t_v,
+                                  const double t_zeta) {
+  if (isTiny(t_zeta) || t_zeta < 0) {
+    // ZRUNERROR("ZETA should be positive. (given: %f)", t_zeta);
+    return 0;
+  }
+  double y = t_y - params().com_position[1];
+  double k1 = params().q1[1] * params().q2[1];
+  double k2 = (params().q1[1] + params().q2[1]) / t_zeta;
+  double nd = calculateNonlinearDamping(
+      t_y, t_v, params().com_position[1], params().q1[1], params().q2[1],
+      params().rho, params().dist, params().kr, t_zeta);
+  return t_y + k1 * y + k2 * nd * t_v;
+}
+
 }  // namespace holon

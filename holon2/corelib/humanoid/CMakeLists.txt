@@ -17,4 +17,5 @@ holon_add_module_test(
   SOURCES ${test_sources}
   )
 
+add_subdirectory(com_controller)
 add_subdirectory(com_zmp_model)

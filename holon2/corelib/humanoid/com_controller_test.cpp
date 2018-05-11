@@ -250,17 +250,17 @@ TEST_CASE(
   CHECK(c.outputs().contact_force == ctrl.model().contact_force());
 }
 
-SCENARIO("com_controller: regulate COM position", "[ComController][.]") {
+SCENARIO("com_controller: regulate COM position", "[ComController]") {
   GIVEN("initial position is (1, 1, 1.5)") {
     ComController ctrl;
     ctrl.reset(Vec3d(1, 1, 1.5));
 
-    WHEN("desired position is given at (0, 0, 1) and update for 5 sec") {
+    WHEN("desired position is given at (0, 0, 1) and update for 10 sec") {
       const Vec3d pd(0, 0, 1);
       auto& params = const_cast<ComControllerParams&>(
           static_cast<const ComController&>(ctrl).params());
       params.com_position = pd;
-      while (ctrl.time() < 5) ctrl.update();
+      while (ctrl.time() < 10) ctrl.update();
 
       THEN("COM moves and converges at the desired position") {
         CHECK_THAT(ctrl.model().com_position(), ApproxEquals(pd, kTOL));

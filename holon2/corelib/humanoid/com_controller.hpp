@@ -22,6 +22,8 @@
 #define HOLON_HUMANOID_COM_CONTROLLER_HPP_
 
 #include "holon2/corelib/humanoid/com_controller/com_controller_data.hpp"
+#include "holon2/corelib/humanoid/com_controller/contact_force_generator.hpp"
+#include "holon2/corelib/humanoid/com_controller/zmp_manipulator.hpp"
 #include "holon2/corelib/humanoid/com_zmp_model.hpp"
 
 namespace holon {
@@ -85,10 +87,6 @@ class ComController {
   bool update();
   bool update(double t_time_step);
 
-  // functor getter functions
-  Functor getContactForceFunctor() const;
-  Functor getZmpPositionFunctor() const;
-
  protected:
   States& states() {
     return const_cast<States&>(static_cast<const Self&>(*this).states());
@@ -101,12 +99,17 @@ class ComController {
   }
   void copyModelData(const Model& t_model);
 
+  Functor getContactForceFunctor() const;
+  Functor getZmpPositionFunctor() const;
+
  private:
   void updateOutputs();
 
  private:
   Data m_data;
   ComZmpModelSimulator m_sim;
+  ContactForceGenerator m_desired_cf;
+  ZmpManipulator m_desired_zmp;
 };
 
 }  // namespace holon

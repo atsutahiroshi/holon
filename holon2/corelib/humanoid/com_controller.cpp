@@ -19,8 +19,11 @@
  */
 
 #include "holon2/corelib/humanoid/com_controller.hpp"
+#include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_formula.hpp"
 
 namespace holon {
+
+namespace cz = com_zmp_model_formula;
 
 const Array3d ComController::default_q1 = {{1, 1, 1}};
 const Array3d ComController::default_q2 = {{1, 1, 1}};
@@ -30,7 +33,10 @@ const double ComController::default_kr = 1;
 
 ComController::ComController() : ComController(Data()) {}
 ComController::ComController(Data t_data)
-    : m_data(t_data), m_sim(m_data.subdata<0, 1>()) {
+    : m_data(t_data),
+      m_sim(m_data.subdata<0, 1>()),
+      m_desired_cf(m_data),
+      m_desired_zmp(m_data) {
   ComZmpModelBuilder().build(m_data.subdata<0, 1>());
   params().com_position = states().com_position;
   params().com_velocity = kVec3dZero;
@@ -40,6 +46,9 @@ ComController::ComController(Data t_data)
   params().dist = default_dist;
   params().kr = default_kr;
   m_sim.setInitialComPosition();
+  m_sim.setZmpPosAsInput();
+  m_sim.setContactForce(getContactForceFunctor());
+  m_sim.setZmpPosition(getZmpPositionFunctor());
 }
 ComController::ComController(const Model& t_model) : ComController() {
   copyModelData(t_model);
@@ -92,7 +101,18 @@ bool ComController::update(double t_time_step) {
   return true;
 }
 
-// ComController::Functor ComController::getContactForceFunctor() const;
-// ComController::Functor ComController::getZmpPositionFunctor() const;
+ComController::Functor ComController::getContactForceFunctor() const {
+  return [this](const Vec3d& p, const Vec3d& v, const double) -> Vec3d {
+    return m_desired_cf.calculate(p, v);
+  };
+}
+
+ComController::Functor ComController::getZmpPositionFunctor() const {
+  return [this](const Vec3d& p, const Vec3d& v, const double) -> Vec3d {
+    auto fz = m_desired_cf.calculateZ(p.z(), v.z());
+    auto zeta = cz::zeta(p.z(), vhp(), fz, mass());
+    return m_desired_zmp.calculate(p, v, zeta);
+  };
+}
 
 }  // namespace holon

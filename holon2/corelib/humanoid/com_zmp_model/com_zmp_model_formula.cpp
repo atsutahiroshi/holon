@@ -148,30 +148,6 @@ double zetaSqr(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
   return numer / denom;
 }
 
-double zeta(double t_com_position_z, double t_zmp_position_z,
-            double t_com_acceleration_z) {
-  return sqrt(
-      zetaSqr(t_com_position_z, t_zmp_position_z, t_com_acceleration_z));
-}
-
-double zeta(double t_com_position_z, double t_zmp_position_z,
-            double t_reation_force_z, double t_mass) {
-  return sqrt(
-      zetaSqr(t_com_position_z, t_zmp_position_z, t_reation_force_z, t_mass));
-}
-
-double zeta(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
-            const Vec3d& t_com_acceleration, const Vec3d& t_nu) {
-  return sqrt(
-      zetaSqr(t_com_position, t_zmp_position, t_com_acceleration, t_nu));
-}
-
-double zeta(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
-            const Vec3d& t_contact_force, double t_mass, const Vec3d& t_nu) {
-  return sqrt(
-      zetaSqr(t_com_position, t_zmp_position, t_contact_force, t_mass, t_nu));
-}
-
 Vec3d contactForce(const Vec3d& t_com_acceleration, double t_mass) {
   return t_mass * (t_com_acceleration + kGravAccel3d);
 }

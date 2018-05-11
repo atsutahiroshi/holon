@@ -21,6 +21,9 @@
 #include <cmath>
 #include "holon2/corelib/math/vec.hpp"
 
+#ifndef HOLON_HUMANOID_COM_ZMP_MODEL_COM_ZMP_MODEL_FORMULA_HPP_
+#define HOLON_HUMANOID_COM_ZMP_MODEL_COM_ZMP_MODEL_FORMULA_HPP_
+
 namespace holon {
 namespace com_zmp_model_formula {
 
@@ -28,7 +31,7 @@ namespace com_zmp_model_formula {
 double zetaSqr(double t_com_position_z, double t_zmp_position_z,
                double t_com_acceleration_z);
 double zetaSqr(double t_com_position_z, double t_zmp_position_z,
-               double t_reation_force_z, double t_mass);
+               double t_contact_force_z, double t_mass);
 double zetaSqr(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
                const Vec3d& t_com_acceleration, const Vec3d& t_nu = kVec3dZ);
 double zetaSqr(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
@@ -64,3 +67,5 @@ Vec3d comAccel(const Vec3d& t_com_position, const Vec3d& t_zmp_position,
 
 }  // namespace com_zmp_model_formula
 }  // namespace holon
+
+#endif  // HOLON_HUMANOID_COM_ZMP_MODEL_COM_ZMP_MODEL_FORMULA_HPP_

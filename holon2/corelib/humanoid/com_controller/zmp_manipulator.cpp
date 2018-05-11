@@ -31,16 +31,17 @@ ZmpManipulator& ZmpManipulator::setData(const Data& t_data) {
   return *this;
 }
 
-double ZmpManipulator::calculateX(const double t_com_position_x,
-                                  const double t_com_velocity_y,
+double ZmpManipulator::calculateX(const double t_x, const double t_v,
                                   const double t_zeta) {
   if (isTiny(t_zeta) || t_zeta < 0) {
     // ZRUNERROR("ZETA should be positive. (given: %f)", t_zeta);
     return 0;
   }
-  // double x = t_x - t_xd;
-  // double v = t_v - t_vd;
-  // return t_x + (t_q1 * t_q2) * x + (t_q1 + t_q2) * v / t_zeta;
+  double x = t_x - params().com_position[0];
+  double v = t_v - params().com_velocity[0];
+  double k1 = params().q1[0] * params().q2[0];
+  double k2 = (params().q1[0] + params().q2[0]) / t_zeta;
+  return t_x + k1 * x + k2 * v;
 }
 
 }  // namespace holon

@@ -3,7 +3,7 @@ set(sources
   )
 set(test_sources
   zmp_manipulator_test.cpp
-  # zmp_manipulator_x_test.cpp
+  zmp_manipulator_x_test.cpp
   )
 
 holon_add_corelib_module_source(humanoid

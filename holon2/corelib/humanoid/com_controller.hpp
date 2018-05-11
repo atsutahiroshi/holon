@@ -103,6 +103,8 @@ class ComController {
   Functor getZmpPositionFunctor() const;
 
  private:
+  void setDefaultParameters();
+  void setupSimulator();
   void updateOutputs();
 
  private:

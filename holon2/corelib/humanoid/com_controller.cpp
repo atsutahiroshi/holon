@@ -45,8 +45,7 @@ ComController::ComController(Data t_data)
 
 ComController::ComController(const Model& t_model) : ComController() {
   copyModelData(t_model);
-  params().com_position = states().com_position;
-  m_sim.setInitialComPosition();
+  reset(states().com_position);
 }
 
 void ComController::setDefaultParameters() {
@@ -75,13 +74,11 @@ ComController& ComController::setTimeStep(double t_time_step) {
   return *this;
 }
 
-ComController& ComController::reset() {
-  m_sim.reset();
-  return *this;
-}
+ComController& ComController::reset() { return reset(getInitialComPosition()); }
 
 ComController& ComController::reset(const Vec3d& t_com_position) {
   m_sim.reset(t_com_position);
+  params().com_position = t_com_position;
   return *this;
 }
 

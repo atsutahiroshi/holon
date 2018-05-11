@@ -194,6 +194,7 @@ TEST_CASE("com_controller: reset COM position at initial one",
   CHECK(ctrl.model().com_position() == p0);
   CHECK(ctrl.model().com_velocity() == kVec3dZero);
   CHECK(ctrl.getInitialComPosition() == p0);
+  CHECK(const_cast<const ComController&>(ctrl).params().com_position == p0);
 }
 
 TEST_CASE("com_controller: reset COM position at a specific one",
@@ -210,6 +211,7 @@ TEST_CASE("com_controller: reset COM position at a specific one",
   CHECK(ctrl.model().com_position() == p);
   CHECK(ctrl.model().com_velocity() == kVec3dZero);
   CHECK(ctrl.getInitialComPosition() == p);
+  CHECK(const_cast<const ComController&>(ctrl).params().com_position == p);
 }
 
 TEST_CASE("com_controller: feedback states", "[ComController]") {

@@ -252,6 +252,12 @@ TEST_CASE(
   CHECK(c.outputs().contact_force == ctrl.model().contact_force());
 }
 
+ComControllerParams& getParamsRef(const ComController& ctrl) {
+  return const_cast<ComControllerParams&>(ctrl.params());
+}
+ComZmpModelStates& getStatesRef(const ComController& ctrl) {
+  return const_cast<ComZmpModelStates&>(ctrl.states());
+}
 SCENARIO("com_controller: regulate COM position", "[ComController]") {
   GIVEN("initial position is (1, 1, 1.5)") {
     ComController ctrl;
@@ -259,14 +265,51 @@ SCENARIO("com_controller: regulate COM position", "[ComController]") {
 
     WHEN("desired position is given at (0, 0, 1) and update for 10 sec") {
       const Vec3d pd(0, 0, 1);
-      auto& params = const_cast<ComControllerParams&>(
-          static_cast<const ComController&>(ctrl).params());
+      auto& params = getParamsRef(ctrl);
       params.com_position = pd;
       while (ctrl.time() < 10) ctrl.update();
 
       THEN("COM moves and converges at the desired position") {
         CHECK_THAT(ctrl.model().com_position(), ApproxEquals(pd, kTOL));
         CHECK_THAT(ctrl.model().com_velocity(), ApproxEquals(kVec3dZero, kTOL));
+      }
+    }
+  }
+}
+
+SCENARIO("com_controller: oscillate COM sideward", "[ComController]") {
+  GIVEN("initial position is (0, 0, 0.42)") {
+    ComController ctrl;
+    auto& params = getParamsRef(ctrl);
+    const Vec3d p0(0, 0, 0.42);
+    const double dist = 0.5;
+    ctrl.reset(p0);
+    params.dist = dist;
+
+    WHEN("given rho = 0 and update for 5 sec") {
+      params.rho = 0;
+      while (ctrl.time() < 5) ctrl.update();
+      THEN("nothing happens") {
+        CAPTURE(ctrl.model().com_position());
+        CHECK(ctrl.model().com_position() == p0);
+      }
+    }
+
+    WHEN("given rho = 1 and update for 5 sec") {
+      params.rho = 1;
+      double yzmax = 0, yzmin = 0;
+      getStatesRef(ctrl).com_velocity[1] += 0.0001;
+      while (ctrl.time() < 5) {
+        ctrl.update();
+        if (ctrl.model().zmp_position().y() > yzmax)
+          yzmax = ctrl.model().zmp_position().y();
+        if (ctrl.model().zmp_position().y() < yzmin)
+          yzmin = ctrl.model().zmp_position().y();
+      }
+      THEN("oscillation with amplitude of 0.5 will be produced") {
+        CAPTURE(yzmax);
+        CAPTURE(yzmin);
+        CHECK((yzmax - yzmin) == Approx(dist));
       }
     }
   }

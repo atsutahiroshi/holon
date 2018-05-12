@@ -25,7 +25,47 @@
 
 namespace holon {
 
-class BipedFootModel {};
+class BipedFootModel {
+  using Params = BipedFootModelParams;
+  using States = BipedFootModelStates;
+  using Data = BipedFootModelData;
+  using Self = BipedFootModel;
+
+ public:
+  BipedFootModel() : m_data() {}
+  explicit BipedFootModel(const Data& t_data) : m_data(t_data) {}
+
+  // special member functions
+  BipedFootModel(const Self&) = delete;
+  Self& operator=(const Self&) = delete;
+  BipedFootModel(Self&&) = default;
+  Self& operator=(Self&&) = default;
+
+  const Data& data() const noexcept { return m_data; }
+  const Params& params() const noexcept { return m_data.get<0>(); }
+  const States& states() const noexcept { return m_data.get<1>(); }
+
+  Data& data() {
+    return const_cast<Data&>(static_cast<const Self&>(*this).data());
+  }
+  Params& params() {
+    return const_cast<Params&>(static_cast<const Self&>(*this).params());
+  }
+  States& states() {
+    return const_cast<States&>(static_cast<const Self&>(*this).states());
+  }
+
+  double mass() const noexcept { return params().mass; }
+  Vec3d position() const noexcept { return states().position; }
+  Vec3d velocity() const noexcept { return states().velocity; }
+  Vec3d acceleration() const noexcept { return states().acceleration; }
+  Vec3d force() const noexcept { return states().force; }
+
+  Self clone() const { return Self(data().clone()); }
+
+ private:
+  Data m_data;
+};
 
 }  // namespace holon
 

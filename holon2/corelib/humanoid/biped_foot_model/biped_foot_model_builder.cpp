@@ -25,7 +25,7 @@
 namespace holon {
 
 const double BipedFootModelBuilder::default_mass = 1.0;
-const Vec3d BipedFootModelBuilder::default_position = {0.0, 0.0, 1.0};
+const Vec3d BipedFootModelBuilder::default_position = {0.0, 0.0, 0.0};
 
 BipedFootModelBuilder::BipedFootModelBuilder()
     : m_mass(default_mass),

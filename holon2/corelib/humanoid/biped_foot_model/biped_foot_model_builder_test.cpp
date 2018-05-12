@@ -43,7 +43,7 @@ void checkModel(const BipedFootModel& model, const double expected_mass,
 TEST_CASE("biped_foot_model_builder: check model builder (default)",
           "[BipedFootModel][BipedFootModelBuilder]") {
   auto model = BipedFootModelBuilder().build();
-  checkModel(model, 1.0, {0, 0, 1}, {0, 0, 0});
+  checkModel(model, 1.0, {0, 0, 0}, {0, 0, 0});
 }
 
 TEST_CASE("biped_foot_model_builder: check model builder (set parameters)",

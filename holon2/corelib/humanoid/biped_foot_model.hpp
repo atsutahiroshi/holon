@@ -26,6 +26,12 @@
 
 namespace holon {
 
+enum class BipedFootType : int {
+  None = 0,
+  Left = 1,
+  Right = -1,
+};
+
 class BipedFootModel {
   using Params = BipedFootModelParams;
   using States = BipedFootModelStates;
@@ -33,18 +39,23 @@ class BipedFootModel {
   using Self = BipedFootModel;
 
  public:
-  BipedFootModel() : m_data() {}
-  explicit BipedFootModel(const Data& t_data) : m_data(t_data) {}
+  explicit BipedFootModel(BipedFootType t_type = BipedFootType::None)
+      : BipedFootModel(Data(), t_type) {}
+  explicit BipedFootModel(const Data& t_data,
+                          BipedFootType t_type = BipedFootType::None)
+      : m_data(t_data), m_type(t_type) {}
 
   // special member functions
   BipedFootModel(const Self&) = delete;
   Self& operator=(const Self&) = delete;
   BipedFootModel(Self&&) = default;
   Self& operator=(Self&&) = default;
+  virtual ~BipedFootModel() = default;
 
   const Data& data() const noexcept { return m_data; }
   const Params& params() const noexcept { return m_data.get<0>(); }
   const States& states() const noexcept { return m_data.get<1>(); }
+  const BipedFootType& type() const noexcept { return m_type; }
 
   Data& data() {
     return const_cast<Data&>(static_cast<const Self&>(*this).data());
@@ -66,6 +77,7 @@ class BipedFootModel {
 
  private:
   Data m_data;
+  BipedFootType m_type;
 };
 
 }  // namespace holon

@@ -75,6 +75,18 @@ TEST_CASE("biped_foot_model_builder: check model builder (external dataset)",
   checkModel(model, m, p0, v0);
 }
 
+TEST_CASE("biped_foot_model_builder: set biped foot type",
+          "[BipedFootModel][BipedFootModelBuilder]") {
+  SECTION("set as left") {
+    auto model = BipedFootModelBuilder().setAsLeft().build();
+    CHECK(model.type() == BipedFootType::Left);
+  }
+  SECTION("set as right") {
+    auto model = BipedFootModelBuilder().setAsRight().build();
+    CHECK(model.type() == BipedFootType::Right);
+  }
+}
+
 TEST_CASE("biped_foot_model_builder: ",
           "[BipedFootModel][BipedFootModelBuilder]") {}
 

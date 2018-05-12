@@ -30,7 +30,8 @@ const Vec3d BipedFootModelBuilder::default_position = {0.0, 0.0, 1.0};
 BipedFootModelBuilder::BipedFootModelBuilder()
     : m_mass(default_mass),
       m_position(default_position),
-      m_velocity(kVec3dZero) {}
+      m_velocity(kVec3dZero),
+      m_type(BipedFootType::None) {}
 
 BipedFootModelBuilder& BipedFootModelBuilder::setMass(const double t_mass) {
   m_mass = t_mass;
@@ -47,6 +48,17 @@ BipedFootModelBuilder& BipedFootModelBuilder::setVelocity(
     const Vec3d& t_velocity) {
   m_velocity = t_velocity;
   return *this;
+}
+
+BipedFootModelBuilder& BipedFootModelBuilder::setType(BipedFootType t_type) {
+  m_type = t_type;
+  return *this;
+}
+BipedFootModelBuilder& BipedFootModelBuilder::setAsLeft() {
+  return setType(BipedFootType::Left);
+}
+BipedFootModelBuilder& BipedFootModelBuilder::setAsRight() {
+  return setType(BipedFootType::Right);
 }
 
 BipedFootModel BipedFootModelBuilder::build() {
@@ -66,7 +78,7 @@ BipedFootModel BipedFootModelBuilder::build(Data t_data) {
       force        // force
   };
   t_data.copy<0, 1>(params, states);
-  return BipedFootModel(t_data);
+  return BipedFootModel(t_data, m_type);
 }
 
 }  // namespace holon

@@ -30,6 +30,7 @@ struct BipedFootModelParams;
 struct BipedFootModelStates;
 using BipedFootModelData = Dataset<BipedFootModelParams, BipedFootModelStates>;
 class BipedFootModel;
+enum class BipedFootType : int;
 
 class BipedFootModelBuilder {
   using Self = BipedFootModelBuilder;
@@ -48,6 +49,9 @@ class BipedFootModelBuilder {
   Self& setMass(const double t_mass);
   Self& setPosition(const Vec3d& t_position);
   Self& setVelocity(const Vec3d& t_velocity);
+  Self& setType(BipedFootType t_type);
+  Self& setAsLeft();
+  Self& setAsRight();
 
   Model build();
   Model build(Data t_data);
@@ -56,6 +60,7 @@ class BipedFootModelBuilder {
   double m_mass;
   Vec3d m_position;
   Vec3d m_velocity;
+  BipedFootType m_type;
 };
 
 }  // namespace holon

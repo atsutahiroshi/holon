@@ -85,6 +85,17 @@ TEST_CASE("biped_foot_model: accessor to force", "[BipedFootModel]") {
   CHECK(model.force() == v);
 }
 
+TEST_CASE("biped_foot_model: accessor to type", "[BipedFootModel]") {
+  SECTION("set left type") {
+    BipedFootModel model(BipedFootType::Left);
+    CHECK(model.type() == BipedFootType::Left);
+  }
+  SECTION("set right type") {
+    BipedFootModel model(BipedFootType::Right);
+    CHECK(model.type() == BipedFootType::Right);
+  }
+}
+
 TEST_CASE("biped_foot_model: clone model instance", "[BipedFootModel]") {
   Random<double> m;
   Random<Vec3d> v;

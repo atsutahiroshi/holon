@@ -267,7 +267,7 @@ SCENARIO("com_controller: regulate COM position", "[ComController]") {
       const Vec3d pd(0, 0, 1);
       auto& params = getParamsRef(ctrl);
       params.com_position = pd;
-      while (ctrl.time() < 10) ctrl.update();
+      while (ctrl.time() < 10) ctrl.update(0.01);
 
       THEN("COM moves and converges at the desired position") {
         CHECK_THAT(ctrl.model().com_position(), ApproxEquals(pd, kTOL));
@@ -288,7 +288,7 @@ SCENARIO("com_controller: oscillate COM sideward", "[ComController]") {
 
     WHEN("given rho = 0 and update for 5 sec") {
       params.rho = 0;
-      while (ctrl.time() < 5) ctrl.update();
+      while (ctrl.time() < 5) ctrl.update(0.01);
       THEN("nothing happens") {
         CAPTURE(ctrl.model().com_position());
         CHECK(ctrl.model().com_position() == p0);
@@ -300,7 +300,7 @@ SCENARIO("com_controller: oscillate COM sideward", "[ComController]") {
       double yzmax = 0, yzmin = 0;
       getStatesRef(ctrl).com_velocity[1] += 0.0001;
       while (ctrl.time() < 5) {
-        ctrl.update();
+        ctrl.update(0.001);
         if (ctrl.model().zmp_position().y() > yzmax)
           yzmax = ctrl.model().zmp_position().y();
         if (ctrl.model().zmp_position().y() < yzmin)
@@ -330,7 +330,7 @@ SCENARIO("com_controller: moving longitudinally with oscillation",
       params.com_velocity[0] = vxd;
       params.rho = 1;
       params.q1[0] = 0;
-      while (ctrl.time() < 0.1) ctrl.update();
+      while (ctrl.time() < 0.1) ctrl.update(0.01);
       THEN("start moving forward") {
         CHECK(ctrl.model().com_position().x() > 0.0);
         CHECK(ctrl.model().com_velocity().x() > 0.0);
@@ -338,7 +338,7 @@ SCENARIO("com_controller: moving longitudinally with oscillation",
       }
 
       WHEN("update for 5 sec") {
-        while (ctrl.time() < 5) ctrl.update();
+        while (ctrl.time() < 5) ctrl.update(0.01);
         THEN("velocity converges at the referential one") {
           CHECK(ctrl.model().com_position().x() > 0.0);
           CHECK(ctrl.model().com_velocity().x() == Approx(vxd));
@@ -350,7 +350,7 @@ SCENARIO("com_controller: moving longitudinally with oscillation",
           params.q1[0] = 1;
           const double x = ctrl.model().com_position()[0];
           params.com_position[0] = x;
-          while (ctrl.time() < 10) ctrl.update();
+          while (ctrl.time() < 10) ctrl.update(0.01);
           THEN("velocity converges at the referential one") {
             CHECK(ctrl.model().com_position().x() == Approx(x));
             CHECK(ctrl.model().com_velocity().x() == Approx(0).margin(kTOL));

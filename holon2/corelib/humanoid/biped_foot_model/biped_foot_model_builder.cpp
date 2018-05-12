@@ -19,9 +19,54 @@
  */
 
 #include "holon2/corelib/humanoid/biped_foot_model/biped_foot_model_builder.hpp"
+#include "holon2/corelib/humanoid/biped_foot_model.hpp"
+#include "holon2/corelib/humanoid/const_defs.hpp"
 
 namespace holon {
 
-//
+const double BipedFootModelBuilder::default_mass = 1.0;
+const Vec3d BipedFootModelBuilder::default_position = {0.0, 0.0, 1.0};
+
+BipedFootModelBuilder::BipedFootModelBuilder()
+    : m_mass(default_mass),
+      m_position(default_position),
+      m_velocity(kVec3dZero) {}
+
+BipedFootModelBuilder& BipedFootModelBuilder::setMass(const double t_mass) {
+  m_mass = t_mass;
+  return *this;
+}
+
+BipedFootModelBuilder& BipedFootModelBuilder::setPosition(
+    const Vec3d& t_position) {
+  m_position = t_position;
+  return *this;
+}
+
+BipedFootModelBuilder& BipedFootModelBuilder::setVelocity(
+    const Vec3d& t_velocity) {
+  m_velocity = t_velocity;
+  return *this;
+}
+
+BipedFootModel BipedFootModelBuilder::build() {
+  Data data;
+  return this->build(data);
+}
+
+BipedFootModel BipedFootModelBuilder::build(Data t_data) {
+  Vec3d force = m_mass * kGravAccel3d;
+  Params params{
+      m_mass  // mass
+  };
+  States states{
+      m_position,  // position
+      m_velocity,  // velocity
+      kVec3dZero,  // acceleration
+      force        // force
+  };
+  t_data.copy<0, 1>(params, states);
+  return BipedFootModel(t_data);
+}
 
 }  // namespace holon

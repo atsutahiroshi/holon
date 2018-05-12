@@ -20,12 +20,60 @@
 
 #include "holon2/corelib/humanoid/biped_foot_model/biped_foot_model_builder.hpp"
 #include "holon2/corelib/humanoid/biped_foot_model.hpp"
+#include "holon2/corelib/humanoid/const_defs.hpp"
 
 #include "holon2/corelib/common/random.hpp"
 #include "third_party/catch/catch.hpp"
 
 namespace holon {
 namespace {
+
+void checkModel(const BipedFootModel& model, const double expected_mass,
+                const Vec3d& expected_p0, const Vec3d& expected_v0) {
+  // params
+  CHECK(model.mass() == expected_mass);
+  // states
+  Vec3d expected_f(0, 0, expected_mass * kGravAccel);
+  CHECK(model.position() == expected_p0);
+  CHECK(model.velocity() == expected_v0);
+  CHECK(model.acceleration() == kVec3dZero);
+  CHECK(model.force() == expected_f);
+}
+
+TEST_CASE("biped_foot_model_builder: check model builder (default)",
+          "[BipedFootModel][BipedFootModelBuilder]") {
+  auto model = BipedFootModelBuilder().build();
+  checkModel(model, 1.0, {0, 0, 1}, {0, 0, 0});
+}
+
+TEST_CASE("biped_foot_model_builder: check model builder (set parameters)",
+          "[BipedFootModel][BipedFootModelBuilder]") {
+  Random<double> rnd(0, 1);
+  Random<Vec3d> vec;
+  const double m = rnd();
+  const Vec3d p0 = vec();
+  const Vec3d v0 = vec();
+  auto model = BipedFootModelBuilder()
+                   .setMass(m)
+                   .setPosition(p0)
+                   .setVelocity(v0)
+                   .build();
+  checkModel(model, m, p0, v0);
+}
+
+TEST_CASE("biped_foot_model_builder: check model builder (external dataset)",
+          "[BipedFootModel][BipedFootModelBuilder]") {
+  Random<double> rnd(0, 1);
+  Random<Vec3d> vec;
+  const double m = rnd();
+  const Vec3d p0 = vec();
+  const Vec3d v0 = vec();
+  BipedFootModelData data;
+  auto model =
+      BipedFootModelBuilder().setMass(m).setPosition(p0).setVelocity(v0).build(
+          data);
+  checkModel(model, m, p0, v0);
+}
 
 TEST_CASE("biped_foot_model_builder: ",
           "[BipedFootModel][BipedFootModelBuilder]") {}

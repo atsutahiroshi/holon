@@ -35,7 +35,7 @@ void checkModel(const ComZmpModel& model, const double expected_mass,
   CHECK(model.params().mass == expected_mass);
   CHECK(model.params().nu == kVec3dZ);
   CHECK(model.params().vhp == expected_vhp);
-  // inputs
+  // states
   Vec3d expected_pz(expected_p0[0], expected_p0[1], expected_vhp);
   Vec3d expected_f(0, 0, expected_mass * kGravAccel);
   CHECK(model.states().com_position == expected_p0);

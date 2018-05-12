@@ -25,7 +25,6 @@
 #include <memory>
 #include "holon2/corelib/humanoid/com_zmp_model/com_zmp_model_data.hpp"
 #include "holon2/corelib/humanoid/simulator.hpp"
-#include "holon2/corelib/math/vec.hpp"
 
 namespace holon {
 

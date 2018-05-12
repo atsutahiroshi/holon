@@ -85,17 +85,20 @@ TEST_CASE("biped_foot_model: accessor to force", "[BipedFootModel]") {
   CHECK(model.force() == v);
 }
 
-#if 0
 TEST_CASE("biped_foot_model: clone model instance", "[BipedFootModel]") {
   Random<double> m;
   Random<Vec3d> v;
-  auto model = BipedFootModelBuilder().setPosition(v()).setMass(m()).build();
+  auto model = BipedFootModelBuilder()
+                   .setPosition(v())
+                   .setVelocity(v())
+                   .setMass(m())
+                   .build();
   auto cln = model.clone();
   CHECK(cln.mass() == model.mass());
-  CHECK(cln.com_position() == model.com_position());
+  CHECK(cln.position() == model.position());
+  CHECK(cln.velocity() == model.velocity());
   CHECK(cln.data() != model.data());
 }
-#endif
 
 TEST_CASE("biped_foot_model: ", "[BipedFootModel]") {}
 

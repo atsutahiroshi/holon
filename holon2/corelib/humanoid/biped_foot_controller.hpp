@@ -21,9 +21,88 @@
 #ifndef HOLON_HUMANOID_BIPED_FOOT_CONTROLLER_HPP_
 #define HOLON_HUMANOID_BIPED_FOOT_CONTROLLER_HPP_
 
+#include "holon2/corelib/humanoid/biped_foot_controller/biped_foot_controller_data.hpp"
+#include "holon2/corelib/humanoid/biped_foot_model.hpp"
+
 namespace holon {
 
-class BipedFootController {};
+class BipedFootController {
+  using Self = BipedFootController;
+  using States = BipedFootModelStates;
+  using Params = BipedFootControllerParams;
+  using Outputs = BipedFootControllerOutputs;
+
+ public:
+  using Data = BipedFootControllerData;
+  using Model = BipedFootModelSimulator::Model;
+  using Functor = BipedFootModelSimulator::Functor;
+
+ public:
+  static const Array3d default_stiffness;
+  static const Array3d default_damping;
+  static const double default_max_height;
+
+ public:
+  BipedFootController();
+  BipedFootController(const Data& t_data);
+  BipedFootController(const Model& t_model);
+
+  // special member functions
+  BipedFootController(const BipedFootController&) = delete;
+  BipedFootController(BipedFootController&&) = delete;
+  BipedFootController& operator=(const BipedFootController&) = delete;
+  BipedFootController& operator=(BipedFootController&&) = delete;
+  virtual ~BipedFootController() = default;
+
+  // accessors
+  const Data& data() const { return m_data; }
+  const Model& model() const { return m_sim.model(); }
+  double mass() const { return model().mass(); }
+  const States& states() const { return model().states(); }
+  const Params& params() const { return m_data.get<2>(); }
+  const Outputs& outputs() const { return m_data.get<3>(); }
+
+  // accessors to simulator
+  double time() const;
+  double time_step() const;
+  Vec3d getInitialPosition() const { return m_sim.getInitialPosition(); }
+
+  // mutators
+  Self& setTimeStep(double t_time_step);
+
+  // reset functions
+  Self& reset();
+  Self& reset(const Vec3d& t_position);
+
+  // feedback functions
+  Self& feedback(const Model& t_model);
+  Self& feedback(const BipedFootModelData& t_model_data);
+
+  // update functions
+  bool update();
+  bool update(double t_time_step);
+
+ protected:
+  States& states() {
+    return const_cast<States&>(static_cast<const Self&>(*this).states());
+  }
+  Params& params() {
+    return const_cast<Params&>(static_cast<const Self&>(*this).params());
+  }
+  Outputs& outputs() {
+    return const_cast<Outputs&>(static_cast<const Self&>(*this).outputs());
+  }
+  void copyModelData(const Model& t_model);
+
+ private:
+  void setDefaultParameters();
+  void setupSimulator();
+  void updateOutputs();
+
+ private:
+  Data m_data;
+  BipedFootModelSimulator m_sim;
+};
 
 }  // namespace holon
 

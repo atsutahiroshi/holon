@@ -132,6 +132,92 @@ TEST_CASE("biped_foot_controller: accessor to control outputs",
   CHECK(ctrl.outputs().force == outputs.force);
 }
 
+TEST_CASE("biped_foot_controller: set time step", "[BipedFootController]") {
+  BipedFootController ctrl;
+  REQUIRE(ctrl.time_step() == kDefaultTimeStep);
+  auto dt = Random<double>(0, 0.01).get();
+  ctrl.setTimeStep(dt);
+  CHECK(ctrl.time_step() == dt);
+}
+
+TEST_CASE("biped_foot_controller: update current time",
+          "[BipedFootController]") {
+  BipedFootController ctrl;
+  Random<double> rnd(0, 0.01);
+  SECTION("update with default time step") {
+    REQUIRE(ctrl.time() == 0.0);
+    ctrl.update();
+    CHECK(ctrl.time() == kDefaultTimeStep);
+    ctrl.update();
+    CHECK(ctrl.time() == 2 * kDefaultTimeStep);
+  }
+  SECTION("modify time step") {
+    auto dt = rnd();
+    REQUIRE(ctrl.time() == 0.0);
+    ctrl.setTimeStep(dt);
+    ctrl.update();
+    CHECK(ctrl.time() == dt);
+    ctrl.update();
+    CHECK(ctrl.time() == 2 * dt);
+  }
+  SECTION("modify time step temporariliy") {
+    auto dt1 = rnd();
+    REQUIRE(ctrl.time() == 0.0);
+    ctrl.update(dt1);
+    CHECK(ctrl.time() == dt1);
+    CHECK(ctrl.time_step() == kDefaultTimeStep);
+    auto dt2 = rnd();
+    ctrl.update(dt2);
+    CHECK(ctrl.time() == dt1 + dt2);
+    CHECK(ctrl.time_step() == kDefaultTimeStep);
+  }
+}
+
+TEST_CASE("biped_foot_controller: reset time", "[BipedFootController]") {
+  BipedFootController ctrl;
+  ctrl.update();
+  REQUIRE(ctrl.time() != 0.0);
+  ctrl.reset();
+  CHECK(ctrl.time() == 0.0);
+}
+
+BipedFootModelStates& getStates(const BipedFootController& ctrl) {
+  return const_cast<BipedFootModelStates&>(ctrl.states());
+}
+TEST_CASE("biped_foot_controller: reset position at initial one",
+          "[BipedFootController]") {
+  auto model = getRandomModel();
+  const Vec3d p0 = model.position();
+  Random<Vec3d> rnd(-0.1, 0.1);
+  BipedFootController ctrl(model);
+  auto& states = getStates(ctrl);
+  states.position = p0 + rnd();
+  states.velocity = rnd();
+  REQUIRE(ctrl.model().position() != p0);
+  REQUIRE(ctrl.model().velocity() != kVec3dZero);
+  ctrl.reset();
+  CHECK(ctrl.model().position() == p0);
+  CHECK(ctrl.model().velocity() == kVec3dZero);
+  CHECK(ctrl.getInitialPosition() == p0);
+  CHECK(const_cast<const BipedFootController&>(ctrl).params().position == p0);
+}
+
+TEST_CASE("biped_foot_controller: reset position at a specific one",
+          "[BipedFootController]") {
+  auto model = getRandomModel();
+  const Vec3d p = Vec3d::Random();
+  BipedFootController ctrl(model);
+  auto& states = getStates(ctrl);
+  states.velocity = Vec3d::Random();
+  REQUIRE(ctrl.model().position() != p);
+  REQUIRE(ctrl.model().velocity() != kVec3dZero);
+  ctrl.reset(p);
+  CHECK(ctrl.model().position() == p);
+  CHECK(ctrl.model().velocity() == kVec3dZero);
+  CHECK(ctrl.getInitialPosition() == p);
+  CHECK(const_cast<const BipedFootController&>(ctrl).params().position == p);
+}
+
 TEST_CASE("biped_foot_controller: ", "[BipedFootController]") {}
 
 }  // namespace

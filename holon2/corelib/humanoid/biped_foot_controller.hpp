@@ -63,8 +63,8 @@ class BipedFootController {
   const Outputs& outputs() const { return m_data.get<3>(); }
 
   // accessors to simulator
-  double time() const;
-  double time_step() const;
+  double time() const { return m_sim.time(); }
+  double time_step() const { return m_sim.time_step(); }
   Vec3d getInitialPosition() const { return m_sim.getInitialPosition(); }
 
   // mutators

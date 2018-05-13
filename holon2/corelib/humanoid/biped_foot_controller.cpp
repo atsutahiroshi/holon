@@ -73,7 +73,10 @@ BipedFootController& BipedFootController::reset(const Vec3d& t_position) {
 // BipedFootController& BipedFootController::feedback(
 //     const BipedFootModelData& t_model_data) {}
 
-// bool BipedFootController::update() {}
-// bool BipedFootController::update(double t_time_step) {}
+bool BipedFootController::update() { return update(time_step()); }
+bool BipedFootController::update(double t_time_step) {
+  m_sim.update(t_time_step);
+  return true;
+}
 
 }  // namespace holon

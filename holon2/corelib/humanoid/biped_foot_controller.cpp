@@ -69,9 +69,16 @@ BipedFootController& BipedFootController::reset(const Vec3d& t_position) {
   return *this;
 }
 
-// BipedFootController& BipedFootController::feedback(const Model& t_model) {}
-// BipedFootController& BipedFootController::feedback(
-//     const BipedFootModelData& t_model_data) {}
+BipedFootController& BipedFootController::feedback(const Model& t_model) {
+  return feedback(t_model.data());
+}
+
+BipedFootController& BipedFootController::feedback(
+    const BipedFootModelData& t_model_data) {
+  states().position = t_model_data.get<1>().position;
+  states().velocity = t_model_data.get<1>().velocity;
+  return *this;
+}
 
 bool BipedFootController::update() { return update(time_step()); }
 bool BipedFootController::update(double t_time_step) {

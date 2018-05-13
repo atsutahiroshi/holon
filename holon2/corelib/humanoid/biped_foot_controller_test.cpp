@@ -218,6 +218,29 @@ TEST_CASE("biped_foot_controller: reset position at a specific one",
   CHECK(const_cast<const BipedFootController&>(ctrl).params().position == p);
 }
 
+TEST_CASE("biped_foot_controller: feedback states", "[BipedFootController]") {
+  Random<Vec3d> rnd(-0.1, 0.1);
+  BipedFootController ctrl;
+  const Vec3d p = ctrl.model().position() + rnd();
+  const Vec3d v = rnd();
+  REQUIRE(ctrl.model().position() != p);
+  REQUIRE(ctrl.model().velocity() != v);
+  SECTION("overloaded function 1: with Model instance") {
+    auto model = BipedFootModelBuilder().setPosition(p).setVelocity(v).build();
+    ctrl.feedback(model);
+    CHECK(ctrl.model().position() == p);
+    CHECK(ctrl.model().velocity() == v);
+  }
+  SECTION("overloaded function 2: with Model data") {
+    BipedFootModelData data;
+    data.get<1>().position = p;
+    data.get<1>().velocity = v;
+    ctrl.feedback(data);
+    CHECK(ctrl.model().position() == p);
+    CHECK(ctrl.model().velocity() == v);
+  }
+}
+
 TEST_CASE("biped_foot_controller: ", "[BipedFootController]") {}
 
 }  // namespace

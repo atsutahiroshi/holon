@@ -28,13 +28,18 @@
 namespace holon {
 
 class BipedFootModelSimulator::Impl {
+  using State = std::array<Vec3d, 2>;
+  using Solver = RungeKutta4<State>;
+  using System = std::function<State(const State, const double)>;
+
  public:
   Impl() : Impl(BipedFootModelBuilder().build().data()) {}
   explicit Impl(const Model& t_model) : Impl(t_model.clone().data()) {}
   explicit Impl(const Data& t_data)
-      : m_model(t_data), m_initial_position(model().position()) {
+      : m_model(t_data), m_initial_position(model().position()), m_solver() {
     setForceDefault();
     setAccelDefault();
+    setSystem();
   }
 
   const Model& model() const { return m_model; }
@@ -60,6 +65,11 @@ class BipedFootModelSimulator::Impl {
   }
 
   bool update(const Vec3d& p, const Vec3d& v, const double t, const double dt) {
+    auto state = m_solver.update(m_system, State{{p, v}}, t, dt);
+    m_model.states().position = state[0];
+    m_model.states().velocity = state[1];
+    m_model.states().acceleration = getAccel(p, v, t);
+    m_model.states().force = getForce(p, v, t);
     return true;
   }
 
@@ -76,11 +86,22 @@ class BipedFootModelSimulator::Impl {
 
   void setForceDefault() { setForce(returnConstVecFunctor(kVec3dZero)); }
 
+  void setSystem() {
+    m_system = [this](const State state, const double t) -> State {
+      State dxdt;
+      dxdt[0] = state[1];
+      dxdt[1] = getAccel(state[0], state[1], t);
+      return dxdt;
+    };
+  }
+
  private:
   Model m_model;
   Vec3d m_initial_position;
   Functor m_accel_functor;
   Functor m_force_functor;
+  Solver m_solver;
+  System m_system;
 };
 
 BipedFootModelSimulator::BipedFootModelSimulator() : m_impl(new Impl) {}

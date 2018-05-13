@@ -217,6 +217,55 @@ TEST_CASE("biped_foot_model_simulator: reset position at specific one",
   CHECK(sim.getInitialPosition() == p);
 }
 
+SCENARIO("biped_foot_model_simulator: check if point move after update",
+         "[BipedFootModel][BipedFootModelSimulator]") {
+  // prepare foot model in which position is set at (0, 0, 0)
+  auto model = BipedFootModelBuilder().build();
+  BipedFootModelSimulator sim(model);
+
+  GIVEN("let position move left-forward and upward") {
+    const Vec3d f(1, 1, 1);
+    sim.setForce(f);
+    REQUIRE_THAT(sim.model().position(), ApproxEquals(kVec3dZero, kTOL));
+    REQUIRE_THAT(sim.model().velocity(), ApproxEquals(kVec3dZero, kTOL));
+
+    WHEN("update once") {
+      sim.update();
+
+      THEN("velocity should be modified towards left-forward and upward") {
+        const Vec3d v = sim.model().velocity();
+        CHECK(v.x() > 0.0);
+        CHECK(v.y() > 0.0);
+        CHECK(v.z() > 0.0);
+      }
+      THEN("but position should still remain at the initial position") {
+        const Vec3d p = sim.model().position();
+        CHECK(p.x() == Approx(0.0).margin(1e-5));
+        CHECK(p.y() == Approx(0.0).margin(1e-5));
+        CHECK(p.z() == Approx(0.0).margin(1e-5));
+      }
+    }
+    WHEN("update several times") {
+      for (auto i = 0; i < 5; ++i) {
+        sim.update(0.01);
+      }
+
+      THEN("velocity should be left-forward and upward") {
+        const Vec3d v = sim.model().velocity();
+        CHECK(v.x() > 0.0);
+        CHECK(v.y() > 0.0);
+        CHECK(v.z() > 0.0);
+      }
+      THEN("and position should also move left-forward and upward") {
+        const Vec3d p = sim.model().position();
+        CHECK(p.x() > 1e-3);
+        CHECK(p.y() > 1e-3);
+        CHECK(p.z() > 1e-3);
+      }
+    }
+  }
+}
+
 TEST_CASE("biped_foot_model_simulator: ",
           "[BipedFootModel][BipedFootModelSimulator]") {}
 

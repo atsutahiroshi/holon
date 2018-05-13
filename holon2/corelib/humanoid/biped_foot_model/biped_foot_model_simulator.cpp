@@ -34,6 +34,7 @@ class BipedFootModelSimulator::Impl {
   explicit Impl(const Data& t_data)
       : m_model(t_data), m_initial_position(model().position()) {
     setForceDefault();
+    setAccelDefault();
   }
 
   const Model& model() const { return m_model; }
@@ -41,10 +42,15 @@ class BipedFootModelSimulator::Impl {
 
   void setInitialPosition(const Vec3d& t_p0) { m_initial_position = t_p0; }
 
+  Vec3d getAccel(const Vec3d& p, const Vec3d& v, const double t) const {
+    return m_accel_functor(p, v, t);
+  }
+
   Vec3d getForce(const Vec3d& p, const Vec3d& v, const double t) const {
     return m_force_functor(p, v, t);
   }
 
+  void setAccel(Functor t_functor) { m_accel_functor = t_functor; }
   void setForce(Functor t_functor) { m_force_functor = t_functor; }
   void setForce(const Vec3d& t_f) { setForce(returnConstVecFunctor(t_f)); }
 
@@ -60,6 +66,12 @@ class BipedFootModelSimulator::Impl {
  private:
   Functor returnConstVecFunctor(const Vec3d& v) {
     return [v](const Vec3d&, const Vec3d&, const double) { return v; };
+  }
+
+  void setAccelDefault() {
+    setAccel([this](const Vec3d& p, const Vec3d& v, const double t) -> Vec3d {
+      return getForce(p, v, t) / m_model.mass();
+    });
   }
 
   void setForceDefault() { setForce(returnConstVecFunctor(kVec3dZero)); }
@@ -101,8 +113,10 @@ BipedFootModelSimulator& BipedFootModelSimulator::setInitialPosition(
   return *this;
 }
 
-// Vec3d BipedFootModelSimulator::getAccel(const Vec3d& p, const Vec3d& v,
-//                                         const double t) const {}
+Vec3d BipedFootModelSimulator::getAccel(const Vec3d& p, const Vec3d& v,
+                                        const double t) const {
+  return m_impl->getAccel(p, v, t);
+}
 
 Vec3d BipedFootModelSimulator::getForce(const Vec3d& p, const Vec3d& v,
                                         const double t) const {

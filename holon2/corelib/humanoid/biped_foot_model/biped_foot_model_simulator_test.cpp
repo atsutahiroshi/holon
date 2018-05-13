@@ -123,6 +123,26 @@ TEST_CASE("biped_foot_model_simulator: set force functor",
   }
 }
 
+TEST_CASE("biped_foot_model_simulator: compute acceleration",
+          "[BipedFootModel][BipedFootModelSimulator]") {
+  auto model = getRandomModel();
+  double mass = model.mass();
+  Vec3d p = model.position();
+  Vec3d v = model.velocity();
+  BipedFootModelSimulator sim(model);
+
+  SECTION("when nothing is given, accel. should be zero") {
+    CHECK_THAT(sim.getAccel(p, v, 0), ApproxEquals(kVec3dZero, kTOL));
+  }
+
+  SECTION("when force is given, accel. should be computed") {
+    sim.setForce(calculateForceExample);
+    Vec3d f = calculateForceExample(p, v, 0);
+    Vec3d expected_acc = f / mass;
+    CHECK_THAT(sim.getAccel(p, v, 0), ApproxEquals(expected_acc, kTOL));
+  }
+}
+
 TEST_CASE("biped_foot_model_simulator: update current time",
           "[BipedFootModel][BipedFootModelSimulator]") {
   BipedFootModelSimulator sim;

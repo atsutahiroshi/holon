@@ -20,8 +20,122 @@
 
 #include "holon2/corelib/humanoid/biped_foot_model/biped_foot_model_simulator.hpp"
 
+#include <array>
+#include <memory>
+#include "holon2/corelib/humanoid/biped_foot_model.hpp"
+#include "holon2/corelib/math/ode_runge_kutta4.hpp"
+
 namespace holon {
 
-//
+class BipedFootModelSimulator::Impl {
+ public:
+  Impl() : Impl(BipedFootModelBuilder().build().data()) {}
+  explicit Impl(const Model& t_model) : Impl(t_model.clone().data()) {}
+  explicit Impl(const Data& t_data)
+      : m_model(t_data), m_initial_position(model().position()) {
+    setForceDefault();
+  }
+
+  const Model& model() const { return m_model; }
+  Vec3d getInitialPosition() const { return m_initial_position; }
+
+  void setInitialPosition(const Vec3d& t_p0) { m_initial_position = t_p0; }
+
+  Vec3d getForce(const Vec3d& p, const Vec3d& v, const double t) const {
+    return m_force_functor(p, v, t);
+  }
+
+  void setForce(Functor t_functor) { m_force_functor = t_functor; }
+  void setForce(const Vec3d& t_f) { setForce(returnConstVecFunctor(t_f)); }
+
+  void reset() {
+    m_model.states().position = getInitialPosition();
+    m_model.states().velocity.setZero();
+  }
+
+  bool update(const Vec3d& p, const Vec3d& v, const double t, const double dt) {
+    return true;
+  }
+
+ private:
+  Functor returnConstVecFunctor(const Vec3d& v) {
+    return [v](const Vec3d&, const Vec3d&, const double) { return v; };
+  }
+
+  void setForceDefault() { setForce(returnConstVecFunctor(kVec3dZero)); }
+
+ private:
+  Model m_model;
+  Vec3d m_initial_position;
+  Functor m_accel_functor;
+  Functor m_force_functor;
+};
+
+BipedFootModelSimulator::BipedFootModelSimulator() : m_impl(new Impl) {}
+BipedFootModelSimulator::BipedFootModelSimulator(const Data& t_data)
+    : m_impl(new Impl(t_data)) {}
+BipedFootModelSimulator::BipedFootModelSimulator(const Model& t_model)
+    : m_impl(new Impl(t_model)) {}
+
+BipedFootModelSimulator::BipedFootModelSimulator(BipedFootModelSimulator&&) =
+    default;
+BipedFootModelSimulator& BipedFootModelSimulator::operator=(
+    BipedFootModelSimulator&&) = default;
+BipedFootModelSimulator::~BipedFootModelSimulator() = default;
+
+const BipedFootModel& BipedFootModelSimulator::model() const {
+  return m_impl->model();
+}
+
+Vec3d BipedFootModelSimulator::getInitialPosition() const {
+  return m_impl->getInitialPosition();
+}
+
+BipedFootModelSimulator& BipedFootModelSimulator::setInitialPosition() {
+  return setInitialPosition(model().position());
+}
+
+BipedFootModelSimulator& BipedFootModelSimulator::setInitialPosition(
+    const Vec3d& t_p0) {
+  m_impl->setInitialPosition(t_p0);
+  return *this;
+}
+
+// Vec3d BipedFootModelSimulator::getAccel(const Vec3d& p, const Vec3d& v,
+//                                         const double t) const {}
+
+Vec3d BipedFootModelSimulator::getForce(const Vec3d& p, const Vec3d& v,
+                                        const double t) const {
+  return m_impl->getForce(p, v, t);
+}
+
+BipedFootModelSimulator& BipedFootModelSimulator::setForce(Functor t_functor) {
+  m_impl->setForce(t_functor);
+  return *this;
+}
+
+BipedFootModelSimulator& BipedFootModelSimulator::setForce(const Vec3d& t_f) {
+  m_impl->setForce(t_f);
+  return *this;
+}
+
+BipedFootModelSimulator& BipedFootModelSimulator::reset() {
+  m_impl->reset();
+  resetTime();
+  return *this;
+}
+
+BipedFootModelSimulator& BipedFootModelSimulator::reset(
+    const Vec3d& t_com_position) {
+  setInitialPosition(t_com_position);
+  return reset();
+}
+
+bool BipedFootModelSimulator::update() { return update(time_step()); }
+bool BipedFootModelSimulator::update(double dt) {
+  m_impl->update(model().position(), model().velocity(), time(), dt);
+  updateTime(dt);
+  return true;
+}
 
 }  // namespace holon

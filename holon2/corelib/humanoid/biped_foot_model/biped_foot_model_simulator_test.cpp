@@ -19,12 +19,183 @@
  */
 
 #include "holon2/corelib/humanoid/biped_foot_model/biped_foot_model_simulator.hpp"
+#include "holon2/corelib/humanoid/biped_foot_model.hpp"
 
 #include "holon2/corelib/common/random.hpp"
 #include "third_party/catch/catch.hpp"
 
 namespace holon {
 namespace {
+
+const double kDefaultTimeStep = 0.001;
+const Vec3d kDefaultPosition = Vec3d(0, 0, 0);
+const double kTOL = 1e-10;
+using ::Catch::Matchers::ApproxEquals;
+
+void checkCtor(const BipedFootModelSimulator& sim, const Vec3d& expected_p0) {
+  CHECK(sim.time() == 0.0);
+  CHECK(sim.time_step() == kDefaultTimeStep);
+  CHECK(sim.model().position() == expected_p0);
+  CHECK(sim.getInitialPosition() == expected_p0);
+}
+TEST_CASE("biped_foot_model_simulator: check c'tors",
+          "[BipedFootModel][BipedFootModelSimulator]") {
+  Random<Vec3d> rnd;
+  SECTION("default c'tor") {
+    BipedFootModelSimulator sim;
+    checkCtor(sim, kDefaultPosition);
+  }
+  SECTION("overloaded c'tor 1: with Data instance") {
+    BipedFootModelData data;
+    Vec3d v = rnd();
+    data.get<1>().position = v;
+    BipedFootModelSimulator sim(data);
+    checkCtor(sim, v);
+    CHECK(sim.model().data() == data);
+  }
+  SECTION("overloaded c'tor 2: with Model instance") {
+    Vec3d v = rnd();
+    auto model = BipedFootModelBuilder().setPosition(v).build();
+    BipedFootModelSimulator sim(model);
+    checkCtor(sim, v);
+    CHECK(sim.model().data() != model.data());
+  }
+}
+
+BipedFootModelStates& getStates(const BipedFootModel& model) {
+  return const_cast<BipedFootModelStates&>(model.states());
+}
+BipedFootModelParams& getParams(const BipedFootModel& model) {
+  return const_cast<BipedFootModelParams&>(model.params());
+}
+TEST_CASE("biped_foot_model_simulator: set initial position to the current one",
+          "[BipedFootModel][BipedFootModelSimulator]") {
+  Random<Vec3d> rnd;
+  BipedFootModelSimulator sim;
+  getStates(sim.model()).position = rnd();
+  const Vec3d p = sim.model().position();
+  REQUIRE(sim.getInitialPosition() != p);
+  sim.setInitialPosition();
+  CHECK(sim.getInitialPosition() == p);
+}
+
+TEST_CASE("biped_foot_model_simulator: set initial position to a specific one",
+          "[BipedFootModel][BipedFootModelSimulator]") {
+  Random<Vec3d> rnd;
+  BipedFootModelSimulator sim;
+  const Vec3d p0 = rnd();
+  sim.setInitialPosition(p0);
+  CHECK(sim.getInitialPosition() == p0);
+}
+
+BipedFootModel getRandomModel() {
+  double mass = Random<double>(0, 2).get();
+  Vec3d p0 = Random<Vec3d>(-1, 1).get();
+  BipedFootModelBuilder b;
+  b.setMass(mass).setPosition(p0);
+  return b.build();
+}
+
+Vec3d calculateForceExample(const Vec3d& p, const Vec3d& v,
+                            const double /* t */) {
+  double k1 = 10;
+  double k2 = 0.1;
+  return k1 * p + k2 * v;
+}
+
+TEST_CASE("biped_foot_model_simulator: set force functor",
+          "[BipedFootModel][BipedFootModelSimulator]") {
+  Random<Vec3d> rnd;
+  BipedFootModelSimulator sim;
+  Vec3d p = rnd();
+  Vec3d v = rnd();
+
+  SECTION("default force") { CHECK(sim.getForce(p, v, 0) == kVec3dZero); }
+  SECTION("set constant force") {
+    Vec3d f = rnd();
+    sim.setForce(f);
+    CHECK(sim.getForce(p, v, 0) == f);
+  }
+  SECTION("set force functor") {
+    sim.setForce(calculateForceExample);
+    Vec3d f = calculateForceExample(p, v, 0);
+    CHECK(sim.getForce(p, v, 0) == f);
+  }
+}
+
+TEST_CASE("biped_foot_model_simulator: update current time",
+          "[BipedFootModel][BipedFootModelSimulator]") {
+  BipedFootModelSimulator sim;
+  Random<double> rnd(0, 0.01);
+  SECTION("update with default time step") {
+    REQUIRE(sim.time() == 0.0);
+    sim.update();
+    CHECK(sim.time() == kDefaultTimeStep);
+    sim.update();
+    CHECK(sim.time() == 2 * kDefaultTimeStep);
+  }
+  SECTION("modify time step") {
+    auto dt = rnd();
+    REQUIRE(sim.time() == 0.0);
+    sim.setTimeStep(dt);
+    sim.update();
+    CHECK(sim.time() == dt);
+    sim.update();
+    CHECK(sim.time() == 2 * dt);
+  }
+  SECTION("modify time step temporariliy") {
+    auto dt1 = rnd();
+    REQUIRE(sim.time() == 0.0);
+    sim.update(dt1);
+    CHECK(sim.time() == dt1);
+    CHECK(sim.time_step() == kDefaultTimeStep);
+    auto dt2 = rnd();
+    sim.update(dt2);
+    CHECK(sim.time() == dt1 + dt2);
+    CHECK(sim.time_step() == kDefaultTimeStep);
+  }
+}
+
+TEST_CASE("biped_foot_model_simulator: reset time",
+          "[BipedFootModel][BipedFootModelSimulator]") {
+  BipedFootModelSimulator sim;
+  sim.update();
+  REQUIRE(sim.time() != 0.0);
+  sim.reset();
+  CHECK(sim.time() == 0.0);
+}
+
+TEST_CASE("biped_foot_model_simulator: reset position at initial one",
+          "[BipedFootModel][BipedFootModelSimulator]") {
+  Random<Vec3d> rnd;
+  auto model = getRandomModel();
+  const Vec3d p0 = model.position();
+  BipedFootModelSimulator sim(model);
+  getStates(sim.model()).position = rnd();
+  getStates(sim.model()).velocity = rnd();
+  REQUIRE(sim.model().position() != p0);
+  REQUIRE(sim.model().velocity() != kVec3dZero);
+  sim.reset();
+  CHECK(sim.model().position() == p0);
+  CHECK(sim.model().velocity() == kVec3dZero);
+  CHECK(sim.getInitialPosition() == p0);
+}
+
+TEST_CASE("biped_foot_model_simulator: reset position at specific one",
+          "[BipedFootModel][BipedFootModelSimulator]") {
+  Random<Vec3d> rnd;
+  auto model = getRandomModel();
+  const Vec3d p = rnd();
+  BipedFootModelSimulator sim(model);
+  getStates(sim.model()).position = rnd();
+  getStates(sim.model()).velocity = rnd();
+  REQUIRE(sim.model().position() != p);
+  REQUIRE(sim.model().velocity() != kVec3dZero);
+  sim.reset(p);
+  CHECK(sim.model().position() == p);
+  CHECK(sim.model().velocity() == kVec3dZero);
+  CHECK(sim.getInitialPosition() == p);
+}
 
 TEST_CASE("biped_foot_model_simulator: ",
           "[BipedFootModel][BipedFootModelSimulator]") {}

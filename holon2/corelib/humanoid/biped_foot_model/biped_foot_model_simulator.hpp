@@ -30,7 +30,54 @@ namespace holon {
 
 class BipedFootModel;
 
-class BipedFootModelSimulator : public Simulator {};
+class BipedFootModelSimulator : public Simulator {
+  using Self = BipedFootModelSimulator;
+
+ public:
+  using Data = BipedFootModelData;
+  using Model = BipedFootModel;
+  using Functor =
+      std::function<Vec3d(const Vec3d&, const Vec3d&, const double)>;
+
+ public:
+  // constructors
+  BipedFootModelSimulator();
+  explicit BipedFootModelSimulator(const Data& t_data);
+  explicit BipedFootModelSimulator(const Model& t_model);
+
+  // special member functions
+  BipedFootModelSimulator(const BipedFootModelSimulator&) = delete;
+  BipedFootModelSimulator& operator=(const BipedFootModelSimulator&) = delete;
+  BipedFootModelSimulator(BipedFootModelSimulator&&);
+  BipedFootModelSimulator& operator=(BipedFootModelSimulator&&);
+  virtual ~BipedFootModelSimulator();
+
+  // accessors
+  const Model& model() const;
+  Vec3d getInitialPosition() const;
+
+  // mutators
+  Self& setInitialPosition();
+  Self& setInitialPosition(const Vec3d& t_p0);
+
+  // computations
+  Vec3d getAccel(const Vec3d& p, const Vec3d& v, const double t) const;
+  Vec3d getForce(const Vec3d& p, const Vec3d& v, const double t) const;
+
+  // set functors
+  Self& setForce(Functor t_functor);
+  Self& setForce(const Vec3d& t_f);
+
+  // update
+  Self& reset() final;
+  Self& reset(const Vec3d& t_com_position);
+  bool update() final;
+  bool update(double dt) final;
+
+ private:
+  class Impl;
+  std::unique_ptr<Impl> m_impl;
+};
 
 }  // namespace holon
 

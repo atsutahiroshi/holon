@@ -70,7 +70,7 @@ TEST_CASE(
   ComZmpModelSimulator sim;
   sim.setContactForceAsInput();
   sim.setContactForce(Vec3d(1, 1, 1));
-  while (sim.time() < 1) sim.update();
+  while (sim.time() < 1) sim.update(0.01);
   Vec3d p = sim.model().com_position();
   REQUIRE(sim.getInitialComPosition() != p);
   sim.setInitialComPosition();
@@ -401,7 +401,7 @@ TEST_CASE("com_zmp_model_simulator: reset COM position at initial one",
   ComZmpModelSimulator sim(model);
   sim.setContactForceAsInput();
   sim.setContactForce(Vec3d(1, 1, 1));
-  while (sim.time() < 1) sim.update();
+  while (sim.time() < 1) sim.update(0.01);
   REQUIRE(sim.model().com_position() != p0);
   REQUIRE(sim.model().com_velocity() != kVec3dZero);
   sim.reset();
@@ -417,7 +417,7 @@ TEST_CASE("com_zmp_model_simulator: reset COM position at specific one",
   ComZmpModelSimulator sim(model);
   sim.setContactForceAsInput();
   sim.setContactForce(Vec3d(1, 1, 1));
-  while (sim.time() < 1) sim.update();
+  while (sim.time() < 1) sim.update(0.01);
   REQUIRE(sim.model().com_position() != p);
   REQUIRE(sim.model().com_velocity() != kVec3dZero);
   sim.reset(p);

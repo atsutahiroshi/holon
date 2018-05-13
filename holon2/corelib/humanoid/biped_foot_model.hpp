@@ -23,6 +23,7 @@
 
 #include "holon2/corelib/humanoid/biped_foot_model/biped_foot_model_builder.hpp"
 #include "holon2/corelib/humanoid/biped_foot_model/biped_foot_model_data.hpp"
+#include "holon2/corelib/humanoid/biped_foot_model/biped_foot_model_simulator.hpp"
 
 namespace holon {
 

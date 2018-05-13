@@ -48,7 +48,10 @@ void BipedFootController::setDefaultParameters() {
   params().max_height = default_max_height;
 }
 
-void BipedFootController::setupSimulator() {}
+void BipedFootController::setupSimulator() {
+  //
+  m_sim.setInitialPosition();
+}
 
 void BipedFootController::copyModelData(const Model& t_model) {
   m_data.copy(t_model.data(), IndexSeq<0, 1>(), IndexSeq<0, 1>());
@@ -80,9 +83,18 @@ BipedFootController& BipedFootController::feedback(
   return *this;
 }
 
+void BipedFootController::updateOutputs() {
+  outputs().position = states().position;
+  outputs().velocity = states().velocity;
+  outputs().acceleration = states().acceleration;
+  outputs().force = states().force;
+}
+
 bool BipedFootController::update() { return update(time_step()); }
+
 bool BipedFootController::update(double t_time_step) {
   m_sim.update(t_time_step);
+  updateOutputs();
   return true;
 }
 

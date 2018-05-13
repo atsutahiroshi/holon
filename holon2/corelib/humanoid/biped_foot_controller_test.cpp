@@ -181,8 +181,11 @@ TEST_CASE("biped_foot_controller: reset time", "[BipedFootController]") {
   CHECK(ctrl.time() == 0.0);
 }
 
-BipedFootModelStates& getStates(const BipedFootController& ctrl) {
+BipedFootModelStates& getStatesRef(const BipedFootController& ctrl) {
   return const_cast<BipedFootModelStates&>(ctrl.states());
+}
+BipedFootControllerParams& getParamsRef(const BipedFootController& ctrl) {
+  return const_cast<BipedFootControllerParams&>(ctrl.params());
 }
 TEST_CASE("biped_foot_controller: reset position at initial one",
           "[BipedFootController]") {
@@ -190,7 +193,7 @@ TEST_CASE("biped_foot_controller: reset position at initial one",
   const Vec3d p0 = model.position();
   Random<Vec3d> rnd(-0.1, 0.1);
   BipedFootController ctrl(model);
-  auto& states = getStates(ctrl);
+  auto& states = getStatesRef(ctrl);
   states.position = p0 + rnd();
   states.velocity = rnd();
   REQUIRE(ctrl.model().position() != p0);
@@ -207,7 +210,7 @@ TEST_CASE("biped_foot_controller: reset position at a specific one",
   auto model = getRandomModel();
   const Vec3d p = Vec3d::Random();
   BipedFootController ctrl(model);
-  auto& states = getStates(ctrl);
+  auto& states = getStatesRef(ctrl);
   states.velocity = Vec3d::Random();
   REQUIRE(ctrl.model().position() != p);
   REQUIRE(ctrl.model().velocity() != kVec3dZero);
@@ -239,6 +242,18 @@ TEST_CASE("biped_foot_controller: feedback states", "[BipedFootController]") {
     CHECK(ctrl.model().position() == p);
     CHECK(ctrl.model().velocity() == v);
   }
+}
+
+TEST_CASE("biped_foot_controller: check outputs after update",
+          "[BipedFootController]") {
+  const auto model = getRandomModel();
+  BipedFootController ctrl(model);
+  while (ctrl.time() < 0.1) ctrl.update();
+  const auto& c = ctrl;
+  CHECK(c.outputs().position == ctrl.model().position());
+  CHECK(c.outputs().velocity == ctrl.model().velocity());
+  CHECK(c.outputs().acceleration == ctrl.model().acceleration());
+  CHECK(c.outputs().force == ctrl.model().force());
 }
 
 TEST_CASE("biped_foot_controller: ", "[BipedFootController]") {}

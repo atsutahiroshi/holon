@@ -256,6 +256,25 @@ TEST_CASE("biped_foot_controller: check outputs after update",
   CHECK(c.outputs().force == ctrl.model().force());
 }
 
+SCENARIO("biped_foot_controller: track position", "[BipedFootController]") {
+  GIVEN("initial position is (1, 1, 1)") {
+    BipedFootController ctrl;
+    const Vec3d p0(1, 1, 1);
+    ctrl.reset(p0);
+
+    WHEN("desired position is given at (0, 0, 0) and update for 10 sec") {
+      const Vec3d pd(0, 0, 0);
+      auto& params = getParamsRef(ctrl);
+      params.position = pd;
+      while (ctrl.time() < 10) ctrl.update(0.01);
+
+      THEN("position converges at the desired position") {
+        CHECK_THAT(ctrl.model().position(), ApproxEquals(pd, kTOL));
+        CHECK_THAT(ctrl.model().velocity(), ApproxEquals(kVec3dZero, kTOL));
+      }
+    }
+  }
+}
 TEST_CASE("biped_foot_controller: ", "[BipedFootController]") {}
 
 }  // namespace

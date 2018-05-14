@@ -94,6 +94,8 @@ class BipedFootController {
   }
   void copyModelData(const Model& t_model);
 
+  Functor getForceFunctor() const;
+
  private:
   void setDefaultParameters();
   void setupSimulator();

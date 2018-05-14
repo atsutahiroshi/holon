@@ -49,8 +49,8 @@ void BipedFootController::setDefaultParameters() {
 }
 
 void BipedFootController::setupSimulator() {
-  //
   m_sim.setInitialPosition();
+  m_sim.setForce(getForceFunctor());
 }
 
 void BipedFootController::copyModelData(const Model& t_model) {
@@ -96,6 +96,15 @@ bool BipedFootController::update(double t_time_step) {
   m_sim.update(t_time_step);
   updateOutputs();
   return true;
+}
+
+BipedFootController::Functor BipedFootController::getForceFunctor() const {
+  return [this](const Vec3d& p, const Vec3d& v, const double) -> Vec3d {
+    Vec3d f;
+    f = params().stiffness.cwiseProduct(params().position - p) +
+        params().damping.cwiseProduct(params().velocity - v);
+    return f;
+  };
 }
 
 }  // namespace holon

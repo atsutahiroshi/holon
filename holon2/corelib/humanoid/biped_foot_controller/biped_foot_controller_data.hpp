@@ -29,8 +29,8 @@ namespace holon {
 struct BipedFootControllerParams {
   Vec3d position;
   Vec3d velocity;
-  Array3d stiffness;
-  Array3d damping;
+  Vec3d stiffness;
+  Vec3d damping;
   double max_height;
 };
 struct BipedFootControllerOutputs {

@@ -104,9 +104,9 @@ TEST_CASE("biped_foot_controller: accessor to control parameters",
   BipedFootControllerData data;
   auto& params = data.get<2>();
   Random<double> rnd;
-  Random<Array3d> arr;
-  params.stiffness = arr();
-  params.damping = arr();
+  Random<Vec3d> vec;
+  params.stiffness = vec();
+  params.damping = vec();
   params.max_height = rnd();
   const BipedFootController ctrl(data);
   for (auto i = 0; i < 3; ++i) {

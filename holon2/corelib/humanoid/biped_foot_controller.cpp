@@ -22,8 +22,8 @@
 
 namespace holon {
 
-const Array3d BipedFootController::default_stiffness = {{3000, 3000, 3000}};
-const Array3d BipedFootController::default_damping = {{200, 200, 200}};
+const Vec3d BipedFootController::default_stiffness = {3000, 3000, 3000};
+const Vec3d BipedFootController::default_damping = {200, 200, 200};
 const double BipedFootController::default_max_height = 0;
 
 BipedFootController::BipedFootController() : BipedFootController(Data()) {}

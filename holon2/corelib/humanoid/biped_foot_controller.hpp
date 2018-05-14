@@ -38,8 +38,8 @@ class BipedFootController {
   using Functor = BipedFootModelSimulator::Functor;
 
  public:
-  static const Array3d default_stiffness;
-  static const Array3d default_damping;
+  static const Vec3d default_stiffness;
+  static const Vec3d default_damping;
   static const double default_max_height;
 
  public:
